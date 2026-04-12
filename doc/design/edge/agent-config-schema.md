@@ -64,13 +64,24 @@ AgentSection {
 
 ```text
 ControlPlaneSection {
-  endpoint
-  tls_mode
-  auth_mode
+  enabled
+  endpoint?
+  tls_mode?
+  auth_mode?
 }
 ```
 
-第一版只要求最小连接信息。
+第一版建议：
+
+- `enabled = false` 表示 `standalone` 模式
+- `enabled = true` 表示 `managed` 模式
+- 当 `enabled = false` 时，`endpoint / tls_mode / auth_mode` 可为空
+- 当 `enabled = true` 时，`endpoint` 为必填
+
+也就是说：
+
+- 是否连接中心节点，必须是显式配置
+- 没有中心节点不是异常态，而是一种受支持运行模式
 
 ---
 

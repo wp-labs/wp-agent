@@ -4,7 +4,7 @@
 
 本文档把 [`agentd-state-and-boundaries.md`](agentd-state-and-boundaries.md) 中的本地状态模型进一步收敛成字段级 schema 草案。
 
-目标是让 `M2 Agentd Skeleton` 可以直接围绕这些本地状态对象实现：
+目标是让 `M3 Edge Runtime Skeleton` 可以直接围绕这些本地状态对象实现：
 
 - `agent_runtime.json`
 - `execution_queue.json`

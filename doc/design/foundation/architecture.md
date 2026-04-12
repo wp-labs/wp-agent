@@ -24,6 +24,7 @@
 - [`container-metrics-spec.md`](../telemetry/container-metrics-spec.md)：`container_metrics` 的字段、发现和资源绑定规格
 - [`k8s-node-pod-metrics-spec.md`](../telemetry/k8s-node-pod-metrics-spec.md)：`k8s_node_pod_metrics` 的字段、发现和资源绑定规格
 - [`metrics-discovery-and-resource-mapping.md`](../telemetry/metrics-discovery-and-resource-mapping.md)：metrics discovery 和 resource mapping 的公共规则
+- [`telemetry-uplink-and-warp-parse.md`](../telemetry/telemetry-uplink-and-warp-parse.md)：数据面上报目标、`warp-parse` 角色边界和统一接收器设计
 - [`action-dsl.md`](../execution/action-dsl.md)：动作作者 DSL、执行 IR、opcode 白名单和编译边界
 - [`control-plane.md`](../center/control-plane.md)：控制对象、状态机、下发协议与编排闭环
 - [`control-center-architecture.md`](../center/control-center-architecture.md)：中心控制系统的模块边界、存储、通路与部署形态
@@ -63,6 +64,8 @@
   CPU、内存、buffer、线程、连接都必须有明确上限
 - 默认可退化：
   资源紧张、网络异常、中心不可达时，优先退化观测能力而不是拖垮宿主机
+- 中心可选：
+  中心节点用于治理、编排和全局分析，但不是边缘数据面运行的前置条件
 - 中心治理：
   AI、统一策略、升级编排、远程执行、审计、权限都放到中心节点
 - 边缘确定性：
@@ -148,6 +151,8 @@
 
 - 控制面异常不应直接阻断数据面本地采集
 - 数据面拥塞时不应让控制面完全失联
+- 没有中心节点时，边缘数据面仍应继续独立工作
+- 没有中心节点时，依赖中心编排的远程任务默认不可用
 - AI 只能影响中心节点的建议和编排，不能直接成为边缘热路径依赖
 
 ---
@@ -177,6 +182,22 @@
 - AI 服务
 
 早期可以先单体实现，后续再按负载和隔离需求拆分成多个服务。
+
+### 4.3 运行模式
+
+`wp-agent` 第一版应明确支持两种运行模式：
+
+- `standalone`
+  没有中心控制节点，边缘本地完成采集、发现、标准化、缓冲和上送
+- `managed`
+  接入中心控制节点，在 `standalone` 基础上增加策略、远程任务、升级编排和集中治理
+
+两种模式的边界应固定为：
+
+- 数据面能力两者都可用
+- 本地状态、自观测、保护模式两者都可用
+- 远程任务只在 `managed` 模式下可用
+- 中心编排升级只在 `managed` 模式下可用
 
 ---
 
@@ -761,6 +782,7 @@ AI 不应直接拥有：
 - 采集、发现、上送、升级、远程执行必须分模块隔离，避免单点高成本任务拖垮整机
 - 所有队列和 buffer 必须有硬上限，避免无限堆积
 - agent 必须能在中心不可达时继续本地有限采集，但不能无限增长本地成本
+- agent 必须能在没有中心节点时长期稳定运行数据面，而不是只支持“中心短时不可达”
 - 高优先级信号和低优先级信号必须支持优先级分层
 - 升级和远程执行与采集热路径隔离，避免控制动作压制数据面
 - 退化和保护模式必须是架构内建能力，不是事后补丁
@@ -774,11 +796,16 @@ AI 不应直接拥有：
 
 先打通最小闭环：
 
-- agent 注册
 - 基础输入
 - 基础发现
 - 统一事件封装
 - 本地 buffer
+- 本地上送或本地输出
+- standalone 运行模式
+
+如果中心节点同时存在，再叠加：
+
+- agent 注册
 - 中心接收
 - 基础资源目录
 

@@ -16,6 +16,7 @@
 - [`target.md`](../foundation/target.md)
 - [`architecture.md`](../foundation/architecture.md)
 - [`roadmap.md`](../foundation/roadmap.md)
+- [`telemetry-uplink-and-warp-parse.md`](telemetry-uplink-and-warp-parse.md)
 
 ---
 

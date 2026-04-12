@@ -6,8 +6,8 @@
 
 它主要服务于 [`roadmap.md`](../foundation/roadmap.md) 中的：
 
-- `M2 Agentd Skeleton`
-- `M4 Local Edge Loop`
+- `M3 Edge Runtime Skeleton`
+- `M5 Controlled Action MVP`
 
 相关文档：
 
@@ -38,6 +38,28 @@
 - `wp-agentd` 负责控制
 - `wp-agent-exec` 负责执行
 - `wp-agent-upgrader` 负责升级辅助
+
+### 2.1 运行模式
+
+`wp-agentd` 第一版应明确支持两种运行模式：
+
+- `standalone`
+- `managed`
+
+`standalone` 模式下：
+
+- 没有中心控制节点也能启动和常驻运行
+- 本地采集、发现、标准化、缓冲、上送、自观测继续工作
+- 本地状态机和保护模式继续工作
+- 不接收远程下发的 `ActionPlan`
+
+`managed` 模式下：
+
+- 在 `standalone` 模式能力基础上接入中心节点
+- 启用会话、心跳、能力上报
+- 启用远程任务与中心编排升级
+
+这个区分必须是架构级约束，而不是实现阶段的临时兼容。
 
 ---
 
@@ -91,6 +113,7 @@
 负责：
 
 - 本地静态配置加载
+- 判定当前是 `standalone` 还是 `managed`
 - 策略版本记录
 - 动态配置切换
 - 运行时 feature gate
@@ -105,6 +128,12 @@
 - 交给 `plan_validator`
 
 第一版它只需要支持动作计划，不必一开始就把所有控制对象都做全。
+
+在 `standalone` 模式下它应表现为：
+
+- 不建立中心会话
+- 不接收远程计划
+- 不影响其他本地模块启动
 
 ### 5.4 `plan_validator`
 
@@ -160,6 +189,8 @@
 第一版应明确：
 
 - 升级任务优先与远程动作任务互斥
+- `managed` 模式下可接中心编排升级
+- `standalone` 模式下至少应支持本地升级辅助，不应阻断 agent 正常运行
 
 ### 5.8 `result_aggregator`
 
@@ -199,6 +230,7 @@
 - 暴露运行中任务数
 - 暴露拒绝计数
 - 暴露执行失败计数
+- 暴露当前运行模式和中心连接状态
 
 ---
 
@@ -213,6 +245,10 @@
 - `result_aggregator` 只管收敛结果，不决定重试策略
 
 这几个边界不能在实现中重新耦合，否则后面会很快失控。
+
+还要补一条运行约束：
+
+- `control_receiver` 不在线时，不得影响数据面和本地守护主循环存活
 
 ---
 
@@ -387,9 +423,9 @@
 
 ---
 
-## 14. M2 需要冻结的最小内容
+## 14. M3 需要冻结的最小内容
 
-为了真正启动 `M2 Agentd Skeleton`，至少需要先冻结：
+为了真正启动 `M3 Edge Runtime Skeleton`，至少需要先冻结：
 
 - `wp-agentd` 模块列表
 - 本地状态机

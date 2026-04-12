@@ -9,8 +9,8 @@
 
 它直接服务于：
 
-- `M2 Agentd Skeleton`
-- `M4 Local Edge Loop`
+- `M3 Edge Runtime Skeleton`
+- `M5 Controlled Action MVP`
 
 相关文档：
 

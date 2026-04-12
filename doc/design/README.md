@@ -11,7 +11,7 @@
 - `center/`
   控制中心、控制平面、Gateway 协议、计划投递与结果回报 schema
 - `telemetry/`
-  metrics 集成、discovery、resource mapping 与 Batch A 规格
+  metrics 集成、discovery、resource mapping、uplink 设计与 Batch A 规格
 
 建议阅读顺序：
 
@@ -22,3 +22,4 @@
 5. [edge/agentd-architecture.md](./edge/agentd-architecture.md)
 6. [center/control-center-architecture.md](./center/control-center-architecture.md)
 7. [telemetry/metrics-integration-roadmap.md](./telemetry/metrics-integration-roadmap.md)
+8. [telemetry/telemetry-uplink-and-warp-parse.md](./telemetry/telemetry-uplink-and-warp-parse.md)
