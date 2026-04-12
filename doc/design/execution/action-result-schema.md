@@ -54,7 +54,7 @@ ActionResult {
 
 ### 3.1 固定值
 
-- `api_version = "v1alpha1"`
+- `api_version = "v1"`
 - `kind = "action_result"`
 
 ### 3.2 必选字段
@@ -176,7 +176,7 @@ ExecutionResourceUsage {
 
 ```json
 {
-  "api_version": "v1alpha1",
+  "api_version": "v1",
   "kind": "action_result",
   "action_id": "act_01",
   "execution_id": "exec_01",

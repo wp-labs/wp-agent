@@ -68,7 +68,7 @@ ActionPlan {
 
 ### 3.3 固定值
 
-- `api_version = "v1alpha1"`
+- `api_version = "v1"`
 - `kind = "action_plan"`
 
 ---
@@ -390,7 +390,7 @@ ActionPlanProvenance {
 
 ```json
 {
-  "api_version": "v1alpha1",
+  "api_version": "v1",
   "kind": "action_plan",
   "meta": {
     "action_id": "act_01",

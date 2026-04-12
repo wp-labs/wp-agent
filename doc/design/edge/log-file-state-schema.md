@@ -73,7 +73,7 @@ FileLogCheckpointState {
 字段说明：
 
 - `schema_version`
-  第一版固定为 `v1alpha1`
+  第一版固定为 `v1`
 - `input_id`
   对应 `logs.file_inputs[].id`
 - `updated_at`
@@ -228,7 +228,7 @@ TrackedFileCheckpoint {
 
 ```json
 {
-  "schema_version": "v1alpha1",
+  "schema_version": "v1",
   "input_id": "nginx_access",
   "updated_at": "2026-04-12T10:00:00Z",
   "files": [

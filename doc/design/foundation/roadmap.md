@@ -185,8 +185,8 @@
 
 子任务：
 
-- 定义 `ActionPlan v1alpha1`
-- 定义 `ActionResult v1alpha1`
+- 定义 `ActionPlan v1`
+- 定义 `ActionResult v1`
 - 定义 `CapabilityReport`
 - 定义 `DispatchActionPlan / ActionPlanAck / ReportActionResult`
 - 定义 `agent-config` 主配置骨架

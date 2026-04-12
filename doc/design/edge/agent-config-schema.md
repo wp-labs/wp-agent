@@ -43,7 +43,7 @@ AgentConfig {
 
 第一版固定：
 
-- `schema_version = "v1alpha1"`
+- `schema_version = "v1"`
 
 ---
 

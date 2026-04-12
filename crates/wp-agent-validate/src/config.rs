@@ -1,12 +1,12 @@
 //! Config validation entrypoints.
 
-use wp_agent_contracts::SCHEMA_VERSION_V1ALPHA1;
+use wp_agent_contracts::SCHEMA_VERSION_V1;
 use wp_agent_contracts::agent_config::AgentConfigContract;
 
 use crate::{ValidationError, require_non_empty};
 
 pub fn validate_config(contract: &AgentConfigContract) -> Result<(), ValidationError> {
-    if contract.schema_version != SCHEMA_VERSION_V1ALPHA1 {
+    if contract.schema_version != SCHEMA_VERSION_V1 {
         return Err(ValidationError::new("invalid_schema_version"));
     }
     if contract.control_plane.enabled {

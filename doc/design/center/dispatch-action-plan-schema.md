@@ -47,7 +47,7 @@ DispatchActionPlan {
 
 ### 3.1 固定值
 
-- `api_version = "v1alpha1"`
+- `api_version = "v1"`
 - `kind = "dispatch_action_plan"`
 
 ### 3.2 必选字段
@@ -144,7 +144,7 @@ plan: ActionPlan
 
 ```json
 {
-  "api_version": "v1alpha1",
+  "api_version": "v1",
   "kind": "dispatch_action_plan",
   "dispatch_id": "dsp_01",
   "action_id": "act_01",
@@ -156,7 +156,7 @@ plan: ActionPlan
     "ack_deadline_at": "2026-04-12T10:00:05Z"
   },
   "plan": {
-    "api_version": "v1alpha1",
+    "api_version": "v1",
     "kind": "action_plan",
     "meta": {
       "action_id": "act_01",

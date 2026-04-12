@@ -1,5 +1,5 @@
 {
-  "schema_version": "v1alpha1",
+  "schema_version": "v1",
   "agent_id": "agent-001",
   "instance_id": "instance-001",
   "version": "0.1.0",

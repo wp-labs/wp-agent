@@ -2,13 +2,13 @@
 
 use std::collections::BTreeSet;
 
-use wp_agent_contracts::API_VERSION_V1ALPHA1;
+use wp_agent_contracts::API_VERSION_V1;
 use wp_agent_contracts::action_plan::{ACTION_PLAN_KIND, ActionPlanContract};
 
 use crate::{ValidationError, parse_rfc3339, require_non_empty};
 
 pub fn validate_action_plan(contract: &ActionPlanContract) -> Result<(), ValidationError> {
-    if contract.api_version != API_VERSION_V1ALPHA1 {
+    if contract.api_version != API_VERSION_V1 {
         return Err(ValidationError::new("invalid_api_version"));
     }
     if contract.kind != ACTION_PLAN_KIND {

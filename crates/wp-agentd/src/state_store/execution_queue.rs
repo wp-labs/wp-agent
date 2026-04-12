@@ -4,7 +4,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
-use wp_agent_contracts::SCHEMA_VERSION_V1ALPHA1;
+use wp_agent_contracts::SCHEMA_VERSION_V1;
 use wp_agent_shared::fs::{read_json, write_json_atomic};
 use wp_agent_shared::paths::EXECUTION_QUEUE_FILE;
 use wp_agent_shared::time::now_rfc3339;
@@ -20,7 +20,7 @@ pub struct ExecutionQueueState {
 impl ExecutionQueueState {
     pub fn new() -> Self {
         Self {
-            schema_version: SCHEMA_VERSION_V1ALPHA1.to_string(),
+            schema_version: SCHEMA_VERSION_V1.to_string(),
             updated_at: now_rfc3339(),
             items: Vec::new(),
         }

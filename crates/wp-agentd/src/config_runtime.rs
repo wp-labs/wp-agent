@@ -208,7 +208,7 @@ mod tests {
             &config_path,
             format!(
                 r#"
-schema_version = "v1alpha1"
+schema_version = "v1"
 
 [agent]
 environment_id = "prod"

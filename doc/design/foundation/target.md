@@ -6,8 +6,8 @@
 - [`glossary.md`](glossary.md)：统一术语词典、推荐用法、禁止混用词和作者侧/执行侧术语边界
 - [`security-model.md`](security-model.md)：身份、权限、审批、审计、升级与远程执行安全边界
 - [`action-plan-ir.md`](../execution/action-plan-ir.md)：边缘唯一执行契约、IR 对象模型、步骤语义、结果模型与校验规则
-- [`action-plan-schema.md`](../execution/action-plan-schema.md)：`ActionPlan v1alpha1` 的字段级 schema、步骤类型与约束定义
-- [`action-result-schema.md`](../execution/action-result-schema.md)：`ActionResult v1alpha1` 和 `StepActionRecord` 的字段级 schema
+- [`action-plan-schema.md`](../execution/action-plan-schema.md)：`ActionPlan v1` 的字段级 schema、步骤类型与约束定义
+- [`action-result-schema.md`](../execution/action-result-schema.md)：`ActionResult v1` 和 `StepActionRecord` 的字段级 schema
 - [`agentd-architecture.md`](../edge/agentd-architecture.md)：`wp-agentd` 模块拆分、本地状态机、调度职责与进程边界
 - [`agentd-exec-protocol.md`](../edge/agentd-exec-protocol.md)：`wp-agentd` 与 `wp-agent-exec` 的本地协议、工作目录、状态文件与取消机制
 - [`agentd-state-and-boundaries.md`](../edge/agentd-state-and-boundaries.md)：`wp-agentd` 的本地状态分层、唯一写入权、状态机拥有者与模块协作边界

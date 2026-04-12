@@ -52,7 +52,7 @@ ReportActionResult {
 
 ### 3.1 固定值
 
-- `api_version = "v1alpha1"`
+- `api_version = "v1"`
 - `kind = "report_action_result"`
 
 ### 3.2 必选字段
@@ -178,7 +178,7 @@ ResultAttestation {
 
 ```json
 {
-  "api_version": "v1alpha1",
+  "api_version": "v1",
   "kind": "report_action_result",
   "report_id": "rep_01",
   "dispatch_id": "dsp_01",
@@ -197,7 +197,7 @@ ResultAttestation {
   },
   "reported_at": "2026-04-12T10:00:03Z",
   "result": {
-    "api_version": "v1alpha1",
+    "api_version": "v1",
     "kind": "action_result",
     "action_id": "act_01",
     "execution_id": "exec_01",

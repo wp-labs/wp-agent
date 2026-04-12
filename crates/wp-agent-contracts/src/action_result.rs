@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::API_VERSION_V1ALPHA1;
+use crate::API_VERSION_V1;
 
 pub const ACTION_RESULT_KIND: &str = "action_result";
 
@@ -22,7 +22,7 @@ pub struct ActionResultContract {
 impl ActionResultContract {
     pub fn new(action_id: String, execution_id: String, final_status: FinalStatus) -> Self {
         Self {
-            api_version: API_VERSION_V1ALPHA1.to_string(),
+            api_version: API_VERSION_V1.to_string(),
             kind: ACTION_RESULT_KIND.to_string(),
             action_id,
             execution_id,

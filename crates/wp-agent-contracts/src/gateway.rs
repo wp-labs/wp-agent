@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::API_VERSION_V1ALPHA1;
+use crate::API_VERSION_V1;
 use crate::action_plan::ActionPlanContract;
 use crate::action_result::ActionResultContract;
 
@@ -30,7 +30,7 @@ pub struct DispatchActionPlan {
 impl DispatchActionPlan {
     pub fn new(dispatch_id: String, plan: ActionPlanContract) -> Self {
         Self {
-            api_version: API_VERSION_V1ALPHA1.to_string(),
+            api_version: API_VERSION_V1.to_string(),
             kind: DISPATCH_ACTION_PLAN_KIND.to_string(),
             dispatch_id,
             plan,
@@ -71,7 +71,7 @@ impl ActionPlanAck {
         acknowledged_at: String,
     ) -> Self {
         Self {
-            api_version: API_VERSION_V1ALPHA1.to_string(),
+            api_version: API_VERSION_V1.to_string(),
             kind: ACTION_PLAN_ACK_KIND.to_string(),
             dispatch_id,
             action_id,
@@ -124,7 +124,7 @@ impl ReportActionResult {
         result: ActionResultContract,
     ) -> Self {
         Self {
-            api_version: API_VERSION_V1ALPHA1.to_string(),
+            api_version: API_VERSION_V1.to_string(),
             report_id,
             kind: REPORT_ACTION_RESULT_KIND.to_string(),
             dispatch_id: None,

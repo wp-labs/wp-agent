@@ -84,7 +84,7 @@
 
 第一版固定：
 
-- `v1alpha1`
+- `v1`
 
 ---
 
@@ -322,7 +322,7 @@ RecentHistoryItem {
 
 ```json
 {
-  "schema_version": "v1alpha1",
+  "schema_version": "v1",
   "updated_at": "2026-04-12T10:00:00Z",
   "items": [
     {
@@ -344,7 +344,7 @@ RecentHistoryItem {
 
 ```json
 {
-  "schema_version": "v1alpha1",
+  "schema_version": "v1",
   "execution_id": "exec_01",
   "action_id": "act_01",
   "plan_digest": "sha256:abc123",

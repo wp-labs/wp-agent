@@ -47,7 +47,7 @@ CapabilityReport {
 
 第一版固定：
 
-- `schema_version = "v1alpha1"`
+- `schema_version = "v1"`
 
 ---
 
@@ -218,7 +218,7 @@ CapabilityLimits {
 
 ```json
 {
-  "schema_version": "v1alpha1",
+  "schema_version": "v1",
   "agent_id": "agent_prod_web_01",
   "instance_id": "inst_01",
   "reported_at": "2026-04-12T10:00:00Z",

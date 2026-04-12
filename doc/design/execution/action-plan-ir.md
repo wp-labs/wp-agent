@@ -580,7 +580,7 @@ IR 中真正的最小执行单位是 `step`。
 
 ```text
 ActionPlan {
-  api_version: "v1alpha1"
+  api_version: "v1"
   kind: "action_plan"
   meta: {
     action_id: "act_01"

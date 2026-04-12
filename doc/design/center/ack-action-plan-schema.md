@@ -54,7 +54,7 @@ ActionPlanAck {
 
 ### 3.1 固定值
 
-- `api_version = "v1alpha1"`
+- `api_version = "v1"`
 - `kind = "action_plan_ack"`
 
 ### 3.2 必选字段
@@ -171,7 +171,7 @@ AckAgentRuntimeSnapshot {
 
 ```json
 {
-  "api_version": "v1alpha1",
+  "api_version": "v1",
   "kind": "action_plan_ack",
   "dispatch_id": "dsp_01",
   "action_id": "act_01",

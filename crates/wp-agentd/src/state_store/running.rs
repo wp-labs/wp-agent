@@ -4,7 +4,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
-use wp_agent_contracts::SCHEMA_VERSION_V1ALPHA1;
+use wp_agent_contracts::SCHEMA_VERSION_V1;
 use wp_agent_shared::fs::{read_json, write_json_atomic};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -46,7 +46,7 @@ impl RunningExecutionState {
         updated_at: String,
     ) -> Self {
         Self {
-            schema_version: SCHEMA_VERSION_V1ALPHA1.to_string(),
+            schema_version: SCHEMA_VERSION_V1.to_string(),
             execution_id,
             action_id,
             plan_digest,

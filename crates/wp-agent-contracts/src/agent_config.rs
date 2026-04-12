@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::SCHEMA_VERSION_V1ALPHA1;
+use crate::SCHEMA_VERSION_V1;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -22,7 +22,7 @@ impl AgentConfigContract {
         execution: ExecutionSection,
     ) -> Self {
         Self {
-            schema_version: SCHEMA_VERSION_V1ALPHA1.to_string(),
+            schema_version: SCHEMA_VERSION_V1.to_string(),
             agent,
             control_plane,
             paths,

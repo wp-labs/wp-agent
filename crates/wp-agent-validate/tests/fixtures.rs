@@ -18,6 +18,10 @@ fn fixture_text(relative: &str) -> String {
     fs::read_to_string(path).expect("read fixture")
 }
 
+fn config_fixture(relative: &str) -> AgentConfigContract {
+    toml::from_str(&fixture_text(relative)).expect("deserialize config fixture")
+}
+
 #[test]
 fn action_plan_valid_fixture_passes() {
     let fixture: ActionPlanContract =
@@ -70,19 +74,14 @@ fn action_result_invalid_fixture_fails() {
 
 #[test]
 fn config_valid_fixture_passes() {
-    let fixture: AgentConfigContract =
-        serde_json::from_str(&fixture_text("contracts/config/valid/standalone.json"))
-            .expect("deserialize config fixture");
+    let fixture = config_fixture("contracts/config/valid/standalone.toml");
 
     validate_config(&fixture).expect("valid config");
 }
 
 #[test]
 fn config_invalid_fixture_fails() {
-    let fixture: AgentConfigContract = serde_json::from_str(&fixture_text(
-        "contracts/config/invalid/managed-missing-endpoint.json",
-    ))
-    .expect("deserialize config fixture");
+    let fixture = config_fixture("contracts/config/invalid/managed-missing-endpoint.toml");
 
     let err = validate_config(&fixture).expect_err("invalid config");
     assert_eq!(err.code, "missing_control_plane_endpoint");

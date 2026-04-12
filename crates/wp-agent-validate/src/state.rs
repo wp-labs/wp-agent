@@ -1,13 +1,13 @@
 //! Local state validation entrypoints.
 
-use wp_agent_contracts::SCHEMA_VERSION_V1ALPHA1;
+use wp_agent_contracts::SCHEMA_VERSION_V1;
 use wp_agent_contracts::state_exec::AgentRuntimeState;
 use wp_agent_contracts::state_logs::LogStateContract;
 
 use crate::{ValidationError, parse_rfc3339, require_non_empty};
 
 pub fn validate_execution_state(contract: &AgentRuntimeState) -> Result<(), ValidationError> {
-    if contract.schema_version != SCHEMA_VERSION_V1ALPHA1 {
+    if contract.schema_version != SCHEMA_VERSION_V1 {
         return Err(ValidationError::new("invalid_schema_version"));
     }
     require_non_empty(&contract.agent_id, "missing_runtime_agent_id")?;
@@ -18,7 +18,7 @@ pub fn validate_execution_state(contract: &AgentRuntimeState) -> Result<(), Vali
 }
 
 pub fn validate_log_state(contract: &LogStateContract) -> Result<(), ValidationError> {
-    if contract.schema_version != SCHEMA_VERSION_V1ALPHA1 {
+    if contract.schema_version != SCHEMA_VERSION_V1 {
         return Err(ValidationError::new("invalid_schema_version"));
     }
     require_non_empty(&contract.input_id, "missing_input_id")?;

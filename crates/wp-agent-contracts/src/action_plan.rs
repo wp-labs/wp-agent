@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::API_VERSION_V1ALPHA1;
+use crate::API_VERSION_V1;
 
 pub const ACTION_PLAN_KIND: &str = "action_plan";
 
@@ -27,7 +27,7 @@ impl ActionPlanContract {
         program: ActionPlanProgram,
     ) -> Self {
         Self {
-            api_version: API_VERSION_V1ALPHA1.to_string(),
+            api_version: API_VERSION_V1.to_string(),
             kind: ACTION_PLAN_KIND.to_string(),
             meta,
             target,
