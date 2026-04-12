@@ -107,10 +107,10 @@
 | 阶段 | 范围 | 目标 |
 |---|---|---|
 | P0 | M0-M3 | 冻结契约，补齐 standalone 边缘运行基线与三进程基础骨架 |
-| P1 | M4-M7 | 在 standalone 基础上叠加 managed 会话、执行闭环、资源发现和数据面底盘 |
-| P2 | M8-M11 | 打通中心治理、安装升级和安全审计闭环 |
-| P3 | M12-M14 | 打通多级树扩容和统一多信号能力 |
-| P4 | M15-M16 | 落地 AI / authoring 与世界级非功能验收 |
+| P1 | M4-M8 | 在 standalone 基础上叠加 managed 会话、执行闭环、资源发现和数据面底盘 |
+| P2 | M9-M14 | 打通中心治理、安装升级和安全审计闭环 |
+| P3 | M15-M18 | 打通多级树扩容和统一多信号能力 |
+| P4 | M19-M20 | 落地 AI / authoring 与世界级非功能验收 |
 
 ---
 
@@ -125,16 +125,20 @@
 | M4 | Gateway Session MVP | 打通 `hello`、heartbeat、capability 和会话管理 |
 | M5 | Controlled Action MVP | 打通本地执行闭环和首批只读 opcode |
 | M6 | Resource Discovery Foundation | 建立 host/process/container/pod/service 发现底盘 |
-| M7 | Telemetry Core + WarpParse Uplink + Batch A | 建立统一结构化 record 数据面，并通过 `warp-parse` 打通 Batch A |
-| M8 | Control Center MVP | 打通请求、审批、编译、签名、下发、ack、结果归档 |
-| M9 | Install Bootstrap MVP | 打通安装、首启、注册、版本落盘和本地恢复 |
-| M10 | Upgrade / Rollback MVP | 打通升级包、切换、健康检查、回滚和中心编排 |
-| M11 | Security / Audit Baseline + Hardening | 固化基线安全、审批绑定、审计和拒绝机制 |
-| M12 | Scale-Out Gateway | 做 gateway 分片、容量模型和 storm protection |
-| M13 | Tree Topology | 做多级树、relay、hop 路由和分层接入 |
-| M14 | Unified Signals Expansion | 扩展 logs / traces / security 与 Batch B/C telemetry |
-| M15 | AI 与 Authoring | 落地中心 AI 辅助与作者侧 frontend |
-| M16 | GA / World-Class NFR | 完成可靠性、压测、故障注入和上线门槛验收 |
+| M7 | Telemetry Core + WarpParse Uplink | 建立统一结构化 record 数据面，并通过 `warp-parse` 打通 `V1` 上报路径 |
+| M8 | Batch A Metrics | 落地 Batch A metrics 与统一 resource binding |
+| M9 | Control Center Core | 建立最小可用的中心控制核心与状态查询能力 |
+| M10 | Approval / Signing / Dispatch Closure | 打通审批、编译、签名、下发、ack、结果归档闭环 |
+| M11 | Install Bootstrap MVP | 打通安装、首启、注册、版本落盘和本地恢复 |
+| M12 | Upgrade / Rollback MVP | 打通升级包、切换、健康检查、回滚和中心编排 |
+| M13 | Security Baseline | 固化基线安全、最小权限与拒绝机制 |
+| M14 | Audit / Security Hardening | 固化审批绑定、全链路审计和篡改检测 |
+| M15 | Scale-Out Gateway | 做 gateway 分片、容量模型和 storm protection |
+| M16 | Tree Topology | 做多级树、relay、hop 路由和分层接入 |
+| M17 | Unified Signals Core | 扩展 logs / traces / security 与统一多信号关联 |
+| M18 | Telemetry Batch B/C Integrations | 扩展 Batch B/C telemetry integrations |
+| M19 | AI 与 Authoring | 落地中心 AI 辅助与作者侧 frontend |
+| M20 | GA / World-Class NFR | 完成可靠性、压测、故障注入和上线门槛验收 |
 
 ---
 
@@ -343,13 +347,13 @@
 
 - 依赖 M3
 
-### 6.8 M7 Telemetry Core + WarpParse Uplink + Batch A
+### 6.8 M7 Telemetry Core + WarpParse Uplink
 
 目标：
 
 - 建立边缘数据面底盘
 - 建立统一结构化文本 record
-- 通过 `warp-parse` 打通 `V1` 上报路径并落地 Batch A metrics
+- 通过 `warp-parse` 打通 `V1` 上报路径
 
 子任务：
 
@@ -359,19 +363,11 @@
 - 建立 `file / object_store` fallback target
 - 建立 OTel 对齐与统一 resource 绑定
 - 建立 telemetry budget 与 backpressure 基础实现
-- 建立 Batch A metrics：
-  - `host_metrics`
-  - `process_metrics`
-  - `container_metrics`
-  - `k8s_node_pod_metrics`
-  - `prom_scrape`
-  - `otlp_metrics_receiver`
 - 建立 `logs / metrics / traces / security` 到统一结构化 record 的编码规则
 - 建立批量 fixture、回放和采样测试
 
 验收标准：
 
-- 边缘侧可稳定输出 Batch A 指标
 - `wp-agentd` 可把多信号编码成统一结构化文本 record
 - `warp-parse` 可作为 `V1` 统一数据接收器稳定接收这些 record
 - 标准化结果可挂接统一 resource 语义
@@ -382,40 +378,87 @@
 - 依赖 M3
 - 依赖 M6
 
-
-### 6.9 M8 Control Center MVP
+### 6.9 M8 Batch A Metrics
 
 目标：
 
-- 建立最小可用的中心控制闭环
+- 在 telemetry core 之上落地 Batch A metrics
+
+子任务：
+
+- 建立 `host_metrics`
+- 建立 `process_metrics`
+- 建立 `container_metrics`
+- 建立 `k8s_node_pod_metrics`
+- 建立 `prom_scrape`
+- 建立 `otlp_metrics_receiver`
+- 建立 Batch A fixture、回放和采样测试
+
+验收标准：
+
+- 边缘侧可稳定输出 Batch A 指标
+- Batch A 各 integration 可挂接统一 resource 语义
+- Batch A 指标受统一 telemetry budget 与 backpressure 约束
+
+依赖关系：
+
+- 依赖 M6
+- 依赖 M7
+
+
+### 6.10 M9 Control Center Core
+
+目标：
+
+- 建立最小可用的中心控制核心与状态查询能力
 
 子任务：
 
 - 实现 `Northbound API`
 - 实现 `ActionTemplate` / `ActionRequest`
-- 实现 `ApprovalRecord`
-- 实现 `Plan Compiler`
-- 实现 `Signer`
-- 实现 `Dispatch Service`
 - 实现 `Execution Tracker`
 - 实现 `Result Ingestor`
 - 实现控制中心主库存储与对象存储落盘
+- 实现最小 `Control Query`
 
 验收标准：
 
-- 请求可编译成单目标 `ActionPlan`
-- 多目标请求可展开成多份 plan
-- 中心可查看 dispatch、ack、execution、result 状态
-- 中心与边缘形成端到端可观察闭环
+- 中心可受理请求并持久化核心控制对象
+- 中心可查看 dispatch、ack、execution、result 基础状态
+- 中心具备最小对象查询与追踪能力
 
 依赖关系：
 
 - 依赖 M1
 - 依赖 M2
 - 依赖 M4
-- 依赖 M5
 
-### 6.10 M9 Install Bootstrap MVP
+### 6.11 M10 Approval / Signing / Dispatch Closure
+
+目标：
+
+- 打通中心侧审批、编译、签名、下发、ack、结果归档闭环
+
+子任务：
+
+- 实现 `ApprovalRecord`
+- 实现 `Plan Compiler`
+- 实现 `Signer`
+- 实现 `Dispatch Service`
+
+验收标准：
+
+- 请求可编译成单目标 `ActionPlan`
+- 多目标请求可展开成多份 plan
+- 中心与边缘形成 dispatch -> ack -> result 的端到端闭环
+- 审批、签名和下发动作形成可追踪链路
+
+依赖关系：
+
+- 依赖 M5
+- 依赖 M9
+
+### 6.12 M11 Install Bootstrap MVP
 
 目标：
 
@@ -441,7 +484,7 @@
 - 依赖 M2
 - 依赖 M3
 
-### 6.11 M10 Upgrade / Rollback MVP
+### 6.13 M12 Upgrade / Rollback MVP
 
 目标：
 
@@ -464,14 +507,14 @@
 
 依赖关系：
 
-- 依赖 M8
-- 依赖 M9
+- 依赖 M10
+- 依赖 M11
 
-### 6.12 M11 Security / Audit Baseline + Hardening
+### 6.14 M13 Security Baseline
 
 目标：
 
-- 把“基线安全”与“强化安全”合并成明确交付
+- 固化第一版基线安全能力
 
 基线安全范围：
 
@@ -479,6 +522,24 @@
 - 计划签名与验签
 - opcode / path / service allow 控制
 - 最小权限运行
+
+验收标准：
+
+- 篡改计划会被拒绝
+- 越权 opcode、越权路径、越权服务操作会被拒绝
+- 边缘高风险执行具备最小权限约束
+
+依赖关系：
+
+- 依赖 M4
+- 依赖 M5
+- 最好依赖 M10
+
+### 6.15 M14 Audit / Security Hardening
+
+目标：
+
+- 在基线安全之上补齐审计与强化安全闭环
 
 强化安全范围：
 
@@ -490,19 +551,16 @@
 
 验收标准：
 
-- 篡改计划会被拒绝
 - 审批缺失或过期会被拒绝
-- 越权 opcode、越权路径、越权服务操作会被拒绝
 - 一次执行的全链路都可审计回放
+- 审计链可识别结果篡改和关键字段缺失
 
 依赖关系：
 
-- 依赖 M4
-- 依赖 M5
-- 依赖 M8
-- 最好依赖 M10
+- 依赖 M10
+- 依赖 M13
 
-### 6.13 M12 Scale-Out Gateway
+### 6.16 M15 Scale-Out Gateway
 
 目标：
 
@@ -528,10 +586,10 @@
 
 依赖关系：
 
-- 依赖 M8
-- 依赖 M11
+- 依赖 M10
+- 依赖 M14
 
-### 6.14 M13 Tree Topology
+### 6.17 M16 Tree Topology
 
 目标：
 
@@ -554,9 +612,10 @@
 
 依赖关系：
 
-- 依赖 M12
+- 依赖 M15
+- 最好依赖 M14
 
-### 6.15 M14 Unified Signals Expansion
+### 6.18 M17 Unified Signals Core
 
 目标：
 
@@ -568,35 +627,53 @@
 - 评估并视需要补充原生 OTLP logs / traces receiver
 - 扩展 security event 标准化
 - 建立同一份原始事件下的多信号关联规则
-- 落地 telemetry Batch B/C：
-  - `StatsD`
-  - `JMX`
-  - `nginx`
-  - `mysql`
-  - `postgresql`
-  - `redis`
-  - `kafka`
-  - `elasticsearch`
-  - `rabbitmq`
-  - `clickhouse`
-  - `coredns`
-  - `kube-apiserver`
-  - `kubelet`
-  - `etcd`
 
 验收标准：
 
-- 常见 target 大多可由 `wp-agentd` 直接采集
 - logs / metrics / traces / security 能挂接统一 resource 上下文
-- exporter compatibility mode 退居 fallback 角色
+- 统一多信号主线不依赖 exporter compatibility mode 才能成立
 
 依赖关系：
 
 - 依赖 M6
 - 依赖 M7
-- 最好依赖 M11
+- 最好依赖 M14
 
-### 6.16 M15 AI 与 Authoring
+### 6.19 M18 Telemetry Batch B/C Integrations
+
+目标：
+
+- 在统一多信号底盘上扩展 Batch B/C telemetry integrations
+
+子任务：
+
+- 落地 `StatsD`
+- 落地 `JMX`
+- 落地 `nginx`
+- 落地 `mysql`
+- 落地 `postgresql`
+- 落地 `redis`
+- 落地 `kafka`
+- 落地 `elasticsearch`
+- 落地 `rabbitmq`
+- 落地 `clickhouse`
+- 落地 `coredns`
+- 落地 `kube-apiserver`
+- 落地 `kubelet`
+- 落地 `etcd`
+
+验收标准：
+
+- 常见 target 大多可由 `wp-agentd` 直接采集
+- Batch B/C integrations 可挂接统一 resource 语义
+- exporter compatibility mode 退居 fallback 角色
+
+依赖关系：
+
+- 依赖 M8
+- 依赖 M17
+
+### 6.20 M19 AI 与 Authoring
 
 目标：
 
@@ -623,10 +700,10 @@
 依赖关系：
 
 - 依赖 M1
-- 依赖 M8
-- 最好依赖 M11
+- 依赖 M10
+- 最好依赖 M14
 
-### 6.17 M16 GA / World-Class NFR
+### 6.21 M20 GA / World-Class NFR
 
 目标：
 
@@ -651,11 +728,12 @@
 
 依赖关系：
 
-- 依赖 M10
-- 依赖 M11
 - 依赖 M12
-- 依赖 M13
 - 依赖 M14
+- 依赖 M15
+- 依赖 M16
+- 依赖 M17
+- 依赖 M18
 
 ---
 
@@ -677,7 +755,8 @@
 
 - M0
 - M1
-- M11
+- M13
+- M14
 
 ### 7.2 身份与接入线
 
@@ -692,8 +771,9 @@
 
 - M2
 - M4
-- M12
 - M13
+- M15
+- M16
 
 ### 7.3 边缘执行线
 
@@ -708,7 +788,7 @@
 
 - M3
 - M5
-- M11
+- M13
 
 ### 7.4 边缘守护与升级线
 
@@ -722,9 +802,9 @@
 主要覆盖：
 
 - M3
-- M9
-- M10
-- M16
+- M11
+- M12
+- M20
 
 ### 7.5 边缘数据面线
 
@@ -741,8 +821,10 @@
 
 - M6
 - M7
-- M14
-- M16
+- M8
+- M17
+- M18
+- M20
 
 ### 7.6 中心控制平面线
 
@@ -754,10 +836,11 @@
 
 主要覆盖：
 
-- M8
-- M11
-- M12
-- M13
+- M9
+- M10
+- M14
+- M15
+- M16
 
 ### 7.7 验证与工具链线
 
@@ -775,9 +858,11 @@
 - M1
 - M5
 - M7
-- M14
-- M15
-- M16
+- M8
+- M17
+- M18
+- M19
+- M20
 
 ---
 
@@ -811,13 +896,16 @@
 - M9
 - M10
 - M11
+- M12
+- M13
+- M14
 
 这样得到的是：
 
-- 资源发现与 Batch A telemetry 底盘
-- 最小可用的控制中心
+- 资源发现、Telemetry Core 与 Batch A telemetry 底盘
+- 最小可用的控制中心与 dispatch 闭环
 - 安装与升级的工程闭环
-- 基线安全与审计能力
+- 基线安全与审计强化能力
 
 ---
 
@@ -825,16 +913,17 @@
 
 第三阶段建议承诺：
 
-- M12
-- M13
-- M14
 - M15
 - M16
+- M17
+- M18
+- M19
+- M20
 
 这样得到的是：
 
 - 多级树拓扑和大规模接入能力
-- 统一多信号底盘
+- 统一多信号底盘与 Batch B/C integrations
 - AI 辅助与作者工具链
 - 接近正式 GA 的世界级非功能水准
 
@@ -846,7 +935,7 @@
 
 1. 完成 M1 中尚未代码化的 schema 与校验器
 2. 启动 M3 的 `standalone` `wp-agentd` / `wp-agent-exec` / `wp-agent-upgrader` skeleton
-3. 启动 M6 与 M7 的本地 discovery / telemetry 底盘
+3. 启动 M6、M7 与 M8 的本地 discovery / telemetry 底盘
 4. 定义统一结构化 telemetry record，并先对接 `warp-parse`
 5. 启动 M2 的 enrollment / identity 设计与实现
 6. 启动 M4 的 gateway session MVP
@@ -854,16 +943,67 @@
 
 如果资源还能再加一条并行主线，再启动：
 
-8. M8 控制中心 MVP
+8. M9 控制中心 Core
 
 也就是说，当前阶段最重要的不是继续抽象讨论，而是把：
 
 - 契约
 - standalone 边缘运行基线
-- 本地 discovery / telemetry 底盘
+- 本地 discovery / telemetry 底盘与 Batch A
 - 统一结构化 record -> `warp-parse`
 - 身份接入
 - managed 接入
 - 最小远程执行闭环
 
 先代码化。
+
+---
+
+## 12. 关键依赖矩阵
+
+下表只列“硬依赖”和“可并行启动”的高价值关系，用于排期，不替代前文逐里程碑依赖说明。
+
+| 里程碑 | 硬依赖 | 可并行启动 | 关键产出 |
+|---|---|---|---|
+| M0 | 无 | 无 | 冻结边界、术语和第一版范围 |
+| M1 | M0 | M2 设计准备 | 可校验 schema 与样例集 |
+| M2 | M1 | M3 | enrollment 与身份基线 |
+| M3 | M1 | M2、M6 | standalone 三进程骨架 |
+| M4 | M2 | M5、M9 | managed 接入与 session 基线 |
+| M5 | M3、M4 | M6、M7 | 单节点远程执行闭环 |
+| M6 | M3 | M5、M7、M9 | 统一 resource discovery 底盘 |
+| M7 | M3、M6 | M8、M9 | telemetry core 与 `warp-parse` 上报路径 |
+| M8 | M6、M7 | M9、M10 | Batch A metrics |
+| M9 | M1、M2、M4 | M7、M8、M11 | 控制中心核心对象与查询 |
+| M10 | M5、M9 | M11、M13 | 审批、签名、下发、归档闭环 |
+| M11 | M2、M3 | M12、M13 | 安装、首启、恢复基线 |
+| M12 | M10、M11 | M13、M14 | 升级与回滚闭环 |
+| M13 | M4、M5 | M12、M14 | 基线安全与拒绝机制 |
+| M14 | M10、M13 | M15、M17 | 审计与强化安全闭环 |
+| M15 | M10、M14 | M17 | scale-out gateway |
+| M16 | M15 | M17、M18 | tree topology |
+| M17 | M6、M7 | M15、M16、M18 | unified signals core |
+| M18 | M8、M17 | M19 | Batch B/C integrations |
+| M19 | M1、M10 | M18、M20 | AI 辅助与 authoring |
+| M20 | M12、M14、M15、M16、M17、M18 | 无 | GA / world-class NFR 验收 |
+
+---
+
+## 13. 当前关键路径建议
+
+如果目标是尽快拿到“可上线的最小可信版本”，推荐把关键路径压成：
+
+1. M0 -> M1 -> M2 -> M4
+2. M1 -> M3 -> M5
+3. M3 -> M6 -> M7 -> M8
+4. M4 + M5 + M9 -> M10
+5. M11 + M10 -> M12
+6. M13 -> M14
+7. M12 + M14 + M15 + M16 + M17 + M18 -> M20
+
+这里的管理含义是：
+
+- `M9/M10` 是中心闭环关键路径
+- `M7/M8` 是数据面成立关键路径
+- `M13/M14` 是安全上线关键路径
+- `M15/M16` 和 `M17/M18` 更适合在第二可用版本后并行扩展，而不是挤进第一上线窗口

@@ -12,6 +12,7 @@
 
 - [`control-plane.md`](../center/control-plane.md)
 - [`action-plan-schema.md`](../execution/action-plan-schema.md)
+- [`log-file-input-spec.md`](../telemetry/log-file-input-spec.md)
 - [`metrics-config-schema.md`](../telemetry/metrics-config-schema.md)
 
 ---
@@ -38,6 +39,7 @@ CapabilityReport {
   reported_at
   exec
   metrics
+  logs?
   upgrade
   limits
 }
@@ -111,7 +113,49 @@ MetricsCapabilities {
 
 ---
 
-## 6. `upgrade`
+## 6. `logs`
+
+```text
+LogsCapabilities {
+  file_inputs[]
+  parsers[]
+  multiline_modes[]
+  watcher_modes[]
+}
+```
+
+字段说明：
+
+- `file_inputs`
+  例如：
+  - `tail_file_v1`
+- `parsers`
+  例如：
+  - `raw`
+  - `json`
+  - `ndjson`
+  - `cri`
+  - `docker_json`
+- `multiline_modes`
+  例如：
+  - `off`
+  - `docker`
+  - `cri`
+  - `java_stacktrace`
+  - `custom_regex`
+- `watcher_modes`
+  例如：
+  - `native_notify`
+  - `poll`
+
+匹配规则建议：
+
+- 控制平面在 logs 策略编译期做 capability 预筛选
+- 边缘在本地配置启用时再次做支持能力校验
+
+---
+
+## 7. `upgrade`
 
 ```text
 UpgradeCapabilities {
@@ -131,7 +175,7 @@ UpgradeCapabilities {
 
 ---
 
-## 7. `limits`
+## 8. `limits`
 
 ```text
 CapabilityLimits {
@@ -150,7 +194,7 @@ CapabilityLimits {
 
 ---
 
-## 8. 匹配规则
+## 9. 匹配规则
 
 第一版建议固定如下：
 
@@ -170,7 +214,7 @@ CapabilityLimits {
 
 ---
 
-## 9. 最小示例
+## 10. 最小示例
 
 ```json
 {
@@ -188,6 +232,12 @@ CapabilityLimits {
     "receivers": ["otlp_metrics_receiver"],
     "discovery_modes": ["local_runtime", "static", "file", "k8s"]
   },
+  "logs": {
+    "file_inputs": ["tail_file_v1"],
+    "parsers": ["raw", "json", "cri", "docker_json"],
+    "multiline_modes": ["off", "docker", "cri", "java_stacktrace", "custom_regex"],
+    "watcher_modes": ["native_notify", "poll"]
+  },
   "upgrade": {
     "supported": true,
     "features": ["prepare", "verify", "rollback"]
@@ -202,10 +252,10 @@ CapabilityLimits {
 
 ---
 
-## 10. 当前决定
+## 11. 当前决定
 
 当前阶段固定以下结论：
 
 - capability 采用显式声明，不做隐式推导
-- `exec` / `metrics` / `upgrade` 三类能力分开建模
+- `exec` / `metrics` / `logs` / `upgrade` 四类能力分开建模
 - `required_capabilities` 的边缘校验走包含判断

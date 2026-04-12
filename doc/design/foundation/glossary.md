@@ -15,6 +15,7 @@
 - 新文档优先引用本词典
 - 如与旧文档冲突，以本词典为准
 - 发现新术语前，先判断能否复用现有词
+- 术语定义尽量同时说明：作用域、统一定义、以及不应混用的近义词
 
 ---
 
@@ -35,6 +36,13 @@
 
 - 控制面对象不要借用数据面队列词
 - 数据面 buffer/spool 不要和本地执行队列混用
+- 同一个英文词如需跨层复用，必须带作用域限定语
+
+例如：
+
+- `IR provenance`
+- `source.path`
+- `execution_queue`
 
 ### 2.3 边缘本地状态优先用 execution 词根
 
@@ -46,6 +54,28 @@
 - `history`
 
 不再笼统使用 `queue`
+
+### 2.4 对标成熟产品时，对齐能力，不对齐配置名
+
+当 `wp-agent` 设计文档提到对标 `Fluent Bit`、`OpenTelemetry Collector` 等成熟产品时，默认含义是：
+
+- 对齐能力边界
+- 对齐关键运行时行为
+- 对齐验收口径
+
+不默认意味着：
+
+- 配置字段名兼容
+- 状态文件格式兼容
+- 插件命名兼容
+- tag/chunk/pipeline 对象模型兼容
+
+例如：
+
+- 可以说“文件日志输入对标 `Fluent Bit tail input`”
+- 不建议说“`wp-agent` 的 logs 配置应兼容 `Fluent Bit tail` 配置”
+
+只有在文档显式写出“兼容配置”或“兼容协议对象”时，才表示需要兼容对应产品的外部接口。
 
 ---
 
@@ -355,9 +385,207 @@ IR 中 `kind = "output"` 的 step 类型。
 
 ---
 
-## 9. Metrics 数据面术语
+## 9. Logs 数据面术语
 
-### 9.1 `collector`
+### 9.1 `file input`
+
+统一定义：
+
+- `wp-agentd` 数据面中的常驻文件日志输入能力
+- 负责发现、跟踪、读取追加内容，并进入统一 telemetry pipeline
+
+推荐使用场景：
+
+- `logs.file_inputs[]`
+- `file log input`
+
+不应拿它指代：
+
+- 远程动作 `file.tail`
+- 一次性文件读取
+- 实现备注中的内部 reader 实例
+
+如需指实现内部对象，推荐使用：
+
+- `file reader`
+- `tail reader`
+
+### 9.2 `file watcher`
+
+统一定义：
+
+- 文件目标变化监听机制
+- 负责目录/文件变化感知，不直接负责 record 构建
+
+第一版推荐枚举：
+
+- `native_notify`
+- `poll`
+- `auto`
+
+在文件日志输入语境下可简称：
+
+- `watcher`
+
+但离开该语境时，优先写全称 `file watcher`。
+
+### 9.3 `read offset`
+
+统一定义：
+
+- reader 当前已读取到的位置
+- 运行中内存态进度
+
+注意：
+
+- `read offset` 不等于 `checkpoint`
+- `read offset` 可以先于 record 安全提交而前进
+
+### 9.4 `commit point`
+
+统一定义：
+
+- file input 判定“可以推进 checkpoint”的最小安全条件
+- `read offset` 与 `checkpoint offset` 之间的语义边界
+
+注意：
+
+- `commit point` 是语义边界，不一定对应单独持久化字段
+- 第一版默认以“record 已进入本地 telemetry buffer/spool 的安全接纳点”作为 `commit point`
+
+### 9.5 `checkpoint`
+
+统一定义：
+
+- 文件输入已安全提交的读取进度
+- crash 恢复的起点
+
+注意：
+
+- `checkpoint` 不等于 `read offset`
+- `checkpoint` 应在越过 `commit point` 后推进
+- 新文档如需写明语义，优先使用 `checkpoint offset`
+
+### 9.6 `file identity`
+
+统一定义：
+
+- 用于区分“这是哪个被跟踪文件”的稳定身份信息
+
+第一版推荐来源：
+
+- `device_id + inode`
+- 或 `canonical_path + fingerprint`
+
+注意：
+
+- `path` 只表示当前路径
+- `file identity` 用于 checkpoint 关联和 rotate/truncate 判断
+
+### 9.7 `rotate`
+
+统一定义：
+
+- 文件因 rename-rotate 等机制发生身份切换，但 reader 需要继续处理旧尾部与新文件接续
+
+推荐使用：
+
+- `rotate`
+- `rotate_wait_ms`
+
+不建议混用：
+
+- `reopen`
+- `roll`
+
+### 9.8 `truncate`
+
+统一定义：
+
+- 同一被跟踪文件内容长度回退，已提交 `checkpoint offset` 失效，需要从较小位置重新读取
+
+推荐使用：
+
+- `truncate`
+
+不建议混用：
+
+- `reset tail`
+- `rewind`
+
+### 9.9 `multiline`
+
+统一定义：
+
+- 多行日志拼装能力
+- 在 record 进入 normalize 前完成事件边界合并
+
+不应称为：
+
+- parser chain
+- post filter
+
+### 9.10 `parser`
+
+在文件日志输入语境下，统一定义：
+
+- 输入侧轻量预解析器
+- 负责把 `raw/json/ndjson/cri/docker_json` 等输入转换为统一字段骨架
+
+注意：
+
+- 它不等于中心侧规则解析
+- 它不等于 `warp-parse` 的完整解析链路
+
+### 9.11 `startup_position`
+
+统一定义：
+
+- agent 启动时，对“无 checkpoint 的已存在文件”从何处开始读取的策略
+
+第一版推荐枚举：
+
+- `head`
+- `tail`
+
+### 9.12 `discovered_file_position`
+
+统一定义：
+
+- agent 已启动后，对“运行时新发现且无 checkpoint 的文件”从何处开始读取的策略
+
+第一版推荐枚举：
+
+- `head`
+- `tail`
+
+注意：
+
+- 不要与 `startup_position` 混用
+
+### 9.13 `source.path` / `source.offset`
+
+统一定义：
+
+- 文件日志 record 的结构化来源字段
+- 属于数据面 source 字段，不属于 IR `provenance`
+
+推荐使用：
+
+- `source.path`
+- `source.offset`
+- `source.input_id`
+
+不建议退回到：
+
+- 非结构化 path tag
+- 仅靠文件名拼接字符串做来源表达
+
+---
+
+## 10. Metrics 数据面术语
+
+### 10.1 `collector`
 
 更偏本地采集器。
 
@@ -367,7 +595,7 @@ IR 中 `kind = "output"` 的 step 类型。
 - `process_metrics`
 - `container_metrics`
 
-### 9.2 `scraper`
+### 10.2 `scraper`
 
 更偏 pull 型目标抓取器。
 
@@ -376,7 +604,7 @@ IR 中 `kind = "output"` 的 step 类型。
 - `prom_scrape`
 - `jmx_scrape`
 
-### 9.3 `receiver`
+### 10.3 `receiver`
 
 更偏 push 型输入接收器。
 
@@ -385,7 +613,7 @@ IR 中 `kind = "output"` 的 step 类型。
 - `otlp_metrics_receiver`
 - `statsd_receiver`
 
-### 9.4 `exporter`
+### 10.4 `exporter`
 
 统一定义：
 
@@ -399,7 +627,7 @@ IR 中 `kind = "output"` 的 step 类型。
 
 ---
 
-## 10. 明确禁止混用的词
+## 11. 明确禁止混用的词
 
 以下词对当前设计最容易造成歧义，建议避免混用：
 
@@ -408,17 +636,21 @@ IR 中 `kind = "output"` 的 step 类型。
 - `control`
   在 IR 中应改成 `constraints`
 - `source`
-  在 IR 中应改成 `provenance`
+  在 IR 语境中应改成 `provenance`；在数据面语境中可保留 `source.path`、`source.offset` 等结构化来源字段
 - `output`
   应按上下文改成 `stdout`、`output step` 或 `outputs`
 - `action`
   不要拿来指代 step 或业务输出
 - `result`
   必须区分 `ActionResult`、`StepActionRecord`、`outputs`
+- `tail`
+  在数据面文档中优先写 `file input` / `file log input`；仅在对标 `Fluent Bit tail input`、描述内部 `tail reader`，或远程动作 `file.tail` 时使用
+- `offset`
+  在文件日志输入文档中优先写 `checkpoint offset`、`read offset` 或 `source.offset`，避免单独使用造成歧义
 
 ---
 
-## 11. 当前推荐用法速查
+## 12. 当前推荐用法速查
 
 如果你要写新文档，优先使用：
 
@@ -433,17 +665,24 @@ IR 中 `kind = "output"` 的 step 类型。
 - IR 输出 step：`output step`
 - 最终业务结果：`outputs`
 - 待调度 execution 队列：`execution_queue`
+- 常驻文件日志输入：`file input`
+- 文件变化监听：`file watcher`
+- 运行态读取位置：`read offset`
+- checkpoint 推进语义边界：`commit point`
+- 文件进度提交点：`checkpoint`
+- 多行日志拼装：`multiline`
 - pull 型指标采集：`scraper`
 - push 型指标接收：`receiver`
 - 本地指标采集器：`collector`
 
 ---
 
-## 12. 当前决定
+## 13. 当前决定
 
 当前阶段固定以下结论：
 
 - 新文档优先引用本词典
 - 作者侧词与 IR 词必须分开
 - `execution_queue` 取代笼统的 `queue`
+- 对标成熟产品时优先对齐能力，不对齐配置名
 - `constraints` / `provenance` / `invoke` / `guard` / `output step` / `abort` 作为 IR 侧统一术语

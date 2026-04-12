@@ -12,11 +12,20 @@
 - `reporting/<execution_id>.json`
 - `history/recent.json`
 
+本文档当前聚焦：
+
+- execution / report 相关本地状态
+
+文件日志输入的 checkpoint state 独立定义在：
+
+- [`log-file-state-schema.md`](log-file-state-schema.md)
+
 相关文档：
 
 - [`agentd-state-and-boundaries.md`](agentd-state-and-boundaries.md)
 - [`agentd-architecture.md`](agentd-architecture.md)
 - [`agentd-exec-protocol.md`](agentd-exec-protocol.md)
+- [`log-file-state-schema.md`](log-file-state-schema.md)
 
 ---
 
@@ -33,6 +42,7 @@
 - 每个状态文件只保留本层最小必要字段
 - 通过 `execution_id` / `action_id` 关联
 - 不在多个文件重复保存大对象
+- execution 状态与 telemetry file input 状态分开建模
 
 ---
 

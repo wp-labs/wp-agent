@@ -10,12 +10,14 @@
 - control plane 连接
 - 本地路径
 - execution 限制
+- logs inputs
 - metrics integrations
 - upgrade 配置
 
 相关文档：
 
 - [`metrics-config-schema.md`](../telemetry/metrics-config-schema.md)
+- [`log-file-input-spec.md`](../telemetry/log-file-input-spec.md)
 - [`agentd-architecture.md`](agentd-architecture.md)
 - [`agentd-state-schema.md`](agentd-state-schema.md)
 
@@ -33,6 +35,7 @@ AgentConfig {
   resource_budget?
   buffering?
   protection?
+  logs?
   metrics?
   upgrade?
 }
@@ -175,7 +178,24 @@ ProtectionSection {
 
 ---
 
-## 10. `metrics`
+## 10. `logs`
+
+```text
+LogsSection {
+  file_inputs[]?
+}
+```
+
+第一版建议：
+
+- 先固定 `logs.file_inputs[]`
+- 其字段结构直接复用：
+  - [`../telemetry/log-file-input-spec.md`](../telemetry/log-file-input-spec.md)
+- `syslog` / `journald` / 其他 logs receiver 后续再补
+
+---
+
+## 11. `metrics`
 
 直接复用：
 
@@ -187,7 +207,7 @@ ProtectionSection {
 
 ---
 
-## 11. `upgrade`
+## 12. `upgrade`
 
 ```text
 UpgradeSection {
@@ -203,11 +223,12 @@ UpgradeSection {
 
 ---
 
-## 12. 当前决定
+## 13. 当前决定
 
 当前阶段固定以下结论：
 
 - `wp-agentd` 需要一份统一总配置
+- logs 配置作为其子树挂入
 - metrics 配置作为其子树挂入
 - `resource_budget / buffering / protection` 需要承担非功能量化目标的配置落点
 - execution / paths / control_plane 作为第一版必需配置段

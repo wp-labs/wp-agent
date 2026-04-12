@@ -18,6 +18,7 @@
 - [`agentd-exec-protocol.md`](agentd-exec-protocol.md)
 - [`action-plan-ir.md`](../execution/action-plan-ir.md)
 - [`roadmap.md`](../foundation/roadmap.md)
+- [`log-file-state-schema.md`](log-file-state-schema.md)
 
 ---
 
@@ -39,13 +40,22 @@
 
 ## 3. 本地状态分层
 
-`wp-agentd` 第一版建议把本地状态分成五层：
+`wp-agentd` 第一版建议把本地状态分成两大类：
+
+- execution / control state
+- telemetry runtime state
+
+其中 execution / control state 再分成五层：
 
 - `agent_runtime_state`
 - `execution_queue_state`
 - `execution_state`
 - `report_state`
 - `history_state`
+
+文件日志输入的 checkpoint state 属于 telemetry runtime state，独立定义在：
+
+- [`log-file-state-schema.md`](log-file-state-schema.md)
 
 ### 3.1 `agent_runtime_state`
 
@@ -149,6 +159,10 @@
       <execution_id>.json
     history/
       recent.json
+    logs/
+      file_inputs/
+        <input_id>/
+          checkpoints.json
   log/
     agentd.log
 ```
@@ -222,6 +236,20 @@
 
 第一版只需保留有限窗口，例如最近 N 条。
 
+### 4.6 `logs/file_inputs/<input_id>/checkpoints.json`
+
+保存文件日志输入的 checkpoint state。
+
+这类状态：
+
+- 不属于 `execution_queue`
+- 不属于 `running` / `reporting`
+- 不由 `execution_scheduler` 持有
+
+其 schema 独立定义在：
+
+- [`log-file-state-schema.md`](log-file-state-schema.md)
+
 ---
 
 ## 5. 哪些状态必须落盘
@@ -234,6 +262,7 @@
 - `execution_queue.json`
 - `running/<execution_id>.json`
 - `reporting/<execution_id>.json`
+- `logs/file_inputs/<input_id>/checkpoints.json`
 - `run/actions/<execution_id>/plan.json`
 - `run/actions/<execution_id>/runtime.json`
 - `run/actions/<execution_id>/state.json`
@@ -266,6 +295,7 @@
 | `running/<execution_id>.json` | `execution_scheduler` | `executor_manager` 通过事件回传，由 scheduler 落盘 |
 | `reporting/<execution_id>.json` | `result_aggregator` | 只读 |
 | `history/recent.json` | `audit_logger` | 只读 |
+| `logs/file_inputs/*/checkpoints.json` | `checkpoint_store` | `file reader` / `file watcher` 通过事件回传，由 `checkpoint_store` 落盘 |
 | `run/actions/*/meta.json` | `executor_manager` | 只读 |
 
 这里的核心原则是：
@@ -273,6 +303,7 @@
 - `executor_manager` 不直接写 scheduler 的状态文件
 - `result_aggregator` 不回写 queue 状态
 - `plan_validator` 不直接改 running 集合
+- `file reader` / `file watcher` 不直接写 `checkpoints.json`
 
 模块之间通过事件或返回对象传递，不通过“大家一起改文件”协作。
 
