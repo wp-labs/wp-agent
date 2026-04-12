@@ -1,0 +1,31 @@
+{
+  "api_version": "v1alpha1",
+  "kind": "action_result",
+  "action_id": "act_001",
+  "execution_id": "exec_001",
+  "final_status": "succeeded",
+  "exit_reason": null,
+  "step_records": [
+    {
+      "step_id": "step_collect",
+      "attempt": 1,
+      "op": "process.list",
+      "status": "succeeded",
+      "started_at": "2026-04-12T10:00:01Z",
+      "finished_at": "2026-04-12T10:00:03Z",
+      "duration_ms": 2000,
+      "error_code": null,
+      "stdout_summary": "2 processes matched",
+      "stderr_summary": null
+    }
+  ],
+  "outputs": {
+    "items": [
+      {
+        "name": "process_count",
+        "value": "2",
+        "redacted": false
+      }
+    ]
+  }
+}

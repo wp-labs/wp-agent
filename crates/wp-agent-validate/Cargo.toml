@@ -6,8 +6,9 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+serde_json.workspace = true
+time.workspace = true
 wp-agent-contracts.workspace = true
 
 [lib]
 path = "src/lib.rs"
-

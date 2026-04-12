@@ -1,0 +1,53 @@
+{
+  "api_version": "v1alpha1",
+  "kind": "action_plan",
+  "meta": {
+    "action_id": "act_001",
+    "request_id": "req_001",
+    "template_id": "tmpl_inventory",
+    "tenant_id": "tenant_a",
+    "environment_id": "prod-cn",
+    "plan_version": 1,
+    "compiled_at": "2026-04-12T10:00:00Z",
+    "expires_at": "2026-04-12T10:05:00Z"
+  },
+  "target": {
+    "agent_id": "agent-001",
+    "instance_id": "instance-001",
+    "node_id": "node-001",
+    "host_name": "node-001.example",
+    "platform": "linux",
+    "arch": "amd64",
+    "selectors": {
+      "role": "db"
+    }
+  },
+  "constraints": {
+    "risk_level": "R1",
+    "approval_ref": "apr_001",
+    "approval_mode": "required",
+    "requested_by": "alice@example.com",
+    "reason": "collect inventory",
+    "max_total_duration_ms": 30000,
+    "step_timeout_default_ms": 10000,
+    "execution_profile": "agent_exec_v1",
+    "required_capabilities": [
+      "process.list"
+    ]
+  },
+  "program": {
+    "entry": "step_collect",
+    "steps": [
+      {
+        "id": "step_collect",
+        "kind": "invoke",
+        "op": "process.list"
+      },
+      {
+        "id": "step_output",
+        "kind": "output",
+        "op": null
+      }
+    ]
+  }
+}

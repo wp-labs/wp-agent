@@ -10,4 +10,3 @@ pub mod signer;
 pub fn run() {
     eprintln!("wp-agent-control skeleton");
 }
-

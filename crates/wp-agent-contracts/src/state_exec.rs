@@ -1,6 +1,11 @@
 //! Execution-related local state contract types.
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+use serde::{Deserialize, Serialize};
+
+use crate::SCHEMA_VERSION_V1ALPHA1;
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AgentRuntimeState {
     pub schema_version: String,
     pub agent_id: String,
@@ -10,10 +15,33 @@ pub struct AgentRuntimeState {
     pub updated_at: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+impl AgentRuntimeState {
+    pub fn new(
+        agent_id: String,
+        instance_id: String,
+        version: String,
+        mode: RuntimeMode,
+        updated_at: String,
+    ) -> Self {
+        Self {
+            schema_version: SCHEMA_VERSION_V1ALPHA1.to_string(),
+            agent_id,
+            instance_id,
+            version,
+            mode,
+            updated_at,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RuntimeMode {
+    #[serde(rename = "normal")]
     Normal,
+    #[serde(rename = "degraded")]
     Degraded,
+    #[serde(rename = "protect")]
     Protect,
+    #[serde(rename = "upgrade_in_progress")]
     UpgradeInProgress,
 }

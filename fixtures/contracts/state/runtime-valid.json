@@ -1,0 +1,8 @@
+{
+  "schema_version": "v1alpha1",
+  "agent_id": "agent-001",
+  "instance_id": "instance-001",
+  "version": "0.1.0",
+  "mode": "normal",
+  "updated_at": "2026-04-12T10:00:00Z"
+}

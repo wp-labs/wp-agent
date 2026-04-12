@@ -1,0 +1,19 @@
+{
+  "schema_version": "v1alpha1",
+  "input_id": "messages",
+  "updated_at": "2026-04-12T10:00:00Z",
+  "files": [
+    {
+      "file_id": "dev-1:inode-42",
+      "path": "/var/log/messages",
+      "device_id": 1,
+      "inode": 42,
+      "fingerprint": "sha256:abc123",
+      "checkpoint_offset": 4096,
+      "last_size": 8192,
+      "last_read_at": "2026-04-12T09:59:59Z",
+      "last_commit_point_at": "2026-04-12T10:00:00Z",
+      "rotated_from_path": null
+    }
+  ]
+}

@@ -8,3 +8,5 @@ rust-version.workspace = true
 [lib]
 path = "src/lib.rs"
 
+[dependencies]
+serde.workspace = true

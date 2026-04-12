@@ -1,0 +1,12 @@
+{
+  "api_version": "v1alpha1",
+  "kind": "action_result",
+  "action_id": "act_001",
+  "execution_id": "exec_001",
+  "final_status": "rejected",
+  "exit_reason": "target_mismatch",
+  "step_records": [],
+  "outputs": {
+    "items": []
+  }
+}

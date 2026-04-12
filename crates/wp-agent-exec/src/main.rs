@@ -1,4 +1,6 @@
 fn main() {
-    wp_agent_exec::run();
+    if let Err(err) = wp_agent_exec::run() {
+        eprintln!("{err}");
+        std::process::exit(1);
+    }
 }
-

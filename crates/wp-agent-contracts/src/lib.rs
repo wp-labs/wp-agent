@@ -8,3 +8,5 @@ pub mod gateway;
 pub mod state_exec;
 pub mod state_logs;
 
+pub const API_VERSION_V1ALPHA1: &str = "v1alpha1";
+pub const SCHEMA_VERSION_V1ALPHA1: &str = "v1alpha1";
