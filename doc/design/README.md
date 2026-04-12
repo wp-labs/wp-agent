@@ -3,7 +3,7 @@
 `doc/design` 目录按主题拆分为以下子目录：
 
 - `foundation/`
-  总体目标、总体架构、术语、路线图、非功能目标、安全模型、参考资料
+  总体目标、总体架构、术语、路线图、实现 backlog、非功能目标、安全模型、参考资料
 - `execution/`
   动作 DSL、`ActionPlan IR`、执行 schema、opcode schema、`run.gxl` 相关文档
 - `edge/`
@@ -25,3 +25,4 @@
 8. [telemetry/telemetry-uplink-and-warp-parse.md](./telemetry/telemetry-uplink-and-warp-parse.md)
 9. [telemetry/log-file-input-spec.md](./telemetry/log-file-input-spec.md)
 10. [edge/log-file-state-schema.md](./edge/log-file-state-schema.md)
+11. [foundation/implementation-backlog.md](./foundation/implementation-backlog.md)
