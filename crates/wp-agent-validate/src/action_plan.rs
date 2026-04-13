@@ -3,7 +3,9 @@
 use std::collections::BTreeSet;
 
 use wp_agent_contracts::API_VERSION_V1;
-use wp_agent_contracts::action_plan::{ACTION_PLAN_KIND, ActionPlanContract};
+use wp_agent_contracts::action_plan::{
+    ACTION_PLAN_KIND, ActionPlanContract, STEP_KIND_INVOKE, is_known_step_kind,
+};
 
 use crate::{ValidationError, parse_rfc3339, require_non_empty};
 
@@ -62,8 +64,11 @@ pub fn validate_action_plan(contract: &ActionPlanContract) -> Result<(), Validat
     for step in &contract.program.steps {
         require_non_empty(&step.id, "missing_step_id")?;
         require_non_empty(&step.kind, "missing_step_kind")?;
+        if !is_known_step_kind(&step.kind) {
+            return Err(ValidationError::new("invalid_step_kind"));
+        }
 
-        if step.kind == "invoke" {
+        if step.kind == STEP_KIND_INVOKE {
             let op = step.op.as_deref().unwrap_or_default();
             require_non_empty(op, "missing_invoke_op")?;
         }

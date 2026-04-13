@@ -27,14 +27,24 @@ impl ExecutionQueueState {
     }
 
     pub fn enqueue(&mut self, item: ExecutionQueueItem) {
-        self.items.push(item);
-        self.items.sort_by_key(|entry| entry.priority);
+        let insert_at = self
+            .items
+            .iter()
+            .position(|entry| item.priority < entry.priority)
+            .unwrap_or(self.items.len());
+        self.items.insert(insert_at, item);
         self.updated_at = now_rfc3339();
     }
 
     pub fn remove(&mut self, execution_id: &str) {
         self.items.retain(|item| item.execution_id != execution_id);
         self.updated_at = now_rfc3339();
+    }
+}
+
+impl Default for ExecutionQueueState {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -93,4 +103,53 @@ pub fn load_or_default(path: &Path) -> io::Result<ExecutionQueueState> {
 
 pub fn store(path: &Path, state: &ExecutionQueueState) -> io::Result<()> {
     write_json_atomic(path, state)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{ExecutionQueueItem, ExecutionQueueState};
+
+    fn item(execution_id: &str, priority: u32, queued_at: &str) -> ExecutionQueueItem {
+        ExecutionQueueItem::new(
+            execution_id.to_string(),
+            format!("act_{execution_id}"),
+            format!("digest_{execution_id}"),
+            format!("req_{execution_id}"),
+            priority,
+            queued_at.to_string(),
+            None,
+            true,
+            None,
+        )
+    }
+
+    #[test]
+    fn enqueue_preserves_fifo_for_equal_priority_items() {
+        let mut queue = ExecutionQueueState::new();
+        queue.enqueue(item("exec_1", 100, "2026-04-13T10:00:00Z"));
+        queue.enqueue(item("exec_2", 100, "2026-04-13T10:00:01Z"));
+        queue.enqueue(item("exec_3", 100, "2026-04-13T10:00:02Z"));
+
+        let ids: Vec<&str> = queue
+            .items
+            .iter()
+            .map(|item| item.execution_id.as_str())
+            .collect();
+        assert_eq!(ids, vec!["exec_1", "exec_2", "exec_3"]);
+    }
+
+    #[test]
+    fn enqueue_places_higher_priority_items_first() {
+        let mut queue = ExecutionQueueState::new();
+        queue.enqueue(item("exec_low", 200, "2026-04-13T10:00:00Z"));
+        queue.enqueue(item("exec_high", 50, "2026-04-13T10:00:01Z"));
+        queue.enqueue(item("exec_mid", 100, "2026-04-13T10:00:02Z"));
+
+        let ids: Vec<&str> = queue
+            .items
+            .iter()
+            .map(|item| item.execution_id.as_str())
+            .collect();
+        assert_eq!(ids, vec!["exec_high", "exec_mid", "exec_low"]);
+    }
 }

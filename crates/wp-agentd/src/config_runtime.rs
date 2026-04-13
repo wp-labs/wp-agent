@@ -206,19 +206,18 @@ mod tests {
         let home = std::env::var("HOME").expect("HOME");
         fs::write(
             &config_path,
-            format!(
-                r#"
+            r#"
 schema_version = "v1"
 
 [agent]
 environment_id = "prod"
-instance_name = "${{HOME}}/instance"
+instance_name = "${HOME}/instance"
 
 [control_plane]
 enabled = false
 
 [paths]
-root_dir = "${{HOME}}/agent-root"
+root_dir = "${HOME}/agent-root"
 run_dir = "run"
 state_dir = "state"
 log_dir = "log"
@@ -229,7 +228,6 @@ cancel_grace_ms = 5000
 default_stdout_limit_bytes = 1048576
 default_stderr_limit_bytes = 1048576
 "#,
-            ),
         )
         .expect("write config");
 
@@ -251,5 +249,42 @@ default_stderr_limit_bytes = 1048576
             config.agent.instance_name.as_deref(),
             Some(format!("{home}/instance").as_str())
         );
+    }
+
+    #[test]
+    fn load_from_path_rejects_unsupported_max_running_actions() {
+        let root = temp_dir("unsupported-max-running-actions");
+        let config_path = root.join("agent.toml");
+        fs::write(
+            &config_path,
+            r#"
+schema_version = "v1"
+
+[agent]
+instance_name = "local"
+
+[control_plane]
+enabled = false
+
+[paths]
+root_dir = "."
+run_dir = "run"
+state_dir = "state"
+log_dir = "log"
+
+[execution]
+max_running_actions = 2
+cancel_grace_ms = 5000
+default_stdout_limit_bytes = 1048576
+default_stderr_limit_bytes = 1048576
+"#,
+        )
+        .expect("write config");
+
+        let err = load_from_path(&config_path).expect_err("unsupported max running actions");
+        assert!(matches!(
+            err,
+            super::ConfigError::Validation("unsupported_max_running_actions")
+        ));
     }
 }

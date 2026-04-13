@@ -26,6 +26,9 @@ pub fn validate_config(contract: &AgentConfigContract) -> Result<(), ValidationE
     if contract.execution.max_running_actions == 0 {
         return Err(ValidationError::new("invalid_max_running_actions"));
     }
+    if contract.execution.max_running_actions != 1 {
+        return Err(ValidationError::new("unsupported_max_running_actions"));
+    }
     if contract.execution.cancel_grace_ms == 0 {
         return Err(ValidationError::new("invalid_cancel_grace_ms"));
     }

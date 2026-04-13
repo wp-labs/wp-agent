@@ -13,6 +13,7 @@
 
 - [`architecture.md`](../foundation/architecture.md)
 - [`action-plan-ir.md`](../execution/action-plan-ir.md)
+- [`agentd-failure-handling.md`](agentd-failure-handling.md)
 - [`agentd-exec-protocol.md`](agentd-exec-protocol.md)
 - [`roadmap.md`](../foundation/roadmap.md)
 

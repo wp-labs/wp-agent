@@ -7,6 +7,11 @@ use serde::{Deserialize, Serialize};
 use crate::API_VERSION_V1;
 
 pub const ACTION_PLAN_KIND: &str = "action_plan";
+pub const STEP_KIND_INVOKE: &str = "invoke";
+pub const STEP_KIND_BRANCH: &str = "branch";
+pub const STEP_KIND_GUARD: &str = "guard";
+pub const STEP_KIND_OUTPUT: &str = "output";
+pub const STEP_KIND_ABORT: &str = "abort";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -111,4 +116,11 @@ pub struct ActionPlanStep {
     pub id: String,
     pub kind: String,
     pub op: Option<String>,
+}
+
+pub fn is_known_step_kind(kind: &str) -> bool {
+    matches!(
+        kind,
+        STEP_KIND_INVOKE | STEP_KIND_BRANCH | STEP_KIND_GUARD | STEP_KIND_OUTPUT | STEP_KIND_ABORT
+    )
 }

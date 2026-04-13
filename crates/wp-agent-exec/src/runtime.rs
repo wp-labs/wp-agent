@@ -28,6 +28,7 @@ pub fn execute(workdir: &ExecutionWorkdir) -> io::Result<ActionResultContract> {
     if let Err(err) = validate_action_plan(&plan) {
         let started_at = now_rfc3339();
         let result = ActionResultContract {
+            request_id: Some(plan.meta.request_id.clone()),
             exit_reason: Some(err.code.to_string()),
             step_records: vec![StepActionRecord {
                 step_id: plan.program.entry.clone(),
@@ -40,7 +41,10 @@ pub fn execute(workdir: &ExecutionWorkdir) -> io::Result<ActionResultContract> {
                 error_code: Some(err.code.to_string()),
                 stdout_summary: None,
                 stderr_summary: None,
+                resource_usage: None,
             }],
+            started_at: Some(started_at.clone()),
+            finished_at: Some(started_at.clone()),
             ..ActionResultContract::new(
                 plan.meta.action_id.clone(),
                 runtime.execution_id.clone(),
@@ -95,11 +99,15 @@ pub fn execute(workdir: &ExecutionWorkdir) -> io::Result<ActionResultContract> {
             error_code: None,
             stdout_summary: None,
             stderr_summary: None,
+            resource_usage: None,
         })
         .collect();
 
     Ok(ActionResultContract {
+        request_id: Some(plan.meta.request_id),
         step_records,
+        started_at: Some(started_at),
+        finished_at: Some(finished_at),
         ..ActionResultContract::new(
             plan.meta.action_id,
             runtime.execution_id,

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::API_VERSION_V1;
 use crate::action_plan::ActionPlanContract;
-use crate::action_result::ActionResultContract;
+use crate::action_result::{ActionResultContract, FinalStatus};
 
 pub const DISPATCH_ACTION_PLAN_KIND: &str = "dispatch_action_plan";
 pub const ACTION_PLAN_ACK_KIND: &str = "action_plan_ack";
@@ -48,7 +48,7 @@ pub struct ActionPlanAck {
     pub plan_digest: String,
     pub agent_id: String,
     pub instance_id: String,
-    pub execution_id: String,
+    pub execution_id: Option<String>,
     pub ack_status: AckStatus,
     pub reason_code: Option<String>,
     pub reason_message: Option<String>,
@@ -65,7 +65,7 @@ impl ActionPlanAck {
         plan_digest: String,
         agent_id: String,
         instance_id: String,
-        execution_id: String,
+        execution_id: Option<String>,
         ack_status: AckStatus,
         received_at: String,
         acknowledged_at: String,
@@ -98,7 +98,7 @@ pub struct ReportActionResult {
     pub dispatch_id: Option<String>,
     pub action_id: String,
     pub report_attempt: u32,
-    pub final_status: String,
+    pub final_status: FinalStatus,
     pub execution_id: String,
     pub plan_digest: String,
     pub agent_id: String,
@@ -114,7 +114,7 @@ impl ReportActionResult {
         report_id: String,
         action_id: String,
         report_attempt: u32,
-        final_status: String,
+        final_status: FinalStatus,
         execution_id: String,
         plan_digest: String,
         agent_id: String,
@@ -145,8 +145,11 @@ impl ReportActionResult {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ResultAttestation {
+    /// Development placeholder until real signing and verifier plumbing is implemented.
     pub result_digest: String,
+    /// Development placeholder signature. Consumers must not treat this as production attestation.
     pub signature: String,
+    /// Development placeholder issuer identity, prefixed as `dev-placeholder:...`.
     pub issued_by: String,
     pub attested_at: String,
 }

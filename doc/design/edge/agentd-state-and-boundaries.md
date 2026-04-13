@@ -15,6 +15,7 @@
 相关文档：
 
 - [`agentd-architecture.md`](agentd-architecture.md)
+- [`agentd-failure-handling.md`](agentd-failure-handling.md)
 - [`agentd-exec-protocol.md`](agentd-exec-protocol.md)
 - [`action-plan-ir.md`](../execution/action-plan-ir.md)
 - [`roadmap.md`](../foundation/roadmap.md)

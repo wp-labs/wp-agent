@@ -1,6 +1,7 @@
 //! `ActionResult` contract types.
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::API_VERSION_V1;
 
@@ -13,10 +14,14 @@ pub struct ActionResultContract {
     pub kind: String,
     pub action_id: String,
     pub execution_id: String,
+    pub request_id: Option<String>,
     pub final_status: FinalStatus,
     pub exit_reason: Option<String>,
     pub step_records: Vec<StepActionRecord>,
     pub outputs: ActionOutputs,
+    pub resource_usage: Option<ExecutionResourceUsage>,
+    pub started_at: Option<String>,
+    pub finished_at: Option<String>,
 }
 
 impl ActionResultContract {
@@ -26,10 +31,14 @@ impl ActionResultContract {
             kind: ACTION_RESULT_KIND.to_string(),
             action_id,
             execution_id,
+            request_id: None,
             final_status,
             exit_reason: None,
             step_records: Vec::new(),
             outputs: ActionOutputs::default(),
+            resource_usage: None,
+            started_at: None,
+            finished_at: None,
         }
     }
 }
@@ -61,6 +70,7 @@ pub struct StepActionRecord {
     pub error_code: Option<String>,
     pub stdout_summary: Option<String>,
     pub stderr_summary: Option<String>,
+    pub resource_usage: Option<ExecutionResourceUsage>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -90,6 +100,15 @@ pub struct ActionOutputs {
 #[serde(deny_unknown_fields)]
 pub struct ActionOutputItem {
     pub name: String,
-    pub value: String,
+    pub value: Value,
     pub redacted: Option<bool>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ExecutionResourceUsage {
+    pub max_rss_bytes: Option<u64>,
+    pub cpu_time_ms: Option<u64>,
+    pub stdout_bytes: Option<u64>,
+    pub stderr_bytes: Option<u64>,
 }

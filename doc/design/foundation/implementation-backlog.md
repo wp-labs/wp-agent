@@ -248,6 +248,62 @@ wp-agent/
 - 能读写 `state/logs/file_inputs/<input_id>/checkpoints.json`
 - `checkpoint_offset` 与 `commit point` 语义被清晰编码
 
+### 4.9 B009 `agentd <-> exec` local protocol
+
+对应里程碑：
+
+- `M3`
+
+建议模块：
+
+- `crates/wp-agentd/src/executor_protocol.rs`
+- `crates/wp-agent-exec/src/protocol.rs`
+- `crates/wp-agent-shared/src/paths.rs`
+
+完成定义：
+
+- `plan.json` / `runtime.json` / `result.json` / `state.json` 的最小交互协议固定
+- `wp-agentd` 可稳定发现执行开始、执行结束、异常退出和取消结果
+- 本地协议边界不依赖中心长连接是否存在
+
+### 4.10 B010 runtime lifecycle / recovery baseline
+
+对应里程碑：
+
+- `M3`
+
+建议模块：
+
+- `crates/wp-agentd/src/supervisor.rs`
+- `crates/wp-agentd/src/recovery.rs`
+- `crates/wp-agentd/src/self_observability.rs`
+- `crates/wp-agent-shared/src/error_codes.rs`
+
+完成定义：
+
+- `wp-agentd` 具备最小健康检查与生命周期管理骨架
+- 基础错误码、panic 归因和 restart/recover 路径可落到统一口径
+- 本地恢复不会破坏已有 `state/` 与 workdir 边界
+
+### 4.11 B011 standalone mode + test harness
+
+对应里程碑：
+
+- `M3`
+
+建议模块：
+
+- `crates/wp-agentd/src/bootstrap.rs`
+- `crates/wp-agentd/src/config_runtime.rs`
+- `tests/e2e/standalone_smoke.rs`
+- `fixtures/runtime/standalone/`
+
+完成定义：
+
+- `control_plane.enabled = false` 的启动与运行路径固定
+- 最小 smoke / integration harness 可覆盖 standalone 启动、状态目录初始化和空执行闭环
+- `M3` 基线能力可以在 CI 中回归验证
+
 ---
 
 ## 5. P1 Backlog
@@ -553,7 +609,7 @@ wp-agent/
 
 ### 6.1 Package A
 
-- B001-B008
+- B001-B011
 - B101-B104
 
 结果：
@@ -583,7 +639,7 @@ wp-agent/
 
 ## 7. 当前最适合立刻创建的 issue
 
-建议立刻建 12 个 issue：
+建议立刻建 15 个 issue：
 
 1. contracts: 定义 `ActionPlan` / `ActionResult` / gateway envelopes
 2. validate: 建立 schema validator 与 fixtures
@@ -597,6 +653,9 @@ wp-agent/
 10. telemetry: record envelope + buffer/spool + `warp-parse` uplink
 11. metrics: Batch A integrations
 12. control center: request/query/dispatch core
+13. local protocol: `agentd <-> exec` workdir / state / result contract
+14. runtime: health / error codes / panic-restart / recovery baseline
+15. harness: standalone mode smoke / integration test baseline
 
 ---
 

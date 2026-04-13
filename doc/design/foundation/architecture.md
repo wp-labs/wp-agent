@@ -8,6 +8,7 @@
 - [`action-plan-schema.md`](../execution/action-plan-schema.md)：`ActionPlan` 的字段级协议定义
 - [`action-result-schema.md`](../execution/action-result-schema.md)：`ActionResult` 和 `StepActionRecord` 的字段级协议定义
 - [`agentd-architecture.md`](../edge/agentd-architecture.md)：`wp-agentd` 的模块边界、本地状态机和调度职责
+- [`agentd-failure-handling.md`](../edge/agentd-failure-handling.md)：`wp-agentd` 的故障分层、状态权威性、恢复和 health 口径
 - [`agentd-exec-protocol.md`](../edge/agentd-exec-protocol.md)：`wp-agentd` 与 `wp-agent-exec` 的本地交互协议
 - [`agentd-state-and-boundaries.md`](../edge/agentd-state-and-boundaries.md)：`wp-agentd` 的本地状态模型、唯一写入权和模块协作边界
 - [`agentd-state-schema.md`](../edge/agentd-state-schema.md)：`wp-agentd` 本地状态对象的字段级 schema
@@ -347,7 +348,7 @@ AI 更适合用于：
 
 这是一种面向边缘环境的最小进程隔离模型。
 
-### 5.4 进程间协作模型
+### 5.6 进程间协作模型
 
 第一版建议由 `wp-agentd` 作为本地唯一协调者：
 
@@ -379,7 +380,7 @@ wp-agentd
 
 这样可以把本地控制面收口到一个确定性入口，避免边缘侧控制面失序。
 
-### 5.5 进程隔离的具体收益
+### 5.7 进程隔离的具体收益
 
 把 daemon 与执行器分离，至少有以下直接收益：
 
@@ -394,7 +395,7 @@ wp-agentd
 - 审计清晰：
   `wp-agentd -> executor/upgrader -> result` 的调用链更容易形成稳定审计记录
 
-### 5.6 进程模型约束
+### 5.8 进程模型约束
 
 为了避免“为了隔离而过度拆分”，还需要补充以下约束：
 
@@ -406,7 +407,7 @@ wp-agentd
 
 也就是说，`wp-agent` 追求的是“高风险能力隔离”，不是“边缘侧服务化泛滥”。
 
-### 5.7 单机数据流
+### 5.9 单机数据流
 
 环境内 agent 的标准数据流建议为：
 
@@ -422,7 +423,7 @@ Input -> Parse -> Normalize -> Attach Resource Ref -> Build Event Envelope
 - `resource_refs` 应在第一跳尽量建立
 - `event_id` 应在边缘生成，避免中心端二次分配导致主线漂移
 
-### 5.8 运行时调度模型
+### 5.10 运行时调度模型
 
 环境内 agent 需要采用轻量、受控的调度模型。
 
@@ -436,7 +437,7 @@ Input -> Parse -> Normalize -> Attach Resource Ref -> Build Event Envelope
 
 这样做的目的是避免任一高成本任务拖垮整机 agent。
 
-### 5.9 本地状态
+### 5.11 本地状态
 
 环境内 agent 本地需要保存的状态应尽量少而明确：
 

@@ -1,4 +1,4 @@
-//! Lightweight local integrity helpers.
+//! Development-only local integrity helpers.
 
 use std::io;
 
@@ -21,6 +21,10 @@ pub fn digest_bytes(bytes: &[u8]) -> String {
     format!("fnv64:{hash:016x}")
 }
 
-pub fn sign_placeholder(issued_by: &str, digest: &str) -> String {
-    format!("devsig:{issued_by}:{digest}")
+pub fn sign_dev_placeholder(issued_by: &str, digest: &str) -> String {
+    format!("dev-placeholder-signature:{issued_by}:{digest}")
+}
+
+pub fn dev_placeholder_issuer(issued_by: &str) -> String {
+    format!("dev-placeholder:{issued_by}")
 }

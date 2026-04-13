@@ -7,7 +7,7 @@
 - `execution/`
   动作 DSL、`ActionPlan IR`、执行 schema、opcode schema、`run.gxl` 相关文档
 - `edge/`
-  `wp-agentd` / `wp-agent-exec` / 本地状态 / logs file state / 配置 / capability / 自观测
+  `wp-agentd` / `wp-agent-exec` / 本地状态 / 故障处理 / logs file state / 配置 / capability / 自观测
 - `center/`
   控制中心、控制平面、Gateway 协议、计划投递与结果回报 schema
 - `telemetry/`
@@ -20,9 +20,10 @@
 3. [foundation/security-model.md](./foundation/security-model.md)
 4. [execution/action-plan-ir.md](./execution/action-plan-ir.md)
 5. [edge/agentd-architecture.md](./edge/agentd-architecture.md)
-6. [center/control-center-architecture.md](./center/control-center-architecture.md)
-7. [telemetry/metrics-integration-roadmap.md](./telemetry/metrics-integration-roadmap.md)
-8. [telemetry/telemetry-uplink-and-warp-parse.md](./telemetry/telemetry-uplink-and-warp-parse.md)
-9. [telemetry/log-file-input-spec.md](./telemetry/log-file-input-spec.md)
-10. [edge/log-file-state-schema.md](./edge/log-file-state-schema.md)
-11. [foundation/implementation-backlog.md](./foundation/implementation-backlog.md)
+6. [edge/agentd-failure-handling.md](./edge/agentd-failure-handling.md)
+7. [center/control-center-architecture.md](./center/control-center-architecture.md)
+8. [telemetry/metrics-integration-roadmap.md](./telemetry/metrics-integration-roadmap.md)
+9. [telemetry/telemetry-uplink-and-warp-parse.md](./telemetry/telemetry-uplink-and-warp-parse.md)
+10. [telemetry/log-file-input-spec.md](./telemetry/log-file-input-spec.md)
+11. [edge/log-file-state-schema.md](./edge/log-file-state-schema.md)
+12. [foundation/implementation-backlog.md](./foundation/implementation-backlog.md)

@@ -3,6 +3,7 @@
 pub mod action_plan;
 pub mod action_result;
 pub mod config;
+pub mod gateway;
 pub mod state;
 
 use time::OffsetDateTime;

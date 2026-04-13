@@ -22,7 +22,7 @@ where
     match args.next().as_deref() {
         Some("run") => {}
         Some(other) => return Err(format!("unsupported subcommand: {other}")),
-        None => return std::env::current_dir().map_err(|err| err.to_string()),
+        None => return Err("missing subcommand: expected run --workdir <path>".to_string()),
     }
 
     match (args.next().as_deref(), args.next()) {
@@ -46,6 +46,7 @@ mod tests {
     use wp_agent_shared::fs::read_json;
     use wp_agent_shared::time::now_rfc3339;
 
+    use crate::parse_cli_args;
     use crate::result_writer;
     use crate::runtime;
     use crate::workdir::{ExecRuntimeContext, ExecutionWorkdir};
@@ -132,5 +133,11 @@ mod tests {
 
         assert_eq!(stored_result.final_status, FinalStatus::Succeeded);
         assert_eq!(stored_state.state, "succeeded");
+    }
+
+    #[test]
+    fn parse_cli_args_requires_subcommand() {
+        let err = parse_cli_args(std::iter::empty()).expect_err("missing args should fail");
+        assert!(err.contains("missing subcommand"));
     }
 }

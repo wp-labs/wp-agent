@@ -1,3 +1,6 @@
 fn main() {
-    wp_agent_upgrader::run();
+    if let Err(err) = wp_agent_upgrader::run() {
+        eprintln!("{err}");
+        std::process::exit(2);
+    }
 }
