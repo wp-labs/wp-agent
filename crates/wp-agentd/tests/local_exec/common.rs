@@ -14,7 +14,8 @@ use wp_agent_contracts::action_plan::{
 };
 use wp_agent_contracts::agent_config::{
     AgentConfigContract, AgentSection, ControlPlaneSection, ExecutionSection, LogFileInputSection,
-    LogsSection, PathsSection, TelemetrySection,
+    LogsFileOutputSection, LogsOutputSection, LogsSection, LogsTcpOutputSection, PathsSection,
+    TelemetrySection,
 };
 
 #[derive(Debug, Deserialize)]
@@ -169,11 +170,17 @@ pub(crate) fn standalone_config_with_file_input(
                 .join("logs")
                 .display()
                 .to_string(),
-            output_file: root
-                .join("log")
-                .join("warp-parse-records.ndjson")
-                .display()
-                .to_string(),
+            output: LogsOutputSection {
+                kind: "file".to_string(),
+                file: LogsFileOutputSection {
+                    path: root
+                        .join("log")
+                        .join("warp-parse-records.ndjson")
+                        .display()
+                        .to_string(),
+                },
+                ..LogsOutputSection::default()
+            },
         },
     })
 }
@@ -192,11 +199,52 @@ pub(crate) fn standalone_config_with_file_inputs(
                 .join("logs")
                 .display()
                 .to_string(),
-            output_file: root
-                .join("log")
-                .join("warp-parse-records.ndjson")
+            output: LogsOutputSection {
+                kind: "file".to_string(),
+                file: LogsFileOutputSection {
+                    path: root
+                        .join("log")
+                        .join("warp-parse-records.ndjson")
+                        .display()
+                        .to_string(),
+                },
+                ..LogsOutputSection::default()
+            },
+        },
+    })
+}
+
+pub(crate) fn standalone_config_with_tcp_file_input(
+    root: &std::path::Path,
+    input_path: &std::path::Path,
+    addr: &str,
+    port: u16,
+    framing: &str,
+) -> AgentConfigContract {
+    standalone_config(root).with_telemetry(TelemetrySection {
+        logs: LogsSection {
+            file_inputs: vec![LogFileInputSection {
+                input_id: "app".to_string(),
+                path: input_path.display().to_string(),
+                startup_position: "head".to_string(),
+                multiline_mode: "none".to_string(),
+            }],
+            in_memory_buffer_bytes: 1_048_576,
+            spool_dir: root
+                .join("state")
+                .join("spool")
+                .join("logs")
                 .display()
                 .to_string(),
+            output: LogsOutputSection {
+                kind: "tcp".to_string(),
+                tcp: LogsTcpOutputSection {
+                    addr: addr.to_string(),
+                    port,
+                    framing: framing.to_string(),
+                },
+                ..LogsOutputSection::default()
+            },
         },
     })
 }

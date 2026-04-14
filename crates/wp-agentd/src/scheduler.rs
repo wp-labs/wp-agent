@@ -15,7 +15,7 @@ use crate::state_store::execution_queue::{self, ExecutionQueueItem};
 #[path = "scheduler_queue_head.rs"]
 mod queue_head_support;
 
-use queue_head_support::{QueueHeadDisposition, handle_queue_head};
+use queue_head_support::{QueueHeadDisposition, handle_queue_head_async};
 
 #[derive(Debug, Clone)]
 pub struct SchedulerRequest {
@@ -99,11 +99,13 @@ pub fn submit_local_plan(request: &SchedulerRequest) -> io::Result<SchedulerOutc
     })
 }
 
-pub fn drain_next(request: &DrainRequest) -> io::Result<bool> {
-    Ok(drain_next_with_report(request)?.is_some())
+pub async fn drain_next_async(request: &DrainRequest) -> io::Result<bool> {
+    Ok(drain_next_with_report_async(request).await?.is_some())
 }
 
-pub fn drain_next_with_report(request: &DrainRequest) -> io::Result<Option<DrainOutcome>> {
+pub async fn drain_next_with_report_async(
+    request: &DrainRequest,
+) -> io::Result<Option<DrainOutcome>> {
     let queue_path = execution_queue::path_for(&request.state_dir);
     let mut queue = execution_queue::load_or_default(&queue_path)?;
     loop {
@@ -111,7 +113,7 @@ pub fn drain_next_with_report(request: &DrainRequest) -> io::Result<Option<Drain
             return Ok(None);
         };
 
-        match handle_queue_head(request, &item)? {
+        match handle_queue_head_async(request, &item).await? {
             QueueHeadDisposition::Blocked => return Ok(None),
             QueueHeadDisposition::ReloadQueue => {
                 queue = execution_queue::load_or_default(&queue_path)?;
@@ -123,6 +125,20 @@ pub fn drain_next_with_report(request: &DrainRequest) -> io::Result<Option<Drain
             }
         }
     }
+}
+
+pub fn drain_next(request: &DrainRequest) -> io::Result<bool> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(drain_next_async(request))
+}
+
+pub fn drain_next_with_report(request: &DrainRequest) -> io::Result<Option<DrainOutcome>> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(drain_next_with_report_async(request))
 }
 
 fn risk_level_name(risk: RiskLevel) -> &'static str {

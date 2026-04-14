@@ -1,11 +1,13 @@
 //! Local execution controller for `wp-agent-exec`.
 
-use std::fs::{self, File};
+use std::fs;
 use std::io;
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use tokio::fs::File;
+use tokio::process::Command;
 use wp_agent_contracts::action_plan::ActionPlanContract;
 use wp_agent_contracts::action_result::{ActionResultContract, FinalStatus};
 use wp_agent_shared::fs::{read_json, write_json_atomic};
@@ -47,7 +49,7 @@ pub struct LocalExecOutcome {
     pub result: ActionResultContract,
 }
 
-pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
+pub async fn execute_async(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
     let workdir = request
         .run_dir
         .join(ACTIONS_DIR)
@@ -68,8 +70,8 @@ pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
     write_json_atomic(&workdir.join(WORKDIR_PLAN_FILE), &request.plan)?;
     write_json_atomic(&workdir.join(WORKDIR_RUNTIME_FILE), &runtime)?;
 
-    let stdout_log = File::create(workdir.join("stdout.log"))?;
-    let stderr_log = File::create(workdir.join("stderr.log"))?;
+    let stdout_log = File::create(workdir.join("stdout.log")).await?;
+    let stderr_log = File::create(workdir.join("stderr.log")).await?;
 
     let mut child = Command::new(&request.exec_bin)
         .arg("run")
@@ -90,6 +92,9 @@ pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
         spawn_stream_capture(stdout_reader, stdout_log, request.stdout_limit_bytes);
     let stderr_capture =
         spawn_stream_capture(stderr_reader, stderr_log, request.stderr_limit_bytes);
+    let child_pid = child
+        .id()
+        .ok_or_else(|| io::Error::other("spawned child pid was not available"))?;
 
     let started_at = now_rfc3339();
     let running_path = running::path_for(&request.state_dir, &request.execution_id);
@@ -100,8 +105,8 @@ pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
         request.request_id.clone(),
         "spawned".to_string(),
         workdir.display().to_string(),
-        child.id().into(),
-        process_identity(child.id())?,
+        child_pid.into(),
+        process_identity(child_pid)?,
         started_at.clone(),
         runtime.deadline_at.clone(),
         None,
@@ -111,9 +116,9 @@ pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
         started_at,
     );
     if let Err(err) = running::store(&running_path, &running_state) {
-        terminate_child(&mut child)?;
-        join_capture(stdout_capture, "stdout")?;
-        join_capture(stderr_capture, "stderr")?;
+        terminate_child(&mut child).await?;
+        join_capture(stdout_capture, "stdout").await?;
+        join_capture(stderr_capture, "stderr").await?;
         return Err(io::Error::new(
             err.kind(),
             format!(
@@ -128,9 +133,10 @@ pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
         request.plan.constraints.max_total_duration_ms,
         request.cancel_grace_ms,
         &running_path,
-    )?;
-    join_capture(stdout_capture, "stdout")?;
-    join_capture(stderr_capture, "stderr")?;
+    )
+    .await?;
+    join_capture(stdout_capture, "stdout").await?;
+    join_capture(stderr_capture, "stderr").await?;
 
     let result_path = workdir.join(WORKDIR_RESULT_FILE);
     let result = load_or_synthesize_result(request, &workdir, &result_path, exit_status)?;
@@ -143,7 +149,7 @@ pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
         request.request_id.clone(),
         final_state_name(&result).to_string(),
         workdir.display().to_string(),
-        child.id().into(),
+        child_pid.into(),
         running_state.process_identity.clone(),
         running_state.started_at,
         runtime.deadline_at,
@@ -164,6 +170,13 @@ pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
         workdir,
         result,
     })
+}
+
+pub fn execute(request: &LocalExecRequest) -> io::Result<LocalExecOutcome> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(execute_async(request))
 }
 
 fn load_or_synthesize_result(

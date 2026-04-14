@@ -16,6 +16,6 @@ pub mod self_observability;
 pub mod state_store;
 pub(crate) mod telemetry;
 
-pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    runtime_entry::run()
+pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    runtime_entry::run().await
 }

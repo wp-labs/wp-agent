@@ -37,7 +37,7 @@ struct TestSink {
 }
 
 impl RecordSink for TestSink {
-    fn write_records(
+    async fn write_records(
         &mut self,
         records: &[wp_agent_contracts::telemetry_record::TelemetryRecordContract],
     ) -> io::Result<()> {

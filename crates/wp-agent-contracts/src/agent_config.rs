@@ -131,8 +131,8 @@ pub struct LogsSection {
     pub in_memory_buffer_bytes: u64,
     #[serde(default = "default_logs_spool_dir")]
     pub spool_dir: String,
-    #[serde(default = "default_logs_output_file")]
-    pub output_file: String,
+    #[serde(default)]
+    pub output: LogsOutputSection,
 }
 
 impl Default for LogsSection {
@@ -141,7 +141,64 @@ impl Default for LogsSection {
             file_inputs: Vec::new(),
             in_memory_buffer_bytes: default_logs_buffer_bytes(),
             spool_dir: default_logs_spool_dir(),
-            output_file: default_logs_output_file(),
+            output: LogsOutputSection::default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LogsOutputSection {
+    #[serde(default = "default_logs_output_kind")]
+    pub kind: String,
+    #[serde(default)]
+    pub file: LogsFileOutputSection,
+    #[serde(default)]
+    pub tcp: LogsTcpOutputSection,
+}
+
+impl Default for LogsOutputSection {
+    fn default() -> Self {
+        Self {
+            kind: default_logs_output_kind(),
+            file: LogsFileOutputSection::default(),
+            tcp: LogsTcpOutputSection::default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LogsFileOutputSection {
+    #[serde(default = "default_logs_output_file")]
+    pub path: String,
+}
+
+impl Default for LogsFileOutputSection {
+    fn default() -> Self {
+        Self {
+            path: default_logs_output_file(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LogsTcpOutputSection {
+    #[serde(default = "default_logs_output_tcp_addr")]
+    pub addr: String,
+    #[serde(default = "default_logs_output_tcp_port")]
+    pub port: u16,
+    #[serde(default = "default_logs_output_tcp_framing")]
+    pub framing: String,
+}
+
+impl Default for LogsTcpOutputSection {
+    fn default() -> Self {
+        Self {
+            addr: default_logs_output_tcp_addr(),
+            port: default_logs_output_tcp_port(),
+            framing: default_logs_output_tcp_framing(),
         }
     }
 }
@@ -199,6 +256,22 @@ fn default_logs_spool_dir() -> String {
 
 fn default_logs_output_file() -> String {
     "log/warp-parse-records.ndjson".to_string()
+}
+
+fn default_logs_output_kind() -> String {
+    "file".to_string()
+}
+
+fn default_logs_output_tcp_addr() -> String {
+    "127.0.0.1".to_string()
+}
+
+fn default_logs_output_tcp_port() -> u16 {
+    9000
+}
+
+fn default_logs_output_tcp_framing() -> String {
+    "line".to_string()
 }
 
 fn default_multiline_mode() -> String {

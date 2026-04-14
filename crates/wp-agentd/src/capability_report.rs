@@ -93,7 +93,8 @@ mod tests {
     use super::build_capability_report;
     use wp_agent_contracts::agent_config::{
         AgentConfigContract, AgentSection, ControlPlaneSection, ExecutionSection,
-        LogFileInputSection, LogsSection, PathsSection, TelemetrySection,
+        LogFileInputSection, LogsFileOutputSection, LogsOutputSection, LogsSection, PathsSection,
+        TelemetrySection,
     };
 
     fn config_with_logs() -> AgentConfigContract {
@@ -140,7 +141,13 @@ mod tests {
                 ],
                 in_memory_buffer_bytes: 65_536,
                 spool_dir: "/tmp/root/state/spool/logs".to_string(),
-                output_file: "/tmp/root/log/records.ndjson".to_string(),
+                output: LogsOutputSection {
+                    kind: "file".to_string(),
+                    file: LogsFileOutputSection {
+                        path: "/tmp/root/log/records.ndjson".to_string(),
+                    },
+                    ..LogsOutputSection::default()
+                },
             },
         })
     }

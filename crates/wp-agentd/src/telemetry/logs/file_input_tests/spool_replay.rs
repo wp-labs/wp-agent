@@ -1,4 +1,5 @@
 use std::fs;
+use std::io;
 
 use super::{FileInputProcessor, TestSink, config, read_output_records, spool, temp_dir};
 use crate::telemetry::warp_parse::FileRecordSink;
@@ -65,4 +66,38 @@ fn replays_spooled_records_after_sink_recovers_and_clears_spool() {
     assert_eq!(records[0].body, first_line);
     assert_eq!(records[1].body, second_line);
     assert_eq!(records[2].body, "third\n");
+}
+
+#[test]
+fn replay_failure_is_reported_when_spool_exists_but_sink_is_still_unavailable() {
+    let root = temp_dir("spool-replay-failure");
+    let source_path = root.join("app.log");
+    fs::create_dir_all(root.join("state")).expect("create state");
+    fs::write(&source_path, "first\nsecond\n").expect("write log");
+
+    let mut first = FileInputProcessor::new(
+        config(&root, &source_path),
+        TestSink {
+            fail_writes: true,
+            ..Default::default()
+        },
+    );
+    first.process_once().expect("first process");
+
+    let mut replay = FileInputProcessor::new(
+        config(&root, &source_path),
+        TestSink {
+            fail_writes: true,
+            ..Default::default()
+        },
+    );
+    let err = replay.process_once().expect_err("replay should fail");
+
+    assert_eq!(err.kind(), io::ErrorKind::Other);
+    assert!(
+        root.join("state")
+            .join("spool")
+            .join("input-app.ndjson")
+            .exists()
+    );
 }

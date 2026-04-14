@@ -54,8 +54,10 @@ fn default_config_template_contains_file_input_example() {
     let template = default_config_template();
 
     assert!(template.contains("[telemetry.logs]"));
+    assert!(template.contains("[telemetry.logs.output]"));
     assert!(template.contains("# [[telemetry.logs.file_inputs]]"));
-    assert!(template.contains("output_file = \"log/warp-parse-records.ndjson\""));
+    assert!(template.contains("path = \"log/warp-parse-records.ndjson\""));
+    assert!(template.contains("# kind = \"tcp\""));
     assert!(!template.contains("max_running_actions = 1"));
     assert!(!template.contains("instance_name = \"local\""));
 }
@@ -91,7 +93,12 @@ default_stderr_limit_bytes = 1048576
 
 [telemetry.logs]
 spool_dir = "state/spool/logs"
-output_file = "log/out.ndjson"
+
+[telemetry.logs.output]
+kind = "file"
+
+[telemetry.logs.output.file]
+path = "log/out.ndjson"
 
 [[telemetry.logs.file_inputs]]
 input_id = "app"
@@ -120,7 +127,7 @@ multiline_mode = "indented"
         Some(format!("{home}/instance").as_str())
     );
     assert_eq!(
-        config.telemetry.logs.output_file,
+        config.telemetry.logs.output.file.path,
         Path::new(&home)
             .join("agent-root")
             .join("log")
@@ -136,6 +143,41 @@ multiline_mode = "indented"
             .display()
             .to_string()
     );
+}
+
+#[test]
+fn load_from_path_expands_tcp_output_env_without_path_resolution() {
+    let root = temp_dir("load-tcp-output");
+    let config_path = root.join("agent.toml");
+    fs::write(
+        &config_path,
+        r#"
+schema_version = "v1"
+
+[telemetry.logs]
+spool_dir = "state/spool/logs"
+
+[telemetry.logs.output]
+kind = "tcp"
+
+[telemetry.logs.output.tcp]
+addr = "${HOME}/warp-parse.local"
+port = 9001
+framing = "len"
+"#,
+    )
+    .expect("write config");
+
+    let config = load_from_path(&config_path).expect("load config");
+    let home = std::env::var("HOME").expect("HOME");
+
+    assert_eq!(config.telemetry.logs.output.kind, "tcp");
+    assert_eq!(
+        config.telemetry.logs.output.tcp.addr,
+        format!("{home}/warp-parse.local")
+    );
+    assert_eq!(config.telemetry.logs.output.tcp.port, 9001);
+    assert_eq!(config.telemetry.logs.output.tcp.framing, "len");
 }
 
 #[test]
@@ -185,8 +227,10 @@ fn load_from_path_uses_defaults_for_missing_paths_and_execution() {
 schema_version = "v1"
 
 [telemetry.logs]
-output_file = "log/out.ndjson"
 spool_dir = "state/spool/logs"
+
+[telemetry.logs.output.file]
+path = "log/out.ndjson"
 "#,
     )
     .expect("write config");
@@ -203,4 +247,5 @@ spool_dir = "state/spool/logs"
     assert_eq!(config.execution.max_running_actions, 1);
     assert_eq!(config.execution.cancel_grace_ms, 5_000);
     assert!(config.agent.instance_name.is_none());
+    assert_eq!(config.telemetry.logs.output.kind, "file");
 }

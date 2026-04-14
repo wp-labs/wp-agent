@@ -11,6 +11,7 @@ serde.workspace = true
 serde_json.workspace = true
 time.workspace = true
 toml.workspace = true
+tokio.workspace = true
 wp-agent-contracts.workspace = true
 wp-agent-shared.workspace = true
 wp-agent-validate.workspace = true

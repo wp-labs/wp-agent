@@ -10,9 +10,9 @@ use wp_agent_shared::paths::AGENT_CONFIG_FILE;
 const CONFIG_DIR: &str = "wp-agentd";
 const LEGACY_CONFIG_DIR: &str = ".wp-agentd";
 
-pub(crate) fn run() -> Result<(), Box<dyn std::error::Error>> {
+pub(crate) async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let root = std::env::current_dir()?;
-    run_from_args(root, std::env::args_os().skip(1))
+    run_from_args_async(root, std::env::args_os().skip(1)).await
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ struct ParsedArgs {
     config_dir: Option<PathBuf>,
 }
 
-fn run_from_args<I, S>(root: PathBuf, args: I) -> Result<(), Box<dyn std::error::Error>>
+async fn run_from_args_async<I, S>(root: PathBuf, args: I) -> Result<(), Box<dyn std::error::Error>>
 where
     I: IntoIterator<Item = S>,
     S: Into<OsString>,
@@ -39,7 +39,7 @@ where
             print!("{}", usage_message());
             Ok(())
         }
-        Command::Run => run_daemon(root, parsed.config_dir.as_deref()),
+        Command::Run => run_daemon(root, parsed.config_dir.as_deref()).await,
         Command::InitConfig { stdout_only: true } => {
             print!("{}", crate::config_runtime::default_config_template());
             Ok(())
@@ -51,6 +51,18 @@ where
             Ok(())
         }
     }
+}
+
+#[cfg(test)]
+fn run_from_args<I, S>(root: PathBuf, args: I) -> Result<(), Box<dyn std::error::Error>>
+where
+    I: IntoIterator<Item = S>,
+    S: Into<OsString>,
+{
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(run_from_args_async(root, args))
 }
 
 fn parse_command<I, S>(args: I) -> io::Result<ParsedArgs>
@@ -149,7 +161,10 @@ fn looks_like_option(value: &OsString) -> bool {
         .is_some_and(|text| matches!(text, "--help" | "-h" | "--stdout" | "--config-dir"))
 }
 
-fn run_daemon(root: PathBuf, config_dir: Option<&Path>) -> Result<(), Box<dyn std::error::Error>> {
+async fn run_daemon(
+    root: PathBuf,
+    config_dir: Option<&Path>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let config_root = match config_dir {
         Some(path) => resolve_requested_config_root(&root, Some(path)),
         None => resolve_config_root(&root),
@@ -171,12 +186,12 @@ fn run_daemon(root: PathBuf, config_dir: Option<&Path>) -> Result<(), Box<dyn st
     };
 
     if std::env::var("WP_AGENTD_RUN_ONCE").ok().as_deref() == Some("1") {
-        let snapshot = daemon::run_once(&loop_ctx)?;
+        let snapshot = daemon::run_once_async(&loop_ctx).await?;
         self_observability::emit(&snapshot);
         return Ok(());
     }
 
-    daemon::run_forever(loop_ctx)?;
+    daemon::run_forever_async(loop_ctx).await?;
     Ok(())
 }
 

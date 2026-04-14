@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use wp_agent_contracts::action_plan::ActionPlanContract;
 use wp_agent_shared::paths::ACTIONS_DIR;
 
-use crate::local_exec::{LocalExecRequest, execute as execute_local};
+use crate::local_exec::{LocalExecRequest, execute_async as execute_local_async};
 use crate::process_control::{
     RunningStateStatus, handle_expired_running_state, inspect_running_state,
 };
@@ -30,7 +30,7 @@ pub(super) enum QueueHeadDisposition {
     Completed(Box<DrainOutcome>),
 }
 
-pub(super) fn handle_queue_head(
+pub(super) async fn handle_queue_head_async(
     request: &DrainRequest,
     item: &ExecutionQueueItem,
 ) -> io::Result<QueueHeadDisposition> {
@@ -40,7 +40,7 @@ pub(super) fn handle_queue_head(
     if let Some(disposition) = reconcile_queue_head(request, item, &head)? {
         return Ok(disposition);
     }
-    execute_queue_head(request, item, &head)
+    execute_queue_head_async(request, item, &head).await
 }
 
 fn load_queue_head_context(
@@ -112,12 +112,12 @@ fn reconcile_queue_head(
     Ok(Some(QueueHeadDisposition::Completed(Box::new(recovered))))
 }
 
-fn execute_queue_head(
+async fn execute_queue_head_async(
     request: &DrainRequest,
     item: &ExecutionQueueItem,
     head: &QueueHeadContext,
 ) -> io::Result<QueueHeadDisposition> {
-    let local_result = match execute_local(&LocalExecRequest {
+    let local_result = match execute_local_async(&LocalExecRequest {
         execution_id: item.execution_id.clone(),
         run_dir: request.run_dir.clone(),
         state_dir: request.state_dir.clone(),
@@ -128,7 +128,9 @@ fn execute_queue_head(
         plan_digest: item.plan_digest.clone(),
         request_id: item.request_id.clone(),
         plan: head.plan.clone(),
-    }) {
+    })
+    .await
+    {
         Ok(local_result) => local_result,
         Err(err) => {
             quarantine_queue_head(

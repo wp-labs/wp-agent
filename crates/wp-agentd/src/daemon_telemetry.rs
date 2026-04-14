@@ -1,11 +1,18 @@
+use std::io;
 use std::path::PathBuf;
 
 use wp_agent_contracts::agent_config::{AgentConfigContract, LogFileInputSection};
 
-use crate::telemetry::logs::file_input::{FileInputConfig, FileInputProcessor, ProcessOutcome};
-use crate::telemetry::logs::file_watcher::StartupPosition;
-use crate::telemetry::logs::multiline::MultilineMode;
-use crate::telemetry::warp_parse::FileRecordSink;
+use crate::telemetry::logs::file_input::{FileInputProcessor, ProcessOutcome};
+use crate::telemetry::warp_parse::RecordSink;
+
+#[path = "daemon_telemetry_support.rs"]
+mod support;
+
+use support::{
+    build_file_input_config, build_record_sink, invalid_output_failure, missing_input_failure,
+    processing_failure, replay_spool_only,
+};
 
 pub(super) struct TelemetryTick {
     pub(super) outcomes: Vec<ProcessOutcome>,
@@ -16,6 +23,7 @@ pub(super) struct TelemetryTick {
 pub(super) enum TelemetryFailureKind {
     MissingInput,
     ProcessingFailed,
+    InvalidOutput,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -35,57 +43,60 @@ impl TelemetryTick {
     }
 }
 
-pub(super) fn process_telemetry_inputs(config: &AgentConfigContract) -> TelemetryTick {
+pub(super) async fn process_telemetry_inputs(config: &AgentConfigContract) -> TelemetryTick {
     let mut outcomes = Vec::new();
     let mut failures = Vec::new();
+    let mut sink = match build_record_sink(config) {
+        Ok(sink) => sink,
+        Err(err) => {
+            for input in &config.telemetry.logs.file_inputs {
+                failures.push(invalid_output_failure(input, err.to_string()));
+            }
+            return TelemetryTick { outcomes, failures };
+        }
+    };
+
     for input in &config.telemetry.logs.file_inputs {
-        let source_path = PathBuf::from(&input.path);
-        if !source_path.exists() {
-            failures.push(TelemetryFailure {
-                kind: TelemetryFailureKind::MissingInput,
-                input_id: input.input_id.clone(),
-                path: input.path.clone(),
-                detail: "source path does not exist".to_string(),
-            });
-            continue;
-        }
-        let sink = FileRecordSink::new(PathBuf::from(&config.telemetry.logs.output_file));
-        let mut processor = FileInputProcessor::new(
-            FileInputConfig {
-                input_id: input.input_id.clone(),
-                source_path,
-                state_dir: PathBuf::from(&config.paths.state_dir),
-                spool_path: PathBuf::from(&config.telemetry.logs.spool_dir)
-                    .join(format!("{}.ndjson", input.input_id)),
-                startup_position: startup_position_for(input),
-                multiline_mode: multiline_mode_for(input),
-                in_memory_budget_bytes: config.telemetry.logs.in_memory_buffer_bytes as usize,
-            },
-            sink,
-        );
-        match processor.process_once() {
-            Ok(outcome) => outcomes.push(outcome),
-            Err(err) => failures.push(TelemetryFailure {
-                kind: TelemetryFailureKind::ProcessingFailed,
-                input_id: input.input_id.clone(),
-                path: input.path.clone(),
-                detail: err.to_string(),
-            }),
-        }
+        process_telemetry_input(config, input, &mut sink, &mut outcomes, &mut failures).await;
     }
+
     TelemetryTick { outcomes, failures }
 }
 
-fn multiline_mode_for(input: &LogFileInputSection) -> MultilineMode {
-    match input.multiline_mode.as_str() {
-        "indented" => MultilineMode::IndentedContinuation,
-        _ => MultilineMode::None,
+async fn process_telemetry_input<S: RecordSink>(
+    config: &AgentConfigContract,
+    input: &LogFileInputSection,
+    sink: &mut S,
+    outcomes: &mut Vec<ProcessOutcome>,
+    failures: &mut Vec<TelemetryFailure>,
+) {
+    let source_path = PathBuf::from(&input.path);
+    if !source_path.exists() {
+        failures.push(missing_input_failure(input));
+        match replay_spool_only(config, input, sink).await {
+            Ok(Some(outcome)) => outcomes.push(outcome),
+            Ok(None) => {}
+            Err(err) => failures.push(processing_failure(
+                input,
+                format!("failed to replay spool: {err}"),
+            )),
+        }
+        return;
+    }
+
+    match process_input_with_sink(config, input, source_path, sink).await {
+        Ok(outcome) => outcomes.push(outcome),
+        Err(err) => failures.push(processing_failure(input, err.to_string())),
     }
 }
 
-fn startup_position_for(input: &LogFileInputSection) -> StartupPosition {
-    match input.startup_position.as_str() {
-        "tail" => StartupPosition::Tail,
-        _ => StartupPosition::Head,
-    }
+async fn process_input_with_sink<S: RecordSink>(
+    config: &AgentConfigContract,
+    input: &LogFileInputSection,
+    source_path: PathBuf,
+    sink: &mut S,
+) -> io::Result<ProcessOutcome> {
+    let mut processor =
+        FileInputProcessor::new(build_file_input_config(config, input, source_path), sink);
+    processor.process_once_async().await
 }

@@ -8,15 +8,15 @@ use wp_agent_shared::time::now_rfc3339;
 
 use crate::state_store::log_checkpoint_state::{PendingMultilineState, TrackedFileCheckpoint};
 use crate::state_store::log_checkpoints;
-use crate::telemetry::buffer::TelemetryBuffer;
 use crate::telemetry::logs::file_reader::{inspect_path, read_from_offset};
 use crate::telemetry::logs::file_watcher::{StartupPosition, decide_resume};
 use crate::telemetry::logs::multiline::MultilineMode;
-use crate::telemetry::spool;
 use crate::telemetry::warp_parse::RecordSink;
 
 #[path = "file_input_checkpoint_support.rs"]
 mod checkpoint_support;
+#[path = "file_input_delivery_support.rs"]
+mod delivery_support;
 #[path = "file_input_multiline_support.rs"]
 mod multiline_support;
 #[path = "file_input_state.rs"]
@@ -25,6 +25,7 @@ mod state_support;
 use checkpoint_support::{
     checkpoint_for_path, find_rotated_path, relocate_checkpoint_path, upsert_checkpoint,
 };
+use delivery_support::{deliver_records, replay_spool_if_present};
 use multiline_support::{
     flush_pending_if_source_changes, pending_should_flush, rebind_pending_source_on_rotate,
     records_from_pending, records_from_read,
@@ -45,7 +46,14 @@ pub struct FileInputConfig {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ProcessOutcomeKind {
+    SourceBatch,
+    SpoolReplayOnly,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProcessOutcome {
+    pub kind: ProcessOutcomeKind,
     pub records_processed: usize,
     pub emitted_directly: usize,
     pub spooled: usize,
@@ -53,6 +61,40 @@ pub struct ProcessOutcome {
     pub replayed_spool: usize,
     pub truncated: bool,
     pub rotated: bool,
+}
+
+impl ProcessOutcome {
+    fn from_delivery(
+        delivery: DeliveryOutcome,
+        checkpoint_offset: u64,
+        replayed_spool: usize,
+        truncated: bool,
+        rotated: bool,
+    ) -> Self {
+        Self {
+            kind: ProcessOutcomeKind::SourceBatch,
+            records_processed: delivery.records_processed,
+            emitted_directly: delivery.emitted_directly,
+            spooled: delivery.spooled,
+            checkpoint_offset,
+            replayed_spool,
+            truncated,
+            rotated,
+        }
+    }
+
+    pub(crate) fn spool_replay_only(replayed_spool: usize) -> Self {
+        Self {
+            kind: ProcessOutcomeKind::SpoolReplayOnly,
+            records_processed: 0,
+            emitted_directly: 0,
+            spooled: 0,
+            checkpoint_offset: 0,
+            replayed_spool,
+            truncated: false,
+            rotated: false,
+        }
+    }
 }
 
 pub struct FileInputProcessor<S> {
@@ -68,8 +110,8 @@ where
         Self { config, sink }
     }
 
-    pub fn process_once(&mut self) -> io::Result<ProcessOutcome> {
-        let mut runtime = self.load_runtime_state()?;
+    pub async fn process_once_async(&mut self) -> io::Result<ProcessOutcome> {
+        let mut runtime = self.load_runtime_state_async().await?;
         let batch = self.collect_read_batch(&mut runtime)?;
         let CollectedReadBatch {
             records,
@@ -78,21 +120,24 @@ where
             checkpoint_offset,
             resume,
         } = batch;
-        let delivery = self.deliver_records(records)?;
+        let delivery = self.deliver_records_async(records).await?;
         self.commit_log_state(&mut runtime, checkpoints, pending_multiline)?;
 
-        Ok(ProcessOutcome {
-            records_processed: delivery.records_processed,
-            emitted_directly: delivery.emitted_directly,
-            spooled: delivery.spooled,
+        Ok(ProcessOutcome::from_delivery(
+            delivery,
             checkpoint_offset,
-            replayed_spool: runtime.replayed_spool,
-            truncated: resume.truncated,
-            rotated: resume.rotated,
-        })
+            runtime.replayed_spool,
+            resume.truncated,
+            resume.rotated,
+        ))
     }
 
-    fn load_runtime_state(&mut self) -> io::Result<RuntimeState> {
+    #[cfg(test)]
+    pub fn process_once(&mut self) -> io::Result<ProcessOutcome> {
+        block_on_io(self.process_once_async())
+    }
+
+    async fn load_runtime_state_async(&mut self) -> io::Result<RuntimeState> {
         let checkpoint_path =
             log_checkpoints::path_for(&self.config.state_dir, &self.config.input_id);
         Ok(RuntimeState {
@@ -102,7 +147,12 @@ where
             )?,
             checkpoint_path,
             observed_at: now_rfc3339(),
-            replayed_spool: self.flush_spool_if_possible()?,
+            replayed_spool: replay_spool_if_present(
+                &mut self.sink,
+                &self.config.spool_path,
+                SPOOL_REPLAY_BATCH_SIZE,
+            )
+            .await?,
         })
     }
 
@@ -209,44 +259,17 @@ where
         Ok(saw_new_lines)
     }
 
-    fn deliver_records(
+    async fn deliver_records_async(
         &mut self,
         records: Vec<TelemetryRecordContract>,
     ) -> io::Result<DeliveryOutcome> {
-        let records_processed = records.len();
-        let mut emitted_directly = 0usize;
-        let mut spooled = 0usize;
-        let mut buffer = TelemetryBuffer::new(self.config.in_memory_budget_bytes);
-        let staged = buffer.stage_all(records);
-
-        if spool::has_records(&self.config.spool_path)? {
-            let mut to_spool = staged.staged;
-            to_spool.extend(staged.overflowed);
-            spooled = to_spool.len();
-            spool::append_records(&self.config.spool_path, &to_spool)?;
-        } else {
-            if !staged.overflowed.is_empty() {
-                spooled += staged.overflowed.len();
-                spool::append_records(&self.config.spool_path, &staged.overflowed)?;
-            }
-            if !staged.staged.is_empty() {
-                match self.sink.write_records(&staged.staged) {
-                    Ok(()) => {
-                        emitted_directly = staged.staged.len();
-                    }
-                    Err(_) => {
-                        spooled += staged.staged.len();
-                        spool::append_records(&self.config.spool_path, &staged.staged)?;
-                    }
-                }
-            }
-        }
-
-        Ok(DeliveryOutcome {
-            records_processed,
-            emitted_directly,
-            spooled,
-        })
+        deliver_records(
+            &mut self.sink,
+            &self.config.spool_path,
+            self.config.in_memory_budget_bytes,
+            records,
+        )
+        .await
     }
 
     fn commit_log_state(
@@ -269,21 +292,14 @@ where
         runtime.log_state.updated_at = runtime.observed_at.clone();
         log_checkpoints::store(&runtime.checkpoint_path, &runtime.log_state)
     }
+}
 
-    fn flush_spool_if_possible(&mut self) -> io::Result<usize> {
-        if !spool::has_records(&self.config.spool_path)? {
-            return Ok(0);
-        }
-
-        match spool::replay_records(
-            &self.config.spool_path,
-            &mut self.sink,
-            SPOOL_REPLAY_BATCH_SIZE,
-        ) {
-            Ok(replayed) => Ok(replayed),
-            Err(_) => Ok(0),
-        }
-    }
+#[cfg(test)]
+fn block_on_io<T>(future: impl std::future::Future<Output = io::Result<T>>) -> io::Result<T> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(future)
 }
 
 #[cfg(test)]

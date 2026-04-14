@@ -1,10 +1,12 @@
-use std::fs::File;
-use std::io::{self, Read, Write};
+use std::io;
 use std::path::Path;
-use std::process::{Child, ExitStatus};
-use std::thread::{self, JoinHandle};
-use std::time::{Duration, Instant};
+use std::process::ExitStatus;
+use std::time::Duration;
 
+use tokio::fs::File;
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncWriteExt};
+use tokio::process::Child;
+use tokio::task::JoinHandle;
 use wp_agent_contracts::action_result::{
     ActionOutputs, ActionResultContract, FinalStatus, StepActionRecord, StepStatus,
 };
@@ -58,51 +60,50 @@ pub(super) fn write_timed_out_result(
     Ok(result)
 }
 
-pub(super) fn wait_for_child(
+pub(super) async fn wait_for_child(
     child: &mut Child,
     timeout_ms: u64,
     cancel_grace_ms: u64,
     running_path: &Path,
 ) -> io::Result<ExitClassification> {
-    let deadline = Instant::now() + Duration::from_millis(timeout_ms.max(1));
-    loop {
+    if let Some(status) = child.try_wait()? {
+        return Ok(ExitClassification::Completed(status));
+    }
+
+    if let Ok(status) =
+        tokio::time::timeout(Duration::from_millis(timeout_ms.max(1)), child.wait()).await
+    {
+        return Ok(ExitClassification::Completed(status?));
+    }
+
+    if let Some(status) = child.try_wait()? {
+        return Ok(ExitClassification::Completed(status));
+    }
+
+    record_signal_request(running_path, SignalRequestKind::Cancel)?;
+    if let Some(pid) = child.id()
+        && let Err(err) = send_terminate(pid)
+    {
         if let Some(status) = child.try_wait()? {
-            return Ok(ExitClassification::Completed(status));
+            return Ok(ExitClassification::CompletedAfterTimeout(status));
         }
-        if Instant::now() >= deadline {
-            if let Some(status) = child.try_wait()? {
-                return Ok(ExitClassification::Completed(status));
-            }
-            let pid = child.id();
-            record_signal_request(running_path, SignalRequestKind::Cancel)?;
-            if let Err(err) = send_terminate(pid) {
-                if let Some(status) = child.try_wait()? {
-                    return Ok(ExitClassification::CompletedAfterTimeout(status));
-                }
-                if err.kind() != io::ErrorKind::InvalidInput {
-                    return Err(err);
-                }
-            }
-            let cancel_deadline = Instant::now() + Duration::from_millis(cancel_grace_ms.max(1));
-            while Instant::now() < cancel_deadline {
-                if let Some(status) = child.try_wait()? {
-                    return Ok(ExitClassification::CompletedAfterTimeout(status));
-                }
-                thread::sleep(Duration::from_millis(10));
-            }
+        if err.kind() != io::ErrorKind::InvalidInput {
+            return Err(err);
+        }
+    }
+
+    match tokio::time::timeout(Duration::from_millis(cancel_grace_ms.max(1)), child.wait()).await {
+        Ok(status) => Ok(ExitClassification::CompletedAfterTimeout(status?)),
+        Err(_) => {
             record_signal_request(running_path, SignalRequestKind::Kill)?;
-            if let Err(err) = child.kill() {
-                if child.try_wait()?.is_some() {
-                    return Ok(ExitClassification::TimedOut);
-                }
-                if err.kind() != io::ErrorKind::InvalidInput {
+            if let Err(err) = child.start_kill() {
+                if child.try_wait()?.is_none() && err.kind() != io::ErrorKind::InvalidInput {
                     return Err(err);
                 }
             }
-            let _ = child.wait()?;
-            return Ok(ExitClassification::TimedOut);
+            let _ = child.wait().await?;
+            Ok(ExitClassification::TimedOut)
         }
-        thread::sleep(Duration::from_millis(10));
     }
 }
 
@@ -112,15 +113,15 @@ pub(super) fn spawn_stream_capture<R>(
     limit_bytes: u64,
 ) -> JoinHandle<io::Result<()>>
 where
-    R: Read + Send + 'static,
+    R: AsyncRead + Unpin + Send + 'static,
 {
-    thread::spawn(move || {
+    tokio::spawn(async move {
         let mut buf = [0u8; 8192];
         let mut written = 0u64;
         let mut truncated = false;
 
         loop {
-            let read = reader.read(&mut buf)?;
+            let read = reader.read(&mut buf).await?;
             if read == 0 {
                 break;
             }
@@ -129,26 +130,26 @@ where
                 let remaining = (limit_bytes - written) as usize;
                 let to_write = read.min(remaining);
                 if to_write > 0 {
-                    output.write_all(&buf[..to_write])?;
+                    output.write_all(&buf[..to_write]).await?;
                     written += to_write as u64;
                 }
                 if to_write < read && !truncated {
-                    output.write_all(STREAM_TRUNCATED_MARKER.as_bytes())?;
+                    output.write_all(STREAM_TRUNCATED_MARKER.as_bytes()).await?;
                     truncated = true;
                 }
             }
         }
 
-        output.sync_all()?;
+        output.sync_all().await?;
         Ok(())
     })
 }
 
-pub(super) fn join_capture(
+pub(super) async fn join_capture(
     handle: JoinHandle<io::Result<()>>,
     stream_name: &str,
 ) -> io::Result<()> {
-    match handle.join() {
+    match handle.await {
         Ok(result) => result,
         Err(_) => Err(io::Error::other(format!(
             "{stream_name} capture thread panicked"
@@ -156,17 +157,17 @@ pub(super) fn join_capture(
     }
 }
 
-pub(super) fn terminate_child(child: &mut Child) -> io::Result<()> {
+pub(super) async fn terminate_child(child: &mut Child) -> io::Result<()> {
     if child.try_wait()?.is_some() {
         return Ok(());
     }
 
-    match child.kill() {
+    match child.start_kill() {
         Ok(()) => {}
         Err(err) if err.kind() == io::ErrorKind::InvalidInput => {}
         Err(err) => return Err(err),
     }
-    let _ = child.wait()?;
+    let _ = child.wait().await?;
     Ok(())
 }
 

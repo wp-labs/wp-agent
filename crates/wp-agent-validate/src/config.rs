@@ -46,9 +46,31 @@ pub fn validate_config(contract: &AgentConfigContract) -> Result<(), ValidationE
     }
     require_non_empty(&contract.telemetry.logs.spool_dir, "missing_logs_spool_dir")?;
     require_non_empty(
-        &contract.telemetry.logs.output_file,
-        "missing_logs_output_file",
+        &contract.telemetry.logs.output.kind,
+        "missing_logs_output_kind",
     )?;
+    match contract.telemetry.logs.output.kind.as_str() {
+        "file" => {
+            require_non_empty(
+                &contract.telemetry.logs.output.file.path,
+                "missing_logs_output_file_path",
+            )?;
+        }
+        "tcp" => {
+            require_non_empty(
+                &contract.telemetry.logs.output.tcp.addr,
+                "missing_logs_output_tcp_addr",
+            )?;
+            if contract.telemetry.logs.output.tcp.port == 0 {
+                return Err(ValidationError::new("invalid_logs_output_tcp_port"));
+            }
+            match contract.telemetry.logs.output.tcp.framing.as_str() {
+                "line" | "len" => {}
+                _ => return Err(ValidationError::new("invalid_logs_output_tcp_framing")),
+            }
+        }
+        _ => return Err(ValidationError::new("invalid_logs_output_kind")),
+    }
     let mut input_ids = HashSet::new();
     for input in &contract.telemetry.logs.file_inputs {
         require_non_empty(&input.input_id, "missing_log_input_id")?;

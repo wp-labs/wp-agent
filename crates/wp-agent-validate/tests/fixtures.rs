@@ -7,7 +7,8 @@ use wp_agent_contracts::action_result::{
 };
 use wp_agent_contracts::agent_config::{
     AgentConfigContract, AgentSection, ControlPlaneSection, ExecutionSection, LogFileInputSection,
-    LogsSection, PathsSection, TelemetrySection,
+    LogsFileOutputSection, LogsOutputSection, LogsSection, LogsTcpOutputSection, PathsSection,
+    TelemetrySection,
 };
 use wp_agent_contracts::gateway::{
     AckStatus, ActionPlanAck, DispatchActionPlan, ReportActionResult, ResultAttestation,
@@ -382,7 +383,13 @@ fn config_with_duplicate_log_input_ids_is_rejected() {
             ],
             in_memory_buffer_bytes: 1024,
             spool_dir: "/tmp/root/state/spool/logs".to_string(),
-            output_file: "/tmp/root/log/records.ndjson".to_string(),
+            output: LogsOutputSection {
+                kind: "file".to_string(),
+                file: LogsFileOutputSection {
+                    path: "/tmp/root/log/records.ndjson".to_string(),
+                },
+                ..LogsOutputSection::default()
+            },
         },
     });
 
@@ -427,10 +434,69 @@ fn config_with_invalid_log_startup_position_is_rejected() {
             }],
             in_memory_buffer_bytes: 1024,
             spool_dir: "/tmp/root/state/spool/logs".to_string(),
-            output_file: "/tmp/root/log/records.ndjson".to_string(),
+            output: LogsOutputSection {
+                kind: "file".to_string(),
+                file: LogsFileOutputSection {
+                    path: "/tmp/root/log/records.ndjson".to_string(),
+                },
+                ..LogsOutputSection::default()
+            },
         },
     });
 
     let err = validate_config(&fixture).expect_err("config should be rejected");
     assert_eq!(err.code, "invalid_log_startup_position");
+}
+
+#[test]
+fn config_with_invalid_tcp_output_framing_is_rejected() {
+    let fixture = AgentConfigContract::new(
+        AgentSection {
+            agent_id: Some("agent-001".to_string()),
+            environment_id: Some("prod".to_string()),
+            instance_name: Some("instance-001".to_string()),
+        },
+        ControlPlaneSection {
+            enabled: false,
+            endpoint: None,
+            tls_mode: None,
+            auth_mode: None,
+        },
+        PathsSection {
+            root_dir: "/tmp/root".to_string(),
+            run_dir: "/tmp/root/run".to_string(),
+            state_dir: "/tmp/root/state".to_string(),
+            log_dir: "/tmp/root/log".to_string(),
+        },
+        ExecutionSection {
+            max_running_actions: 1,
+            cancel_grace_ms: 5_000,
+            default_stdout_limit_bytes: 1024,
+            default_stderr_limit_bytes: 1024,
+        },
+    )
+    .with_telemetry(TelemetrySection {
+        logs: LogsSection {
+            file_inputs: vec![LogFileInputSection {
+                input_id: "app".to_string(),
+                path: "/tmp/root/app.log".to_string(),
+                startup_position: "head".to_string(),
+                multiline_mode: "none".to_string(),
+            }],
+            in_memory_buffer_bytes: 1024,
+            spool_dir: "/tmp/root/state/spool/logs".to_string(),
+            output: LogsOutputSection {
+                kind: "tcp".to_string(),
+                tcp: LogsTcpOutputSection {
+                    addr: "127.0.0.1".to_string(),
+                    port: 9000,
+                    framing: "auto".to_string(),
+                },
+                ..LogsOutputSection::default()
+            },
+        },
+    });
+
+    let err = validate_config(&fixture).expect_err("config should be rejected");
+    assert_eq!(err.code, "invalid_logs_output_tcp_framing");
 }

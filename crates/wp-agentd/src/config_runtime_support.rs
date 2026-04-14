@@ -11,7 +11,12 @@ pub(super) fn default_file_config_text() -> String {
 [telemetry.logs]
 in_memory_buffer_bytes = 1048576
 spool_dir = "state/spool/logs"
-output_file = "log/warp-parse-records.ndjson"
+
+[telemetry.logs.output]
+kind = "file"
+
+[telemetry.logs.output.file]
+path = "log/warp-parse-records.ndjson"
 
 # 可选：
 # [agent]
@@ -34,6 +39,15 @@ output_file = "log/warp-parse-records.ndjson"
 # path = "/var/log/monitoring/app.log"
 # startup_position = "head"
 # multiline_mode = "none"
+#
+# 示例：把日志通过 TCP 发到本机 WarpParse 的 tcp_src。
+# [telemetry.logs.output]
+# kind = "tcp"
+#
+# [telemetry.logs.output.tcp]
+# addr = "127.0.0.1"
+# port = 9000
+# framing = "line"
 "#
     .to_string()
 }
@@ -52,7 +66,11 @@ pub(super) fn expand_env_contract(
     config.paths.state_dir = expand_string(config.paths.state_dir)?;
     config.paths.log_dir = expand_string(config.paths.log_dir)?;
     config.telemetry.logs.spool_dir = expand_string(config.telemetry.logs.spool_dir)?;
-    config.telemetry.logs.output_file = expand_string(config.telemetry.logs.output_file)?;
+    config.telemetry.logs.output.kind = expand_string(config.telemetry.logs.output.kind)?;
+    config.telemetry.logs.output.file.path = expand_string(config.telemetry.logs.output.file.path)?;
+    config.telemetry.logs.output.tcp.addr = expand_string(config.telemetry.logs.output.tcp.addr)?;
+    config.telemetry.logs.output.tcp.framing =
+        expand_string(config.telemetry.logs.output.tcp.framing)?;
     for input in &mut config.telemetry.logs.file_inputs {
         input.input_id = expand_string(std::mem::take(&mut input.input_id))?;
         input.path = expand_string(std::mem::take(&mut input.path))?;
@@ -82,9 +100,10 @@ pub(super) fn resolve_paths(
     config.telemetry.logs.spool_dir = absolutize(&root_dir, &config.telemetry.logs.spool_dir)
         .display()
         .to_string();
-    config.telemetry.logs.output_file = absolutize(&root_dir, &config.telemetry.logs.output_file)
-        .display()
-        .to_string();
+    config.telemetry.logs.output.file.path =
+        absolutize(&root_dir, &config.telemetry.logs.output.file.path)
+            .display()
+            .to_string();
     config.telemetry.logs.file_inputs = config
         .telemetry
         .logs
