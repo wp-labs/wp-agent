@@ -67,6 +67,8 @@
   资源紧张、网络异常、中心不可达时，优先退化观测能力而不是拖垮宿主机
 - 中心可选：
   中心节点用于治理、编排和全局分析，但不是边缘数据面运行的前置条件
+- standalone 先验证：
+  第一版实现顺序必须先验证 `standalone` 可独立成立，再叠加 `managed` 接入路径
 - 中心治理：
   AI、统一策略、升级编排、远程执行、审计、权限都放到中心节点
 - 边缘确定性：
@@ -199,6 +201,14 @@
 - 本地状态、自观测、保护模式两者都可用
 - 远程任务只在 `managed` 模式下可用
 - 中心编排升级只在 `managed` 模式下可用
+
+同时，运行模式不只是部署选项，还应作为实现顺序的验证门：
+
+- `standalone` 必须先成为独立成立的运行模式，而不是 `managed` 模式删掉中心连接后的降级残留
+- 第一阶段应先验证一条 `standalone` 文件日志替代切片
+- 该切片至少覆盖 `file input -> parser / multiline -> checkpoint / commit point -> buffer / spool -> warp-parse/file output`
+- 该切片成立后，再叠加 enrollment、gateway session、远程任务和中心治理
+- 因此 `managed` 是在 `standalone` 基线之上叠加的治理模式，而不是先行定义产品价值的入口
 
 ---
 
@@ -795,22 +805,38 @@ AI 不应直接拥有：
 
 ### 12.1 Phase A
 
-先打通最小闭环：
+先打通 `standalone` 边缘运行基线：
 
-- 基础输入
-- 基础发现
-- 统一事件封装
-- 本地 buffer
-- 本地上送或本地输出
-- standalone 运行模式
+- `wp-agentd` / `wp-agent-exec` / `wp-agent-upgrader` 三进程骨架
+- 本地工作目录、状态目录和恢复骨架
+- `standalone` 运行模式
+- 最小自观测、错误码和 health 基线
 
-如果中心节点同时存在，再叠加：
+### 12.2 Phase B
+
+再打通 `standalone` 可替代切片：
+
+- 受控单路径文件日志输入
+- parser / multiline
+- `checkpoint / commit point`
+- 本地 buffer / spool
+- `warp-parse` 或本地 file output
+- rotate / truncate / restart recovery
+- 一类真实 `Fluent Bit tail input` 替代场景验证
+
+此阶段不要求先完成通用 discovery / watcher / protect 产品形态。
+
+### 12.3 Phase C
+
+在 `standalone` 切片成立后，再叠加 `managed` 接入基线：
 
 - agent 注册
 - 中心接收
 - 基础资源目录
+- enrollment / identity
+- gateway session / capability report
 
-### 12.2 Phase B
+### 12.4 Phase D
 
 补齐治理骨架：
 
@@ -820,7 +846,7 @@ AI 不应直接拥有：
 - 升级协议
 - 升级回滚机制
 
-### 12.3 Phase C
+### 12.5 Phase E
 
 补齐高风险控制面：
 
@@ -829,7 +855,7 @@ AI 不应直接拥有：
 - 动作并发控制
 - 风险分级
 
-### 12.4 Phase D
+### 12.6 Phase F
 
 补齐高阶分析平面：
 
@@ -862,8 +888,9 @@ AI 不应直接拥有：
 
 - 边缘 agent 是轻量执行面，负责采集、发现、标准化、缓冲、上送，以及受控执行升级和远程动作
 - 中心节点是控制、分析和治理中心，负责策略、资源目录、统一关联、升级编排、远程动作编排、审计和 AI 辅助
+- 第一版实现顺序必须先让 `standalone` 独立成立，并先验证一条可替代部分 `Fluent Bit` 工作的最小切片，再叠加 `managed` 接入
 - 数据平面与控制平面必须明确分离，但共享统一身份、统一资源模型和统一审计链路
 - OpenTelemetry 是协议和语义的优先基线
 - 非功能目标不是附属要求，而是第一架构约束
 
-如果后续实现偏离以上四点，`wp-agent` 很容易重新滑回“重边缘、弱治理、强耦合”的错误方向。
+如果后续实现偏离以上五点，`wp-agent` 很容易重新滑回“重边缘、弱治理、强耦合”的错误方向。

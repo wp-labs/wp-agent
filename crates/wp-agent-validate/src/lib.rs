@@ -1,4 +1,4 @@
-//! Static validators for contracts, config, and local state.
+//! Static validators for contracts, config, and runtime state.
 
 pub mod action_plan;
 pub mod action_result;

@@ -1,5 +1,7 @@
 //! Config validation entrypoints.
 
+use std::collections::HashSet;
+
 use wp_agent_contracts::SCHEMA_VERSION_V1;
 use wp_agent_contracts::agent_config::AgentConfigContract;
 
@@ -37,6 +39,31 @@ pub fn validate_config(contract: &AgentConfigContract) -> Result<(), ValidationE
     }
     if contract.execution.default_stderr_limit_bytes == 0 {
         return Err(ValidationError::new("invalid_stderr_limit"));
+    }
+
+    if contract.telemetry.logs.in_memory_buffer_bytes == 0 {
+        return Err(ValidationError::new("invalid_logs_buffer_bytes"));
+    }
+    require_non_empty(&contract.telemetry.logs.spool_dir, "missing_logs_spool_dir")?;
+    require_non_empty(
+        &contract.telemetry.logs.output_file,
+        "missing_logs_output_file",
+    )?;
+    let mut input_ids = HashSet::new();
+    for input in &contract.telemetry.logs.file_inputs {
+        require_non_empty(&input.input_id, "missing_log_input_id")?;
+        require_non_empty(&input.path, "missing_log_input_path")?;
+        if !input_ids.insert(input.input_id.as_str()) {
+            return Err(ValidationError::new("duplicate_log_input_id"));
+        }
+        match input.startup_position.as_str() {
+            "head" | "tail" => {}
+            _ => return Err(ValidationError::new("invalid_log_startup_position")),
+        }
+        match input.multiline_mode.as_str() {
+            "none" | "indented" => {}
+            _ => return Err(ValidationError::new("invalid_log_multiline_mode")),
+        }
     }
 
     Ok(())

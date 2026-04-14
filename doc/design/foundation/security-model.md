@@ -46,6 +46,8 @@
   未显式允许的动作、权限、目标范围默认拒绝
 - 分层信任：
   中心节点、`wp-agentd`、`wp-agent-exec`、`wp-agent-upgrader` 之间不是同级全信任
+- standalone 先收敛：
+  第一阶段先验证 `standalone` 文件日志替代切片的本地安全边界，再叠加 `managed` 接入、远程动作和中心编排升级
 - 最小暴露面：
   环境内只暴露必要通信接口，不引入不必要常驻监听面
 - 高风险动作强治理：
@@ -173,6 +175,21 @@
 - 请求时间和过期时间
 
 如果上述信息不完整，`wp-agentd` 不应接受执行。
+
+### 6.4 standalone 模式安全基线
+
+在 `standalone` 模式下，第一版安全边界应固定为：
+
+- 没有中心节点时，不建立远程动作信任链，也不开放依赖中心编排的升级链路
+- `wp-agentd` 只承担本地采集、状态落盘、checkpoint 推进和数据上送 / 输出职责
+- 文件日志输入链路的安全重点不是“谁下发了动作”，而是“本地状态是否被错误推进、篡改或误恢复”
+
+因此 `standalone` 替代切片至少要满足：
+
+- `checkpoint_offset` 只能在越过 `commit point` 后推进
+- rotate / truncate / restart recovery 不得把未确认数据误标记为已提交
+- 本地 `buffer / spool / checkpoint` 状态写入必须原子、可校验、可恢复
+- `managed` 模式才启用的远程动作、中心升级和审批链路，不得在 `standalone` 中被隐式开启
 
 ---
 
@@ -408,6 +425,7 @@
 - 升级包损坏、来源错误或版本不兼容
 - 节点本地环境被篡改，试图伪造执行结果
 - 中心节点短时不可达，agent 仍需保持采集稳定
+- `standalone` 文件日志链路在 rotate / truncate / restart 后错误推进 `checkpoint`
 
 对应防线应包括：
 
@@ -417,6 +435,7 @@
 - 包签名与版本校验
 - 双向身份认证、结果级完整性保护与结果链路审计
 - 本地保护模式与中心端状态感知
+- `commit point -> checkpoint_offset` 的单向推进和恢复校验
 
 ---
 
@@ -425,6 +444,9 @@
 第一阶段建议优先落地以下能力：
 
 - `wp-agentd / wp-agent-exec / wp-agent-upgrader` 三进程角色固定
+- `standalone` 替代切片的本地状态边界：
+  `file input -> parser / multiline -> checkpoint / commit point -> buffer / spool -> warp-parse/file output`
+- `standalone` 下默认关闭远程动作和中心编排升级入口
 - 中心到 `wp-agentd` 的双向身份认证
 - 远程动作白名单模型
 - 风险等级与审批规则
@@ -439,10 +461,12 @@
 
 `wp-agent` 的第一版安全模型可以概括为：
 
+- 第一安全验证门应先落在 `standalone` 替代切片，本地数据面状态推进和恢复边界必须先成立
 - 中心节点负责策略、授权、审批、编排和归档，但不能绕过治理直接把任意动作塞进边缘节点
 - `wp-agentd` 是本地唯一控制入口，但不应承载无限执行权
 - `wp-agent-exec` 和 `wp-agent-upgrader` 是受临时授权驱动的高风险执行进程，不应长期继承主身份和高权限
 - 远程动作和升级都必须走“身份 -> 授权 -> 审批 -> 执行 -> 回传 -> 审计 -> 必要时回滚”的完整闭环
+- 在 `standalone` 模式下，默认只成立本地采集与状态恢复链路，不应隐式暴露 `managed` 才具备的控制能力
 - 资源限制、超时、并发和输出上限不是附属优化，而是安全边界的一部分
 
 如果这些边界不成立，`wp-agent` 即使功能完整，也不能算一个可投入生产环境的系统。

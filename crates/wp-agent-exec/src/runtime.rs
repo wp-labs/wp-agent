@@ -36,7 +36,7 @@ pub fn execute(workdir: &ExecutionWorkdir) -> io::Result<ActionResultContract> {
                 op: None,
                 status: StepStatus::Failed,
                 started_at: started_at.clone(),
-                finished_at: Some(started_at),
+                finished_at: Some(started_at.clone()),
                 duration_ms: Some(0),
                 error_code: Some(err.code.to_string()),
                 stdout_summary: None,

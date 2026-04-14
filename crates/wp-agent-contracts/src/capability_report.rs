@@ -18,27 +18,30 @@ pub struct CapabilityReportContract {
     pub limits: CapabilityLimits,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CapabilityReportSections {
+    pub agent_id: String,
+    pub instance_id: String,
+    pub reported_at: String,
+    pub exec: ExecCapabilities,
+    pub metrics: MetricsCapabilities,
+    pub logs: Option<LogsCapabilities>,
+    pub upgrade: UpgradeCapabilities,
+    pub limits: CapabilityLimits,
+}
+
 impl CapabilityReportContract {
-    pub fn new(
-        agent_id: String,
-        instance_id: String,
-        reported_at: String,
-        exec: ExecCapabilities,
-        metrics: MetricsCapabilities,
-        logs: Option<LogsCapabilities>,
-        upgrade: UpgradeCapabilities,
-        limits: CapabilityLimits,
-    ) -> Self {
+    pub fn new(sections: CapabilityReportSections) -> Self {
         Self {
             schema_version: SCHEMA_VERSION_V1.to_string(),
-            agent_id,
-            instance_id,
-            reported_at,
-            exec,
-            metrics,
-            logs,
-            upgrade,
-            limits,
+            agent_id: sections.agent_id,
+            instance_id: sections.instance_id,
+            reported_at: sections.reported_at,
+            exec: sections.exec,
+            metrics: sections.metrics,
+            logs: sections.logs,
+            upgrade: sections.upgrade,
+            limits: sections.limits,
         }
     }
 }

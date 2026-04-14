@@ -51,6 +51,16 @@
 - `wp-agentd` 需要做一个可对标 `Fluent Bit tail` 的文件日志输入器
 - 但输出目标不是 Fluent Bit tag/chunk 模型，而是 `wp-agent` 的统一 record / resource / buffer 模型
 
+实施阶段边界同时固定为：
+
+- 本文档描述的是通用 `file input` 的完整基线目标
+- `M4` 只实现其受控子集，用于先验证 `standalone` 替代切片
+- `M4` 的实现边界收敛为：
+  - 显式单路径输入，而不是通用 `path_patterns[]` 发现模型
+  - 最小 `parser / multiline / checkpoint / rotate / truncate / restart recovery` 链路
+  - 最小 `buffer / spool -> warp-parse / file output` 主线
+- `M8` 再把该受控子集扩展为通用文件日志 runtime，包括 discovery、watcher 策略、完整调度、保护模式与自观测
+
 ---
 
 ## 3. 对标基线
@@ -171,6 +181,19 @@ discover -> watch -> read delta -> split lines -> multiline
 -> enqueue local telemetry buffer/spool -> reach commit point -> advance checkpoint
 ```
 
+实施阶段约束：
+
+- 对完整通用 `file input` 而言，上述流水线成立
+- `M4` 只要求验证其受控子链路：
+
+```text
+explicit file target -> read delta -> split lines -> multiline
+-> parse -> normalize -> attach resource refs
+-> enqueue local telemetry buffer/spool -> reach commit point -> advance checkpoint
+```
+
+- `discover`、通用 `watch` 策略与更完整扫描调度属于 `M8` 扩展项
+
 ### 6.2 发现模型
 
 第一版至少支持：
@@ -253,6 +276,21 @@ FileLogInput {
   labels?
 }
 ```
+
+实施阶段约束：
+
+- 配置骨架保留完整通用 `file input` 目标形态，避免后续扩展时再次改写总 schema
+- `M4` 实现只要求其中的受控子集：
+  - `id`
+  - `enabled`
+  - 单路径目标字段
+  - 最小 `startup_position`
+  - 最小 `parser`
+  - 最小 `multiline`
+  - 最小 `checkpoint`
+  - 最小 `buffering`
+  - 最小 `resource_mapping`
+- `path_patterns[]` / `exclude_path_patterns[]`、`watcher_mode`、`refresh_interval_ms` 等通用运行时字段在 `M8` 补齐完整实现
 
 字段说明：
 
@@ -625,9 +663,11 @@ multiline 组装必须受以下限制：
 
 ---
 
-## 14. 第一版验收标准
+## 14. 验收标准
 
-第一版建议至少满足以下验收：
+### 14.1 完整 `file input` 基线验收
+
+完整通用 `file input` 建议至少满足以下验收：
 
 1. 能稳定读取单文件和 glob 多文件输入。
 2. 能在 restart 后基于 checkpoint 恢复，并满足 at-least-once。
@@ -637,6 +677,17 @@ multiline 组装必须受以下限制：
 6. 能在 backpressure 下维持资源硬边界，不因日志洪峰拖垮宿主机。
 7. 能把 `source.path`、`source.offset`、`resource_refs` 稳定挂入统一 record。
 8. 能用自观测指标证明与 Fluent Bit `tail` 同等级的关键能力已具备。
+
+### 14.2 `M4` 受控子集验收
+
+`M4` 只按受控子集验收，不以完整通用 `file input` 为交付门：
+
+1. 在 `control_plane.enabled = false` 时，能稳定读取一个显式配置的文件路径。
+2. 能在 restart 后基于已提交 checkpoint 恢复，并满足 at-least-once。
+3. 能正确处理 append、rename-rotate、truncate 与最小 multiline 基线。
+4. 能把 `source.path`、`source.offset`、`resource_refs` 稳定挂入统一 record。
+5. 能通过 `warp-parse` 或本地 fallback 输出，验证至少一类 `standalone` 替代链路。
+6. 不要求在 `M4` 提供通用 glob 发现、完整 watcher 策略、完整保护模式与完整自观测。
 
 ---
 
@@ -648,3 +699,4 @@ multiline 组装必须受以下限制：
 - 其目标是对标 Fluent Bit `tail`，不是依赖 Fluent Bit
 - 配置、checkpoint、rotate、multiline、budget 必须一起设计，不能拆成零散补丁
 - `file.tail` 不能替代常驻文件日志采集
+- `M4` 先落受控单路径替代切片，`M8` 再扩展为通用 `file input` runtime

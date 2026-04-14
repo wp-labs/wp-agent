@@ -6,7 +6,7 @@ pub mod agent_config;
 pub mod capability_report;
 pub mod gateway;
 pub mod state_exec;
-pub mod state_logs;
+pub mod telemetry_record;
 
 pub const API_VERSION_V1: &str = "v1";
 pub const SCHEMA_VERSION_V1: &str = "v1";

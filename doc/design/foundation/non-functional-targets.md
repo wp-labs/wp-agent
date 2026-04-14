@@ -31,6 +31,13 @@
 - 峰值下优先退化观测深度，不拖垮宿主业务
 - 最后保底对象必须明确，不能在压力下把审计、状态和最终结果一起丢掉
 
+当前阶段还要固定一个验收顺序：
+
+- 第一非功能验收门应先覆盖 `standalone` 文件日志替代切片
+- 在这条切片跑稳之前，不应把 `managed` 接入或大规模 metrics 集成当成第一验收目标
+- 第一门要重点验证 `checkpoint / commit point`、`buffer / spool`、rotate / truncate / restart recovery 与 backpressure 行为
+- 第一门默认按“受控单路径替代切片”验收，不把通用 discovery / watcher / protect 全量能力提前并入
+
 这些量化目标在配置层应分别落到：
 
 - `resource_budget`
@@ -54,7 +61,20 @@
 
 ### 3.2 参考功能集
 
-第一版非功能目标先覆盖以下能力组合：
+第一版非功能目标建议分成两组口径：
+
+第一组是当前优先验收的 `standalone replacement slice`：
+
+- `wp-agentd` 常驻
+- 最小 self-observability 开启
+- 单路径 `file input`
+- `parser / multiline`
+- `checkpoint / commit point`
+- `buffer / spool`
+- `warp-parse` 或本地 file output
+- rotate / truncate / restart recovery
+
+第二组是后续扩展的 `managed + metrics baseline`：
 
 - `wp-agentd` 常驻
 - control plane 长连
@@ -73,17 +93,21 @@
 - `idle`
   只有心跳、自观测和低频发现刷新，无持续业务采集流量
 - `moderate`
-  平台底盘级 metrics 常态采集，约等于：
+  以当前优先验收门为主时，等价于：
+  - `1-2` 路持续文件日志输入
+  - `<= 5 MiB/s` 原始日志持续输入
+  - 典型 multiline、rotate、truncate 场景持续出现
+  以 `managed + metrics baseline` 为主时，等价于：
   - `20` 个 `prom_scrape` target
   - `<= 10000` metrics samples / 秒的持续输入
   - `<= 300` 个 container / pod 级被观测对象
 - `peak`
-  `3x moderate` 持续 `10` 分钟，且伴随网络抖动、控制面重试或 target 波动
+  `3x moderate` 持续 `10` 分钟，且伴随网络抖动、控制面重试、rotate / truncate 或 target 波动
 
 说明：
 
-- 日志 / traces / security 的更细量化目标后续再补
-- 当前草案先把 `wp-agentd` 的公共底盘和 Batch A metrics 路径固定下来
+- 更细的 traces / security 量化目标后续再补
+- 当前第一门先把 `standalone` 文件日志替代链路固定下来，再扩展到 Batch A metrics
 
 ---
 
@@ -127,6 +151,8 @@
   - control plane 心跳不丢
   - 当前运行中的 action 最终结果不丢
   - 本地审计事件不丢
+  - 已越过 `commit point` 的日志数据恢复后不重放成无限重复
+  - 未越过 `commit point` 的日志数据不得被提前推进为已提交
 
 ---
 
@@ -151,6 +177,7 @@
 2. 降低 self-observability 日志细度
 3. 降低低优先级 `prom_scrape` 并发
 4. 暂停可选的高成本 label / metadata enrich
+5. 拉长低优先级文件输入的 poll / scan 周期，但不破坏 `commit point` 语义
 
 ### 5.3 `protect`
 
@@ -167,6 +194,7 @@
 2. 拒绝新的低优先级 receiver 输入
 3. 停止发现新 target，只保留已有 target 稳态采集
 4. 保留 control plane、状态落盘、审计和结果回传预算
+5. 保留日志 `checkpoint / commit point` 状态写入预算，不允许因保护模式跳过提交边界
 
 ### 5.4 退出条件
 
@@ -216,6 +244,12 @@
 - 审计事件
 - agent 状态切换事件
 - control plane 必需心跳
+- 已持久化但尚未越过 `commit point` 的恢复所需 checkpoint 元数据
+
+同时必须固定：
+
+- `checkpoint_offset` 只能跟随已确认的 `commit point` 推进
+- backpressure 不得通过“提前写 checkpoint”伪造消费完成
 
 ---
 
@@ -246,7 +280,12 @@
 
 ## 8. 验收建议
 
-第一版建议至少做三类验收：
+第一版建议至少做四类验收：
+
+- `standalone replacement` soak test：
+  - 持续文件输入 `24h`
+  - rotate / truncate / restart recovery 行为符合预期
+  - `checkpoint / commit point` 推进不越界
 
 - `24h` soak test：
   - 不进入 `protect`
@@ -265,6 +304,7 @@
 当前阶段固定以下结论：
 
 - 非功能目标必须量化，不能只写“低资源”
+- 第一非功能验收门应先覆盖 `standalone` 文件日志替代切片
 - `wp-agent` 要优先保护业务、控制面和审计链
 - 退化策略必须先于实现编码
 - `normal / degraded / protect` 三态应作为后续实现和验收的统一口径

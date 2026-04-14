@@ -6,20 +6,20 @@ use wp_agent_contracts::action_result::{
     ActionOutputs, ActionResultContract, FinalStatus, StepActionRecord, StepStatus,
 };
 use wp_agent_contracts::agent_config::{
-    AgentConfigContract, AgentSection, ControlPlaneSection, ExecutionSection, PathsSection,
+    AgentConfigContract, AgentSection, ControlPlaneSection, ExecutionSection, LogFileInputSection,
+    LogsSection, PathsSection, TelemetrySection,
 };
 use wp_agent_contracts::gateway::{
     AckStatus, ActionPlanAck, DispatchActionPlan, ReportActionResult, ResultAttestation,
 };
 use wp_agent_contracts::state_exec::AgentRuntimeState;
-use wp_agent_contracts::state_logs::LogStateContract;
 use wp_agent_validate::action_plan::validate_action_plan;
 use wp_agent_validate::action_result::validate_action_result;
 use wp_agent_validate::config::validate_config;
 use wp_agent_validate::gateway::{
     validate_action_plan_ack, validate_dispatch_action_plan, validate_report_action_result,
 };
-use wp_agent_validate::state::{validate_execution_state, validate_log_state};
+use wp_agent_validate::state::validate_execution_state;
 
 fn fixture_text(relative: &str) -> String {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -117,21 +117,13 @@ fn runtime_state_valid_fixture_passes() {
     validate_execution_state(&fixture).expect("valid runtime state");
 }
 
-#[test]
-fn log_state_valid_fixture_passes() {
-    let fixture: LogStateContract =
-        serde_json::from_str(&fixture_text("contracts/state/logs-valid.json"))
-            .expect("deserialize log state fixture");
-
-    validate_log_state(&fixture).expect("valid log state");
-}
-
 fn sample_action_result(final_status: FinalStatus) -> ActionResultContract {
     ActionResultContract {
         api_version: "v1".to_string(),
         kind: "action_result".to_string(),
         action_id: "act_001".to_string(),
         execution_id: "exec_001".to_string(),
+        request_id: Some("req_001".to_string()),
         final_status,
         exit_reason: None,
         step_records: vec![StepActionRecord {
@@ -145,8 +137,12 @@ fn sample_action_result(final_status: FinalStatus) -> ActionResultContract {
             error_code: None,
             stdout_summary: None,
             stderr_summary: None,
+            resource_usage: None,
         }],
         outputs: ActionOutputs::default(),
+        resource_usage: None,
+        started_at: Some("2026-04-12T10:00:00Z".to_string()),
+        finished_at: Some("2026-04-12T10:00:01Z".to_string()),
     }
 }
 
@@ -219,7 +215,7 @@ fn action_plan_ack_queued_without_queue_position_fails() {
         plan_digest: "sha256:abc123".to_string(),
         agent_id: "agent-001".to_string(),
         instance_id: "instance-001".to_string(),
-        execution_id: "exec_001".to_string(),
+        execution_id: Some("exec_001".to_string()),
         ack_status: AckStatus::Queued,
         reason_code: None,
         reason_message: None,
@@ -242,7 +238,7 @@ fn action_plan_ack_accepted_with_queue_position_fails() {
         plan_digest: "sha256:abc123".to_string(),
         agent_id: "agent-001".to_string(),
         instance_id: "instance-001".to_string(),
-        execution_id: "exec_001".to_string(),
+        execution_id: Some("exec_001".to_string()),
         ack_status: AckStatus::Accepted,
         reason_code: None,
         reason_message: None,
@@ -339,4 +335,102 @@ fn config_with_more_than_one_running_action_is_rejected() {
 
     let err = validate_config(&fixture).expect_err("config should be rejected");
     assert_eq!(err.code, "unsupported_max_running_actions");
+}
+
+#[test]
+fn config_with_duplicate_log_input_ids_is_rejected() {
+    let fixture = AgentConfigContract::new(
+        AgentSection {
+            agent_id: Some("agent-001".to_string()),
+            environment_id: Some("prod".to_string()),
+            instance_name: Some("instance-001".to_string()),
+        },
+        ControlPlaneSection {
+            enabled: false,
+            endpoint: None,
+            tls_mode: None,
+            auth_mode: None,
+        },
+        PathsSection {
+            root_dir: "/tmp/root".to_string(),
+            run_dir: "/tmp/root/run".to_string(),
+            state_dir: "/tmp/root/state".to_string(),
+            log_dir: "/tmp/root/log".to_string(),
+        },
+        ExecutionSection {
+            max_running_actions: 1,
+            cancel_grace_ms: 5_000,
+            default_stdout_limit_bytes: 1024,
+            default_stderr_limit_bytes: 1024,
+        },
+    )
+    .with_telemetry(TelemetrySection {
+        logs: LogsSection {
+            file_inputs: vec![
+                LogFileInputSection {
+                    input_id: "app".to_string(),
+                    path: "/tmp/root/app.log".to_string(),
+                    startup_position: "head".to_string(),
+                    multiline_mode: "none".to_string(),
+                },
+                LogFileInputSection {
+                    input_id: "app".to_string(),
+                    path: "/tmp/root/other.log".to_string(),
+                    startup_position: "head".to_string(),
+                    multiline_mode: "none".to_string(),
+                },
+            ],
+            in_memory_buffer_bytes: 1024,
+            spool_dir: "/tmp/root/state/spool/logs".to_string(),
+            output_file: "/tmp/root/log/records.ndjson".to_string(),
+        },
+    });
+
+    let err = validate_config(&fixture).expect_err("config should be rejected");
+    assert_eq!(err.code, "duplicate_log_input_id");
+}
+
+#[test]
+fn config_with_invalid_log_startup_position_is_rejected() {
+    let fixture = AgentConfigContract::new(
+        AgentSection {
+            agent_id: Some("agent-001".to_string()),
+            environment_id: Some("prod".to_string()),
+            instance_name: Some("instance-001".to_string()),
+        },
+        ControlPlaneSection {
+            enabled: false,
+            endpoint: None,
+            tls_mode: None,
+            auth_mode: None,
+        },
+        PathsSection {
+            root_dir: "/tmp/root".to_string(),
+            run_dir: "/tmp/root/run".to_string(),
+            state_dir: "/tmp/root/state".to_string(),
+            log_dir: "/tmp/root/log".to_string(),
+        },
+        ExecutionSection {
+            max_running_actions: 1,
+            cancel_grace_ms: 5_000,
+            default_stdout_limit_bytes: 1024,
+            default_stderr_limit_bytes: 1024,
+        },
+    )
+    .with_telemetry(TelemetrySection {
+        logs: LogsSection {
+            file_inputs: vec![LogFileInputSection {
+                input_id: "app".to_string(),
+                path: "/tmp/root/app.log".to_string(),
+                startup_position: "middle".to_string(),
+                multiline_mode: "none".to_string(),
+            }],
+            in_memory_buffer_bytes: 1024,
+            spool_dir: "/tmp/root/state/spool/logs".to_string(),
+            output_file: "/tmp/root/log/records.ndjson".to_string(),
+        },
+    });
+
+    let err = validate_config(&fixture).expect_err("config should be rejected");
+    assert_eq!(err.code, "invalid_log_startup_position");
 }

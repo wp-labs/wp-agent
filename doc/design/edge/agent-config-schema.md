@@ -191,6 +191,9 @@ LogsSection {
 - 先固定 `logs.file_inputs[]`
 - 其字段结构直接复用：
   - [`../telemetry/log-file-input-spec.md`](../telemetry/log-file-input-spec.md)
+- 当前 schema 复用的是完整 `file input` 基线设计
+- 但 `M4` 实现只要求其中受控子集，用于验证显式单路径 `standalone` 替代切片
+- 通用 `path_patterns[]` / `exclude_path_patterns[]`、完整 watcher 策略和更完整 telemetry runtime 字段在后续 telemetry core 阶段补齐
 - `syslog` / `journald` / 其他 logs receiver 后续再补
 
 ---
