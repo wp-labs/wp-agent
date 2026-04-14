@@ -32,6 +32,8 @@ fn load_or_init_creates_default_config() {
             .display()
             .to_string()
     );
+    assert!(config.agent.instance_name.is_none());
+    assert_eq!(config.execution.max_running_actions, 1);
 }
 
 #[test]
@@ -54,6 +56,8 @@ fn default_config_template_contains_file_input_example() {
     assert!(template.contains("[telemetry.logs]"));
     assert!(template.contains("# [[telemetry.logs.file_inputs]]"));
     assert!(template.contains("output_file = \"log/warp-parse-records.ndjson\""));
+    assert!(!template.contains("max_running_actions = 1"));
+    assert!(!template.contains("instance_name = \"local\""));
 }
 
 #[test]
@@ -169,4 +173,34 @@ default_stderr_limit_bytes = 1048576
         err,
         ConfigError::Validation("unsupported_max_running_actions")
     ));
+}
+
+#[test]
+fn load_from_path_uses_defaults_for_missing_paths_and_execution() {
+    let root = temp_dir("missing-defaultable-sections");
+    let config_path = root.join("agent.toml");
+    fs::write(
+        &config_path,
+        r#"
+schema_version = "v1"
+
+[telemetry.logs]
+output_file = "log/out.ndjson"
+spool_dir = "state/spool/logs"
+"#,
+    )
+    .expect("write config");
+
+    let config = load_from_path(&config_path).expect("load config");
+
+    assert_eq!(config.paths.root_dir, root.display().to_string());
+    assert_eq!(config.paths.run_dir, root.join("run").display().to_string());
+    assert_eq!(
+        config.paths.state_dir,
+        root.join("state").display().to_string()
+    );
+    assert_eq!(config.paths.log_dir, root.join("log").display().to_string());
+    assert_eq!(config.execution.max_running_actions, 1);
+    assert_eq!(config.execution.cancel_grace_ms, 5_000);
+    assert!(config.agent.instance_name.is_none());
 }

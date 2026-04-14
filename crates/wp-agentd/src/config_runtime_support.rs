@@ -8,29 +8,24 @@ use crate::config_runtime::ConfigError;
 pub(super) fn default_file_config_text() -> String {
     r#"schema_version = "v1"
 
-[agent]
-instance_name = "local"
-
-[control_plane]
-enabled = false
-
-[paths]
-root_dir = "."
-run_dir = "run"
-state_dir = "state"
-log_dir = "log"
-
-[execution]
-max_running_actions = 1
-cancel_grace_ms = 5000
-default_stdout_limit_bytes = 1048576
-default_stderr_limit_bytes = 1048576
-
 [telemetry.logs]
 in_memory_buffer_bytes = 1048576
 spool_dir = "state/spool/logs"
 output_file = "log/warp-parse-records.ndjson"
 
+# 可选：
+# [agent]
+# # 为空时会自动生成实例名；如需显式指定可取消注释。
+# # instance_name = "monitoring-host-01"
+#
+# 可选：
+# [paths]
+# # 下面这些默认分别是 ".", "run", "state", "log"
+# # root_dir = "."
+# # run_dir = "run"
+# # state_dir = "state"
+# # log_dir = "log"
+#
 # 示例：把某个监控系统日志文件送到本地 warp-parse record 输出文件。
 # 取消注释后，把 path 改成你的真实日志路径。
 #

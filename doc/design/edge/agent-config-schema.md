@@ -112,7 +112,6 @@ PathsSection {
 
 ```text
 ExecutionSection {
-  max_running_actions
   cancel_grace_ms
   default_stdout_limit_bytes
   default_stderr_limit_bytes
@@ -121,7 +120,8 @@ ExecutionSection {
 
 第一版建议：
 
-- `max_running_actions = 1`
+- 不暴露用户可调并发数
+- action 执行固定为单并发
 
 ---
 

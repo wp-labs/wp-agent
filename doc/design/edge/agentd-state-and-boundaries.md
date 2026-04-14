@@ -534,13 +534,13 @@ succeeded | failed | cancelled | timed_out
 
 建议 `execution_scheduler` 持有以下调度约束：
 
-- `max_running_actions`
+- 固定单并发 action 执行槽
 - `upgrade_mutex`
 - `high_risk_action_mutex`
 
 第一版建议最保守策略：
 
-- `max_running_actions = 1`
+- action 执行固定为单并发
 - upgrade 与 action 全互斥
 
 这样可以显著降低本地状态复杂度。

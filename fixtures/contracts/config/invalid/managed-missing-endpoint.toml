@@ -17,7 +17,6 @@ state_dir = "/var/lib/wp-agent/state"
 log_dir = "/var/log/wp-agent"
 
 [execution]
-max_running_actions = 1
 cancel_grace_ms = 5000
 default_stdout_limit_bytes = 1048576
 default_stderr_limit_bytes = 1048576
