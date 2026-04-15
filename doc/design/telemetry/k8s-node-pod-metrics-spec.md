@@ -1,10 +1,10 @@
-# wp-agent `k8s_node_pod_metrics` 规格草案
+# warp-insight `k8s_node_pod_metrics` 规格草案
 
 ## 1. 文档目的
 
 本文档定义 `k8s_node_pod_metrics` integration 的第一版规格。
 
-目标是让部署在 Kubernetes 节点侧的 `wp-agentd` 直接提供 node / pod 基础指标与资源映射，而不是要求额外安装专用 exporter 作为默认前提。
+目标是让部署在 Kubernetes 节点侧的 `warp-insightd` 直接提供 node / pod 基础指标与资源映射，而不是要求额外安装专用 exporter 作为默认前提。
 
 相关文档：
 

@@ -1,12 +1,12 @@
-# wp-agent 文件日志输入设计
+# warp-insight 文件日志输入设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agentd` 对日志文件的常驻读取能力。
+本文档定义 `warp-insightd` 对日志文件的常驻读取能力。
 
 这里的“文件日志输入”特指：
 
-- `wp-agentd` 作为数据面常驻组件持续监控和读取文本日志文件
+- `warp-insightd` 作为数据面常驻组件持续监控和读取文本日志文件
 - 将文件新增内容转换为统一 telemetry record
 - 进入统一 `parse -> normalize -> resource binding -> buffer/spool -> export` 主线
 
@@ -32,9 +32,9 @@
 
 第一版固定以下结论：
 
-- 文件日志读取是 `wp-agentd` 的一等数据面能力，不是远程动作替代方案
+- 文件日志读取是 `warp-insightd` 的一等数据面能力，不是远程动作替代方案
 - 第一版必须明确对标 `Fluent Bit tail input`
-- 对标对象是能力边界和工程行为，不是把 `wp-agent` 定义成 Fluent Bit 封装层
+- 对标对象是能力边界和工程行为，不是把 `warp-insight` 定义成 Fluent Bit 封装层
 - 第一版必须覆盖：
   - 路径 glob 匹配与排除
   - 启动读头/读尾策略
@@ -48,8 +48,8 @@
 
 一句话说：
 
-- `wp-agentd` 需要做一个可对标 `Fluent Bit tail` 的文件日志输入器
-- 但输出目标不是 Fluent Bit tag/chunk 模型，而是 `wp-agent` 的统一 record / resource / buffer 模型
+- `warp-insightd` 需要做一个可对标 `Fluent Bit tail` 的文件日志输入器
+- 但输出目标不是 Fluent Bit tag/chunk 模型，而是 `warp-insight` 的统一 record / resource / buffer 模型
 
 实施阶段边界同时固定为：
 
@@ -93,7 +93,7 @@
 
 - 目标是达到同类成熟日志文件输入器应有的能力下限
 - 不是要求配置名、内部状态文件格式、输出结构与 Fluent Bit 完全一致
-- `wp-agent` 可以用更适合自身架构的对象模型替代 Fluent Bit 的 plugin/tag/chunk 习惯
+- `warp-insight` 可以用更适合自身架构的对象模型替代 Fluent Bit 的 plugin/tag/chunk 习惯
 
 ### 3.3 我们应优于 Fluent Bit 的地方
 
@@ -165,7 +165,7 @@
 
 第一版不建议把这些模块暴露成独立进程。
 
-它们应属于 `wp-agentd` 数据面内部模块，由统一 runtime supervisor 管理。
+它们应属于 `warp-insightd` 数据面内部模块，由统一 runtime supervisor 管理。
 
 ---
 
@@ -584,7 +584,7 @@ multiline 组装必须受以下限制：
 
 这里不要求照搬 Fluent Bit 的 `tag` / `tag_regex`。
 
-`wp-agent` 更适合的做法是：
+`warp-insight` 更适合的做法是：
 
 - 用显式 `resource_refs`
 - 用结构化 `source.*`
@@ -626,7 +626,7 @@ multiline 组装必须受以下限制：
 - 读文件缓冲保护
 - 输出拥塞时的内存保护
 
-但 `wp-agent` 还应补充：
+但 `warp-insight` 还应补充：
 
 - 统一保护模式状态
 - drop reason
@@ -695,7 +695,7 @@ multiline 组装必须受以下限制：
 
 当前阶段固定以下结论：
 
-- 文件日志输入必须进入 `wp-agentd` 第一版 logs 设计范围
+- 文件日志输入必须进入 `warp-insightd` 第一版 logs 设计范围
 - 其目标是对标 Fluent Bit `tail`，不是依赖 Fluent Bit
 - 配置、checkpoint、rotate、multiline、budget 必须一起设计，不能拆成零散补丁
 - `file.tail` 不能替代常驻文件日志采集

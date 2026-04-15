@@ -1,8 +1,8 @@
-# wp-agent Agent 配置 Schema 草案
+# warp-insight Agent 配置 Schema 草案
 
 ## 1. 文档目的
 
-本文档定义 `wp-agentd` 的本地总配置骨架。
+本文档定义 `warp-insightd` 的本地总配置骨架。
 
 目标是把当前分散的配置讨论收敛成一份统一结构，覆盖：
 
@@ -230,7 +230,7 @@ UpgradeSection {
 
 当前阶段固定以下结论：
 
-- `wp-agentd` 需要一份统一总配置
+- `warp-insightd` 需要一份统一总配置
 - logs 配置作为其子树挂入
 - metrics 配置作为其子树挂入
 - `resource_budget / buffering / protection` 需要承担非功能量化目标的配置落点

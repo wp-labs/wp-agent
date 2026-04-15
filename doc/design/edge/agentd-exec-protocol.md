@@ -1,13 +1,13 @@
-# wp-agentd 与 wp-agent-exec 本地协议设计
+# warp-insightd 与 warp-insight-exec 本地协议设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agentd` 与 `wp-agent-exec` 之间的本地交互协议。
+本文档定义 `warp-insightd` 与 `warp-insight-exec` 之间的本地交互协议。
 
 它主要解决以下问题：
 
-- `wp-agentd` 如何把 `ActionPlan` 交给 `wp-agent-exec`
-- `wp-agent-exec` 如何回传状态与结果
+- `warp-insightd` 如何把 `ActionPlan` 交给 `warp-insight-exec`
+- `warp-insight-exec` 如何回传状态与结果
 - 取消、超时、异常退出如何处理
 - v1 应优先选用哪种本地协议，才能尽快落地并控制复杂度
 
@@ -27,19 +27,19 @@ v1 建议采用：
 
 不建议 v1 采用：
 
-- `wp-agentd` 解析 `wp-agent-exec` 的 stdout/stderr 作为正式协议
+- `warp-insightd` 解析 `warp-insight-exec` 的 stdout/stderr 作为正式协议
 - 自定义复杂本地 RPC
 - 共享内存
 - 一开始就引入 Unix Domain Socket 双向协议
 
 一句话说：
 
-- `wp-agentd` 负责创建执行工作目录
-- `wp-agentd` 把输入文件写入工作目录
-- `wp-agentd` 启动 `wp-agent-exec`
-- `wp-agent-exec` 读取工作目录中的输入文件
-- `wp-agent-exec` 原子写入状态文件和结果文件
-- `wp-agentd` 用进程信号驱动取消和强制终止
+- `warp-insightd` 负责创建执行工作目录
+- `warp-insightd` 把输入文件写入工作目录
+- `warp-insightd` 启动 `warp-insight-exec`
+- `warp-insight-exec` 读取工作目录中的输入文件
+- `warp-insight-exec` 原子写入状态文件和结果文件
+- `warp-insightd` 用进程信号驱动取消和强制终止
 
 这样做的主要原因是：
 
@@ -56,7 +56,7 @@ v1 建议采用：
 
 ### 3.1 stdout/stderr 不是正式协议
 
-`wp-agent-exec` 的 stdout/stderr 只能作为诊断日志，不作为结构化控制协议。
+`warp-insight-exec` 的 stdout/stderr 只能作为诊断日志，不作为结构化控制协议。
 
 原因：
 
@@ -76,9 +76,9 @@ v1 要求所有正式输入输出都落到工作目录中的结构化文件。
 - `state.json`
 - `result.json`
 
-### 3.3 `wp-agentd` 是控制器
+### 3.3 `warp-insightd` 是控制器
 
-`wp-agentd` 负责：
+`warp-insightd` 负责：
 
 - 创建工作目录
 - 写入输入文件
@@ -88,7 +88,7 @@ v1 要求所有正式输入输出都落到工作目录中的结构化文件。
 - 读取状态文件与结果文件
 - 汇总并上报
 
-`wp-agent-exec` 不负责：
+`warp-insight-exec` 不负责：
 
 - 排队
 - 并发调度
@@ -132,7 +132,7 @@ v1 要求所有正式输入输出都落到工作目录中的结构化文件。
 
 ### 4.1 `plan.json`
 
-由 `wp-agentd` 写入。
+由 `warp-insightd` 写入。
 
 内容：
 
@@ -140,7 +140,7 @@ v1 要求所有正式输入输出都落到工作目录中的结构化文件。
 
 ### 4.2 `runtime.json`
 
-由 `wp-agentd` 写入。
+由 `warp-insightd` 写入。
 
 内容建议包括：
 
@@ -155,30 +155,30 @@ v1 要求所有正式输入输出都落到工作目录中的结构化文件。
 
 ### 4.3 `state.json`
 
-由 `wp-agent-exec` 更新。
+由 `warp-insight-exec` 更新。
 
 表示当前本地执行状态。
 
 ### 4.4 `result.json`
 
-由 `wp-agent-exec` 在结束时写入。
+由 `warp-insight-exec` 在结束时写入。
 
 内容为最终 `ActionResult`。
 
 说明：
 
 - `result.json` 只包含执行语义对象，不直接包含中心回报 envelope
-- 结果级摘要与签名由 `wp-agentd` 在读取 `result.json` 后生成
+- 结果级摘要与签名由 `warp-insightd` 在读取 `result.json` 后生成
 
 ### 4.5 `stdout.log` / `stderr.log`
 
-由 `wp-agentd` 重定向采集。
+由 `warp-insightd` 重定向采集。
 
 仅用于诊断，不属于正式协议字段。
 
 ### 4.6 `meta.json`
 
-由 `wp-agentd` 维护。
+由 `warp-insightd` 维护。
 
 用于记录本地调度元数据，例如：
 
@@ -192,10 +192,10 @@ v1 要求所有正式输入输出都落到工作目录中的结构化文件。
 
 ## 5. 进程启动协议
 
-建议 `wp-agentd` 使用明确参数拉起：
+建议 `warp-insightd` 使用明确参数拉起：
 
 ```text
-wp-agent-exec run --workdir <execution_workdir>
+warp-insight-exec run --workdir <execution_workdir>
 ```
 
 第一版不建议把 `ActionPlan` 直接通过命令行传递。
@@ -206,16 +206,16 @@ wp-agent-exec run --workdir <execution_workdir>
 - 容易暴露敏感内容
 - 不利于现场保留
 
-### 5.1 `wp-agentd` 启动前步骤
+### 5.1 `warp-insightd` 启动前步骤
 
 1. 创建工作目录
 2. 写入 `plan.json`
 3. 写入 `runtime.json`
 4. 初始化 `meta.json`
 5. 打开 `stdout.log` / `stderr.log`
-6. spawn `wp-agent-exec`
+6. spawn `warp-insight-exec`
 
-### 5.2 `wp-agent-exec` 启动后步骤
+### 5.2 `warp-insight-exec` 启动后步骤
 
 1. 读取 `runtime.json`
 2. 读取 `plan.json`
@@ -226,7 +226,7 @@ wp-agent-exec run --workdir <execution_workdir>
 7. 最终写入 `result.json`
 8. 最终写入 `state.json = done|failed|timed_out|cancelled|rejected`
 
-随后由 `wp-agentd`：
+随后由 `warp-insightd`：
 
 9. 读取 `result.json`
 10. 计算 `result_digest`
@@ -271,7 +271,7 @@ wp-agent-exec run --workdir <execution_workdir>
 - `running`
   正在执行 `program.steps[]`
 - `cancelling`
-  `wp-agentd` 已请求取消，等待执行器收敛
+  `warp-insightd` 已请求取消，等待执行器收敛
 - `cancelled`
   执行器确认取消结束
 - `timed_out`
@@ -287,7 +287,7 @@ wp-agent-exec run --workdir <execution_workdir>
 
 `result.json` 应使用 [`action-plan-ir.md`](../execution/action-plan-ir.md) 中定义的 `ActionResult` 模型。
 
-建议 `wp-agent-exec` 只在以下时机写入最终 `result.json`：
+建议 `warp-insight-exec` 只在以下时机写入最终 `result.json`：
 
 - 成功完成
 - 校验拒绝
@@ -301,7 +301,7 @@ wp-agent-exec run --workdir <execution_workdir>
 - fsync
 - 原子 rename 到 `result.json`
 
-`wp-agentd` 应只在检测到 `result.json` 完整落盘后，才认为结果可消费。
+`warp-insightd` 应只在检测到 `result.json` 完整落盘后，才认为结果可消费。
 
 ---
 
@@ -311,27 +311,27 @@ wp-agent-exec run --workdir <execution_workdir>
 
 v1 建议：
 
-- `wp-agentd` 负责总超时裁决
-- `wp-agent-exec` 负责步骤超时执行
+- `warp-insightd` 负责总超时裁决
+- `warp-insight-exec` 负责步骤超时执行
 
 也就是说：
 
-- `constraints.max_total_duration_ms` 由 `wp-agentd` 监控
-- `program.steps[].timeout_ms` 或默认 step timeout 由 `wp-agent-exec` 监控
+- `constraints.max_total_duration_ms` 由 `warp-insightd` 监控
+- `program.steps[].timeout_ms` 或默认 step timeout 由 `warp-insight-exec` 监控
 
 ### 8.2 取消流程
 
 建议流程：
 
-1. `wp-agentd` 标记本地执行为 `cancel_requested`
-2. `wp-agentd` 向 `wp-agent-exec` 发送 `SIGTERM`
-3. `wp-agent-exec` 把 `state.json` 更新为 `cancelling`
-4. `wp-agent-exec` 做有限清理并写最终 `result.json`
-5. 若宽限时间后仍未退出，`wp-agentd` 发送 `SIGKILL`
+1. `warp-insightd` 标记本地执行为 `cancel_requested`
+2. `warp-insightd` 向 `warp-insight-exec` 发送 `SIGTERM`
+3. `warp-insight-exec` 把 `state.json` 更新为 `cancelling`
+4. `warp-insight-exec` 做有限清理并写最终 `result.json`
+5. 若宽限时间后仍未退出，`warp-insightd` 发送 `SIGKILL`
 
 ### 8.3 强制终止
 
-以下情况允许 `wp-agentd` 强制 kill：
+以下情况允许 `warp-insightd` 强制 kill：
 
 - 取消宽限期超时
 - 总超时已到且执行器未退出
@@ -366,7 +366,7 @@ v1 建议：
 
 ### 9.3 `cancelled`
 
-执行过程中被 `wp-agentd` 取消。
+执行过程中被 `warp-insightd` 取消。
 
 ### 9.4 `timed_out`
 
@@ -384,7 +384,7 @@ v1 建议：
   "action_id": "act_01",
   "agent_id": "agent_prod_web_01",
   "node_id": "prod-web-01",
-  "workdir": "/var/lib/wp-agent/run/actions/exec_01",
+  "workdir": "/var/lib/warp-insight/run/actions/exec_01",
   "spawned_at": "2026-04-12T10:00:00Z",
   "deadline_at": "2026-04-12T10:00:05Z"
 }
@@ -430,8 +430,8 @@ v1 建议：
 
 当前阶段固定以下结论：
 
-- `wp-agentd` 与 `wp-agent-exec` 的 v1 正式协议不是 stdout/stderr
+- `warp-insightd` 与 `warp-insight-exec` 的 v1 正式协议不是 stdout/stderr
 - v1 采用 `工作目录 + 文件契约 + 进程信号`
-- `wp-agentd` 是本地控制器
-- `wp-agent-exec` 是一次性受控执行器
+- `warp-insightd` 是本地控制器
+- `warp-insight-exec` 是一次性受控执行器
 - 未来若要增强流式交互，再引入 UDS v2，而不是一开始就做重协议

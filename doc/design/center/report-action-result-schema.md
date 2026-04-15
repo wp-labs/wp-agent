@@ -1,8 +1,8 @@
-# wp-agent ReportActionResult Schema 草案
+# warp-insight ReportActionResult Schema 草案
 
 ## 1. 文档目的
 
-本文档定义边缘 `wp-agentd` 向中心回报最终执行结果时使用的消息 envelope。
+本文档定义边缘 `warp-insightd` 向中心回报最终执行结果时使用的消息 envelope。
 
 重点回答：
 
@@ -161,8 +161,8 @@ ResultAttestation {
 
 第一版建议：
 
-- `wp-agentd` 在生成 `ActionResult` 后，先写本地 `result.json`
-- `wp-agentd` 读取 `result.json` 后计算 `result_digest` 并生成本地签名
+- `warp-insightd` 在生成 `ActionResult` 后，先写本地 `result.json`
+- `warp-insightd` 读取 `result.json` 后计算 `result_digest` 并生成本地签名
 - 再生成 `reporting/<execution_id>.json`
 - 成功收到中心确认前，不删除本地 reporting 状态
 

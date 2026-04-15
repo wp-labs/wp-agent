@@ -1,4 +1,4 @@
-# wp-agent Metrics Batch A 规格草案
+# warp-insight Metrics Batch A 规格草案
 
 ## 1. 文档目的
 
@@ -9,7 +9,7 @@
 - `prom_scrape`
 - `otlp_metrics_receiver`
 
-这四个 integration 足以支撑第一批 `wp-agentd` 数据面框架落地。
+这四个 integration 足以支撑第一批 `warp-insightd` 数据面框架落地。
 
 相关文档：
 

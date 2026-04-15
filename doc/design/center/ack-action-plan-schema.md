@@ -1,8 +1,8 @@
-# wp-agent ActionPlanAck Schema 草案
+# warp-insight ActionPlanAck Schema 草案
 
 ## 1. 文档目的
 
-本文档定义边缘 `wp-agentd` 对 `DispatchActionPlan` 的接收确认消息。
+本文档定义边缘 `warp-insightd` 对 `DispatchActionPlan` 的接收确认消息。
 
 重点回答：
 

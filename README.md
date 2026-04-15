@@ -1,25 +1,25 @@
-# wp-agent
+# warp-insight
 
 This repository currently contains the design docs and a minimal Rust workspace skeleton
 for the first implementation wave.
 
 Workspace layout:
 
-- `crates/wp-agent-contracts`
+- `crates/warp-insight-contracts`
   Shared contract types and versioned schema objects.
-- `crates/wp-agent-validate`
+- `crates/warp-insight-validate`
   Static validators for plans, results, config, and state.
-- `crates/wp-agent-shared`
+- `crates/warp-insight-shared`
   Shared errors, IDs, paths, and common runtime helpers.
-- `crates/wp-agentd`
+- `crates/warp-insightd`
   Edge daemon skeleton.
-- `crates/wp-agent-exec`
+- `crates/warp-insight-exec`
   ActionPlan runtime skeleton.
-- `crates/wp-agent-upgrader`
+- `crates/warp-insight-upgrader`
   Upgrade helper skeleton.
-- `crates/wp-agent-gateway`
+- `crates/warp-insight-gateway`
   Southbound gateway/server skeleton.
-- `crates/wp-agent-control`
+- `crates/warp-insight-control`
   Control-center core skeleton.
 
 The current code is intentionally minimal and is meant to anchor the module boundaries

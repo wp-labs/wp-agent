@@ -1,0 +1,17 @@
+[package]
+name = "warp-insight-control"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+warp-insight-contracts.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "warp-insight-control"
+path = "src/main.rs"
+

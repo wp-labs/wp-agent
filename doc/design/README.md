@@ -1,4 +1,4 @@
-# wp-agent 设计文档索引
+# warp-insight 设计文档索引
 
 `doc/design` 目录按主题拆分为以下子目录：
 
@@ -7,7 +7,7 @@
 - `execution/`
   动作 DSL、`ActionPlan IR`、执行 schema、opcode schema、`run.gxl` 相关文档
 - `edge/`
-  `wp-agentd` / `wp-agent-exec` / 本地状态 / 故障处理 / logs file state / 配置 / capability / 自观测
+  `warp-insightd` / `warp-insight-exec` / 本地状态 / 故障处理 / logs file state / 配置 / capability / 自观测
 - `center/`
   控制中心、控制平面、Gateway 协议、计划投递与结果回报 schema
 - `telemetry/`

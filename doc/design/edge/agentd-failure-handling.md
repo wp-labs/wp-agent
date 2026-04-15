@@ -1,8 +1,8 @@
-# wp-agentd 故障处理与恢复设计
+# warp-insightd 故障处理与恢复设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agentd` 在第一版里的故障分层、恢复语义和健康口径，重点回答三类问题：
+本文档定义 `warp-insightd` 在第一版里的故障分层、恢复语义和健康口径，重点回答三类问题：
 
 - 什么故障只影响单个 execution
 - 什么故障必须让 daemon 进入失败或保护态
@@ -25,7 +25,7 @@
 
 ## 2. 核心结论
 
-`wp-agentd` 第一版必须固定以下结论：
+`warp-insightd` 第一版必须固定以下结论：
 
 1. 单个 execution 的坏数据，默认不能打停整个 daemon
 2. 本地状态必须区分权威状态和可重建工件
@@ -62,7 +62,7 @@
 
 默认处理规则：
 
-- 不直接打停 `wp-agentd`
+- 不直接打停 `warp-insightd`
 - 能重建就重建
 - 不能重建就 quarantine 当前 execution
 - 必须保留最小 history 记录
@@ -106,7 +106,7 @@
 
 ## 4. 本地状态权威性
 
-`wp-agentd` 第一版必须明确以下 source-of-truth 关系。
+`warp-insightd` 第一版必须明确以下 source-of-truth 关系。
 
 ### 4.1 execution 结果
 
@@ -231,7 +231,7 @@
 
 ## 7. health 与自观测口径
 
-`wp-agentd` 的 runtime health 不能只看 queue 和 running。
+`warp-insightd` 的 runtime health 不能只看 queue 和 running。
 
 第一版至少要覆盖：
 

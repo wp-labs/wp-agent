@@ -4,7 +4,7 @@
 
 当前链路是：
 
-`WarpInsight (wp-agentd) -> TCP -> WarpParse tcp_src`
+`WarpInsight (warp-insightd) -> TCP -> WarpParse tcp_src`
 
 ## 1. 前提
 
@@ -39,32 +39,32 @@ framing = "auto"
   - `WarpInsight` 侧改用 `framing = "len"`。
   - `WarpParse tcp_src` 可保持 `framing = "auto"`，也可显式设成 `len`。
 
-原因是当前 `wp-agentd` 发送到 TCP 的内容是原始日志 `body`。如果 `body` 内部包含换行，而仍使用 `line` framing，接收端会按多行拆开。
+原因是当前 `warp-insightd` 发送到 TCP 的内容是原始日志 `body`。如果 `body` 内部包含换行，而仍使用 `line` framing，接收端会按多行拆开。
 
 ## 2. 生成默认配置文件
 
 在目标机器上执行：
 
 ```bash
-wp-agentd init-config
+warp-insightd init-config
 ```
 
 默认会在当前目录创建：
 
 ```text
-wp-agentd/agent.toml
+warp-insightd/agent.toml
 ```
 
 如果只想先查看模板：
 
 ```bash
-wp-agentd init-config --stdout
+warp-insightd init-config --stdout
 ```
 
 如果要放到指定目录：
 
 ```bash
-wp-agentd init-config --config-dir /etc/warpinsight
+warp-insightd init-config --config-dir /etc/warpinsight
 ```
 
 ## 3. 最小远程发送配置
@@ -167,15 +167,15 @@ log_dir = "log"
 例如配置目录是：
 
 ```text
-/opt/warpinsight/wp-agentd
+/opt/warpinsight/warp-insightd
 ```
 
 那么默认会使用：
 
 ```text
-/opt/warpinsight/wp-agentd/run
-/opt/warpinsight/wp-agentd/state
-/opt/warpinsight/wp-agentd/log
+/opt/warpinsight/warp-insightd/run
+/opt/warpinsight/warp-insightd/state
+/opt/warpinsight/warp-insightd/log
 ```
 
 其中：
@@ -190,19 +190,19 @@ log_dir = "log"
 使用默认配置目录：
 
 ```bash
-wp-agentd
+warp-insightd
 ```
 
 使用指定配置目录：
 
 ```bash
-wp-agentd --config-dir /etc/warpinsight
+warp-insightd --config-dir /etc/warpinsight
 ```
 
 只跑一轮，便于验证：
 
 ```bash
-WP_AGENTD_RUN_ONCE=1 wp-agentd --config-dir /etc/warpinsight
+WARP_INSIGHTD_RUN_ONCE=1 warp-insightd --config-dir /etc/warpinsight
 ```
 
 ## 7. 发送内容说明
@@ -254,8 +254,8 @@ WP_AGENTD_RUN_ONCE=1 wp-agentd --config-dir /etc/warpinsight
 
 1. 在 `WarpParse` 机器确认 `9000/TCP` 已监听。
 2. 在 `WarpInsight` 机器用一份最小配置只采集一个日志文件。
-3. 先用 `WP_AGENTD_RUN_ONCE=1` 跑一次，确认无明显错误。
-4. 再持续运行 `wp-agentd`。
+3. 先用 `WARP_INSIGHTD_RUN_ONCE=1` 跑一次，确认无明显错误。
+4. 再持续运行 `warp-insightd`。
 5. 确认 `WarpParse` 已收到原始日志行。
 
 ## 11. 一个可直接改写的完整模板

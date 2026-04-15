@@ -1,12 +1,12 @@
-# wp-agent 控制中心架构设计
+# warp-insight 控制中心架构设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agent` 中心侧控制系统的总体架构。
+本文档定义 `warp-insight` 中心侧控制系统的总体架构。
 
 这里的“控制中心”特指：
 
-- 面向 `wp-agentd` 的中心控制节点
+- 面向 `warp-insightd` 的中心控制节点
 - 负责请求、审批、编译、签名、下发、跟踪、审计、升级编排的中心系统
 
 本文档重点回答：
@@ -34,7 +34,7 @@
 
 ## 2. 核心结论
 
-`wp-agent` 控制中心第一版应被定义为：
+`warp-insight` 控制中心第一版应被定义为：
 
 - 一个中心治理系统
 - 一个控制平面执行系统
@@ -118,8 +118,8 @@
 
 控制中心不负责：
 
-- 替代 `wp-agentd` 执行 opcode
-- 直接控制 `wp-agent-exec`
+- 替代 `warp-insightd` 执行 opcode
+- 直接控制 `warp-insight-exec`
 - 在中心侧实时解析边缘原始 telemetry 流
 - 替代资源查询平台做全量分析引擎
 
@@ -162,7 +162,7 @@
 
 ```text
 +------------------------------------------------------------------+
-|                      wp-agent Control Center                     |
+|                      warp-insight Control Center                     |
 |                                                                  |
 |  +------------------+    +------------------+                    |
 |  | Northbound API   |    | Control Query    |                    |
@@ -193,7 +193,7 @@
                      control stream / result stream
                                |
 +------------------------------v-----------------------------------+
-|                           wp-agentd                               |
+|                           warp-insightd                               |
 +------------------------------------------------------------------+
 ```
 
@@ -221,7 +221,7 @@
 
 ### 6.2 Agent Gateway
 
-面向 `wp-agentd` 的南向入口。
+面向 `warp-insightd` 的南向入口。
 
 第一版建议承担：
 
@@ -332,7 +332,7 @@
 
 说明：
 
-- 结果级签名属于 `wp-agentd` 责任，不属于中心 Signer
+- 结果级签名属于 `warp-insightd` 责任，不属于中心 Signer
 
 ### 6.10 Dispatch Service
 
@@ -569,7 +569,7 @@
 
 ### 10.2 南向通路
 
-`wp-agentd` 通过 `Agent Gateway` 与控制中心交互。
+`warp-insightd` 通过 `Agent Gateway` 与控制中心交互。
 
 第一版建议支持：
 

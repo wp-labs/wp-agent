@@ -1,4 +1,4 @@
-# wp-agent 非功能目标草案
+# warp-insight 非功能目标草案
 
 ## 1. 文档目的
 
@@ -22,7 +22,7 @@
 
 ## 2. 核心结论
 
-`wp-agent` 如果要达到“业务第一”的非功能水准，不能只写原则，必须把资源预算、退化阈值和保底能力写死成验收目标。
+`warp-insight` 如果要达到“业务第一”的非功能水准，不能只写原则，必须把资源预算、退化阈值和保底能力写死成验收目标。
 
 第一版先固定四个结论：
 
@@ -65,7 +65,7 @@
 
 第一组是当前优先验收的 `standalone replacement slice`：
 
-- `wp-agentd` 常驻
+- `warp-insightd` 常驻
 - 最小 self-observability 开启
 - 单路径 `file input`
 - `parser / multiline`
@@ -76,7 +76,7 @@
 
 第二组是后续扩展的 `managed + metrics baseline`：
 
-- `wp-agentd` 常驻
+- `warp-insightd` 常驻
 - control plane 长连
 - self-observability 开启
 - `host_metrics`
@@ -259,7 +259,7 @@
 
 在 `normal` 或 `degraded` 模式下，建议满足：
 
-- 已接受计划到 `wp-agent-exec` 启动：
+- 已接受计划到 `warp-insight-exec` 启动：
   - `p95 <= 2s`
 - cancel 请求到本地 kill / graceful stop 生效：
   - `p95 <= 3s`
@@ -305,6 +305,6 @@
 
 - 非功能目标必须量化，不能只写“低资源”
 - 第一非功能验收门应先覆盖 `standalone` 文件日志替代切片
-- `wp-agent` 要优先保护业务、控制面和审计链
+- `warp-insight` 要优先保护业务、控制面和审计链
 - 退化策略必须先于实现编码
 - `normal / degraded / protect` 三态应作为后续实现和验收的统一口径

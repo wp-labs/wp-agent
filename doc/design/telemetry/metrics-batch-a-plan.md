@@ -1,4 +1,4 @@
-# wp-agent Metrics Batch A 计划
+# warp-insight Metrics Batch A 计划
 
 ## 1. 文档目的
 
@@ -365,10 +365,10 @@ integration {
 
 要认为 `Batch A` 可交付，至少应满足：
 
-- `wp-agentd` 可稳定输出 host 基础指标
-- `wp-agentd` 可稳定输出 process 基础指标
-- `wp-agentd` 可稳定 scrape Prometheus / OpenMetrics target
-- `wp-agentd` 可稳定接收 OTLP metrics
+- `warp-insightd` 可稳定输出 host 基础指标
+- `warp-insightd` 可稳定输出 process 基础指标
+- `warp-insightd` 可稳定 scrape Prometheus / OpenMetrics target
+- `warp-insightd` 可稳定接收 OTLP metrics
 - 至少完成一种 container runtime 或 Kubernetes 基础指标接入
 - 所有指标都能稳定绑定到统一 resource model
 

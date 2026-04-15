@@ -1,8 +1,8 @@
-# wp-agent 术语词典
+# warp-insight 术语词典
 
 ## 1. 文档目的
 
-本文档定义 `wp-agent` 设计文档中的统一术语。
+本文档定义 `warp-insight` 设计文档中的统一术语。
 
 目标是解决三类问题：
 
@@ -46,7 +46,7 @@
 
 ### 2.3 边缘本地状态优先用 execution 词根
 
-在 `wp-agentd` 本地状态中，优先使用：
+在 `warp-insightd` 本地状态中，优先使用：
 
 - `execution_queue`
 - `running`
@@ -57,7 +57,7 @@
 
 ### 2.4 对标成熟产品时，对齐能力，不对齐配置名
 
-当 `wp-agent` 设计文档提到对标 `Fluent Bit`、`OpenTelemetry Collector` 等成熟产品时，默认含义是：
+当 `warp-insight` 设计文档提到对标 `Fluent Bit`、`OpenTelemetry Collector` 等成熟产品时，默认含义是：
 
 - 对齐能力边界
 - 对齐关键运行时行为
@@ -73,7 +73,7 @@
 例如：
 
 - 可以说“文件日志输入对标 `Fluent Bit tail input`”
-- 不建议说“`wp-agent` 的 logs 配置应兼容 `Fluent Bit tail` 配置”
+- 不建议说“`warp-insight` 的 logs 配置应兼容 `Fluent Bit tail` 配置”
 
 只有在文档显式写出“兼容配置”或“兼容协议对象”时，才表示需要兼容对应产品的外部接口。
 
@@ -81,17 +81,17 @@
 
 ## 3. 角色术语
 
-### 3.1 `wp-agent`
+### 3.1 `warp-insight`
 
 整个系统中的环境内代理产品名。
 
 包含但不限于：
 
-- `wp-agentd`
-- `wp-agent-exec`
-- `wp-agent-upgrader`
+- `warp-insightd`
+- `warp-insight-exec`
+- `warp-insight-upgrader`
 
-### 3.2 `wp-agentd`
+### 3.2 `warp-insightd`
 
 边缘常驻 daemon。
 
@@ -107,7 +107,7 @@
 - step runner
 - action engine
 
-### 3.3 `wp-agent-exec`
+### 3.3 `warp-insight-exec`
 
 边缘按需拉起的受控执行器。
 
@@ -122,7 +122,7 @@
 - controller
 - scheduler
 
-### 3.4 `wp-agent-upgrader`
+### 3.4 `warp-insight-upgrader`
 
 边缘按需拉起的升级辅助进程。
 
@@ -221,7 +221,7 @@ IR 中 `kind = "output"` 的 step 类型。
 - `ActionPlan`
 - `ActionPlan IR`
 - `ActionResult`
-- `wp-agent-exec` runtime
+- `warp-insight-exec` runtime
 
 不应把这张表直接套用到作者侧 DSL 文档。
 
@@ -300,7 +300,7 @@ IR 中 `kind = "output"` 的 step 类型。
 统一定义：
 
 - 已通过本地校验
-- 尚未拉起 `wp-agent-exec`
+- 尚未拉起 `warp-insight-exec`
 - 等待 `execution_scheduler` 调度
 
 不是：
@@ -391,7 +391,7 @@ IR 中 `kind = "output"` 的 step 类型。
 
 统一定义：
 
-- `wp-agentd` 数据面中的常驻文件日志输入能力
+- `warp-insightd` 数据面中的常驻文件日志输入能力
 - 负责发现、跟踪、读取追加内容，并进入统一 telemetry pipeline
 
 推荐使用场景：
@@ -620,7 +620,7 @@ IR 中 `kind = "output"` 的 step 类型。
 - 数据上送组件
 - 或外部兼容目标中的现有 exporter
 
-在 `wp-agent` 体系里：
+在 `warp-insight` 体系里：
 
 - 外部 exporter 是 fallback
 - 不是默认前提
@@ -654,8 +654,8 @@ IR 中 `kind = "output"` 的 step 类型。
 
 如果你要写新文档，优先使用：
 
-- 边缘主进程：`wp-agentd`
-- 边缘执行器：`wp-agent-exec`
+- 边缘主进程：`warp-insightd`
+- 边缘执行器：`warp-insight-exec`
 - 最终执行对象：`ActionPlan`
 - 最终回传对象：`ActionResult`
 - 最小执行单位：`step`

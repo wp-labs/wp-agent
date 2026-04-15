@@ -1,0 +1,15 @@
+[package]
+name = "warp-insight-validate"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde_json.workspace = true
+time.workspace = true
+toml.workspace = true
+warp-insight-contracts.workspace = true
+
+[lib]
+path = "src/lib.rs"

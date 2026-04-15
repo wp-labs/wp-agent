@@ -3,7 +3,7 @@ extern mod rust,ver { path = "@{PATH}"; }
 mod envs  {
    env _common  : rust_env.init   {
     root      = ".";
-    prj_key   = "wp-agent" ;
+    prj_key   = "warp-insight" ;
     target_name = "bin-name";
 
   }
@@ -45,6 +45,7 @@ mod main  {
   #[task(name="pub to local")]
   flow _pub_local   {
     gx.cmd (  "mkdir -p ${MAIN_HOME_BIN}" );
-    gx.cmd (  "cp ${MAIN_BLD_BINS}/${ENV_TARGET_NAME} ${MAIN_HOME_BIN}/"  );
+    gx.cmd (  "cp ${MAIN_BLD_BINS}/warp-insightd ${MAIN_HOME_BIN}/"  );
+    gx.cmd (  "cp ${MAIN_BLD_BINS}/warp-insight-exec ${MAIN_HOME_BIN}/"  );
   }
 }

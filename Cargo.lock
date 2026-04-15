@@ -369,6 +369,76 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
 
 [[package]]
+name = "warp-insight-contracts"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "warp-insight-control"
+version = "0.1.0"
+dependencies = [
+ "warp-insight-contracts",
+]
+
+[[package]]
+name = "warp-insight-exec"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "warp-insight-contracts",
+ "warp-insight-shared",
+ "warp-insight-validate",
+]
+
+[[package]]
+name = "warp-insight-gateway"
+version = "0.1.0"
+dependencies = [
+ "warp-insight-contracts",
+]
+
+[[package]]
+name = "warp-insight-shared"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "time",
+]
+
+[[package]]
+name = "warp-insight-upgrader"
+version = "0.1.0"
+
+[[package]]
+name = "warp-insight-validate"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "time",
+ "toml",
+ "warp-insight-contracts",
+]
+
+[[package]]
+name = "warp-insightd"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "serde",
+ "serde_json",
+ "time",
+ "tokio",
+ "toml",
+ "warp-insight-contracts",
+ "warp-insight-shared",
+ "warp-insight-validate",
+]
+
+[[package]]
 name = "wasi"
 version = "0.11.1+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -396,76 +466,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df79d97927682d2fd8adb29682d1140b343be4ac0f08fd68b7765d9c059d3945"
 dependencies = [
  "memchr",
-]
-
-[[package]]
-name = "wp-agent-contracts"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "wp-agent-control"
-version = "0.1.0"
-dependencies = [
- "wp-agent-contracts",
-]
-
-[[package]]
-name = "wp-agent-exec"
-version = "0.1.0"
-dependencies = [
- "serde",
- "wp-agent-contracts",
- "wp-agent-shared",
- "wp-agent-validate",
-]
-
-[[package]]
-name = "wp-agent-gateway"
-version = "0.1.0"
-dependencies = [
- "wp-agent-contracts",
-]
-
-[[package]]
-name = "wp-agent-shared"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "time",
-]
-
-[[package]]
-name = "wp-agent-upgrader"
-version = "0.1.0"
-
-[[package]]
-name = "wp-agent-validate"
-version = "0.1.0"
-dependencies = [
- "serde_json",
- "time",
- "toml",
- "wp-agent-contracts",
-]
-
-[[package]]
-name = "wp-agentd"
-version = "0.1.0"
-dependencies = [
- "libc",
- "serde",
- "serde_json",
- "time",
- "tokio",
- "toml",
- "wp-agent-contracts",
- "wp-agent-shared",
- "wp-agent-validate",
 ]
 
 [[package]]

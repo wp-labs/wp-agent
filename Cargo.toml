@@ -1,13 +1,13 @@
 [workspace]
 members = [
-  "crates/wp-agent-contracts",
-  "crates/wp-agent-validate",
-  "crates/wp-agent-shared",
-  "crates/wp-agentd",
-  "crates/wp-agent-exec",
-  "crates/wp-agent-upgrader",
-  "crates/wp-agent-gateway",
-  "crates/wp-agent-control",
+  "crates/warp-insight-contracts",
+  "crates/warp-insight-validate",
+  "crates/warp-insight-shared",
+  "crates/warp-insightd",
+  "crates/warp-insight-exec",
+  "crates/warp-insight-upgrader",
+  "crates/warp-insight-gateway",
+  "crates/warp-insight-control",
 ]
 resolver = "2"
 
@@ -18,9 +18,9 @@ version = "0.1.0" #@gxl:set(version)
 rust-version = "1.85"
 
 [workspace.dependencies]
-wp-agent-contracts = { path = "crates/wp-agent-contracts" }
-wp-agent-validate = { path = "crates/wp-agent-validate" }
-wp-agent-shared = { path = "crates/wp-agent-shared" }
+warp-insight-contracts = { path = "crates/warp-insight-contracts" }
+warp-insight-validate = { path = "crates/warp-insight-validate" }
+warp-insight-shared = { path = "crates/warp-insight-shared" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 time = { version = "0.3", features = ["formatting", "parsing"] }

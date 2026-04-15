@@ -1,4 +1,4 @@
-# wp-agent 架构设计
+# warp-insight 架构设计
 
 相关设计文档：
 
@@ -7,16 +7,16 @@
 - [`security-model.md`](security-model.md)：三进程信任边界、最小权限、审批链和审计链
 - [`action-plan-schema.md`](../execution/action-plan-schema.md)：`ActionPlan` 的字段级协议定义
 - [`action-result-schema.md`](../execution/action-result-schema.md)：`ActionResult` 和 `StepActionRecord` 的字段级协议定义
-- [`agentd-architecture.md`](../edge/agentd-architecture.md)：`wp-agentd` 的模块边界、本地状态机和调度职责
-- [`agentd-failure-handling.md`](../edge/agentd-failure-handling.md)：`wp-agentd` 的故障分层、状态权威性、恢复和 health 口径
-- [`agentd-exec-protocol.md`](../edge/agentd-exec-protocol.md)：`wp-agentd` 与 `wp-agent-exec` 的本地交互协议
-- [`agentd-state-and-boundaries.md`](../edge/agentd-state-and-boundaries.md)：`wp-agentd` 的本地状态模型、唯一写入权和模块协作边界
-- [`agentd-state-schema.md`](../edge/agentd-state-schema.md)：`wp-agentd` 本地状态对象的字段级 schema
-- [`agentd-events.md`](../edge/agentd-events.md)：`wp-agentd` 进程内事件对象和模块事件流
+- [`agentd-architecture.md`](../edge/agentd-architecture.md)：`warp-insightd` 的模块边界、本地状态机和调度职责
+- [`agentd-failure-handling.md`](../edge/agentd-failure-handling.md)：`warp-insightd` 的故障分层、状态权威性、恢复和 health 口径
+- [`agentd-exec-protocol.md`](../edge/agentd-exec-protocol.md)：`warp-insightd` 与 `warp-insight-exec` 的本地交互协议
+- [`agentd-state-and-boundaries.md`](../edge/agentd-state-and-boundaries.md)：`warp-insightd` 的本地状态模型、唯一写入权和模块协作边界
+- [`agentd-state-schema.md`](../edge/agentd-state-schema.md)：`warp-insightd` 本地状态对象的字段级 schema
+- [`agentd-events.md`](../edge/agentd-events.md)：`warp-insightd` 进程内事件对象和模块事件流
 - [`capability-report-schema.md`](../edge/capability-report-schema.md)：agent 能力声明和匹配规则
-- [`agent-config-schema.md`](../edge/agent-config-schema.md)：`wp-agentd` 总配置骨架
+- [`agent-config-schema.md`](../edge/agent-config-schema.md)：`warp-insightd` 总配置骨架
 - [`error-codes.md`](../edge/error-codes.md)：统一错误码和原因码词典
-- [`self-observability.md`](../edge/self-observability.md)：`wp-agent` 自身可观测性和验收指标面设计
+- [`self-observability.md`](../edge/self-observability.md)：`warp-insight` 自身可观测性和验收指标面设计
 - [`non-functional-targets.md`](non-functional-targets.md)：资源预算、退化阈值、buffer/backpressure 和保底目标
 - [`metrics-integration-roadmap.md`](../telemetry/metrics-integration-roadmap.md)：metrics integration 的目标分层、优先级和批次规划
 - [`metrics-batch-a-plan.md`](../telemetry/metrics-batch-a-plan.md)：Batch A 的最小 target 覆盖、指标范围和统一配置骨架
@@ -30,7 +30,7 @@
 - [`control-plane.md`](../center/control-plane.md)：控制对象、状态机、下发协议与编排闭环
 - [`control-center-architecture.md`](../center/control-center-architecture.md)：中心控制系统的模块边界、存储、通路与部署形态
 - [`control-center-storage-schema.md`](../center/control-center-storage-schema.md)：控制中心主存储对象、主键、索引与对象存储边界
-- [`agent-gateway-protocol.md`](../center/agent-gateway-protocol.md)：中心与 `wp-agentd` 的南向会话和消息协议
+- [`agent-gateway-protocol.md`](../center/agent-gateway-protocol.md)：中心与 `warp-insightd` 的南向会话和消息协议
 - [`dispatch-action-plan-schema.md`](../center/dispatch-action-plan-schema.md)：中心向边缘投递 `ActionPlan` 的 envelope schema
 - [`ack-action-plan-schema.md`](../center/ack-action-plan-schema.md)：边缘对计划投递的接收确认 schema
 - [`report-action-result-schema.md`](../center/report-action-result-schema.md)：边缘向中心回报最终结果的 envelope schema
@@ -39,7 +39,7 @@
 
 本文档在 [`target.md`](target.md) 的目标定义基础上，进一步回答以下问题：
 
-- `wp-agent` 应拆成哪些核心模块
+- `warp-insight` 应拆成哪些核心模块
 - 环境内 agent 与中心节点之间如何分工
 - 数据平面与控制平面如何解耦
 - 升级、远程执行、资源发现、多信号关联应落在哪一层
@@ -51,7 +51,7 @@
 
 ## 2. 架构原则
 
-`wp-agent` 的第一版架构必须同时满足以下原则：
+`warp-insight` 的第一版架构必须同时满足以下原则：
 
 - 两层分离：
   环境内 agent 与中心节点必须职责清晰，不能重新耦合成一个“大一统进程”
@@ -80,7 +80,7 @@
 
 ### 3.1 分层概览
 
-`wp-agent` 由两层组成：
+`warp-insight` 由两层组成：
 
 - 环境内 agent：
   部署在主机、容器、Kubernetes 节点或目标环境中，负责采集、发现、标准化、缓冲、上送，以及受控执行升级和远程动作
@@ -188,7 +188,7 @@
 
 ### 4.3 运行模式
 
-`wp-agent` 第一版应明确支持两种运行模式：
+`warp-insight` 第一版应明确支持两种运行模式：
 
 - `standalone`
   没有中心控制节点，边缘本地完成采集、发现、标准化、缓冲和上送
@@ -247,7 +247,7 @@
 
 这里还应明确一个架构方向：
 
-- `wp-agentd` 要尽量内建大多数常见目标的 metrics 采集能力
+- `warp-insightd` 要尽量内建大多数常见目标的 metrics 采集能力
 - “先部署各种 exporter，再让 agent 去抓” 不应成为默认路线
 - 对少数专有系统、历史系统或短期不值得自研的目标，才保留 exporter compatibility mode
 
@@ -266,7 +266,7 @@
 
 ### 5.3 常见 metrics 采集与 exporter 策略
 
-`wp-agent` 在 metrics 侧的目标，不应只是“兼容 exporter 生态”，而应是：
+`warp-insight` 在 metrics 侧的目标，不应只是“兼容 exporter 生态”，而应是：
 
 - 对大多数常见目标直接内建采集能力
 - 尽量减少额外 exporter 的安装、升级和运维成本
@@ -283,7 +283,7 @@
 
 对这类目标，推荐模型是：
 
-- `wp-agentd` 内建 collector / scraper / receiver
+- `warp-insightd` 内建 collector / scraper / receiver
 - 结合 discovery 自动发现 target
 - 结合 normalize pipeline 直接做 OTel 对齐和资源绑定
 
@@ -321,19 +321,19 @@ AI 更适合用于：
 
 建议默认采用三类进程：
 
-- `wp-agentd`：
+- `warp-insightd`：
   常驻主进程，负责采集、发现、标准化、统一事件封装、buffer、上送、心跳、策略接收和本地保护状态机
-- `wp-agent-exec`：
+- `warp-insight-exec`：
   按需拉起的动作执行进程，负责执行远程诊断、只读命令、服务控制类动作和其他受控动作
-- `wp-agent-upgrader`：
+- `warp-insight-upgrader`：
   按需拉起的升级辅助进程，负责升级包下载、校验、切换、健康探测和回滚
 
 这三个进程的职责边界应明确如下：
 
-- `wp-agentd` 不直接承载高风险远程动作执行逻辑
-- `wp-agentd` 不直接在自身进程内完成自我替换式升级
-- `wp-agent-exec` 不负责采集、发现、buffer 和上送
-- `wp-agent-upgrader` 不负责常驻采集任务和远程动作编排
+- `warp-insightd` 不直接承载高风险远程动作执行逻辑
+- `warp-insightd` 不直接在自身进程内完成自我替换式升级
+- `warp-insight-exec` 不负责采集、发现、buffer 和上送
+- `warp-insight-upgrader` 不负责常驻采集任务和远程动作编排
 
 之所以这样拆分，是因为 `target.md` 已经把以下要求定义成硬约束：
 
@@ -360,11 +360,11 @@ AI 更适合用于：
 
 ### 5.6 进程间协作模型
 
-第一版建议由 `wp-agentd` 作为本地唯一协调者：
+第一版建议由 `warp-insightd` 作为本地唯一协调者：
 
 - 接收中心节点策略、升级计划和远程动作计划
 - 校验本地状态是否允许执行
-- 拉起 `wp-agent-exec` 或 `wp-agent-upgrader`
+- 拉起 `warp-insight-exec` 或 `warp-insight-upgrader`
 - 传递最小必要参数和受限执行上下文
 - 回收执行结果、状态码和审计元数据
 - 对执行超时、异常退出和资源超限进行统一治理
@@ -375,9 +375,9 @@ AI 更适合用于：
 Center Node
     |
     v
-wp-agentd
-  |---- spawn ----> wp-agent-exec
-  |---- spawn ----> wp-agent-upgrader
+warp-insightd
+  |---- spawn ----> warp-insight-exec
+  |---- spawn ----> warp-insight-upgrader
   |
   +---- collect / discover / buffer / export
 ```
@@ -386,7 +386,7 @@ wp-agentd
 
 - 中心节点不直接控制本地执行器进程
 - 本地执行器不直接长连中心节点做自由编排
-- 所有动作都通过 `wp-agentd` 统一受理、编号、审计和状态回报
+- 所有动作都通过 `warp-insightd` 统一受理、编号、审计和状态回报
 
 这样可以把本地控制面收口到一个确定性入口，避免边缘侧控制面失序。
 
@@ -403,7 +403,7 @@ wp-agentd
 - 升级可实现性：
   使用独立升级器比主进程自替换更容易实现可靠切换和失败回滚
 - 审计清晰：
-  `wp-agentd -> executor/upgrader -> result` 的调用链更容易形成稳定审计记录
+  `warp-insightd -> executor/upgrader -> result` 的调用链更容易形成稳定审计记录
 
 ### 5.8 进程模型约束
 
@@ -415,7 +415,7 @@ wp-agentd
 - 常驻进程数量应尽量少，默认应控制在一个主 daemon 加少量按需子进程的规模
 - 执行器和升级器应默认按需拉起、执行完退出，而不是长期常驻
 
-也就是说，`wp-agent` 追求的是“高风险能力隔离”，不是“边缘侧服务化泛滥”。
+也就是说，`warp-insight` 追求的是“高风险能力隔离”，不是“边缘侧服务化泛滥”。
 
 ### 5.9 单机数据流
 
@@ -807,7 +807,7 @@ AI 不应直接拥有：
 
 先打通 `standalone` 边缘运行基线：
 
-- `wp-agentd` / `wp-agent-exec` / `wp-agent-upgrader` 三进程骨架
+- `warp-insightd` / `warp-insight-exec` / `warp-insight-upgrader` 三进程骨架
 - 本地工作目录、状态目录和恢复骨架
 - `standalone` 运行模式
 - 最小自观测、错误码和 health 基线
@@ -884,7 +884,7 @@ AI 不应直接拥有：
 
 ## 14. 当前架构结论
 
-第一版 `wp-agent` 架构可以总结为：
+第一版 `warp-insight` 架构可以总结为：
 
 - 边缘 agent 是轻量执行面，负责采集、发现、标准化、缓冲、上送，以及受控执行升级和远程动作
 - 中心节点是控制、分析和治理中心，负责策略、资源目录、统一关联、升级编排、远程动作编排、审计和 AI 辅助
@@ -893,4 +893,4 @@ AI 不应直接拥有：
 - OpenTelemetry 是协议和语义的优先基线
 - 非功能目标不是附属要求，而是第一架构约束
 
-如果后续实现偏离以上五点，`wp-agent` 很容易重新滑回“重边缘、弱治理、强耦合”的错误方向。
+如果后续实现偏离以上五点，`warp-insight` 很容易重新滑回“重边缘、弱治理、强耦合”的错误方向。

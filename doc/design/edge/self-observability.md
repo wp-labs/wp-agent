@@ -1,12 +1,12 @@
-# wp-agent Self-Observability 设计
+# warp-insight Self-Observability 设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agent` 自身的可观测性设计，重点覆盖：
+本文档定义 `warp-insight` 自身的可观测性设计，重点覆盖：
 
-- `wp-agentd`
-- `wp-agent-exec`
-- `wp-agent-upgrader`
+- `warp-insightd`
+- `warp-insight-exec`
+- `warp-insight-upgrader`
 
 目标是让边缘代理自身也具备可诊断、可验收、可压测的观测能力。
 
@@ -20,7 +20,7 @@
 
 ## 2. 核心结论
 
-`wp-agent` 必须把自观测视为一等能力，而不是上线后再补的辅助项。
+`warp-insight` 必须把自观测视为一等能力，而不是上线后再补的辅助项。
 
 第一版自观测至少要覆盖三类信息：
 
@@ -30,7 +30,7 @@
 
 一句话说：
 
-- 没有 self-observability，就很难验证 `wp-agent` 是否真的轻、稳、可退化、可恢复
+- 没有 self-observability，就很难验证 `warp-insight` 是否真的轻、稳、可退化、可恢复
 
 ---
 
@@ -66,7 +66,7 @@
 
 ## 4. 观测对象分层
 
-### 4.1 `wp-agentd`
+### 4.1 `warp-insightd`
 
 重点观测：
 
@@ -76,7 +76,7 @@
 - metrics collection framework 健康
 - degrade / protect 状态
 
-### 4.2 `wp-agent-exec`
+### 4.2 `warp-insight-exec`
 
 重点观测：
 
@@ -85,7 +85,7 @@
 - stdout/stderr 摘要
 - 失败、取消、超时原因
 
-### 4.3 `wp-agent-upgrader`
+### 4.3 `warp-insight-upgrader`
 
 重点观测：
 
@@ -98,7 +98,7 @@
 
 ## 5. Self Metrics
 
-### 5.1 `wp-agentd` 基础指标
+### 5.1 `warp-insightd` 基础指标
 
 建议第一版至少包括：
 
@@ -290,7 +290,7 @@ metrics 数据面建议至少有：
 
 当前阶段固定以下结论：
 
-- `wp-agent` 自身必须具备自观测能力
-- `wp-agentd` 的 queue / running / reporting / mode 必须有对应指标
+- `warp-insight` 自身必须具备自观测能力
+- `warp-insightd` 的 queue / running / reporting / mode 必须有对应指标
 - metrics 数据面验收必须依赖 self-observability 指标
 - 自观测要受控，不能反过来拖重 agent

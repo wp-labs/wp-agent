@@ -11,10 +11,10 @@ tls_mode = "tls"
 auth_mode = "mtls"
 
 [paths]
-root_dir = "/var/lib/wp-agent"
-run_dir = "/var/lib/wp-agent/run"
-state_dir = "/var/lib/wp-agent/state"
-log_dir = "/var/log/wp-agent"
+root_dir = "/var/lib/warp-insight"
+run_dir = "/var/lib/warp-insight/run"
+state_dir = "/var/lib/warp-insight/state"
+log_dir = "/var/log/warp-insight"
 
 [execution]
 cancel_grace_ms = 5000

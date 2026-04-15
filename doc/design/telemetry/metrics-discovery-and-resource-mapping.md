@@ -1,4 +1,4 @@
-# wp-agent Metrics Discovery 与 Resource Mapping 设计
+# warp-insight Metrics Discovery 与 Resource Mapping 设计
 
 ## 1. 文档目的
 

@@ -1,4 +1,4 @@
-# wp-agent 首批实现 Backlog
+# warp-insight 首批实现 Backlog
 
 ## 1. 文档目的
 
@@ -53,17 +53,17 @@
 当前仓库没有代码，可以按下面的最小布局起步：
 
 ```text
-wp-agent/
+warp-insight/
   doc/
   crates/
-    wp-agent-contracts/
-    wp-agent-validate/
-    wp-agent-shared/
-    wp-agentd/
-    wp-agent-exec/
-    wp-agent-upgrader/
-    wp-agent-gateway/
-    wp-agent-control/
+    warp-insight-contracts/
+    warp-insight-validate/
+    warp-insight-shared/
+    warp-insightd/
+    warp-insight-exec/
+    warp-insight-upgrader/
+    warp-insight-gateway/
+    warp-insight-control/
   fixtures/
     contracts/
     action-plans/
@@ -75,21 +75,21 @@ wp-agent/
 
 模块角色：
 
-- `wp-agent-contracts/`
+- `warp-insight-contracts/`
   所有 schema 对象、枚举、serde 类型、版本字段
-- `wp-agent-validate/`
+- `warp-insight-validate/`
   独立校验器、约束检查器、负例测试
-- `wp-agent-shared/`
+- `warp-insight-shared/`
   错误码、通用 paths、ids、时间工具、配置加载
-- `wp-agentd/`
+- `warp-insightd/`
   边缘常驻 daemon、state store、scheduler、telemetry runtime
-- `wp-agent-exec/`
+- `warp-insight-exec/`
   `ActionPlan` runtime、opcode dispatch、`ActionResult`
-- `wp-agent-upgrader/`
+- `warp-insight-upgrader/`
   prepare / switch / health-check / rollback
-- `wp-agent-gateway/`
+- `warp-insight-gateway/`
   南向 session、hello、heartbeat、dispatch、ack/result 通道
-- `wp-agent-control/`
+- `warp-insight-control/`
   request / approval / compile / sign / dispatch / tracker
 
 ---
@@ -104,12 +104,12 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-contracts/src/action_plan.rs`
-- `crates/wp-agent-contracts/src/action_result.rs`
-- `crates/wp-agent-contracts/src/capability_report.rs`
-- `crates/wp-agent-contracts/src/gateway.rs`
-- `crates/wp-agent-contracts/src/agent_config.rs`
-- `crates/wp-agent-contracts/src/state_exec.rs`
+- `crates/warp-insight-contracts/src/action_plan.rs`
+- `crates/warp-insight-contracts/src/action_result.rs`
+- `crates/warp-insight-contracts/src/capability_report.rs`
+- `crates/warp-insight-contracts/src/gateway.rs`
+- `crates/warp-insight-contracts/src/agent_config.rs`
+- `crates/warp-insight-contracts/src/state_exec.rs`
 
 完成定义：
 
@@ -125,10 +125,10 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-validate/src/action_plan.rs`
-- `crates/wp-agent-validate/src/action_result.rs`
-- `crates/wp-agent-validate/src/config.rs`
-- `crates/wp-agent-validate/src/state.rs`
+- `crates/warp-insight-validate/src/action_plan.rs`
+- `crates/warp-insight-validate/src/action_result.rs`
+- `crates/warp-insight-validate/src/config.rs`
+- `crates/warp-insight-validate/src/state.rs`
 
 完成定义：
 
@@ -154,7 +154,7 @@ wp-agent/
 - 每类核心对象至少有一组 valid/invalid fixtures
 - CI 可以批量回放校验
 
-### 4.4 B004 `wp-agentd` skeleton
+### 4.4 B004 `warp-insightd` skeleton
 
 对应里程碑：
 
@@ -162,19 +162,19 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/main.rs`
-- `crates/wp-agentd/src/bootstrap.rs`
-- `crates/wp-agentd/src/config_runtime.rs`
-- `crates/wp-agentd/src/state_store/mod.rs`
-- `crates/wp-agentd/src/self_observability.rs`
+- `crates/warp-insightd/src/main.rs`
+- `crates/warp-insightd/src/bootstrap.rs`
+- `crates/warp-insightd/src/config_runtime.rs`
+- `crates/warp-insightd/src/state_store/mod.rs`
+- `crates/warp-insightd/src/self_observability.rs`
 
 完成定义：
 
-- `wp-agentd` 可独立启动
+- `warp-insightd` 可独立启动
 - 能初始化 `run/`、`state/`、`log/` 目录
 - 能加载配置并进入 `standalone` 常驻主循环
 
-### 4.5 B005 `wp-agent-exec` skeleton
+### 4.5 B005 `warp-insight-exec` skeleton
 
 对应里程碑：
 
@@ -182,10 +182,10 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-exec/src/main.rs`
-- `crates/wp-agent-exec/src/runtime.rs`
-- `crates/wp-agent-exec/src/workdir.rs`
-- `crates/wp-agent-exec/src/result_writer.rs`
+- `crates/warp-insight-exec/src/main.rs`
+- `crates/warp-insight-exec/src/runtime.rs`
+- `crates/warp-insight-exec/src/workdir.rs`
+- `crates/warp-insight-exec/src/result_writer.rs`
 
 完成定义：
 
@@ -193,7 +193,7 @@ wp-agent/
 - 能写出 `state.json` / `result.json`
 - 暂无真实 opcode 也可完成最小空执行
 
-### 4.6 B006 `wp-agent-upgrader` skeleton
+### 4.6 B006 `warp-insight-upgrader` skeleton
 
 对应里程碑：
 
@@ -201,16 +201,16 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-upgrader/src/main.rs`
-- `crates/wp-agent-upgrader/src/prepare.rs`
-- `crates/wp-agent-upgrader/src/switch.rs`
-- `crates/wp-agent-upgrader/src/rollback.rs`
+- `crates/warp-insight-upgrader/src/main.rs`
+- `crates/warp-insight-upgrader/src/prepare.rs`
+- `crates/warp-insight-upgrader/src/switch.rs`
+- `crates/warp-insight-upgrader/src/rollback.rs`
 
 完成定义：
 
 - 二进制可启动
 - 预留 prepare / switch / rollback 命令面
-- 与 `wp-agentd` 的工作目录和状态边界清晰
+- 与 `warp-insightd` 的工作目录和状态边界清晰
 
 ### 4.7 B007 execution state store
 
@@ -221,11 +221,11 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/state_store/agent_runtime.rs`
-- `crates/wp-agentd/src/state_store/execution_queue.rs`
-- `crates/wp-agentd/src/state_store/running.rs`
-- `crates/wp-agentd/src/state_store/reporting.rs`
-- `crates/wp-agentd/src/state_store/history.rs`
+- `crates/warp-insightd/src/state_store/agent_runtime.rs`
+- `crates/warp-insightd/src/state_store/execution_queue.rs`
+- `crates/warp-insightd/src/state_store/running.rs`
+- `crates/warp-insightd/src/state_store/reporting.rs`
+- `crates/warp-insightd/src/state_store/history.rs`
 
 完成定义：
 
@@ -243,7 +243,7 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/state_store/log_checkpoints.rs`
+- `crates/warp-insightd/src/state_store/log_checkpoints.rs`
 
 完成定义：
 
@@ -258,14 +258,14 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/executor_protocol.rs`
-- `crates/wp-agent-exec/src/protocol.rs`
-- `crates/wp-agent-shared/src/paths.rs`
+- `crates/warp-insightd/src/executor_protocol.rs`
+- `crates/warp-insight-exec/src/protocol.rs`
+- `crates/warp-insight-shared/src/paths.rs`
 
 完成定义：
 
 - `plan.json` / `runtime.json` / `result.json` / `state.json` 的最小交互协议固定
-- `wp-agentd` 可稳定发现执行开始、执行结束、异常退出和取消结果
+- `warp-insightd` 可稳定发现执行开始、执行结束、异常退出和取消结果
 - 本地协议边界不依赖中心长连接是否存在
 
 ### 4.10 B010 runtime lifecycle / recovery baseline
@@ -276,14 +276,14 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/supervisor.rs`
-- `crates/wp-agentd/src/recovery.rs`
-- `crates/wp-agentd/src/self_observability.rs`
-- `crates/wp-agent-shared/src/error_codes.rs`
+- `crates/warp-insightd/src/supervisor.rs`
+- `crates/warp-insightd/src/recovery.rs`
+- `crates/warp-insightd/src/self_observability.rs`
+- `crates/warp-insight-shared/src/error_codes.rs`
 
 完成定义：
 
-- `wp-agentd` 具备最小健康检查与生命周期管理骨架
+- `warp-insightd` 具备最小健康检查与生命周期管理骨架
 - 基础错误码、panic 归因和 restart/recover 路径可落到统一口径
 - 本地恢复不会破坏已有 `state/` 与 workdir 边界
 
@@ -295,8 +295,8 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/bootstrap.rs`
-- `crates/wp-agentd/src/config_runtime.rs`
+- `crates/warp-insightd/src/bootstrap.rs`
+- `crates/warp-insightd/src/config_runtime.rs`
 - `tests/e2e/standalone_smoke.rs`
 - `fixtures/runtime/standalone/`
 
@@ -314,14 +314,14 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/telemetry/logs/file_input.rs`
-- `crates/wp-agentd/src/telemetry/logs/file_watcher.rs`
-- `crates/wp-agentd/src/telemetry/logs/file_reader.rs`
-- `crates/wp-agentd/src/telemetry/logs/multiline.rs`
-- `crates/wp-agentd/src/telemetry/logs/parser.rs`
-- `crates/wp-agentd/src/telemetry/buffer.rs`
-- `crates/wp-agentd/src/telemetry/spool.rs`
-- `crates/wp-agentd/src/telemetry/warp_parse.rs`
+- `crates/warp-insightd/src/telemetry/logs/file_input.rs`
+- `crates/warp-insightd/src/telemetry/logs/file_watcher.rs`
+- `crates/warp-insightd/src/telemetry/logs/file_reader.rs`
+- `crates/warp-insightd/src/telemetry/logs/multiline.rs`
+- `crates/warp-insightd/src/telemetry/logs/parser.rs`
+- `crates/warp-insightd/src/telemetry/buffer.rs`
+- `crates/warp-insightd/src/telemetry/spool.rs`
+- `crates/warp-insightd/src/telemetry/warp_parse.rs`
 
 完成定义：
 
@@ -344,8 +344,8 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-shared/src/identity.rs`
-- `crates/wp-agentd/src/identity/mod.rs`
+- `crates/warp-insight-shared/src/identity.rs`
+- `crates/warp-insightd/src/identity/mod.rs`
 
 完成定义：
 
@@ -361,8 +361,8 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/identity/enroll.rs`
-- `crates/wp-agent-gateway/src/enroll_api.rs`
+- `crates/warp-insightd/src/identity/enroll.rs`
+- `crates/warp-insight-gateway/src/enroll_api.rs`
 
 完成定义：
 
@@ -377,9 +377,9 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/gateway_client.rs`
-- `crates/wp-agent-gateway/src/session.rs`
-- `crates/wp-agent-gateway/src/lease.rs`
+- `crates/warp-insightd/src/gateway_client.rs`
+- `crates/warp-insight-gateway/src/session.rs`
+- `crates/warp-insight-gateway/src/lease.rs`
 
 完成定义：
 
@@ -394,7 +394,7 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/capability_report.rs`
+- `crates/warp-insightd/src/capability_report.rs`
 
 完成定义：
 
@@ -408,11 +408,11 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/control_receiver.rs`
-- `crates/wp-agentd/src/plan_validator.rs`
-- `crates/wp-agentd/src/execution_scheduler.rs`
-- `crates/wp-agentd/src/executor_manager.rs`
-- `crates/wp-agentd/src/result_aggregator.rs`
+- `crates/warp-insightd/src/control_receiver.rs`
+- `crates/warp-insightd/src/plan_validator.rs`
+- `crates/warp-insightd/src/execution_scheduler.rs`
+- `crates/warp-insightd/src/executor_manager.rs`
+- `crates/warp-insightd/src/result_aggregator.rs`
 
 完成定义：
 
@@ -427,12 +427,12 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-exec/src/opcodes/process.rs`
-- `crates/wp-agent-exec/src/opcodes/socket.rs`
-- `crates/wp-agent-exec/src/opcodes/service.rs`
-- `crates/wp-agent-exec/src/opcodes/file.rs`
-- `crates/wp-agent-exec/src/opcodes/config.rs`
-- `crates/wp-agent-exec/src/opcodes/agent.rs`
+- `crates/warp-insight-exec/src/opcodes/process.rs`
+- `crates/warp-insight-exec/src/opcodes/socket.rs`
+- `crates/warp-insight-exec/src/opcodes/service.rs`
+- `crates/warp-insight-exec/src/opcodes/file.rs`
+- `crates/warp-insight-exec/src/opcodes/config.rs`
+- `crates/warp-insight-exec/src/opcodes/agent.rs`
 
 完成定义：
 
@@ -446,11 +446,11 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/discovery/host.rs`
-- `crates/wp-agentd/src/discovery/process.rs`
-- `crates/wp-agentd/src/discovery/container.rs`
-- `crates/wp-agentd/src/discovery/k8s.rs`
-- `crates/wp-agentd/src/discovery/cache.rs`
+- `crates/warp-insightd/src/discovery/host.rs`
+- `crates/warp-insightd/src/discovery/process.rs`
+- `crates/warp-insightd/src/discovery/container.rs`
+- `crates/warp-insightd/src/discovery/k8s.rs`
+- `crates/warp-insightd/src/discovery/cache.rs`
 
 完成定义：
 
@@ -466,9 +466,9 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-contracts/src/telemetry_record.rs`
-- `crates/wp-agentd/src/telemetry/envelope.rs`
-- `crates/wp-agentd/src/telemetry/normalize.rs`
+- `crates/warp-insight-contracts/src/telemetry_record.rs`
+- `crates/warp-insightd/src/telemetry/envelope.rs`
+- `crates/warp-insightd/src/telemetry/normalize.rs`
 
 完成定义：
 
@@ -484,11 +484,11 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/telemetry/input_router.rs`
-- `crates/wp-agentd/src/telemetry/buffer.rs`
-- `crates/wp-agentd/src/telemetry/spool.rs`
-- `crates/wp-agentd/src/telemetry/exporter.rs`
-- `crates/wp-agentd/src/telemetry/warp_parse.rs`
+- `crates/warp-insightd/src/telemetry/input_router.rs`
+- `crates/warp-insightd/src/telemetry/buffer.rs`
+- `crates/warp-insightd/src/telemetry/spool.rs`
+- `crates/warp-insightd/src/telemetry/exporter.rs`
+- `crates/warp-insightd/src/telemetry/warp_parse.rs`
 
 完成定义：
 
@@ -505,11 +505,11 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/telemetry/logs/file_input.rs`
-- `crates/wp-agentd/src/telemetry/logs/file_watcher.rs`
-- `crates/wp-agentd/src/telemetry/logs/file_reader.rs`
-- `crates/wp-agentd/src/telemetry/logs/multiline.rs`
-- `crates/wp-agentd/src/telemetry/logs/parser.rs`
+- `crates/warp-insightd/src/telemetry/logs/file_input.rs`
+- `crates/warp-insightd/src/telemetry/logs/file_watcher.rs`
+- `crates/warp-insightd/src/telemetry/logs/file_reader.rs`
+- `crates/warp-insightd/src/telemetry/logs/multiline.rs`
+- `crates/warp-insightd/src/telemetry/logs/parser.rs`
 
 完成定义：
 
@@ -530,12 +530,12 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agentd/src/telemetry/metrics/host_metrics.rs`
-- `crates/wp-agentd/src/telemetry/metrics/process_metrics.rs`
-- `crates/wp-agentd/src/telemetry/metrics/container_metrics.rs`
-- `crates/wp-agentd/src/telemetry/metrics/k8s_node_pod_metrics.rs`
-- `crates/wp-agentd/src/telemetry/metrics/prom_scrape.rs`
-- `crates/wp-agentd/src/telemetry/metrics/otlp_metrics_receiver.rs`
+- `crates/warp-insightd/src/telemetry/metrics/host_metrics.rs`
+- `crates/warp-insightd/src/telemetry/metrics/process_metrics.rs`
+- `crates/warp-insightd/src/telemetry/metrics/container_metrics.rs`
+- `crates/warp-insightd/src/telemetry/metrics/k8s_node_pod_metrics.rs`
+- `crates/warp-insightd/src/telemetry/metrics/prom_scrape.rs`
+- `crates/warp-insightd/src/telemetry/metrics/otlp_metrics_receiver.rs`
 
 完成定义：
 
@@ -549,11 +549,11 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-control/src/api.rs`
-- `crates/wp-agent-control/src/registry.rs`
-- `crates/wp-agent-control/src/request_store.rs`
-- `crates/wp-agent-control/src/query.rs`
-- `crates/wp-agent-control/src/result_ingest.rs`
+- `crates/warp-insight-control/src/api.rs`
+- `crates/warp-insight-control/src/registry.rs`
+- `crates/warp-insight-control/src/request_store.rs`
+- `crates/warp-insight-control/src/query.rs`
+- `crates/warp-insight-control/src/result_ingest.rs`
 
 完成定义：
 
@@ -567,10 +567,10 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-control/src/approval.rs`
-- `crates/wp-agent-control/src/compiler.rs`
-- `crates/wp-agent-control/src/signer.rs`
-- `crates/wp-agent-control/src/dispatch.rs`
+- `crates/warp-insight-control/src/approval.rs`
+- `crates/warp-insight-control/src/compiler.rs`
+- `crates/warp-insight-control/src/signer.rs`
+- `crates/warp-insight-control/src/dispatch.rs`
 
 完成定义：
 
@@ -589,7 +589,7 @@ wp-agent/
 
 完成定义：
 
-- 新节点可安装并拉起 `wp-agentd`
+- 新节点可安装并拉起 `warp-insightd`
 
 ### 5.15 B115 upgrade / rollback
 
@@ -599,9 +599,9 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-upgrader/src/download.rs`
-- `crates/wp-agent-upgrader/src/verify.rs`
-- `crates/wp-agent-upgrader/src/health_check.rs`
+- `crates/warp-insight-upgrader/src/download.rs`
+- `crates/warp-insight-upgrader/src/verify.rs`
+- `crates/warp-insight-upgrader/src/health_check.rs`
 
 完成定义：
 
@@ -615,9 +615,9 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-validate/src/attestation.rs`
-- `crates/wp-agent-exec/src/allow.rs`
-- `crates/wp-agent-shared/src/error_codes.rs`
+- `crates/warp-insight-validate/src/attestation.rs`
+- `crates/warp-insight-exec/src/allow.rs`
+- `crates/warp-insight-shared/src/error_codes.rs`
 
 完成定义：
 
@@ -631,8 +631,8 @@ wp-agent/
 
 建议模块：
 
-- `crates/wp-agent-control/src/audit.rs`
-- `crates/wp-agentd/src/audit_logger.rs`
+- `crates/warp-insight-control/src/audit.rs`
+- `crates/warp-insightd/src/audit_logger.rs`
 
 完成定义：
 

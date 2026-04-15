@@ -1,0 +1,24 @@
+[package]
+name = "warp-insightd"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+libc = "0.2"
+serde.workspace = true
+serde_json.workspace = true
+time.workspace = true
+toml.workspace = true
+tokio.workspace = true
+warp-insight-contracts.workspace = true
+warp-insight-shared.workspace = true
+warp-insight-validate.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "warp-insightd"
+path = "src/main.rs"

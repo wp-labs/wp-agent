@@ -1,10 +1,10 @@
-# wp-agent CapabilityReport Schema 草案
+# warp-insight CapabilityReport Schema 草案
 
 ## 1. 文档目的
 
 本文档定义 `CapabilityReport` 的字段级 schema，用于统一：
 
-- `wp-agentd` 如何声明本机能力
+- `warp-insightd` 如何声明本机能力
 - 控制平面如何筛选目标 agent
 - `ActionPlan.constraints.required_capabilities` 如何在边缘校验
 

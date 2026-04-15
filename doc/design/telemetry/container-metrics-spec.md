@@ -1,10 +1,10 @@
-# wp-agent `container_metrics` 规格草案
+# warp-insight `container_metrics` 规格草案
 
 ## 1. 文档目的
 
 本文档定义 `container_metrics` integration 的第一版规格。
 
-目标是让 `wp-agentd` 能直接采集常见 container runtime 的基础指标，而不是默认依赖额外 exporter。
+目标是让 `warp-insightd` 能直接采集常见 container runtime 的基础指标，而不是默认依赖额外 exporter。
 
 相关文档：
 
@@ -188,6 +188,6 @@
 
 当前阶段固定以下结论：
 
-- `container_metrics` 属于 `wp-agentd` 内建能力
+- `container_metrics` 属于 `warp-insightd` 内建能力
 - 第一版优先覆盖 `containerd` / `docker` / `cri-o`
 - 先把容器基础资源指标与稳定资源绑定做好，再谈更深诊断指标

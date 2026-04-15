@@ -1,0 +1,19 @@
+[package]
+name = "warp-insight-exec"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde.workspace = true
+warp-insight-contracts.workspace = true
+warp-insight-shared.workspace = true
+warp-insight-validate.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "warp-insight-exec"
+path = "src/main.rs"

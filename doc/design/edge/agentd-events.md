@@ -1,8 +1,8 @@
-# wp-agentd 事件对象设计
+# warp-insightd 事件对象设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agentd` 进程内模块协作所使用的最小事件对象集合。
+本文档定义 `warp-insightd` 进程内模块协作所使用的最小事件对象集合。
 
 目标是让模块之间通过显式事件协作，而不是共享抢写状态文件。
 
@@ -16,7 +16,7 @@
 
 ## 2. 核心结论
 
-第一版建议 `wp-agentd` 使用“对象 + 事件”边界：
+第一版建议 `warp-insightd` 使用“对象 + 事件”边界：
 
 - 模块输入是结构化对象
 - 模块输出是结构化事件
@@ -136,7 +136,7 @@
 
 ### 6.3 `ProcessSpawned`
 
-表示 `executor_manager` 已成功拉起 `wp-agent-exec`。
+表示 `executor_manager` 已成功拉起 `warp-insight-exec`。
 
 建议字段：
 
@@ -161,7 +161,7 @@
 
 ### 6.5 `ProcessExited`
 
-表示 `wp-agent-exec` 已退出。
+表示 `warp-insight-exec` 已退出。
 
 建议字段：
 

@@ -1,8 +1,8 @@
-# wp-agent `run.gxl` 子集设计
+# warp-insight `run.gxl` 子集设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agent` 中 `run.gxl` 的受限子集规格。
+本文档定义 `warp-insight` 中 `run.gxl` 的受限子集规格。
 
 目标不是重新定义完整 GXL，而是明确：
 
@@ -412,4 +412,4 @@ emit port
 - 一个只能调用白名单 opcode 的受控子集
 - 一个必须与 `control.wac` 绑定后才能编译的输入
 
-如果 `run.gxl` 不能保持在这个边界内，就不应被引入 `wp-agent` 体系。
+如果 `run.gxl` 不能保持在这个边界内，就不应被引入 `warp-insight` 体系。

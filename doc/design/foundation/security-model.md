@@ -1,10 +1,10 @@
-# wp-agent 安全模型设计
+# warp-insight 安全模型设计
 
 ## 1. 文档目的
 
-本文档在 [`target.md`](target.md) 和 [`architecture.md`](architecture.md) 的基础上，进一步定义 `wp-agent` 的安全模型，重点回答以下问题：
+本文档在 [`target.md`](target.md) 和 [`architecture.md`](architecture.md) 的基础上，进一步定义 `warp-insight` 的安全模型，重点回答以下问题：
 
-- 环境内 `wp-agentd`、`wp-agent-exec`、`wp-agent-upgrader` 之间的信任边界如何划分
+- 环境内 `warp-insightd`、`warp-insight-exec`、`warp-insight-upgrader` 之间的信任边界如何划分
 - 中心节点与环境内 agent 之间如何建立可信控制链路
 - 远程动作和自我升级如何做到可限权、可审批、可审计、可回滚
 - 如何把“业务优先、故障隔离、资源封顶、可治理”落实到安全架构中
@@ -21,7 +21,7 @@
 
 ## 2. 安全目标
 
-`wp-agent` 的安全目标不是简单“通信加密”，而是同时满足以下要求：
+`warp-insight` 的安全目标不是简单“通信加密”，而是同时满足以下要求：
 
 - 可信身份：
   中心节点、环境内 agent、升级包、远程动作请求都必须有明确身份
@@ -45,7 +45,7 @@
 - 默认拒绝：
   未显式允许的动作、权限、目标范围默认拒绝
 - 分层信任：
-  中心节点、`wp-agentd`、`wp-agent-exec`、`wp-agent-upgrader` 之间不是同级全信任
+  中心节点、`warp-insightd`、`warp-insight-exec`、`warp-insight-upgrader` 之间不是同级全信任
 - standalone 先收敛：
   第一阶段先验证 `standalone` 文件日志替代切片的本地安全边界，再叠加 `managed` 接入、远程动作和中心编排升级
 - 最小暴露面：
@@ -68,9 +68,9 @@
 - 边界 A：
   中心节点与环境内 agent 之间
 - 边界 B：
-  `wp-agentd` 与 `wp-agent-exec` 之间
+  `warp-insightd` 与 `warp-insight-exec` 之间
 - 边界 C：
-  `wp-agentd` 与 `wp-agent-upgrader` 之间
+  `warp-insightd` 与 `warp-insight-upgrader` 之间
 - 边界 D：
   agent 进程与宿主机操作系统 / 容器运行时 / Kubernetes 节点之间
 - 边界 E：
@@ -81,9 +81,9 @@
 第一版应明确以下结论：
 
 - 中心节点可信，但中心节点内部不同角色也要受 RBAC 和审批约束
-- `wp-agentd` 是本地唯一协调入口，但不是“本地无限权限根”
-- `wp-agent-exec` 是高风险受控执行器，不应默认继承 `wp-agentd` 的全部能力
-- `wp-agent-upgrader` 是高风险切换器，不应承担采集和远程动作职责
+- `warp-insightd` 是本地唯一协调入口，但不是“本地无限权限根”
+- `warp-insight-exec` 是高风险受控执行器，不应默认继承 `warp-insightd` 的全部能力
+- `warp-insight-upgrader` 是高风险切换器，不应承担采集和远程动作职责
 - 宿主环境默认视为半可信，必须考虑本地篡改、环境异常和资源压力
 
 ---
@@ -124,15 +124,15 @@
 
 环境内三类进程的身份关系不应等同：
 
-- `wp-agentd` 持有与中心节点通信所需的主身份
-- `wp-agent-exec` 不直接长期持有中心通信主身份
-- `wp-agent-upgrader` 不直接长期持有中心通信主身份
+- `warp-insightd` 持有与中心节点通信所需的主身份
+- `warp-insight-exec` 不直接长期持有中心通信主身份
+- `warp-insight-upgrader` 不直接长期持有中心通信主身份
 
 建议模型是：
 
-- `wp-agentd` 作为本地根协调者，接收中心指令
-- `wp-agentd` 为每次执行动作生成一次性本地执行上下文
-- `wp-agent-exec` / `wp-agent-upgrader` 只在该上下文内拥有临时执行权限
+- `warp-insightd` 作为本地根协调者，接收中心指令
+- `warp-insightd` 为每次执行动作生成一次性本地执行上下文
+- `warp-insight-exec` / `warp-insight-upgrader` 只在该上下文内拥有临时执行权限
 
 也就是说，执行器和升级器应基于“临时授权”，而不是“永久继承主权限”。
 
@@ -174,14 +174,14 @@
 - 审批要求
 - 请求时间和过期时间
 
-如果上述信息不完整，`wp-agentd` 不应接受执行。
+如果上述信息不完整，`warp-insightd` 不应接受执行。
 
 ### 6.4 standalone 模式安全基线
 
 在 `standalone` 模式下，第一版安全边界应固定为：
 
 - 没有中心节点时，不建立远程动作信任链，也不开放依赖中心编排的升级链路
-- `wp-agentd` 只承担本地采集、状态落盘、checkpoint 推进和数据上送 / 输出职责
+- `warp-insightd` 只承担本地采集、状态落盘、checkpoint 推进和数据上送 / 输出职责
 - 文件日志输入链路的安全重点不是“谁下发了动作”，而是“本地状态是否被错误推进、篡改或误恢复”
 
 因此 `standalone` 替代切片至少要满足：
@@ -206,15 +206,15 @@
 - 节点执行权限：
   哪些节点允许执行哪些动作
 - 本地进程权限：
-  `wp-agentd`、`wp-agent-exec`、`wp-agent-upgrader` 各自拥有哪些 OS / runtime 权限
+  `warp-insightd`、`warp-insight-exec`、`warp-insight-upgrader` 各自拥有哪些 OS / runtime 权限
 
 ### 7.2 本地最小权限
 
 环境内应尽量做到：
 
-- `wp-agentd` 只保留采集、发现、上送、状态管理所需权限
-- `wp-agent-exec` 只在动作执行期间获得必要权限
-- `wp-agent-upgrader` 只在升级窗口内获得安装、切换、回滚所需权限
+- `warp-insightd` 只保留采集、发现、上送、状态管理所需权限
+- `warp-insight-exec` 只在动作执行期间获得必要权限
+- `warp-insight-upgrader` 只在升级窗口内获得安装、切换、回滚所需权限
 
 不应接受以下设计：
 
@@ -274,7 +274,7 @@
 
 ### 8.3 执行器约束
 
-`wp-agent-exec` 必须具备以下硬约束：
+`warp-insight-exec` 必须具备以下硬约束：
 
 - 明确超时
 - 明确并发限制
@@ -287,20 +287,20 @@
 
 远程动作本地调用链建议固定为：
 
-1. `wp-agentd` 接收并校验 `DispatchActionPlan` / `ActionPlan`
-2. `wp-agentd` 生成 `action_id` 和本地一次性执行上下文
-3. `wp-agentd` 拉起 `wp-agent-exec`
-4. `wp-agent-exec` 在受限上下文中执行动作
-5. `wp-agent-exec` 输出 `ActionResult` 并退出
-6. `wp-agentd` 对结果计算摘要并做结果级签名
-7. `wp-agentd` 汇总结果、记录审计并上报中心
+1. `warp-insightd` 接收并校验 `DispatchActionPlan` / `ActionPlan`
+2. `warp-insightd` 生成 `action_id` 和本地一次性执行上下文
+3. `warp-insightd` 拉起 `warp-insight-exec`
+4. `warp-insight-exec` 在受限上下文中执行动作
+5. `warp-insight-exec` 输出 `ActionResult` 并退出
+6. `warp-insightd` 对结果计算摘要并做结果级签名
+7. `warp-insightd` 汇总结果、记录审计并上报中心
 
 ### 8.5 禁止事项
 
 第一版明确禁止：
 
 - 中心节点直接把任意 shell 文本透传到节点执行
-- 执行器绕过 `wp-agentd` 直接接受中心编排
+- 执行器绕过 `warp-insightd` 直接接受中心编排
 - 未带审批上下文的高风险动作直接执行
 - 无超时、无输出上限、无并发限制的长时间执行任务
 
@@ -314,10 +314,10 @@
 
 1. 中心创建 `UpgradePlan`
 2. 中心校验目标范围、版本兼容性和发布批次
-3. `wp-agentd` 接收计划并做本地预检查
-4. `wp-agentd` 拉起 `wp-agent-upgrader`
-5. `wp-agent-upgrader` 下载、校验、切换、探活、必要时回滚
-6. `wp-agentd` 汇总结果并上报中心
+3. `warp-insightd` 接收计划并做本地预检查
+4. `warp-insightd` 拉起 `warp-insight-upgrader`
+5. `warp-insight-upgrader` 下载、校验、切换、探活、必要时回滚
+6. `warp-insightd` 汇总结果并上报中心
 
 ### 9.2 升级校验
 
@@ -340,7 +340,7 @@
 
 ### 9.4 升级器权限约束
 
-`wp-agent-upgrader` 只应拥有升级所需最小权限，例如：
+`warp-insight-upgrader` 只应拥有升级所需最小权限，例如：
 
 - 读取当前版本信息
 - 写入目标安装目录
@@ -400,7 +400,7 @@
 
 ## 11. 资源限制也是安全边界
 
-对于 `wp-agent` 来说，资源失控本身就是安全问题和稳定性问题。
+对于 `warp-insight` 来说，资源失控本身就是安全问题和稳定性问题。
 
 因此以下限制属于安全模型的一部分：
 
@@ -443,11 +443,11 @@
 
 第一阶段建议优先落地以下能力：
 
-- `wp-agentd / wp-agent-exec / wp-agent-upgrader` 三进程角色固定
+- `warp-insightd / warp-insight-exec / warp-insight-upgrader` 三进程角色固定
 - `standalone` 替代切片的本地状态边界：
   `file input -> parser / multiline -> checkpoint / commit point -> buffer / spool -> warp-parse/file output`
 - `standalone` 下默认关闭远程动作和中心编排升级入口
-- 中心到 `wp-agentd` 的双向身份认证
+- 中心到 `warp-insightd` 的双向身份认证
 - 远程动作白名单模型
 - 风险等级与审批规则
 - 升级包签名校验
@@ -459,14 +459,14 @@
 
 ## 14. 当前结论
 
-`wp-agent` 的第一版安全模型可以概括为：
+`warp-insight` 的第一版安全模型可以概括为：
 
 - 第一安全验证门应先落在 `standalone` 替代切片，本地数据面状态推进和恢复边界必须先成立
 - 中心节点负责策略、授权、审批、编排和归档，但不能绕过治理直接把任意动作塞进边缘节点
-- `wp-agentd` 是本地唯一控制入口，但不应承载无限执行权
-- `wp-agent-exec` 和 `wp-agent-upgrader` 是受临时授权驱动的高风险执行进程，不应长期继承主身份和高权限
+- `warp-insightd` 是本地唯一控制入口，但不应承载无限执行权
+- `warp-insight-exec` 和 `warp-insight-upgrader` 是受临时授权驱动的高风险执行进程，不应长期继承主身份和高权限
 - 远程动作和升级都必须走“身份 -> 授权 -> 审批 -> 执行 -> 回传 -> 审计 -> 必要时回滚”的完整闭环
 - 在 `standalone` 模式下，默认只成立本地采集与状态恢复链路，不应隐式暴露 `managed` 才具备的控制能力
 - 资源限制、超时、并发和输出上限不是附属优化，而是安全边界的一部分
 
-如果这些边界不成立，`wp-agent` 即使功能完整，也不能算一个可投入生产环境的系统。
+如果这些边界不成立，`warp-insight` 即使功能完整，也不能算一个可投入生产环境的系统。

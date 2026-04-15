@@ -1,4 +1,4 @@
-# wp-agentd 本地状态 Schema 草案
+# warp-insightd 本地状态 Schema 草案
 
 ## 1. 文档目的
 
@@ -92,7 +92,7 @@
 
 ### 4.1 作用
 
-保存 `wp-agentd` 自身运行态。
+保存 `warp-insightd` 自身运行态。
 
 ### 4.2 建议字段
 
@@ -303,7 +303,7 @@ RecentHistoryItem {
 - `running/*.json`
   保存 scheduler / controller 视角的运行状态
 - `run/actions/<execution_id>/state.json`
-  保存 `wp-agent-exec` 视角的执行状态
+  保存 `warp-insight-exec` 视角的执行状态
 - `reporting/*.json`
   保存上报流程状态
 - `run/actions/<execution_id>/result.json`
@@ -311,7 +311,7 @@ RecentHistoryItem {
 
 也就是说：
 
-- `wp-agentd` 自身状态文件和 `wp-agent-exec` workdir 文件是两层不同状态
+- `warp-insightd` 自身状态文件和 `warp-insight-exec` workdir 文件是两层不同状态
 - 不能混成一份
 
 ---
@@ -350,7 +350,7 @@ RecentHistoryItem {
   "plan_digest": "sha256:abc123",
   "request_id": "req_01",
   "state": "running",
-  "workdir": "/var/lib/wp-agent/run/actions/exec_01",
+  "workdir": "/var/lib/warp-insight/run/actions/exec_01",
   "pid": 38122,
   "started_at": "2026-04-12T10:00:01Z",
   "deadline_at": "2026-04-12T10:05:00Z",

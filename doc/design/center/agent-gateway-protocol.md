@@ -1,8 +1,8 @@
-# wp-agent Agent Gateway 协议设计
+# warp-insight Agent Gateway 协议设计
 
 ## 1. 文档目的
 
-本文档定义控制中心 `Agent Gateway` 与边缘 `wp-agentd` 之间的南向协议。
+本文档定义控制中心 `Agent Gateway` 与边缘 `warp-insightd` 之间的南向协议。
 
 重点回答：
 
@@ -154,7 +154,7 @@ Gateway 不负责：
 
 ### 5.1 建连前提
 
-`wp-agentd` 连接 Gateway 前必须具备：
+`warp-insightd` 连接 Gateway 前必须具备：
 
 - `agent_id`
 - `instance_id`
@@ -491,7 +491,7 @@ gRPC stream 的优点是：
 
 ## 13. 多级树拓扑建议
 
-如果未来 `wp-agentd` 演进为多级树结构，本协议仍建议保持同一逻辑协议族，不为每一级单独发明新协议。
+如果未来 `warp-insightd` 演进为多级树结构，本协议仍建议保持同一逻辑协议族，不为每一级单独发明新协议。
 
 ### 13.1 基本原则
 

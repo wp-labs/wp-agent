@@ -1,10 +1,10 @@
-# wp-agent 控制平面设计
+# warp-insight 控制平面设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agent` 的控制平面，重点回答以下问题：
+本文档定义 `warp-insight` 的控制平面，重点回答以下问题：
 
-- 中心节点与 `wp-agentd` 之间需要哪些控制对象
+- 中心节点与 `warp-insightd` 之间需要哪些控制对象
 - 远程动作与升级编排在控制平面上如何建模
 - `control` 与 `run` 如何绑定、审批、编译和下发
 - `request_id / action_id / audit_id` 应如何贯穿控制链路
@@ -62,20 +62,20 @@
 
 ### 3.2 边缘负责什么
 
-`wp-agentd` 负责：
+`warp-insightd` 负责：
 
 - 维护与中心的受信连接
 - 上报能力与状态
 - 接收已签名的最终计划
 - 校验来源、签名、过期时间和 capability
-- 拉起 `wp-agent-exec` 或 `wp-agent-upgrader`
+- 拉起 `warp-insight-exec` 或 `warp-insight-upgrader`
 - 回传状态和结果
 
 ### 3.3 边界原则
 
 - 边缘不负责编排审批
 - 边缘不直接理解作者 DSL
-- 中心不直接控制 `wp-agent-exec`
+- 中心不直接控制 `warp-insight-exec`
 - 高风险动作必须经过控制平面完整链路
 
 ---
@@ -577,13 +577,13 @@ running -> succeeded | failed | cancelled
 
 ---
 
-## 10. `wp-agentd` 的控制面行为
+## 10. `warp-insightd` 的控制面行为
 
-`wp-agentd` 在控制平面里建议始终扮演“本地网关”角色。
+`warp-insightd` 在控制平面里建议始终扮演“本地网关”角色。
 
 ### 10.1 接收动作计划时
 
-`wp-agentd` 应按如下顺序处理：
+`warp-insightd` 应按如下顺序处理：
 
 1. 校验 `action_id / request_id`
 2. 校验 `signature`
@@ -592,21 +592,21 @@ running -> succeeded | failed | cancelled
 5. 校验本机 capability
 6. 校验本地当前状态是否允许执行
 7. 生成本地 `execution_id`
-8. 拉起 `wp-agent-exec`
+8. 拉起 `warp-insight-exec`
 
 ### 10.2 接收升级计划时
 
-`wp-agentd` 应按如下顺序处理：
+`warp-insightd` 应按如下顺序处理：
 
 1. 校验 `upgrade_id`
 2. 校验签名和版本来源
 3. 校验本机状态、磁盘和 buffer 门槛
 4. 生成本地升级执行上下文
-5. 拉起 `wp-agent-upgrader`
+5. 拉起 `warp-insight-upgrader`
 
 ### 10.3 本地拒绝条件
 
-以下情况下，`wp-agentd` 应拒绝计划：
+以下情况下，`warp-insightd` 应拒绝计划：
 
 - 计划已过期
 - 签名无效
@@ -732,12 +732,12 @@ running -> succeeded | failed | cancelled
 
 ## 15. 当前结论
 
-`wp-agent` 的控制平面应被明确设计为：
+`warp-insight` 的控制平面应被明确设计为：
 
 - 一个围绕 `request -> approval -> compile -> dispatch -> execute -> report -> audit` 的治理闭环
 - 中心节点负责控制对象生成与状态机推进
-- `wp-agentd` 只消费最终计划，不消费作者 DSL
-- `wp-agent-exec` 与 `wp-agent-upgrader` 不直接挂接中心控制面
+- `warp-insightd` 只消费最终计划，不消费作者 DSL
+- `warp-insight-exec` 与 `warp-insight-upgrader` 不直接挂接中心控制面
 - 所有关键对象都必须有稳定主键、状态和审计关联
 
 如果控制平面做不好，前面已经设计好的 `control/run` 分离、审批、风险分层、最小权限和边缘确定性都很难真正落地。

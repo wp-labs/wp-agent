@@ -1,8 +1,8 @@
-# wp-agent Metrics 配置 Schema 草案
+# warp-insight Metrics 配置 Schema 草案
 
 ## 1. 文档目的
 
-本文档定义 `wp-agentd` 数据面中 metrics integration 的统一配置骨架。
+本文档定义 `warp-insightd` 数据面中 metrics integration 的统一配置骨架。
 
 目标是先把公共配置模型固定下来，避免每个 integration 各写一套结构。
 

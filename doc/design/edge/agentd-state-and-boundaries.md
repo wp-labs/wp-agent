@@ -1,8 +1,8 @@
-# wp-agentd 本地状态与模块边界设计
+# warp-insightd 本地状态与模块边界设计
 
 ## 1. 文档目的
 
-本文档把 `wp-agentd` 的两件关键前置设计固定下来：
+本文档把 `warp-insightd` 的两件关键前置设计固定下来：
 
 - 本地状态模型
 - 模块实现边界
@@ -25,7 +25,7 @@
 
 ## 2. 核心结论
 
-`wp-agentd` 的实现必须建立在下面三个原则上：
+`warp-insightd` 的实现必须建立在下面三个原则上：
 
 1. 本地状态必须分层
 2. 每类状态必须有唯一写入者
@@ -41,7 +41,7 @@
 
 ## 3. 本地状态分层
 
-`wp-agentd` 第一版建议把本地状态分成两大类：
+`warp-insightd` 第一版建议把本地状态分成两大类：
 
 - execution / control state
 - telemetry runtime state
@@ -85,7 +85,7 @@
 这里的 `execution_queue` 专指：
 
 - 已通过本地校验
-- 尚未拉起 `wp-agent-exec`
+- 尚未拉起 `warp-insight-exec`
 - 正在等待 `execution_scheduler` 调度
 
 它不是：
@@ -145,7 +145,7 @@
 
 ## 4. 本地目录与对象模型
 
-建议 `wp-agentd` 采用如下目录：
+建议 `warp-insightd` 采用如下目录：
 
 ```text
 <agent_root>/
@@ -507,7 +507,7 @@ succeeded | failed | cancelled | timed_out
 
 ## 10. crash 恢复最小算法
 
-`wp-agentd` 启动时至少执行以下恢复步骤：
+`warp-insightd` 启动时至少执行以下恢复步骤：
 
 1. 读取 `execution_queue.json`
 2. 扫描 `state/running/*.json`
@@ -588,7 +588,7 @@ succeeded | failed | cancelled | timed_out
 
 当前阶段固定以下结论：
 
-- `wp-agentd` 的本地状态必须分层
+- `warp-insightd` 的本地状态必须分层
 - `execution_queue` / `running` / `reporting` / `history` 必须分开
 - 每类状态必须有唯一写入模块
 - 模块之间通过事件和返回对象协作，不通过共享写文件协作

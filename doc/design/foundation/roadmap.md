@@ -1,8 +1,8 @@
-# wp-agent 多里程碑开发路线图
+# warp-insight 多里程碑开发路线图
 
 ## 1. 文档目的
 
-本文档把 `wp-agent` 当前已经确认的目标、架构和边界，收敛成一份更细粒度的全项目开发路线图。
+本文档把 `warp-insight` 当前已经确认的目标、架构和边界，收敛成一份更细粒度的全项目开发路线图。
 
 这里的“全项目”覆盖六条主线：
 
@@ -61,7 +61,7 @@
 4. 安全不能全部放到后期 hardening，必须区分“基线安全”与“强化安全”
 5. 安装 bootstrap 和中心编排升级不能混成一个里程碑
 6. 验证、fixture、e2e harness 不应只在 GA 阶段才出现
-7. `wp-agentd` 无中心节点独立运行能力必须前置，而不是做成受管模式的副产品
+7. `warp-insightd` 无中心节点独立运行能力必须前置，而不是做成受管模式的副产品
 8. 数据面 `V1` 上报目标不能默认假设是中心 telemetry ingest，应先允许统一结构化文本 record -> `warp-parse`
 9. 若近期目标是先在 `standalone` 模式下替代部分 `Fluent Bit` 工作，必须把“可替代的最小纵向切片”提升成独立验证门，而不是隐含在后续通用 telemetry 里程碑中
 
@@ -124,7 +124,7 @@
 | M0 | 设计冻结 | 固定关键词、边界、协议对象和第一版范围 |
 | M1 | 契约与 Schema | 冻结核心 schema、版本与校验器 |
 | M2 | Identity / Enrollment Baseline | 固定首次注册、证书、agent 身份与实例语义 |
-| M3 | Edge Runtime Skeleton | 建立支持 `standalone` 的 `wp-agentd` / `wp-agent-exec` / `wp-agent-upgrader` 基础骨架 |
+| M3 | Edge Runtime Skeleton | 建立支持 `standalone` 的 `warp-insightd` / `warp-insight-exec` / `warp-insight-upgrader` 基础骨架 |
 | M4 | Standalone Replacement Slice | 打通 `standalone` 文件日志输入、checkpoint、buffer/spool 与 `warp-parse/file` 输出，验证可替代部分 `Fluent Bit` 工作 |
 | M5 | Gateway Session MVP | 打通 `hello`、heartbeat、capability 和会话管理 |
 | M6 | Controlled Action MVP | 打通本地执行闭环和首批只读 opcode |
@@ -156,9 +156,9 @@
   - 边缘 agent
   - 中心节点
 - 固定三进程边界：
-  - `wp-agentd`
-  - `wp-agent-exec`
-  - `wp-agent-upgrader`
+  - `warp-insightd`
+  - `warp-insight-exec`
+  - `warp-insight-upgrader`
 - 固定边缘唯一执行输入为 `ActionPlan`
 - 固定南向逻辑协议对象
 - 固定第一版 telemetry / discovery / remote action 的能力边界
@@ -242,9 +242,9 @@
 
 子任务：
 
-- 建立 `wp-agentd` 常驻进程骨架
-- 建立 `wp-agent-exec` 最小 runtime 骨架
-- 建立 `wp-agent-upgrader` 最小骨架
+- 建立 `warp-insightd` 常驻进程骨架
+- 建立 `warp-insight-exec` 最小 runtime 骨架
+- 建立 `warp-insight-upgrader` 最小骨架
 - 建立 `agentd <-> exec` 本地协议骨架
 - 建立工作目录、状态落盘和生命周期管理
 - 建立基础自观测、错误码和 panic/restart 框架
@@ -254,8 +254,8 @@
 验收标准：
 
 - 三个二进制具备独立启动与最小健康检查能力
-- `wp-agentd` 能管理本地状态和子进程生命周期
-- 没有中心节点时，`wp-agentd` 仍可稳定进入常驻运行
+- `warp-insightd` 能管理本地状态和子进程生命周期
+- 没有中心节点时，`warp-insightd` 仍可稳定进入常驻运行
 - 边缘实现不依赖 DSL parser
 
 依赖关系：
@@ -266,7 +266,7 @@
 
 目标：
 
-- 在没有中心节点的前提下，先验证 `wp-agentd` 可替代部分 `Fluent Bit` 的实际工作
+- 在没有中心节点的前提下，先验证 `warp-insightd` 可替代部分 `Fluent Bit` 的实际工作
 - 用最小纵向切片验证当前边缘架构，而不是等待完整中心闭环
 
 子任务：
@@ -289,7 +289,7 @@
 
 验收标准：
 
-- 在 `control_plane.enabled = false` 时，`wp-agentd` 能对一个显式配置的文件路径稳定持续读取并产出统一结构化 record
+- 在 `control_plane.enabled = false` 时，`warp-insightd` 能对一个显式配置的文件路径稳定持续读取并产出统一结构化 record
 - crash / restart 后能从已提交 `checkpoint` 继续，而不是从 `read offset` 误恢复
 - 正常 append 场景只读取新增内容；rotate / truncate / multiline 正确性基线成立
 - 可通过 `warp-parse` 或本地 fallback 输出完成至少一类真实 `standalone` 链路验证
@@ -317,7 +317,7 @@
 
 验收标准：
 
-- 单个 `wp-agentd` 能稳定接入 `gateway`
+- 单个 `warp-insightd` 能稳定接入 `gateway`
 - 首次 enrollment、正常重连、实例替换都能跑通
 - 中心能看到在线状态和能力上报
 
@@ -334,11 +334,11 @@
 
 子任务：
 
-- `wp-agentd` 接收 `DispatchActionPlan`
-- `wp-agentd` 做本地校验、排队与调度
-- `wp-agentd` 拉起 `wp-agent-exec`
-- `wp-agent-exec` 执行最小 step runtime
-- `wp-agentd` 汇总结果并上报 `ActionPlanAck` / `ReportActionResult`
+- `warp-insightd` 接收 `DispatchActionPlan`
+- `warp-insightd` 做本地校验、排队与调度
+- `warp-insightd` 拉起 `warp-insight-exec`
+- `warp-insight-exec` 执行最小 step runtime
+- `warp-insightd` 汇总结果并上报 `ActionPlanAck` / `ReportActionResult`
 - 实现首批只读 opcode：
   - `process.list`
   - `process.stat`
@@ -415,7 +415,7 @@
 
 验收标准：
 
-- `wp-agentd` 可把多信号编码成统一结构化文本 record
+- `warp-insightd` 可把多信号编码成统一结构化文本 record
 - logs runtime 已不再局限于单路径受控切片，而具备通用文件输入基线
 - `warp-parse` 可作为 `V1` 统一数据接收器稳定接收这些 record
 - 标准化结果可挂接统一 resource 语义
@@ -522,7 +522,7 @@
 
 验收标准：
 
-- 新节点可完成安装并稳定拉起 `wp-agentd`
+- 新节点可完成安装并稳定拉起 `warp-insightd`
 - 重启后能恢复最小本地状态
 - 安装阶段和升级阶段的职责边界明确
 
@@ -540,7 +540,7 @@
 子任务：
 
 - 设计版本清单、签名校验与下载策略
-- 打通 `wp-agent-upgrader`
+- 打通 `warp-insight-upgrader`
 - 打通升级前检查、切换、健康检查、回滚
 - 建立升级编排最小中心对象与协议
 - 建立升级与 action 的互斥规则
@@ -711,7 +711,7 @@
 
 验收标准：
 
-- 常见 target 大多可由 `wp-agentd` 直接采集
+- 常见 target 大多可由 `warp-insightd` 直接采集
 - Batch B/C integrations 可挂接统一 resource 语义
 - exporter compatibility mode 退居 fallback 角色
 
@@ -826,7 +826,7 @@
 
 负责：
 
-- `wp-agent-exec`
+- `warp-insight-exec`
 - opcode runtime
 - `ActionResult`
 - 执行资源保护
@@ -841,8 +841,8 @@
 
 负责：
 
-- `wp-agentd`
-- `wp-agent-upgrader`
+- `warp-insightd`
+- `warp-insight-upgrader`
 - 本地状态机
 - 安装与升级
 
@@ -985,7 +985,7 @@
 当前最值得立刻启动的是：
 
 1. 完成 M1 中尚未代码化的 schema 与校验器
-2. 启动 M3 的 `standalone` `wp-agentd` / `wp-agent-exec` / `wp-agent-upgrader` skeleton
+2. 启动 M3 的 `standalone` `warp-insightd` / `warp-insight-exec` / `warp-insight-upgrader` skeleton
 3. 启动 M4 的 `file input -> checkpoint -> buffer/spool -> warp-parse/file output` 替代验证切片
 4. 用一类真实 `standalone` 日志链路验证“能力可替代、配置不兼容”的产品假设
 5. 在 M4 跑通后，再启动 M2 的 enrollment / identity 设计与实现

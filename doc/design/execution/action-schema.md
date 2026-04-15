@@ -1,4 +1,4 @@
-# wp-agent 动作 Schema 设计
+# warp-insight 动作 Schema 设计
 
 ## 1. 文档目的
 

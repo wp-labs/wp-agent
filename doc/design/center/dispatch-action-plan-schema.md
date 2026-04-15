@@ -1,8 +1,8 @@
-# wp-agent DispatchActionPlan Schema 草案
+# warp-insight DispatchActionPlan Schema 草案
 
 ## 1. 文档目的
 
-本文档定义中心节点向边缘 `wp-agentd` 下发执行计划时使用的消息 envelope。
+本文档定义中心节点向边缘 `warp-insightd` 下发执行计划时使用的消息 envelope。
 
 重点回答：
 
@@ -121,7 +121,7 @@ plan: ActionPlan
 
 ## 6. 边缘校验要求
 
-`wp-agentd` 接收到 `DispatchActionPlan` 后，第一版至少要校验：
+`warp-insightd` 接收到 `DispatchActionPlan` 后，第一版至少要校验：
 
 - `kind` / `api_version`
 - `dispatch_id` 是否已见过

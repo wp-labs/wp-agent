@@ -1,8 +1,8 @@
-# wp-agentd 架构设计
+# warp-insightd 架构设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agentd` 的职责边界、模块拆分、本地状态机和与 `wp-agent-exec` / `wp-agent-upgrader` 的关系。
+本文档定义 `warp-insightd` 的职责边界、模块拆分、本地状态机和与 `warp-insight-exec` / `warp-insight-upgrader` 的关系。
 
 它主要服务于 [`roadmap.md`](../foundation/roadmap.md) 中的：
 
@@ -21,7 +21,7 @@
 
 ## 2. 核心定位
 
-`wp-agentd` 不是执行器，而是边缘控制器。
+`warp-insightd` 不是执行器，而是边缘控制器。
 
 它的核心职责是：
 
@@ -29,20 +29,20 @@
 - 接收中心侧下发对象
 - 做本地校验
 - 做本地 `execution_queue` 排队和并发控制
-- 拉起 `wp-agent-exec`
-- 拉起 `wp-agent-upgrader`
+- 拉起 `warp-insight-exec`
+- 拉起 `warp-insight-upgrader`
 - 汇总本地执行结果
 - 上报状态、健康和审计事件
 
 一句话说：
 
-- `wp-agentd` 负责控制
-- `wp-agent-exec` 负责执行
-- `wp-agent-upgrader` 负责升级辅助
+- `warp-insightd` 负责控制
+- `warp-insight-exec` 负责执行
+- `warp-insight-upgrader` 负责升级辅助
 
 ### 2.1 运行模式
 
-`wp-agentd` 第一版应明确支持两种运行模式：
+`warp-insightd` 第一版应明确支持两种运行模式：
 
 - `standalone`
 - `managed`
@@ -66,7 +66,7 @@
 
 ## 3. 明确不负责什么
 
-`wp-agentd` 第一版不负责：
+`warp-insightd` 第一版不负责：
 
 - 直接执行 `ActionPlan.program`
 - 解析作者 DSL
@@ -75,13 +75,13 @@
 - 复杂数据分析
 - AI 推理
 
-这几类能力都不应被塞回 `wp-agentd`。
+这几类能力都不应被塞回 `warp-insightd`。
 
 ---
 
 ## 4. 顶层模块
 
-建议 `wp-agentd` 第一版拆成以下模块：
+建议 `warp-insightd` 第一版拆成以下模块：
 
 - `bootstrap`
 - `config_runtime`
@@ -172,7 +172,7 @@
 
 - 创建执行工作目录
 - 写入 `plan.json` / `runtime.json`
-- 拉起 `wp-agent-exec`
+- 拉起 `warp-insight-exec`
 - 监控子进程生命周期
 - 转发取消信号
 - 回收退出状态
@@ -183,7 +183,7 @@
 
 负责：
 
-- 拉起 `wp-agent-upgrader`
+- 拉起 `warp-insight-upgrader`
 - 维护升级互斥
 - 接收升级结果
 
@@ -226,7 +226,7 @@
 
 负责：
 
-- 暴露 `wp-agentd` 自身状态
+- 暴露 `warp-insightd` 自身状态
 - 暴露 `execution_queue` 长度
 - 暴露运行中任务数
 - 暴露拒绝计数
@@ -255,7 +255,7 @@
 
 ## 7. 本地状态机
 
-建议 `wp-agentd` 维护独立于控制平面的本地执行状态机。
+建议 `warp-insightd` 维护独立于控制平面的本地执行状态机。
 
 第一版建议状态：
 
@@ -284,7 +284,7 @@
 - `queued`
   已通过校验，等待调度
 - `dispatching_local`
-  正在准备工作目录并拉起 `wp-agent-exec`
+  正在准备工作目录并拉起 `warp-insight-exec`
 - `running`
   子进程已进入执行
 - `cancelling`
@@ -313,7 +313,7 @@
 
 ## 8. 本地数据与目录
 
-建议 `wp-agentd` 管理三类本地数据：
+建议 `warp-insightd` 管理三类本地数据：
 
 ### 8.1 运行目录
 
@@ -366,15 +366,15 @@
 
 ---
 
-## 10. 与 wp-agent-exec 的关系
+## 10. 与 warp-insight-exec 的关系
 
-`wp-agentd` 与 `wp-agent-exec` 的关系应固定为：
+`warp-insightd` 与 `warp-insight-exec` 的关系应固定为：
 
-- `wp-agentd` 是父进程与控制器
-- `wp-agent-exec` 是子进程与执行器
+- `warp-insightd` 是父进程与控制器
+- `warp-insight-exec` 是子进程与执行器
 - 两者通过 [`agentd-exec-protocol.md`](agentd-exec-protocol.md) 中定义的本地协议交互
 
-`wp-agentd` 不应：
+`warp-insightd` 不应：
 
 - 直接在本进程中执行 opcode
 - 直接解释 `program.steps[]`
@@ -383,21 +383,21 @@
 
 ---
 
-## 11. 与 wp-agent-upgrader 的关系
+## 11. 与 warp-insight-upgrader 的关系
 
-`wp-agentd` 应是 `wp-agent-upgrader` 的调度入口，但不是升级执行体。
+`warp-insightd` 应是 `warp-insight-upgrader` 的调度入口，但不是升级执行体。
 
 建议原则：
 
-- `wp-agentd` 负责升级计划接收与互斥判断
-- `wp-agent-upgrader` 负责升级下载、校验、切换、回滚
-- `wp-agentd` 负责升级结果汇总与上报
+- `warp-insightd` 负责升级计划接收与互斥判断
+- `warp-insight-upgrader` 负责升级下载、校验、切换、回滚
+- `warp-insightd` 负责升级结果汇总与上报
 
 ---
 
 ## 12. 启动顺序
 
-第一版建议 `wp-agentd` 启动顺序如下：
+第一版建议 `warp-insightd` 启动顺序如下：
 
 1. 初始化工作目录
 2. 加载本地配置
@@ -428,13 +428,13 @@
 
 为了真正启动 `M3 Edge Runtime Skeleton`，至少需要先冻结：
 
-- `wp-agentd` 模块列表
+- `warp-insightd` 模块列表
 - 本地状态机
 - 工作目录布局
-- 与 `wp-agent-exec` 的 v1 本地协议
+- 与 `warp-insight-exec` 的 v1 本地协议
 - 并发与互斥基本原则
 
-如果这几项不先冻结，`wp-agentd` 开发会很快陷入反复返工。
+如果这几项不先冻结，`warp-insightd` 开发会很快陷入反复返工。
 
 ---
 
@@ -442,8 +442,8 @@
 
 当前阶段固定以下结论：
 
-- `wp-agentd` 必须先于 `wp-agent-exec` 进入开发主线
-- `wp-agentd` 是边缘控制器，不是 step 执行器
-- `wp-agentd` 必须持有本地状态机、队列和调度能力
-- `wp-agentd` 与 `wp-agent-exec` 通过独立本地协议交互
-- `wp-agentd` 与 `wp-agent-upgrader` 保持明确互斥与调度边界
+- `warp-insightd` 必须先于 `warp-insight-exec` 进入开发主线
+- `warp-insightd` 是边缘控制器，不是 step 执行器
+- `warp-insightd` 必须持有本地状态机、队列和调度能力
+- `warp-insightd` 与 `warp-insight-exec` 通过独立本地协议交互
+- `warp-insightd` 与 `warp-insight-upgrader` 保持明确互斥与调度边界

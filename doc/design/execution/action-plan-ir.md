@@ -1,8 +1,8 @@
-# wp-agent ActionPlan IR 设计
+# warp-insight ActionPlan IR 设计
 
 ## 1. 文档目的
 
-本文档把 `ActionPlan IR` 定义为 `wp-agent` 远程执行体系中的唯一执行契约。
+本文档把 `ActionPlan IR` 定义为 `warp-insight` 远程执行体系中的唯一执行契约。
 
 当前阶段先固定 IR，再讨论作者侧到底采用 `run.gxl`、`run.war`，还是其他 frontend。
 
@@ -31,7 +31,7 @@
 
 - 作者输入可以有多种 frontend
 - 中心节点只把 frontend 编译到统一 IR
-- `wp-agentd` / `wp-agent-exec` 只接受 IR
+- `warp-insightd` / `warp-insight-exec` 只接受 IR
 - 边缘不解析 DSL，不执行脚本，不解释字符串表达式
 
 一句话说：

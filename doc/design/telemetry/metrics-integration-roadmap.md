@@ -1,13 +1,13 @@
-# wp-agent Metrics Integration 路线图
+# warp-insight Metrics Integration 路线图
 
 ## 1. 文档目的
 
-本文档定义 `wp-agent` 在 metrics 侧的 integration 覆盖范围、优先级和分批落地顺序。
+本文档定义 `warp-insight` 在 metrics 侧的 integration 覆盖范围、优先级和分批落地顺序。
 
 目标不是列一个很长的支持清单，而是明确：
 
 - 哪些 target 应作为第一优先级
-- 哪些 target 应由 `wp-agentd` 直接内建采集
+- 哪些 target 应由 `warp-insightd` 直接内建采集
 - 哪些 target 可以先走 exporter compatibility mode
 - AI 在这条研发线上应承担什么角色
 
@@ -22,9 +22,9 @@
 
 ## 2. 核心结论
 
-`wp-agent` 在 metrics 侧的默认路线应是：
+`warp-insight` 在 metrics 侧的默认路线应是：
 
-- `wp-agentd` 内建 collector / scraper / receiver
+- `warp-insightd` 内建 collector / scraper / receiver
 - 尽量覆盖大多数常见 target
 - 外部 exporter 仅作为兼容 fallback
 
@@ -74,9 +74,9 @@
 
 ### 3.4 不把远程 action 当采集主路径
 
-metrics 采集不能通过 `wp-agent-exec` 临时执行命令来补。
+metrics 采集不能通过 `warp-insight-exec` 临时执行命令来补。
 
-metrics integration 必须属于 `wp-agentd` 常驻数据面能力。
+metrics integration 必须属于 `warp-insightd` 常驻数据面能力。
 
 ---
 
@@ -315,7 +315,7 @@ AI 适合加速以下研发工作：
 
 但必须明确：
 
-- AI 不进入 `wp-agentd` 运行时热路径
+- AI 不进入 `warp-insightd` 运行时热路径
 - AI 不参与每次 scrape 决策
 - AI 不参与边缘端实时指标解释
 
@@ -325,9 +325,9 @@ AI 适合加速以下研发工作：
 
 如果要说“metrics integration 路线成立了”，第一版至少应满足：
 
-- `wp-agentd` 能直接采集主机与运行时基础指标
-- `wp-agentd` 能直接 scrape Prometheus / OpenMetrics endpoint
-- `wp-agentd` 能直接接收 OTLP metrics
+- `warp-insightd` 能直接采集主机与运行时基础指标
+- `warp-insightd` 能直接 scrape Prometheus / OpenMetrics endpoint
+- `warp-insightd` 能直接接收 OTLP metrics
 - 至少落地 3 到 5 个高频中间件 integration
 - exporter compatibility mode 存在，但不是默认推荐路径
 
@@ -338,7 +338,7 @@ AI 适合加速以下研发工作：
 建议把 metrics integration 与总体路线图这样对齐：
 
 - M2：
-  `wp-agentd` skeleton 里预留 metrics collection framework
+  `warp-insightd` skeleton 里预留 metrics collection framework
 - M3：
   本地闭环先不追求多 integration，只验证框架可运行
 - M4 之后：
@@ -348,8 +348,8 @@ AI 适合加速以下研发工作：
 
 也就是说：
 
-- metrics integration 不是 `wp-agent-exec` 工作
-- metrics integration 是 `wp-agentd` 数据面主线
+- metrics integration 不是 `warp-insight-exec` 工作
+- metrics integration 是 `warp-insightd` 数据面主线
 
 ---
 
@@ -357,7 +357,7 @@ AI 适合加速以下研发工作：
 
 当前阶段固定以下结论：
 
-- `wp-agentd` 应承担大多数常见 metrics 采集
+- `warp-insightd` 应承担大多数常见 metrics 采集
 - exporter 不再是默认前提，而是兼容选项
 - 先做 Batch A，再做 Batch B
 - AI 用于加速 integration 研发，而不是进入边缘运行时

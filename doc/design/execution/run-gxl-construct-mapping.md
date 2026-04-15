@@ -1,4 +1,4 @@
-# wp-agent `run.gxl` 构件映射设计
+# warp-insight `run.gxl` 构件映射设计
 
 ## 1. 文档目的
 

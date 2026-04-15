@@ -1,12 +1,12 @@
-# wp-agent Telemetry 上报与 Warp Parse 接入设计
+# warp-insight Telemetry 上报与 Warp Parse 接入设计
 
 ## 1. 文档目的
 
-本文档定义 `wp-agent` 数据面采集结果的上报方向，并明确 `warp-parse` 在整体架构中的角色。
+本文档定义 `warp-insight` 数据面采集结果的上报方向，并明确 `warp-parse` 在整体架构中的角色。
 
 重点回答：
 
-- `wp-agentd` 采集的数据是否可以直接提交到 `warp-parse`
+- `warp-insightd` 采集的数据是否可以直接提交到 `warp-parse`
 - `warp-parse` 是否可以作为统一数据接收器
 - `logs / metrics / traces / security` 是否都应该走同一种输入形式
 - `standalone` 和 `managed` 模式下的数据上报路径应如何设计
@@ -25,12 +25,12 @@
 
 当前阶段固定以下结论：
 
-- `warp-parse` 可以作为 `wp-agentd` 的数据面上报目标之一
+- `warp-parse` 可以作为 `warp-insightd` 的数据面上报目标之一
 - `warp-parse` 可以被设计成统一数据接收器
 - 这里的“统一”指统一接入层，而不是把所有信号都降级成文本日志
 - 第一阶段默认路线可以采用“统一结构化文本记录 -> `warp-parse`”
 - `warp-parse` 只承担数据面接入、解析、转换、路由职责
-- `warp-parse` 不能替代 `wp-agent` 控制中心、`Agent Gateway` 或远程任务治理链路
+- `warp-parse` 不能替代 `warp-insight` 控制中心、`Agent Gateway` 或远程任务治理链路
 
 一句话说：
 
@@ -43,7 +43,7 @@
 
 ### 3.1 `warp-parse` 的合适角色
 
-`warp-parse` 在 `wp-agent` 体系里最适合承担：
+`warp-parse` 在 `warp-insight` 体系里最适合承担：
 
 - 数据接入
 - 数据解析
@@ -69,7 +69,7 @@
 
 这几个能力仍然属于：
 
-- `wp-agent` 控制中心
+- `warp-insight` 控制中心
 
 ---
 
@@ -98,7 +98,7 @@
 
 但对第一阶段，还需要加一个工程性判断：
 
-- 如果 `wp-agentd` 先把多信号转成统一的结构化文本记录
+- 如果 `warp-insightd` 先把多信号转成统一的结构化文本记录
 - `warp-parse` 就可以先作为统一接收器成立
 
 因此第一阶段可以先收敛为：
@@ -164,7 +164,7 @@
 
 但第一阶段允许采用折中方案：
 
-- `wp-agentd` 把 metric sample 转成结构化文本 record
+- `warp-insightd` 把 metric sample 转成结构化文本 record
 - `warp-parse` 先统一接收和路由
 
 这里的关键前提是：
@@ -192,7 +192,7 @@
 
 但第一阶段允许采用折中方案：
 
-- `wp-agentd` 把每个 span 编码成结构化文本 record
+- `warp-insightd` 把每个 span 编码成结构化文本 record
 - `warp-parse` 对其进行统一接收、解析和路由
 
 这里必须保留：
@@ -289,7 +289,7 @@
 
 默认路线可以先定为：
 
-- `wp-agentd` 将 `logs / metrics / traces / security` 统一编码成结构化文本 record
+- `warp-insightd` 将 `logs / metrics / traces / security` 统一编码成结构化文本 record
 - `warp-parse` 先作为统一文本接入器、解析器和路由器
 
 这种做法的优势是：
@@ -300,7 +300,7 @@
 
 它的代价也必须明确：
 
-- `wp-agentd` 侧编码责任更重
+- `warp-insightd` 侧编码责任更重
 - metrics / traces 的标准原生协议优势会被部分折叠
 - 长期看未必是最终最优性能路径
 
@@ -314,9 +314,9 @@
 
 ---
 
-## 8. `wp-agentd` 的上报目标建议
+## 8. `warp-insightd` 的上报目标建议
 
-`wp-agentd` 第一版建议支持以下数据面上报目标类型：
+`warp-insightd` 第一版建议支持以下数据面上报目标类型：
 
 - `warp_parse`
 - `otlp`
@@ -367,9 +367,9 @@
 
 `standalone` 模式下推荐：
 
-- `wp-agentd -> warp-parse`
+- `warp-insightd -> warp-parse`
   或
-- `wp-agentd -> local file / object store`
+- `warp-insightd -> local file / object store`
 
 此时：
 
@@ -382,9 +382,9 @@
 `managed` 模式下推荐：
 
 - 数据面：
-  `wp-agentd -> warp-parse` 或 `OTLP backend`
+  `warp-insightd -> warp-parse` 或 `OTLP backend`
 - 控制面：
-  `wp-agentd <-> wp-agent control center`
+  `warp-insightd <-> warp-insight control center`
 
 这里必须明确：
 
@@ -393,11 +393,11 @@
 
 ---
 
-## 10. 对 `wp-agent` 的直接设计影响
+## 10. 对 `warp-insight` 的直接设计影响
 
 ### 10.1 架构影响
 
-`wp-agent` 需要把“数据上报目标”视为一等配置项，而不是写死成“只能上中心节点”。
+`warp-insight` 需要把“数据上报目标”视为一等配置项，而不是写死成“只能上中心节点”。
 
 ### 10.2 协议影响
 
@@ -412,9 +412,9 @@
 
 这条设计允许：
 
-- `wp-agentd` 在没有控制中心时独立工作
+- `warp-insightd` 在没有控制中心时独立工作
 - `warp-parse` 先成为统一数据接收器
-- `wp-agent` 控制中心后续再叠加治理能力
+- `warp-insight` 控制中心后续再叠加治理能力
 
 这对当前阶段是有利的，因为它把：
 
@@ -436,10 +436,10 @@
 
 当前阶段建议固定以下结论：
 
-- `warp-parse` 可以作为 `wp-agentd` 的统一数据接收器
+- `warp-parse` 可以作为 `warp-insightd` 的统一数据接收器
 - 但它只负责数据面，不负责控制面
 - `Logs / Security` 最适合先直接进入 `warp-parse`
-- 第一阶段允许 `Metrics / Traces` 先由 `wp-agentd` 编码成结构化文本 record，再进入 `warp-parse`
+- 第一阶段允许 `Metrics / Traces` 先由 `warp-insightd` 编码成结构化文本 record，再进入 `warp-parse`
 - 这里说的“文本”必须是保留完整语义的结构化 record，而不是普通 message line
 - 后续仍可按需要为 `Metrics / Traces` 增加原生 receiver
 - 后续应继续补一份专门的 `telemetry uplink protocol` 文档，把上报 envelope 与目标协议继续定稿

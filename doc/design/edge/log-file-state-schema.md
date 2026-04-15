@@ -1,8 +1,8 @@
-# wp-agent 文件日志输入状态 Schema 草案
+# warp-insight 文件日志输入状态 Schema 草案
 
 ## 1. 文档目的
 
-本文档定义 `wp-agentd` 文件日志输入的本地状态 schema。
+本文档定义 `warp-insightd` 文件日志输入的本地状态 schema。
 
 这里的状态专指：
 
@@ -13,7 +13,7 @@
 本文档不讨论：
 
 - `execution_queue` / `running` / `reporting` 这类远程执行状态
-- `wp-agent-exec` workdir 状态
+- `warp-insight-exec` workdir 状态
 - parser / multiline 的运行时内存对象细节
 
 相关文档：
