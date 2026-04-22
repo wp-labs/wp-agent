@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 
 use warp_insight_contracts::agent_config::AgentConfigContract;
 use warp_insight_shared::fs::write_bytes_atomic;
-use warp_insight_shared::paths::AGENT_CONFIG_FILE;
+use warp_insight_shared::paths::{INSIGHTD_CONFIG_FILE, LEGACY_AGENT_CONFIG_FILE};
 use warp_insight_validate::config::validate_config;
 
 #[path = "config_runtime_support.rs"]
@@ -55,7 +55,7 @@ pub fn load_or_init(config_root: &Path) -> Result<AgentConfigContract, ConfigErr
 
 pub fn ensure_default_config(config_root: &Path) -> Result<EnsuredConfigFile, ConfigError> {
     fs::create_dir_all(config_root)?;
-    let config_path = config_root.join(AGENT_CONFIG_FILE);
+    let config_path = resolve_config_path(config_root);
     let created = if config_path.exists() {
         false
     } else {
@@ -80,6 +80,20 @@ pub fn load_from_path(config_path: &Path) -> Result<AgentConfigContract, ConfigE
     let path_resolved = resolve_paths(env_resolved, config_path);
     validate_config(&path_resolved).map_err(|err| ConfigError::Validation(err.code))?;
     Ok(path_resolved)
+}
+
+pub fn resolve_config_path(config_root: &Path) -> PathBuf {
+    let preferred = config_root.join(INSIGHTD_CONFIG_FILE);
+    if preferred.is_file() {
+        return preferred;
+    }
+
+    let legacy = config_root.join(LEGACY_AGENT_CONFIG_FILE);
+    if legacy.is_file() {
+        return legacy;
+    }
+
+    preferred
 }
 
 #[cfg(test)]

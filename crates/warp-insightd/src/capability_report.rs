@@ -23,7 +23,7 @@ pub fn build_capability_report(config: &AgentConfigContract) -> CapabilityReport
             .unwrap_or_else(|| "local".to_string()),
         reported_at: now_rfc3339(),
         exec: exec_capabilities(),
-        metrics: MetricsCapabilities::default(),
+        metrics: metrics_capabilities(),
         logs: logs_capabilities(config),
         upgrade: upgrade_capabilities(),
         limits: limits(config),
@@ -43,6 +43,13 @@ fn exec_capabilities() -> ExecCapabilities {
             "agent.health_check".to_string(),
         ],
         execution_profiles: vec!["agent_exec_v1".to_string()],
+    }
+}
+
+fn metrics_capabilities() -> MetricsCapabilities {
+    MetricsCapabilities {
+        discovery_modes: vec!["local_runtime".to_string()],
+        ..MetricsCapabilities::default()
     }
 }
 
@@ -160,6 +167,7 @@ mod tests {
         assert_eq!(report.agent_id, "agent-001");
         assert_eq!(report.instance_id, "instance-001");
         assert_eq!(report.exec.execution_profiles, vec!["agent_exec_v1"]);
+        assert_eq!(report.metrics.discovery_modes, vec!["local_runtime"]);
         assert_eq!(logs.file_inputs, vec!["tail_file_v1"]);
         assert_eq!(logs.parsers, vec!["raw"]);
         assert_eq!(logs.watcher_modes, vec!["poll"]);
@@ -199,5 +207,6 @@ mod tests {
         ));
 
         assert!(report.logs.is_none());
+        assert_eq!(report.metrics.discovery_modes, vec!["local_runtime"]);
     }
 }

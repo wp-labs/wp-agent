@@ -40,6 +40,12 @@ pub fn validate_config(contract: &AgentConfigContract) -> Result<(), ValidationE
     if contract.execution.default_stderr_limit_bytes == 0 {
         return Err(ValidationError::new("invalid_stderr_limit"));
     }
+    if !contract.discovery.host_enabled
+        && !contract.discovery.process_enabled
+        && !contract.discovery.container_enabled
+    {
+        return Err(ValidationError::new("missing_discovery_probe"));
+    }
 
     if contract.telemetry.logs.in_memory_buffer_bytes == 0 {
         return Err(ValidationError::new("invalid_logs_buffer_bytes"));

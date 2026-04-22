@@ -30,6 +30,14 @@ where
     write_bytes_atomic(path, &bytes)
 }
 
+pub fn write_json_compact_atomic<T>(path: &Path, value: &T) -> io::Result<()>
+where
+    T: Serialize,
+{
+    let bytes = serde_json::to_vec(value).map_err(io::Error::other)?;
+    write_bytes_atomic(path, &bytes)
+}
+
 pub fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> io::Result<()> {
     ensure_parent(path)?;
 

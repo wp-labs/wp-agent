@@ -18,6 +18,13 @@ kind = "file"
 [telemetry.logs.output.file]
 path = "log/warp-parse-records.ndjson"
 
+[discovery]
+# 默认保留 host + process discovery，便于本地 metrics / action target 建模。
+# container 属于更高基数发现，只有启用对应场景时再显式打开。
+host_enabled = true
+process_enabled = true
+container_enabled = false
+
 # 可选：
 # [agent]
 # # 为空时会自动生成实例名；如需显式指定可取消注释。

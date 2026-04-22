@@ -625,6 +625,99 @@ IR 中 `kind = "output"` 的 step 类型。
 - 外部 exporter 是 fallback
 - 不是默认前提
 
+### 10.5 `resource`
+
+在数据面与 discovery 语境下，统一定义：
+
+- 被观测或被绑定的运行时对象
+- 具有稳定 identity 的本地或远端实体
+
+常见类型：
+
+- `host`
+- `process`
+- `container`
+- `k8s_pod`
+- `service`
+
+注意：
+
+- 优先使用 `resource`
+- 如无特别定义，不再在同一语义位置混用 `asset`
+
+### 10.6 `resource reference`
+
+统一定义：
+
+- record、target 或 planner 对象中指向某个 resource 的结构化引用
+
+推荐字段名：
+
+- `resource_refs`
+
+注意：
+
+- `resource reference` 是运行时关联关系
+- 不等于中心侧资源目录对象本身
+- 不建议在新文档中混用 `resource_ref` 和 `resource_refs` 指代同一字段语义
+
+### 10.7 `DiscoveredResource`
+
+统一定义：
+
+- 边缘 discovery 运行时产出的资源事实对象
+- 表达“本机发现到了哪个 resource”
+
+它属于：
+
+- discovery / 数据面运行时对象
+
+它不等于：
+
+- 中心侧资源目录记录
+- telemetry record
+- `CapabilityReport`
+
+### 10.8 `DiscoveredTarget`
+
+统一定义：
+
+- 边缘 discovery 运行时产出的 target 事实对象
+- 表达“本机发现到了哪个可候选消费的 target”
+
+注意：
+
+- `DiscoveredTarget.kind` 只描述发现对象本身
+- 不直接表达后续用哪种 collector / scraper / receiver 去采
+
+### 10.9 `CandidateCollectionTarget`
+
+统一定义：
+
+- planner 基于 discovery 结果和配置 / 策略生成的候选采集目标
+- 表达“后续准备如何采这个 target”
+
+注意：
+
+- 它是 planning 对象，不是 discovery cache 对象
+- 它位于 discovery 与实际 collector / scraper / receiver 之间
+
+### 10.10 `DiscoverySnapshot`
+
+统一定义：
+
+- 某一轮 discovery 完成后形成的完整本地快照
+
+适用语境：
+
+- 边缘 discovery cache
+- downstream 读取 discovery 当前视图
+
+注意：
+
+- `DiscoverySnapshot` 是边缘本地事实快照
+- 不等于中心归并后的全局资源视图
+
 ---
 
 ## 11. 明确禁止混用的词
@@ -647,6 +740,8 @@ IR 中 `kind = "output"` 的 step 类型。
   在数据面文档中优先写 `file input` / `file log input`；仅在对标 `Fluent Bit tail input`、描述内部 `tail reader`，或远程动作 `file.tail` 时使用
 - `offset`
   在文件日志输入文档中优先写 `checkpoint offset`、`read offset` 或 `source.offset`，避免单独使用造成歧义
+- `asset`
+  在 discovery / 数据面语境中优先统一回 `resource`；除非文档显式定义资产目录或资产治理对象，否则不要与 `resource` 混用
 
 ---
 
@@ -674,6 +769,12 @@ IR 中 `kind = "output"` 的 step 类型。
 - pull 型指标采集：`scraper`
 - push 型指标接收：`receiver`
 - 本地指标采集器：`collector`
+- 被观测运行时对象：`resource`
+- 资源结构化引用：`resource reference` / `resource_refs`
+- discovery 资源事实对象：`DiscoveredResource`
+- discovery target 事实对象：`DiscoveredTarget`
+- planner 候选采集目标：`CandidateCollectionTarget`
+- discovery 本地完整快照：`DiscoverySnapshot`
 
 ---
 

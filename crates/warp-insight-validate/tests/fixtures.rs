@@ -6,9 +6,9 @@ use warp_insight_contracts::action_result::{
     ActionOutputs, ActionResultContract, FinalStatus, StepActionRecord, StepStatus,
 };
 use warp_insight_contracts::agent_config::{
-    AgentConfigContract, AgentSection, ControlPlaneSection, ExecutionSection, LogFileInputSection,
-    LogsFileOutputSection, LogsOutputSection, LogsSection, LogsTcpOutputSection, PathsSection,
-    TelemetrySection,
+    AgentConfigContract, AgentSection, ControlPlaneSection, DiscoverySection, ExecutionSection,
+    LogFileInputSection, LogsFileOutputSection, LogsOutputSection, LogsSection,
+    LogsTcpOutputSection, PathsSection, TelemetrySection,
 };
 use warp_insight_contracts::gateway::{
     AckStatus, ActionPlanAck, DispatchActionPlan, ReportActionResult, ResultAttestation,
@@ -336,6 +336,43 @@ fn config_with_more_than_one_running_action_is_rejected() {
 
     let err = validate_config(&fixture).expect_err("config should be rejected");
     assert_eq!(err.code, "unsupported_max_running_actions");
+}
+
+#[test]
+fn config_with_all_discovery_probes_disabled_is_rejected() {
+    let mut fixture = AgentConfigContract::new(
+        AgentSection {
+            agent_id: Some("agent-001".to_string()),
+            environment_id: Some("prod".to_string()),
+            instance_name: Some("instance-001".to_string()),
+        },
+        ControlPlaneSection {
+            enabled: false,
+            endpoint: None,
+            tls_mode: None,
+            auth_mode: None,
+        },
+        PathsSection {
+            root_dir: "/tmp/root".to_string(),
+            run_dir: "/tmp/root/run".to_string(),
+            state_dir: "/tmp/root/state".to_string(),
+            log_dir: "/tmp/root/log".to_string(),
+        },
+        ExecutionSection {
+            max_running_actions: 1,
+            cancel_grace_ms: 5_000,
+            default_stdout_limit_bytes: 1024,
+            default_stderr_limit_bytes: 1024,
+        },
+    );
+    fixture.discovery = DiscoverySection {
+        host_enabled: false,
+        process_enabled: false,
+        container_enabled: false,
+    };
+
+    let err = validate_config(&fixture).expect_err("config should be rejected");
+    assert_eq!(err.code, "missing_discovery_probe");
 }
 
 #[test]

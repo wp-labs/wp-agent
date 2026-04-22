@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use crate::daemon;
 use crate::self_observability;
 use crate::state_store;
-use warp_insight_shared::paths::AGENT_CONFIG_FILE;
+use warp_insight_shared::paths::{INSIGHTD_CONFIG_FILE, LEGACY_AGENT_CONFIG_FILE};
 
 const CONFIG_DIR: &str = "warp-insightd";
 const LEGACY_CONFIG_DIR: &str = ".warp-insightd";
@@ -224,7 +224,7 @@ fn usage_message() -> &'static str {
         "\n",
         "Commands:\n",
         "  help                 Show this help message.\n",
-        "  init-config          Initialize config directory warp-insightd/ and write agent.toml.\n",
+        "  init-config          Initialize config directory warp-insightd/ and write insightd.toml.\n",
         "  init-config --stdout Print the default config template to stdout.\n",
         "\n",
         "Options:\n",
@@ -255,7 +255,8 @@ fn resolve_config_root(root: &Path) -> PathBuf {
 }
 
 fn config_file_exists(config_root: &Path) -> bool {
-    config_root.join(AGENT_CONFIG_FILE).is_file()
+    config_root.join(INSIGHTD_CONFIG_FILE).is_file()
+        || config_root.join(LEGACY_AGENT_CONFIG_FILE).is_file()
 }
 
 fn initialize_runtime_state(
@@ -275,24 +276,39 @@ fn initialize_runtime_state(
 
 fn resolve_exec_bin() -> io::Result<PathBuf> {
     let env_override = std::env::var_os("WARP_INSIGHT_EXEC_BIN").map(PathBuf::from);
+    let path_env = std::env::var_os("PATH");
     let current_exe = std::env::current_exe()?;
-    resolve_exec_bin_from(&current_exe, env_override.as_deref())
+    resolve_exec_bin_from(&current_exe, env_override.as_deref(), path_env.as_deref())
 }
 
-fn resolve_exec_bin_from(current_exe: &Path, env_override: Option<&Path>) -> io::Result<PathBuf> {
-    let candidate = env_override
-        .map(Path::to_path_buf)
-        .unwrap_or_else(|| current_exe.with_file_name("warp-insight-exec"));
-    validate_exec_bin(candidate, env_override.is_some())
+fn resolve_exec_bin_from(
+    current_exe: &Path,
+    env_override: Option<&Path>,
+    path_env: Option<&std::ffi::OsStr>,
+) -> io::Result<PathBuf> {
+    if let Some(path) = env_override {
+        return validate_exec_bin(path.to_path_buf(), "WARP_INSIGHT_EXEC_BIN");
+    }
+
+    let sibling = current_exe.with_file_name("warp-insight-exec");
+    if sibling.exists() {
+        return validate_exec_bin(sibling, "current executable sibling");
+    }
+
+    if let Some(path_env) = path_env {
+        for dir in std::env::split_paths(path_env) {
+            let candidate = dir.join("warp-insight-exec");
+            if candidate.exists() {
+                return validate_exec_bin(candidate, "PATH");
+            }
+        }
+    }
+
+    validate_exec_bin(sibling, "current executable sibling")
 }
 
-fn validate_exec_bin(path: PathBuf, from_env: bool) -> io::Result<PathBuf> {
+fn validate_exec_bin(path: PathBuf, origin: &str) -> io::Result<PathBuf> {
     let metadata = std::fs::metadata(&path).map_err(|err| {
-        let origin = if from_env {
-            "WARP_INSIGHT_EXEC_BIN"
-        } else {
-            "current executable sibling"
-        };
         io::Error::new(
             err.kind(),
             format!(

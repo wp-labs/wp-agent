@@ -41,10 +41,60 @@ fn resolve_exec_bin_uses_env_override_when_present() {
         fs::set_permissions(&override_path, perms).expect("set override permissions");
     }
 
-    let resolved =
-        resolve_exec_bin_from(&current_exe, Some(Path::new(&override_path))).expect("resolve");
+    let resolved = resolve_exec_bin_from(&current_exe, Some(Path::new(&override_path)), None)
+        .expect("resolve");
 
     assert_eq!(resolved, override_path);
+}
+
+#[cfg(unix)]
+#[test]
+fn resolve_exec_bin_uses_path_when_sibling_is_missing() {
+    let root = temp_dir("path-fallback");
+    let current_exe = root.join("bin").join("warp-insightd");
+    let path_dir = root.join("path-bin");
+    let path_exec = path_dir.join("warp-insight-exec");
+    fs::create_dir_all(current_exe.parent().expect("current_exe parent"))
+        .expect("create current_exe parent");
+    fs::create_dir_all(&path_dir).expect("create path dir");
+    fs::write(&path_exec, b"#!/bin/sh\n").expect("write path exec");
+    let mut perms = fs::metadata(&path_exec)
+        .expect("path exec metadata")
+        .permissions();
+    perms.set_mode(0o755);
+    fs::set_permissions(&path_exec, perms).expect("set path exec permissions");
+
+    let path_env = std::ffi::OsString::from(path_dir.display().to_string());
+    let resolved = resolve_exec_bin_from(&current_exe, None, Some(path_env.as_os_str()))
+        .expect("resolve via path");
+
+    assert_eq!(resolved, path_exec);
+}
+
+#[cfg(unix)]
+#[test]
+fn resolve_exec_bin_prefers_sibling_before_path() {
+    let root = temp_dir("sibling-before-path");
+    let current_exe = root.join("bin").join("warp-insightd");
+    let sibling = root.join("bin").join("warp-insight-exec");
+    let path_dir = root.join("path-bin");
+    let path_exec = path_dir.join("warp-insight-exec");
+    fs::create_dir_all(current_exe.parent().expect("current_exe parent"))
+        .expect("create current_exe parent");
+    fs::create_dir_all(&path_dir).expect("create path dir");
+    fs::write(&sibling, b"#!/bin/sh\n").expect("write sibling");
+    fs::write(&path_exec, b"#!/bin/sh\n").expect("write path exec");
+    for path in [&sibling, &path_exec] {
+        let mut perms = fs::metadata(path).expect("exec metadata").permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(path, perms).expect("set exec permissions");
+    }
+
+    let path_env = std::ffi::OsString::from(path_dir.display().to_string());
+    let resolved = resolve_exec_bin_from(&current_exe, None, Some(path_env.as_os_str()))
+        .expect("resolve sibling before path");
+
+    assert_eq!(resolved, sibling);
 }
 
 #[test]
@@ -162,7 +212,7 @@ fn run_from_args_init_config_creates_config_without_exec_bin() {
 
     run_from_args(root.clone(), ["init-config"]).expect("init config command");
 
-    assert!(root.join("warp-insightd").join("agent.toml").exists());
+    assert!(root.join("warp-insightd").join("insightd.toml").exists());
 }
 
 #[test]
@@ -172,18 +222,18 @@ fn run_from_args_init_config_honors_custom_config_dir() {
     run_from_args(root.clone(), ["init-config", "--config-dir", "conf"])
         .expect("init config with custom dir");
 
-    assert!(root.join("conf").join("agent.toml").exists());
+    assert!(root.join("conf").join("insightd.toml").exists());
 }
 
 #[test]
 fn init_config_message_mentions_config_directory_when_created() {
-    let path = Path::new("/tmp/project/warp-insightd/agent.toml");
+    let path = Path::new("/tmp/project/warp-insightd/insightd.toml");
 
     let message = init_config_message(path, true);
 
     assert!(message.contains("initialized config directory"));
     assert!(message.contains("/tmp/project/warp-insightd"));
-    assert!(message.contains("/tmp/project/warp-insightd/agent.toml"));
+    assert!(message.contains("/tmp/project/warp-insightd/insightd.toml"));
 }
 
 #[test]
@@ -198,13 +248,13 @@ fn usage_message_lists_supported_commands() {
 
 #[test]
 fn init_config_message_mentions_existing_config_file_and_directory() {
-    let path = Path::new("/tmp/project/warp-insightd/agent.toml");
+    let path = Path::new("/tmp/project/warp-insightd/insightd.toml");
 
     let message = init_config_message(path, false);
 
     assert!(message.contains("config file already exists"));
     assert!(message.contains("/tmp/project/warp-insightd"));
-    assert!(message.contains("/tmp/project/warp-insightd/agent.toml"));
+    assert!(message.contains("/tmp/project/warp-insightd/insightd.toml"));
 }
 
 #[test]
@@ -213,7 +263,7 @@ fn run_from_args_init_config_stdout_does_not_create_config_file() {
 
     run_from_args(root.clone(), ["init-config", "--stdout"]).expect("init config stdout");
 
-    assert!(!root.join("warp-insightd").join("agent.toml").exists());
+    assert!(!root.join("warp-insightd").join("insightd.toml").exists());
 }
 
 #[test]
@@ -222,12 +272,12 @@ fn resolve_config_root_prefers_visible_directory() {
     fs::create_dir_all(root.join("warp-insightd")).expect("create visible config dir");
     fs::create_dir_all(root.join(".warp-insightd")).expect("create legacy config dir");
     fs::write(
-        root.join("warp-insightd").join("agent.toml"),
+        root.join("warp-insightd").join("insightd.toml"),
         "schema_version = \"v1\"\n",
     )
     .expect("write visible config");
     fs::write(
-        root.join(".warp-insightd").join("agent.toml"),
+        root.join(".warp-insightd").join("insightd.toml"),
         "schema_version = \"v1\"\n",
     )
     .expect("write legacy config");
@@ -240,10 +290,36 @@ fn resolve_config_root_falls_back_to_legacy_hidden_directory() {
     let root = temp_dir("config-root-legacy");
     fs::create_dir_all(root.join(".warp-insightd")).expect("create legacy config dir");
     fs::write(
-        root.join(".warp-insightd").join("agent.toml"),
+        root.join(".warp-insightd").join("insightd.toml"),
         "schema_version = \"v1\"\n",
     )
     .expect("write legacy config");
+
+    assert_eq!(resolve_config_root(&root), root.join(".warp-insightd"));
+}
+
+#[test]
+fn resolve_config_root_accepts_legacy_agent_toml_in_visible_directory() {
+    let root = temp_dir("config-root-visible-legacy-file");
+    fs::create_dir_all(root.join("warp-insightd")).expect("create visible config dir");
+    fs::write(
+        root.join("warp-insightd").join("agent.toml"),
+        "schema_version = \"v1\"\n",
+    )
+    .expect("write visible legacy config");
+
+    assert_eq!(resolve_config_root(&root), root.join("warp-insightd"));
+}
+
+#[test]
+fn resolve_config_root_accepts_legacy_agent_toml_in_hidden_directory() {
+    let root = temp_dir("config-root-hidden-legacy-file");
+    fs::create_dir_all(root.join(".warp-insightd")).expect("create hidden config dir");
+    fs::write(
+        root.join(".warp-insightd").join("agent.toml"),
+        "schema_version = \"v1\"\n",
+    )
+    .expect("write hidden legacy config");
 
     assert_eq!(resolve_config_root(&root), root.join(".warp-insightd"));
 }
@@ -261,7 +337,7 @@ fn resolve_config_root_prefers_legacy_when_visible_dir_has_no_config_file() {
     fs::create_dir_all(root.join("warp-insightd")).expect("create visible config dir");
     fs::create_dir_all(root.join(".warp-insightd")).expect("create legacy config dir");
     fs::write(
-        root.join(".warp-insightd").join("agent.toml"),
+        root.join(".warp-insightd").join("insightd.toml"),
         "schema_version = \"v1\"\n",
     )
     .expect("write legacy config");
@@ -297,7 +373,8 @@ fn resolve_exec_bin_rejects_missing_candidate() {
     fs::create_dir_all(current_exe.parent().expect("current_exe parent"))
         .expect("create current_exe parent");
 
-    let err = resolve_exec_bin_from(&current_exe, None).expect_err("missing exec should fail");
+    let err =
+        resolve_exec_bin_from(&current_exe, None, None).expect_err("missing exec should fail");
     assert!(err.to_string().contains("warp-insight-exec was not found"));
 }
 
@@ -316,7 +393,7 @@ fn resolve_exec_bin_rejects_non_executable_file() {
     perms.set_mode(0o644);
     fs::set_permissions(&candidate, perms).expect("set candidate permissions");
 
-    let err = resolve_exec_bin_from(&current_exe, None)
+    let err = resolve_exec_bin_from(&current_exe, None, None)
         .expect_err("non executable candidate should fail");
 
     assert!(err.to_string().contains("not executable"));

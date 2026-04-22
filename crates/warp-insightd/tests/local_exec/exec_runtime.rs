@@ -19,8 +19,8 @@ fn local_exec_synthesizes_timeout_result() {
     bootstrap::initialize(&root, &run_dir, &state_dir, &log_dir).expect("bootstrap");
 
     let mut plan = sample_plan();
-    plan.constraints.max_total_duration_ms = 1_000;
-    let exec_bin = write_exec_wrapper(&root, "sleep 1");
+    plan.constraints.max_total_duration_ms = 50;
+    let exec_bin = write_exec_wrapper(&root, "sleep 2");
 
     let outcome = execute_local(&LocalExecRequest {
         execution_id: "exec_timeout".to_string(),

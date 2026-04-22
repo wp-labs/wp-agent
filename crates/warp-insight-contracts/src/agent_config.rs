@@ -18,6 +18,8 @@ pub struct AgentConfigContract {
     pub execution: ExecutionSection,
     #[serde(default)]
     pub telemetry: TelemetrySection,
+    #[serde(default)]
+    pub discovery: DiscoverySection,
 }
 
 impl AgentConfigContract {
@@ -34,12 +36,34 @@ impl AgentConfigContract {
             paths,
             execution,
             telemetry: TelemetrySection::default(),
+            discovery: DiscoverySection::default(),
         }
     }
 
     pub fn with_telemetry(mut self, telemetry: TelemetrySection) -> Self {
         self.telemetry = telemetry;
         self
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DiscoverySection {
+    #[serde(default = "default_discovery_host_enabled")]
+    pub host_enabled: bool,
+    #[serde(default)]
+    pub process_enabled: bool,
+    #[serde(default)]
+    pub container_enabled: bool,
+}
+
+impl Default for DiscoverySection {
+    fn default() -> Self {
+        Self {
+            host_enabled: default_discovery_host_enabled(),
+            process_enabled: true,
+            container_enabled: false,
+        }
     }
 }
 
@@ -280,4 +304,8 @@ fn default_multiline_mode() -> String {
 
 fn default_startup_position() -> String {
     "head".to_string()
+}
+
+fn default_discovery_host_enabled() -> bool {
+    true
 }

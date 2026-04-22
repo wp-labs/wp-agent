@@ -52,7 +52,7 @@ warp-insightd init-config
 默认会在当前目录创建：
 
 ```text
-warp-insightd/agent.toml
+warp-insightd/insightd.toml
 ```
 
 如果只想先查看模板：
@@ -237,7 +237,7 @@ WARP_INSIGHTD_RUN_ONCE=1 warp-insightd --config-dir /etc/warpinsight
 
 1. `WarpParse` 的 `tcp_src` 是否真的在监听目标端口。
 2. 两台机器之间的防火墙、安全组、路由是否允许 TCP 连通。
-3. `agent.toml` 里的 `addr`、`port` 是否写对。
+3. `insightd.toml` 里的 `addr`、`port` 是否写对。
 4. `path` 指向的日志文件是否存在，进程是否有读取权限。
 5. `state/spool/logs` 下是否出现 `.ndjson` 文件。
 6. 如果启用了 `multiline_mode = "indented"`，是否同时把 TCP `framing` 配成了 `len`。
