@@ -6,6 +6,8 @@ use std::io;
 #[cfg(unix)]
 use std::process::Command;
 
+use std::collections::BTreeMap;
+
 use warp_insight_contracts::discovery::{
     DiscoveredResource, DiscoveredTarget, DiscoveryOrigin, StringKeyValue,
 };
@@ -50,23 +52,24 @@ impl DiscoveryProbe for ProcessDiscoveryProbe {
         for process in processes {
             let resource_id = process.resource_id(&host_id);
             let target_id = process.target_id(&host_id);
-            let mut attributes = vec![StringKeyValue::new("process.pid", process.pid.to_string())];
+            let mut attributes = BTreeMap::new();
+            attributes.insert("process.pid".to_string(), process.pid.to_string());
             if let Some(name) = &process.name {
-                attributes.push(StringKeyValue::new("process.executable.name", name));
+                attributes.insert("process.executable.name".to_string(), name.clone());
             }
-            let mut execution_hints =
-                vec![StringKeyValue::new("process.pid", process.pid.to_string())];
+            let mut execution_hints = BTreeMap::new();
+            execution_hints.insert("process.pid".to_string(), process.pid.to_string());
             if let Some(identity) = &process.identity {
-                execution_hints.push(StringKeyValue::new("process.identity", identity));
+                execution_hints.insert("process.identity".to_string(), identity.clone());
             }
             if process.identity.is_none() {
-                execution_hints.push(StringKeyValue::new("discovery.identity_strength", "weak"));
+                execution_hints.insert("discovery.identity_strength".to_string(), "weak".to_string());
             }
             if process.identity_unavailable {
-                execution_hints.push(StringKeyValue::new(
-                    "discovery.identity_status",
-                    "unavailable",
-                ));
+                execution_hints.insert(
+                    "discovery.identity_status".to_string(),
+                    "unavailable".to_string(),
+                );
             }
 
             resources.push(DiscoveredResource {
@@ -74,6 +77,10 @@ impl DiscoveryProbe for ProcessDiscoveryProbe {
                 kind: "process".to_string(),
                 origin_idx: 0,
                 attributes,
+                discovered_at: discovered_at.clone(),
+                last_seen_at: discovered_at.clone(),
+                health: "healthy".to_string(),
+                source: self.name().to_string(),
             });
             targets.push(DiscoveredTarget {
                 target_id,
@@ -81,6 +88,7 @@ impl DiscoveryProbe for ProcessDiscoveryProbe {
                 origin_idx: 0,
                 resource_ref: resource_id,
                 execution_hints,
+                state: "active".to_string(),
             });
         }
 

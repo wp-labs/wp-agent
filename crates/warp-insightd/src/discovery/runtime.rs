@@ -191,11 +191,12 @@ impl DiscoveryRefreshResult {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
     use std::time::{Duration, SystemTime};
     use std::{fs, path::PathBuf};
 
     use warp_insight_contracts::discovery::{
-        DiscoveredResource, DiscoveryOrigin, DiscoverySnapshotContract, StringKeyValue,
+        DiscoveredResource, DiscoveryOrigin, DiscoverySnapshotContract,
     };
 
     use crate::discovery::{DiscoveryProbeError, DiscoverySourceKind, ProbeOutput};
@@ -253,7 +254,11 @@ mod tests {
                 resource_id: "host-1".to_string(),
                 kind: "host".to_string(),
                 origin_idx: 0,
-                attributes: vec![StringKeyValue::new("host.id", "host-1")],
+                attributes: BTreeMap::from([("host.id".to_string(), "host-1".to_string())]),
+                discovered_at: "2026-04-19T00:00:00Z".to_string(),
+                last_seen_at: "2026-04-19T00:00:00Z".to_string(),
+                health: "healthy".to_string(),
+                source: "local_runtime".to_string(),
             }],
             targets: Vec::new(),
         };
@@ -293,7 +298,11 @@ mod tests {
                 resource_id: "host-1".to_string(),
                 kind: "host".to_string(),
                 origin_idx: 0,
-                attributes: vec![StringKeyValue::new("host.id", "host-1")],
+                attributes: BTreeMap::from([("host.id".to_string(), "host-1".to_string())]),
+                discovered_at: "2026-04-19T00:00:00Z".to_string(),
+                last_seen_at: "2026-04-19T00:00:00Z".to_string(),
+                health: "healthy".to_string(),
+                source: "local_runtime".to_string(),
             }],
             targets: Vec::new(),
         };
@@ -334,7 +343,11 @@ mod tests {
             resource_id: "host-1".to_string(),
             kind: "host".to_string(),
             origin_idx: 0,
-            attributes: vec![StringKeyValue::new("host.id", "host-1")],
+            attributes: BTreeMap::from([("host.id".to_string(), "host-1".to_string())]),
+            discovered_at: "2026-04-19T00:00:00Z".to_string(),
+            last_seen_at: "2026-04-19T00:00:00Z".to_string(),
+            health: "healthy".to_string(),
+            source: "local_runtime".to_string(),
         }];
 
         let mut runtime = DiscoveryRuntime::new(vec![Box::new(StubProbe {

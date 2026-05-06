@@ -13,6 +13,9 @@ use crate::discovery::container::ContainerDiscoveryProbe;
 use crate::discovery::host::HostDiscoveryProbe;
 use crate::discovery::process::ProcessDiscoveryProbe;
 use crate::discovery::runtime::{DiscoveryRefreshResult, DiscoveryRuntime};
+use warp_insight_contracts::exporter::ExporterSource;
+
+use crate::exporter;
 use crate::planner_bridge;
 use crate::scheduler;
 use crate::self_observability::{
@@ -100,6 +103,17 @@ async fn run_once_with_failure_cache(
     let metrics_active = metrics_tick.is_active();
 
     recover_incomplete_executions(state_dir, &instance_id)?;
+
+    // Step 0: export unified-envelope output alongside existing cache files
+    let agent_id = loop_ctx
+        .config
+        .agent
+        .agent_id
+        .as_deref()
+        .unwrap_or("unknown");
+    let export_source = ExporterSource::new(agent_id, &instance_id);
+    exporter::export_all(state_dir, &export_source);
+
     let drained = scheduler::drain_next_async(&scheduler::DrainRequest {
         run_dir: run_dir.to_path_buf(),
         state_dir: state_dir.to_path_buf(),

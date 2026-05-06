@@ -2,6 +2,8 @@
 
 use std::fs;
 
+use std::collections::BTreeMap;
+
 use warp_insight_contracts::discovery::{
     DiscoveredResource, DiscoveredTarget, DiscoveryOrigin, StringKeyValue,
 };
@@ -45,17 +47,24 @@ impl DiscoveryProbe for HostDiscoveryProbe {
                 resource_id: host_id.clone(),
                 kind: "host".to_string(),
                 origin_idx: 0,
-                attributes: vec![
-                    StringKeyValue::new("host.id", &host_id),
-                    StringKeyValue::new("host.name", &host_name),
-                ],
+                attributes: BTreeMap::from([
+                    ("host.id".to_string(), host_id.clone()),
+                    ("host.name".to_string(), host_name.clone()),
+                ]),
+                discovered_at: discovered_at.clone(),
+                last_seen_at: discovered_at.clone(),
+                health: "healthy".to_string(),
+                source: self.name().to_string(),
             }],
             targets: vec![DiscoveredTarget {
                 target_id: format!("{host_id}:host"),
                 kind: "host".to_string(),
                 origin_idx: 0,
                 resource_ref: host_id,
-                execution_hints: vec![StringKeyValue::new("host.name", host_name)],
+                execution_hints: BTreeMap::from([
+                    ("host.name".to_string(), host_name.clone()),
+                ]),
+                state: "active".to_string(),
             }],
         })
     }

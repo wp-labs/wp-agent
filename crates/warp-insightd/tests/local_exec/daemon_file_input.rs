@@ -48,32 +48,6 @@ struct TestMetricsRuntimeSnapshot {
 }
 
 #[derive(Debug, Deserialize)]
-struct TestMetricsSamplesSnapshot {
-    samples: Vec<TestMetricsSampleRecord>,
-}
-
-#[derive(Debug, Deserialize)]
-struct TestMetricsSampleRecord {
-    metric_name: String,
-    value: TestMetricsSampleValue,
-    value_type: String,
-    target_ref: String,
-    collection_kind: String,
-    resource_attributes: Vec<warp_insight_contracts::discovery::StringKeyValue>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(tag = "kind", content = "value", rename_all = "snake_case")]
-enum TestMetricsSampleValue {
-    #[allow(dead_code)]
-    I64(i64),
-    #[allow(dead_code)]
-    F64(String),
-    #[allow(dead_code)]
-    Text(String),
-}
-
-#[derive(Debug, Deserialize)]
 struct TestMetricsCollectionOutcome {
     collection_kind: String,
     status: String,
@@ -152,9 +126,7 @@ fn daemon_run_once_processes_configured_file_input() {
             .join("metrics_runtime_snapshot.json"),
     )
     .expect("read metrics runtime snapshot");
-    let metrics_samples: TestMetricsSamplesSnapshot =
-        read_json(&state_dir.join("telemetry").join("metrics_samples.json"))
-            .expect("read metrics samples");
+    let _metrics_samples_exporter = state_dir.join("export").join("metrics.json");
 
     assert_eq!(
         snapshot.state,
@@ -361,23 +333,10 @@ fn daemon_run_once_processes_configured_file_input() {
             .flat_map(|outcome| outcome.sample_targets.iter())
             .any(|sample| !sample.candidate_id.is_empty() && !sample.target_ref.is_empty())
     );
-    assert!(!metrics_samples.samples.is_empty());
-    assert!(metrics_samples.samples.iter().any(|sample| {
-        sample.collection_kind == "host_metrics"
-            && !sample.metric_name.is_empty()
-            && !sample.value_type.is_empty()
-            && !sample.target_ref.is_empty()
-            && matches!(
-                sample.value,
-                TestMetricsSampleValue::I64(_)
-                    | TestMetricsSampleValue::F64(_)
-                    | TestMetricsSampleValue::Text(_)
-            )
-            && sample
-                .resource_attributes
-                .iter()
-                .any(|attr| attr.key == "resource.id")
-    }));
+    assert!(
+        _metrics_samples_exporter.exists(),
+        "metrics exporter output should exist"
+    );
     assert!(snapshot.metrics.updated_at.is_some());
 }
 

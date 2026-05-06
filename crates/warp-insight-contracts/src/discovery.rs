@@ -1,5 +1,7 @@
 //! Discovery runtime contract types shared by edge modules.
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
 use crate::SCHEMA_VERSION_V1;
@@ -83,7 +85,19 @@ pub struct DiscoveredResource {
     pub kind: String,
     pub origin_idx: usize,
     #[serde(default)]
-    pub attributes: Vec<StringKeyValue>,
+    pub attributes: BTreeMap<String, String>,
+    /// When this resource was first discovered (RFC3339 UTC).
+    #[serde(default)]
+    pub discovered_at: String,
+    /// When this resource was last confirmed present (RFC3339 UTC).
+    #[serde(default)]
+    pub last_seen_at: String,
+    /// Health status from the discovery runtime's perspective.
+    #[serde(default = "default_health")]
+    pub health: String,
+    /// Name of the probe that discovered this resource, e.g. "local_runtime".
+    #[serde(default)]
+    pub source: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -94,7 +108,18 @@ pub struct DiscoveredTarget {
     pub origin_idx: usize,
     pub resource_ref: String,
     #[serde(default)]
-    pub execution_hints: Vec<StringKeyValue>,
+    pub execution_hints: BTreeMap<String, String>,
+    /// Target state from the discovery runtime's perspective.
+    #[serde(default = "default_target_state")]
+    pub state: String,
+}
+
+fn default_health() -> String {
+    "unknown".to_string()
+}
+
+fn default_target_state() -> String {
+    "active".to_string()
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

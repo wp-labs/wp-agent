@@ -5,6 +5,7 @@
 - [`target.md`](target.md)：目标定义、分层边界、非功能约束和阶段目标
 - [`glossary.md`](glossary.md)：统一术语词典和推荐用法
 - [`security-model.md`](security-model.md)：三进程信任边界、最小权限、审批链和审计链
+- [`error-handling-system.md`](error-handling-system.md)：Rust 错误模型、协议错误投影、故障裁决和观测暴露
 - [`action-plan-schema.md`](../execution/action-plan-schema.md)：`ActionPlan` 的字段级协议定义
 - [`action-result-schema.md`](../execution/action-result-schema.md)：`ActionResult` 和 `StepActionRecord` 的字段级协议定义
 - [`agentd-architecture.md`](../edge/agentd-architecture.md)：`warp-insightd` 的模块边界、本地状态机和调度职责

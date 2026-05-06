@@ -1,6 +1,8 @@
 //! Discovery snapshot to collection candidate mapping.
 
-use warp_insight_contracts::discovery::{CandidateCollectionTarget, DiscoverySnapshotContract};
+use warp_insight_contracts::discovery::{
+    CandidateCollectionTarget, DiscoverySnapshotContract, StringKeyValue,
+};
 
 pub fn build_collection_candidates(
     snapshot: &DiscoverySnapshotContract,
@@ -14,17 +16,19 @@ pub fn build_collection_candidates(
                 target_ref: target.target_id.clone(),
                 collection_kind: "host_metrics".to_string(),
                 resource_ref: target.resource_ref.clone(),
-                execution_hints: target.execution_hints.clone(),
+                execution_hints: target.execution_hints.iter().map(|(k, v)| StringKeyValue::new(k.clone(), v.clone())).collect(),
                 generated_at: snapshot.generated_at.clone(),
             }),
             "process" => {
                 let mut execution_hints = Vec::new();
-                for hint in &target.execution_hints {
-                    match hint.key.as_str() {
+                for (key, value) in &target.execution_hints {
+                    match key.as_str() {
                         "process.pid"
                         | "process.identity"
                         | "discovery.identity_strength"
-                        | "discovery.identity_status" => execution_hints.push(hint.clone()),
+                        | "discovery.identity_status" => {
+                            execution_hints.push(StringKeyValue::new(key.clone(), value.clone()))
+                        }
                         _ => {}
                     }
                 }
@@ -39,8 +43,8 @@ pub fn build_collection_candidates(
             }
             "container" => {
                 let mut execution_hints = Vec::new();
-                for hint in &target.execution_hints {
-                    match hint.key.as_str() {
+                for (key, value) in &target.execution_hints {
+                    match key.as_str() {
                         "container.runtime"
                         | "container.runtime.namespace"
                         | "pid"
@@ -48,7 +52,9 @@ pub fn build_collection_candidates(
                         | "k8s.namespace.name"
                         | "k8s.pod.uid"
                         | "k8s.pod.name"
-                        | "k8s.container.name" => execution_hints.push(hint.clone()),
+                        | "k8s.container.name" => {
+                            execution_hints.push(StringKeyValue::new(key.clone(), value.clone()))
+                        }
                         _ => {}
                     }
                 }
@@ -70,6 +76,8 @@ pub fn build_collection_candidates(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+
     use warp_insight_contracts::discovery::{
         DiscoveredTarget, DiscoverySnapshotContract, StringKeyValue,
     };
@@ -89,28 +97,31 @@ mod tests {
                 kind: "host".to_string(),
                 origin_idx: 0,
                 resource_ref: "host-1".to_string(),
-                execution_hints: vec![StringKeyValue::new("host.name", "host-1")],
+                execution_hints: BTreeMap::from([("host.name".to_string(), "host-1".to_string())]),
+                state: "active".to_string(),
             },
             DiscoveredTarget {
                 target_id: "host-1:pid:42:process".to_string(),
                 kind: "process".to_string(),
                 origin_idx: 1,
                 resource_ref: "host-1:pid:42".to_string(),
-                execution_hints: vec![
-                    StringKeyValue::new("process.pid", "42"),
-                    StringKeyValue::new("process.identity", "linux_proc_start:1"),
-                ],
+                execution_hints: BTreeMap::from([
+                    ("process.pid".to_string(), "42".to_string()),
+                    ("process.identity".to_string(), "linux_proc_start:1".to_string()),
+                ]),
+                state: "active".to_string(),
             },
             DiscoveredTarget {
                 target_id: "container-1".to_string(),
                 kind: "container".to_string(),
                 origin_idx: 2,
                 resource_ref: "container-1".to_string(),
-                execution_hints: vec![
-                    StringKeyValue::new("container.runtime", "containerd"),
-                    StringKeyValue::new("k8s.pod.uid", "pod-1"),
-                    StringKeyValue::new("pid", "1234"),
-                ],
+                execution_hints: BTreeMap::from([
+                    ("container.runtime".to_string(), "containerd".to_string()),
+                    ("k8s.pod.uid".to_string(), "pod-1".to_string()),
+                    ("pid".to_string(), "1234".to_string()),
+                ]),
+                state: "active".to_string(),
             },
         ];
 

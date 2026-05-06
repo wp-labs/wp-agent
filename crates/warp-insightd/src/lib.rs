@@ -6,6 +6,7 @@ pub mod config_runtime;
 pub mod daemon;
 pub mod discovery;
 pub mod execution_support;
+pub mod exporter;
 pub mod local_exec;
 pub mod planner_bridge;
 pub mod process_control;

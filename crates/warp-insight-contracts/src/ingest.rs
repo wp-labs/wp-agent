@@ -385,8 +385,10 @@ mod tests {
         WarpParseIngestHead, WarpParseIngestMessageKind,
     };
     use crate::API_VERSION_V1;
+    use std::collections::BTreeMap;
+
     use crate::discovery::{
-        DiscoveredResource, DiscoveryOrigin, DiscoverySnapshotContract, StringKeyValue,
+        DiscoveredResource, DiscoveryOrigin, DiscoverySnapshotContract,
     };
 
     fn sample_snapshot() -> DiscoverySnapshotContract {
@@ -405,7 +407,11 @@ mod tests {
             resource_id: "host:host-01".to_string(),
             kind: "host".to_string(),
             origin_idx: 0,
-            attributes: vec![StringKeyValue::new("host.id", "host-01")],
+            attributes: BTreeMap::from([("host.id".to_string(), "host-01".to_string())]),
+            discovered_at: "2026-04-20T00:00:00Z".to_string(),
+            last_seen_at: "2026-04-20T00:00:00Z".to_string(),
+            health: "healthy".to_string(),
+            source: "local_runtime".to_string(),
         });
         snapshot
     }

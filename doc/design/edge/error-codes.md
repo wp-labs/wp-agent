@@ -11,6 +11,7 @@
 
 相关文档：
 
+- [`error-handling-system.md`](../foundation/error-handling-system.md)
 - [`action-result-schema.md`](../execution/action-result-schema.md)
 - [`agentd-events.md`](agentd-events.md)
 - [`agentd-state-schema.md`](agentd-state-schema.md)

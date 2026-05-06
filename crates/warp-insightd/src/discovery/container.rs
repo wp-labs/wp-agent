@@ -6,6 +6,7 @@ use std::io;
 use std::path::PathBuf;
 
 use serde::Deserialize;
+
 use warp_insight_contracts::discovery::{
     DiscoveredResource, DiscoveredTarget, DiscoveryOrigin, StringKeyValue,
 };
@@ -46,44 +47,37 @@ impl DiscoveryProbe for ContainerDiscoveryProbe {
         let mut targets = Vec::with_capacity(containers.len());
         for container in containers {
             let resource_id = container.container_id.clone();
-            let mut attributes = vec![
-                StringKeyValue::new("container.id", &container.container_id),
-                StringKeyValue::new("container.name", &container.name),
-                StringKeyValue::new("container.runtime", container.runtime),
-            ];
-            let mut execution_hints =
-                vec![StringKeyValue::new("container.runtime", container.runtime)];
+            let mut attributes = BTreeMap::new();
+            attributes.insert("container.id".to_string(), container.container_id.clone());
+            attributes.insert("container.name".to_string(), container.name.clone());
+            attributes.insert("container.runtime".to_string(), container.runtime.to_string());
+            let mut execution_hints = BTreeMap::new();
+            execution_hints.insert("container.runtime".to_string(), container.runtime.to_string());
             if let Some(namespace) = &container.runtime_namespace {
-                attributes.push(StringKeyValue::new(
-                    "container.runtime.namespace",
-                    namespace,
-                ));
-                execution_hints.push(StringKeyValue::new(
-                    "container.runtime.namespace",
-                    namespace,
-                ));
+                attributes.insert("container.runtime.namespace".to_string(), namespace.clone());
+                execution_hints.insert("container.runtime.namespace".to_string(), namespace.clone());
             }
             if let Some(pid) = container.pid {
-                execution_hints.push(StringKeyValue::new("pid", pid.to_string()));
+                execution_hints.insert("pid".to_string(), pid.to_string());
             }
             if let Some(cgroup_path) = &container.cgroup_path {
-                execution_hints.push(StringKeyValue::new("cgroup.path", cgroup_path));
+                execution_hints.insert("cgroup.path".to_string(), cgroup_path.clone());
             }
             if let Some(namespace) = &container.k8s_namespace_name {
-                attributes.push(StringKeyValue::new("k8s.namespace.name", namespace));
-                execution_hints.push(StringKeyValue::new("k8s.namespace.name", namespace));
+                attributes.insert("k8s.namespace.name".to_string(), namespace.clone());
+                execution_hints.insert("k8s.namespace.name".to_string(), namespace.clone());
             }
             if let Some(pod_uid) = &container.k8s_pod_uid {
-                attributes.push(StringKeyValue::new("k8s.pod.uid", pod_uid));
-                execution_hints.push(StringKeyValue::new("k8s.pod.uid", pod_uid));
+                attributes.insert("k8s.pod.uid".to_string(), pod_uid.clone());
+                execution_hints.insert("k8s.pod.uid".to_string(), pod_uid.clone());
             }
             if let Some(pod_name) = &container.k8s_pod_name {
-                attributes.push(StringKeyValue::new("k8s.pod.name", pod_name));
-                execution_hints.push(StringKeyValue::new("k8s.pod.name", pod_name));
+                attributes.insert("k8s.pod.name".to_string(), pod_name.clone());
+                execution_hints.insert("k8s.pod.name".to_string(), pod_name.clone());
             }
             if let Some(container_name) = &container.k8s_container_name {
-                attributes.push(StringKeyValue::new("k8s.container.name", container_name));
-                execution_hints.push(StringKeyValue::new("k8s.container.name", container_name));
+                attributes.insert("k8s.container.name".to_string(), container_name.clone());
+                execution_hints.insert("k8s.container.name".to_string(), container_name.clone());
             }
 
             resources.push(DiscoveredResource {
@@ -91,6 +85,10 @@ impl DiscoveryProbe for ContainerDiscoveryProbe {
                 kind: "container".to_string(),
                 origin_idx: 0,
                 attributes,
+                discovered_at: discovered_at.clone(),
+                last_seen_at: discovered_at.clone(),
+                health: "healthy".to_string(),
+                source: self.name().to_string(),
             });
             targets.push(DiscoveredTarget {
                 target_id: container.container_id,
@@ -98,6 +96,7 @@ impl DiscoveryProbe for ContainerDiscoveryProbe {
                 origin_idx: 0,
                 resource_ref: resource_id,
                 execution_hints,
+                state: "active".to_string(),
             });
         }
 
@@ -234,7 +233,7 @@ fn read_runtime_root(root: &ContainerRuntimeRoot) -> io::Result<Vec<ObservedCont
 
         containers.push(ObservedContainer {
             name: discover_container_name(runtime_spec.as_ref(), &container_id)
-                .unwrap_or_else(|| container_id.clone()),
+                .unwrap_or_else(|| container_id.to_string()),
             container_id,
             runtime: root.runtime,
             runtime_namespace: root.runtime_namespace.map(str::to_string),

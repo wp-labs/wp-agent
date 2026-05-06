@@ -7,7 +7,6 @@ use warp_insight_shared::fs::read_json;
 use crate::self_observability::MetricsHealthSnapshot;
 use crate::telemetry::metrics::{
     runtime::{self, MetricsRuntimeSnapshot},
-    samples,
     target_view::{self, MetricsTargetView},
 };
 
@@ -23,7 +22,6 @@ pub(super) enum MetricsFailureKind {
     TargetViewLoadFailed,
     RuntimeSnapshotLoadFailed,
     RuntimeSnapshotStoreFailed,
-    SamplesSnapshotStoreFailed,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -111,17 +109,6 @@ pub(super) fn process_metrics_tick(state_dir: &Path) -> MetricsTick {
                     err,
                 ));
             }
-            let samples_snapshot = samples::build_samples_snapshot(&snapshot);
-            let samples_snapshot_path = samples::path_for(state_dir);
-            if let Err(err) = samples::store(&samples_snapshot_path, &samples_snapshot) {
-                failures.push(metrics_failure(
-                    MetricsFailureKind::SamplesSnapshotStoreFailed,
-                    "samples_snapshot_store",
-                    &samples_snapshot_path,
-                    err,
-                ));
-            }
-
             MetricsTick {
                 snapshot: Some(snapshot),
                 failures,
@@ -250,9 +237,6 @@ mod tests {
     use crate::telemetry::metrics::runtime::{
         MetricsRuntimeSnapshot, path_for as runtime_path_for,
     };
-    use crate::telemetry::metrics::samples::{
-        MetricsSamplesSnapshot, path_for as samples_path_for,
-    };
     use crate::telemetry::metrics::target_view::{
         MetricsTargetView, MetricsTargetViewEntry, path_for as target_view_path_for, store,
     };
@@ -294,8 +278,6 @@ mod tests {
         let tick = process_metrics_tick(&state_dir);
         let stored: MetricsRuntimeSnapshot =
             read_json(&runtime_path_for(&state_dir)).expect("load runtime snapshot");
-        let samples: MetricsSamplesSnapshot =
-            read_json(&samples_path_for(&state_dir)).expect("load samples snapshot");
 
         assert!(tick.target_view_loaded);
         assert!(!tick.used_cached_snapshot);
@@ -305,7 +287,6 @@ mod tests {
         assert_eq!(stored.host_targets, 1);
         assert_eq!(stored.process_targets, 1);
         assert_eq!(stored.container_targets, 0);
-        assert!(!samples.samples.is_empty());
     }
 
     #[test]
