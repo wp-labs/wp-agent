@@ -132,7 +132,7 @@ Agent 首次启动时提交：
 
 ```text
 Internal CA
-  -> signs WarpInsightAdmin server certificate
+  -> signs WarpGateWay server certificate
   -> optionally signs Agent client certificate after enrollment
 ```
 

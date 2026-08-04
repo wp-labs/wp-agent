@@ -1,11 +1,11 @@
-// WarpInsightAdmin 子系统用例
+// WarpGateWay 子系统用例
 
 // 获取 Agent 安装代码
 usecase GetAgentInstallCode {
   meta {
     label zh "获取 Agent 安装代码"
     label en "Get Agent Install Code"
-    summary zh "运维工程师在 WarpInsightAdmin 安装页直接获取 X86-Linux 或 Arm-Linux 的 Agent 安装代码；页面不需要输入参数和管理员身份权限，代码可直接复制到服务器终端执行。"
+    summary zh "运维工程师在 WarpGateWay 安装页直接获取 X86-Linux 或 Arm-Linux 的 Agent 安装代码；页面不需要输入参数和管理员身份权限，代码可直接复制到服务器终端执行。"
     tag "agent-install"
     tag "install-code"
     tag "public"
@@ -21,7 +21,7 @@ usecase GetAgentOverview {
   meta {
     label zh "获取 Agent 总览"
     label en "Get Agent Overview"
-    summary zh "管理员打开 WarpInsightAdmin 首页时获取 Agent 状态指标和异常 Agent 列表，用于首页总览展示。"
+    summary zh "管理员打开 WarpGateWay 首页时获取 Agent 状态指标和异常 Agent 列表，用于首页总览展示。"
     tag "agent-status"
     tag "overview"
     tag "admin"
@@ -38,7 +38,7 @@ usecase ShowAgentRuntimeStatus {
   meta {
     label zh "展示 Agent 的运行状态"
     label en "Show Agent Runtime Status"
-    summary zh "管理员在 WarpInsightAdmin 中查看已接入 Agent 的在线状态、版本、最后上报时间和健康状态。"
+    summary zh "管理员在 WarpGateWay 中查看已接入 Agent 的在线状态、版本、最后上报时间和健康状态。"
     tag "agent-status"
     tag "admin"
   }
@@ -53,7 +53,7 @@ usecase PauseAgent {
   meta {
     label zh "暂停 Agent"
     label en "Pause Agent"
-    summary zh "管理员在 WarpInsightAdmin 控制中心选择目标 Agent，向业务服务器上的 WpAgent 下发暂停请求。"
+    summary zh "管理员在 WarpGateWay 控制中心选择目标 Agent，向业务服务器上的 WpAgent 下发暂停请求。"
     tag "agent-pause"
     tag "admin"
   }
@@ -68,7 +68,7 @@ usecase UpgradeAgentRemotely {
   meta {
     label zh "远程升级 Agent"
     label en "Upgrade Agent Remotely"
-    summary zh "管理员在 WarpInsightAdmin 中选择目标 Agent 和目标版本，向业务服务器上的 WpAgent 下发远程升级请求。"
+    summary zh "管理员在 WarpGateWay 中选择目标 Agent 和目标版本，向业务服务器上的 WpAgent 下发远程升级请求。"
     tag "agent-upgrade"
     tag "admin"
   }

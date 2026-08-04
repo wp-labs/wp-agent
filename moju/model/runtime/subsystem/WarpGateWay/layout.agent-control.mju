@@ -1,4 +1,4 @@
-// WarpInsightAdmin Agent control reusable layout regions
+// WarpGateWay Agent control reusable layout regions
 
 region PauseAgentUsecaseCard {
   meta {

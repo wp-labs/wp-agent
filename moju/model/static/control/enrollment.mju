@@ -24,7 +24,7 @@ struct ManagementEndpointTrustBundle {
   meta {
     label zh "管理端信任包"
     label en "Management Endpoint Trust Bundle"
-    summary zh "Agent 安装和注册阶段用于校验 WarpInsightAdmin HTTPS 服务端证书的内部 CA 信任材料和端点约束。"
+    summary zh "Agent 安装和注册阶段用于校验 WarpGateWay HTTPS 服务端证书的内部 CA 信任材料和端点约束。"
     tag "enrollment"
     tag "tls"
     tag "trust-bundle"
@@ -201,7 +201,7 @@ struct AgentInstallCode {
   meta {
     label zh "Agent 安装代码"
     label en "Agent Install Code"
-    summary zh "WarpInsightAdmin 返回给管理员的 Agent 安装入口代码，按架构提供可复制执行的安装命令，并关联 bootstrap bundle。"
+    summary zh "WarpGateWay 返回给管理员的 Agent 安装入口代码，按架构提供可复制执行的安装命令，并关联 bootstrap bundle。"
     tag "admin"
     tag "agent-install"
     tag "install-code"

@@ -1,0 +1,52 @@
+// WarpInsightCenter 子系统用例
+//
+// 网关级事实（Control.WarpGateway、Control.GatewayOperator 及 GatewaySupervision
+// 模块下的 command/struct）在 Control 域 gateway-supervision.mju 中建模。
+
+// 获取初始配置信息
+usecase GetInitialConfig {
+  meta {
+    label zh "获取初始配置信息"
+    label en "Get Initial Config"
+    summary zh "客户服务工程师在 WarpInsightCenter 获取指定 WarpGateWay 实例的初始配置信息，包括控制中心地址、策略版本与遥测输出，用于协助排查与配置核对。"
+    tag "gateway"
+    tag "bootstrap"
+    tag "config"
+  }
+
+  actor Control.CustomerServiceEngineer
+  trigger Control.GetGatewayInitialConfig
+  outcome Control.GatewayInitialConfig
+}
+
+// 接收Gateway状态上报
+usecase ReceiveGatewayStatusReport {
+  meta {
+    label zh "接收 Gateway 状态上报"
+    label en "Receive Gateway Status Report"
+    summary zh "WarpInsightCenter 接收各 WarpGateWay 实例定期上报的状态、健康与总览信息，用于全局聚合展示与后续全局控制。"
+    tag "gateway"
+    tag "status"
+    tag "aggregation"
+  }
+
+  actor Control.WarpGateway
+  trigger Control.ReportGatewayStatus
+  outcome Control.GatewayStatusAccepted
+}
+
+// 查看GateWay状态
+usecase ViewGatewayStatus {
+  meta {
+    label zh "查看GateWay状态"
+    label en "View Gateway Status"
+    summary zh "客户服务工程师在 WarpInsightCenter 查看各 WarpGateWay 实例的在线状态、版本、健康状态和最后上报时间，形成全局网关视图。"
+    tag "gateway"
+    tag "status"
+    tag "global-view"
+  }
+
+  actor Control.CustomerServiceEngineer
+  trigger Control.ShowGatewayStatus
+  outcome Control.GatewayStatusView
+}

@@ -1,6 +1,6 @@
 // Control domain HTTP bindings
 
-bind WarpInsightAdminPublicInstallInterface {
+bind WarpGateWayPublicInstallInterface {
   entry AdminGetAgentInstallCode {
     route GET "/api/v1/agent/install-code"
     auth bearer
@@ -10,7 +10,7 @@ bind WarpInsightAdminPublicInstallInterface {
   }
 }
 
-bind WarpInsightAdminManagementInterface {
+bind WarpGateWayManagementInterface {
   entry AdminShowAgentRuntimeStatus {
     route GET "/api/v1/admin/agents/{agent_id}/runtime-status"
     auth bearer

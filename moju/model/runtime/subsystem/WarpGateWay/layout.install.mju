@@ -1,4 +1,4 @@
-// WarpInsightAdmin install page layout regions
+// WarpGateWay install page layout regions
 
 region AgentInstallCodeList {
   meta {

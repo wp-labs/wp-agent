@@ -1,17 +1,21 @@
 // warp-insight 部署视图
 
-node ManagementPlatformHost {
+node WarpGateWayHost {
   meta {
-    label zh "WarpInsight管理节点"
-    summary zh "在线业务区内的 WarpInsight 管理节点，运行 WarpInsightAdmin 前端 WEB、后端 WEB 服务接口、控制中心和数据平台能力。"
+    label zh "WarpGateWay 管理节点"
+    label en "WarpGateWay Host"
+    summary zh "在线业务区内的 WarpGateWay 控制平台节点，运行 WarpGateWay 前端 WEB、后端 WEB 服务接口和控制中心；数据平台能力由托管服务区承载。WarpGateWay 实例接入上级 WarpInsightCenter 聚合控制中心，接收全局策略与控制指令。"
     tag "center"
     tag "online-business-zone"
+    tag "control-plane"
+    tag "warp-gateway"
   }
 }
 
 node AgentHost1 {
   meta {
     label zh "现有业务服务器节点 1"
+    label en "Agent Host 1"
     summary zh "在线业务区内已经存在的业务服务器节点，安装 WpAgent 后运行 warp-insightd 和 warp-insight-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
     tag "edge"
     tag "online-business-zone"
@@ -22,10 +26,22 @@ node AgentHost1 {
 node AgentHost2 {
   meta {
     label zh "现有业务服务器节点 2"
+    label en "Agent Host 2"
     summary zh "在线业务区内已经存在的业务服务器节点，安装 WpAgent 后运行 warp-insightd 和 warp-insight-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
     tag "edge"
     tag "online-business-zone"
     tag "existing-host"
+  }
+}
+
+node ManagedServiceHost {
+  meta {
+    label zh "托管服务节点"
+    label en "Managed Service Host"
+    summary zh "托管服务区内的高信任节点，后续承载 WarpInsight 托管服务（数据平台等）。"
+    tag "managed-service-zone"
+    tag "center"
+    tag "managed-service"
   }
 }
 
@@ -55,20 +71,51 @@ module<adapter> AgentHost2ControlClient {
   responsible_for "AgentHost2 上的 WpAgent 主动连接 WarpInsight 管理节点控制通道。"
 }
 
+module<adapter> ManagedServiceHostControlClient {
+  meta {
+    label zh "托管服务节点控制客户端"
+    label en "Managed Service Host Control Client"
+    summary zh "托管服务节点上的托管服务主动连接 WarpInsight 管理节点控制通道。"
+    tag "topology-helper"
+    tag "control-link"
+  }
+
+  depends Control.Protocol
+  responsible_for "托管服务节点上的托管服务主动连接 WarpInsight 管理节点控制通道。"
+}
+
 network OnlineBusinessZone {
   ingress controlled_internal
   trust_level business_internal
-  contains ManagementPlatformHost
+  contains WarpGateWayHost
   contains AgentHost1
   contains AgentHost2
 }
 
+network ManagedServiceZone {
+  meta {
+    label zh "托管服务区"
+    label en "Managed Service Zone"
+    summary zh "承载 WarpInsight 托管服务的高信任网络分区。"
+  }
+  ingress internal_only
+  trust_level internal
+  contains ManagedServiceHost
+}
+
 // 拓扑辅助绑定：为节点连线提供模块依赖依据，不作为节点内 target 展示。
-bind warp-insight-admin-web to ManagementPlatformHost with topology
-bind warp-insight-admin to ManagementPlatformHost with topology
 bind AgentHost1ControlClient to AgentHost1 with topology
 bind AgentHost2ControlClient to AgentHost2 with topology
+bind ManagedServiceHostControlClient to ManagedServiceHost with topology
+// Agent 主机部署 WpAgent：先绑 agent 数据面模块，再绑管理节点，使控制面模块
+// 最终归属管理节点，Agent 节点保留 Discovery/Observed/Reporting 数据面。
+bind warp-insightd to AgentHost1 with topology
+bind warp-insightd to AgentHost2 with topology
+bind warp-gateway-web to WarpGateWayHost with topology
+bind warp-gateway to WarpGateWayHost with topology
 
 // 节点间关系：Agent 主动连接管理节点控制通道。
-link<call> AgentHost1 -> ManagementPlatformHost
-link<call> AgentHost2 -> ManagementPlatformHost
+link<call> AgentHost1 -> WarpGateWayHost
+link<call> AgentHost2 -> WarpGateWayHost
+// 托管服务节点上的托管服务连接管理节点控制通道。
+link<call> ManagedServiceHost -> WarpGateWayHost

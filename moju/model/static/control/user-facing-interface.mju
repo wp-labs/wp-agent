@@ -43,10 +43,10 @@ message<response> AdminUpgradeAgentDispatchReturned {
   result: DispatchReceipt
 }
 
-interface WarpInsightAdminPublicInstallInterface {
+interface WarpGateWayPublicInstallInterface {
   meta {
-    label zh "WarpInsightAdmin 运维安装接口"
-    label en "WarpInsightAdmin Operations Install Interface"
+    label zh "WarpGateWay 运维安装接口"
+    label en "WarpGateWay Operations Install Interface"
     summary zh "运维工程师通过管理员 bearer 身份获取 Agent 安装代码；接口只负责安装脚本复制和 bootstrap 引导，不面向未认证访问者开放。"
     tag "authenticated"
     tag "bootstrap"
@@ -62,10 +62,10 @@ interface WarpInsightAdminPublicInstallInterface {
   }
 }
 
-interface WarpInsightAdminManagementInterface {
+interface WarpGateWayManagementInterface {
   meta {
-    label zh "WarpInsightAdmin 管理接口"
-    label en "WarpInsightAdmin Management Interface"
+    label zh "WarpGateWay 管理接口"
+    label en "WarpGateWay Management Interface"
     summary zh "需要管理员身份权限的 Web 管理接口，覆盖 Agent 运行状态查询、暂停和远程升级操作。"
     tag "admin"
     tag "authenticated"
@@ -133,10 +133,10 @@ flow AdminGetAgentInstallCodeFlow {
   step BuildInstallCode {
     create AgentBootstrapBundle {
       bundle_id = "agent-bootstrap-install-token-001"
-      install_script_url = "https://warp-insight-admin/api/v1/agent/install/x86/install.sh?token=install-token-001"
-      agent_package_url = "https://warp-insight-admin/api/v1/agent/packages/current"
+      install_script_url = "https://warp-gateway/api/v1/agent/install/x86/install.sh?token=install-token-001"
+      agent_package_url = "https://warp-gateway/api/v1/agent/packages/current"
       agent_package_sha256 = "sha256:package-digest"
-      control_endpoint = "https://warp-insight-admin"
+      control_endpoint = "https://warp-gateway"
       trust_bundle = "internal-ca"
       tenant_id = "tenant-default"
       environment_id = "env-default"
@@ -144,8 +144,8 @@ flow AdminGetAgentInstallCodeFlow {
     }
 
     create AgentInstallCode {
-      x86_linux_install_code = "curl -fsSL https://warp-insight-admin/api/v1/agent/install/x86/install.sh?token=install-token-001 | bash"
-      arm_linux_install_code = "curl -fsSL https://warp-insight-admin/api/v1/agent/install/arm/install.sh?token=install-token-001 | bash"
+      x86_linux_install_code = "curl -fsSL https://warp-gateway/api/v1/agent/install/x86/install.sh?token=install-token-001 | bash"
+      arm_linux_install_code = "curl -fsSL https://warp-gateway/api/v1/agent/install/arm/install.sh?token=install-token-001 | bash"
       bootstrap_bundle = "agent-bootstrap-install-token-001"
     }
   }
@@ -178,7 +178,7 @@ flow AdminGetAgentOverviewFlow {
   meta {
     label zh "获取 Agent 总览"
     label en "Get Agent Overview Flow"
-    summary zh "管理员打开 WarpInsightAdmin 首页时，聚合 Agent 状态指标、最近上线注册 Agent 和异常 Agent 列表。"
+    summary zh "管理员打开 WarpGateWay 首页时，聚合 Agent 状态指标、最近上线注册 Agent 和异常 Agent 列表。"
     tag "admin"
     tag "agent-status"
     tag "overview"

@@ -2,7 +2,7 @@ module<interface> UserFacingInterface {
   meta {
     label zh "用户侧服务接口"
     label en "User Facing Service Interface"
-    summary zh "WarpInsightAdmin 面向运维用户和管理员的 HTTP 接口，统一承载已认证安装代码获取、Agent 状态查询、暂停和远程升级能力。"
+    summary zh "WarpGateWay 面向运维用户和管理员的 HTTP 接口，统一承载已认证安装代码获取、Agent 状态查询、暂停和远程升级能力。"
     tag "user-facing"
     tag "admin"
     tag "web"
@@ -12,8 +12,8 @@ module<interface> UserFacingInterface {
   }
 
   layer Application
-  owns WarpInsightAdminPublicInstallInterface
-  owns WarpInsightAdminManagementInterface
+  owns WarpGateWayPublicInstallInterface
+  owns WarpGateWayManagementInterface
   owns AdminGetAgentInstallCode
   owns AdminShowAgentRuntimeStatus
   owns AdminGetAgentOverview
@@ -24,8 +24,8 @@ module<interface> UserFacingInterface {
   owns AdminAgentOverviewReturned
   owns AdminPauseAgentDispatchReturned
   owns AdminUpgradeAgentDispatchReturned
-  provides WarpInsightAdminPublicInstallInterface by protocol<http>
-  provides WarpInsightAdminManagementInterface by protocol<http>
+  provides WarpGateWayPublicInstallInterface by protocol<http>
+  provides WarpGateWayManagementInterface by protocol<http>
   depends Enrollment
   depends Identity
   depends AgentdStatusManagement

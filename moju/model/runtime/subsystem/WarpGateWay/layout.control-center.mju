@@ -1,4 +1,4 @@
-// WarpInsightAdmin control center page layout regions
+// WarpGateWay control center page layout regions
 
 region AdminOperatorLane {
   meta {
@@ -47,7 +47,7 @@ region AdminOperatorAccess {
   meta {
     label zh "操作者访问方式"
     label en "Admin Operator Access"
-    summary zh "表达 AdminOperator 通过 HTTP 访问 WarpInsightAdmin WEB。"
+    summary zh "表达 AdminOperator 通过 HTTP 访问 WarpGateWay WEB。"
     tag "admin"
     tag "access"
   }

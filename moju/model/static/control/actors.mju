@@ -36,3 +36,43 @@ actor AdminOperator {
   can AdminPauseAgent
   can AdminUpgradeAgent
 }
+
+actor<system> WarpGateway {
+  meta {
+    label zh "WarpGateWay 实例"
+    label en "Warp GateWay Instance"
+    summary zh "接入 WarpInsightCenter 的一个 WarpGateWay 实例，作为系统 actor 定期上报状态。"
+    tag "gateway"
+  }
+
+  access protocol<http>
+  can ReportGatewayStatus
+}
+
+actor GatewayOperator {
+  meta {
+    label zh "全局操作者"
+    label en "Gateway Operator"
+    summary zh "操作 WarpInsightCenter 的全局操作者，查看各 WarpGateWay 实例的聚合状态。"
+    tag "gateway"
+    tag "ops"
+  }
+
+  access protocol<http>
+  can ShowGatewayStatus
+}
+
+actor CustomerServiceEngineer {
+  meta {
+    label zh "客户服务工程师"
+    label en "Customer Service Engineer"
+    summary zh "面向客户提供服务的工程师，可在 WarpInsightCenter 获取指定 WarpGateWay 实例的初始配置信息、查看各 WarpGateWay 实例的运行状态，用于协助排查与配置核对。"
+    tag "ops"
+    tag "customer-service"
+    tag "gateway"
+  }
+
+  access protocol<http>
+  can GetGatewayInitialConfig
+  can ShowGatewayStatus
+}

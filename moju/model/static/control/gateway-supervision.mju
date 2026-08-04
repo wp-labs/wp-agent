@@ -1,0 +1,92 @@
+// Module: GatewaySupervision — WarpGateWay 上级聚合
+// 覆盖 WarpGateWay 实例接入 WarpInsightCenter 的初始配置获取、状态上报与全局状态视图。
+
+command GetGatewayInitialConfig {
+  meta {
+    label zh "获取初始配置"
+    label en "Get Initial Config"
+    summary zh "WarpGateWay 实例向 WarpInsightCenter 请求初始配置信息。"
+    tag "gateway"
+    tag "bootstrap"
+    tag "config"
+  }
+
+  instance_id: String
+  requested_at: DateTime
+}
+
+struct GatewayInitialConfig {
+  meta {
+    label zh "Gateway 初始配置"
+    label en "Gateway Initial Config"
+    summary zh "WarpGateWay 实例接入 WarpInsightCenter 后获取的初始运行配置，包括控制中心地址、策略版本与遥测输出。"
+    tag "gateway"
+    tag "config"
+  }
+
+  control_center_endpoint: String
+  policy_version: String
+  telemetry_output: String
+}
+
+command ReportGatewayStatus {
+  meta {
+    label zh "上报 Gateway 状态"
+    label en "Report Gateway Status"
+    summary zh "WarpGateWay 实例定期向 WarpInsightCenter 上报在线状态、版本与健康信息。"
+    tag "gateway"
+    tag "status"
+  }
+
+  gateway_id: String
+  instance_id: String
+  version: String
+  status: String
+  health: String
+  reported_at: DateTime
+}
+
+struct GatewayStatusAccepted {
+  meta {
+    label zh "Gateway 状态已接收"
+    label en "Gateway Status Accepted"
+    summary zh "WarpInsightCenter 接收 Gateway 状态上报后的确认回执。"
+    tag "gateway"
+    tag "status"
+  }
+
+  gateway_id: String
+  instance_id: String
+  accepted_at: DateTime
+}
+
+command ShowGatewayStatus {
+  meta {
+    label zh "展示 Gateway 状态"
+    label en "Show Gateway Status"
+    summary zh "全局操作者查看各 WarpGateWay 实例的聚合状态视图。"
+    tag "gateway"
+    tag "status"
+    tag "global-view"
+  }
+
+  requested_by: String
+}
+
+struct GatewayStatusView {
+  meta {
+    label zh "Gateway 状态视图"
+    label en "Gateway Status View"
+    summary zh "WarpInsightCenter 展示单个 WarpGateWay 实例在线状态、版本、健康状态和最后上报时间的聚合视图。"
+    tag "gateway"
+    tag "status"
+    tag "global-view"
+  }
+
+  gateway_id: String
+  instance_id: String
+  version: String
+  status: String
+  health: String
+  last_seen_at: DateTime
+}

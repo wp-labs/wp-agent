@@ -1,6 +1,6 @@
 // warp-insight 生成与部署目标
 
-target<bin,http> warp-insight-admin {
+target<bin,http> warp-gateway {
   modules Control.UserFacingInterface, Control.AgentFacingInterface
   modules Control.Enrollment, Control.Identity, Control.AgentdStatusManagement
   modules Control.AgentCommandControl
