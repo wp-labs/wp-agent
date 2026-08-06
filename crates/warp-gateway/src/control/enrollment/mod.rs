@@ -1,0 +1,33 @@
+// @moju generated
+// Control model module: enrollment
+
+pub mod agent_bootstrap_bundle;
+pub use agent_bootstrap_bundle::*;
+pub mod agent_enrollment_accepted;
+pub use agent_enrollment_accepted::*;
+pub mod agent_enrollment_auth_profile;
+pub use agent_enrollment_auth_profile::*;
+pub mod agent_enrollment_rejected;
+pub use agent_enrollment_rejected::*;
+pub mod agent_enrollment_result;
+pub use agent_enrollment_result::*;
+pub mod agent_enrollment_result_status;
+pub use agent_enrollment_result_status::*;
+pub mod agent_enrollment_token;
+pub use agent_enrollment_token::*;
+pub mod agent_enrollment_token_accepted;
+pub use agent_enrollment_token_accepted::*;
+pub mod agent_enrollment_token_rejected;
+pub use agent_enrollment_token_rejected::*;
+pub mod agent_enrollment_token_status;
+pub use agent_enrollment_token_status::*;
+pub mod agent_enrollment_token_validation;
+pub use agent_enrollment_token_validation::*;
+pub mod agent_enrollment_token_validation_status;
+pub use agent_enrollment_token_validation_status::*;
+pub mod agent_install_code;
+pub use agent_install_code::*;
+pub mod duplicate_registration_detected;
+pub use duplicate_registration_detected::*;
+pub mod management_endpoint_trust_bundle;
+pub use management_endpoint_trust_bundle::*;

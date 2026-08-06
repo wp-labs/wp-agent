@@ -1,7 +1,7 @@
 // @moju generated
 // @moju hash=8c5f4e01d1ad3c4e
 
-use crate::domain::messages::AdminGetAgentInstallCode;
+use crate::control::AdminGetAgentInstallCode;
 
 #[derive(::moju_derive::MoJu)]
 #[moju(kind = "interface", domain = "Control", module = "Control.UserFacingInterface")]

@@ -18,8 +18,8 @@ use warp_insight_contracts::enrollment::{
     AgentIdentityStatus, RenewAgentCredential, SubmitEnrollmentRequest,
 };
 
-use crate::domain::messages::{AgentHello, PollControlCommands, ReportActionResult};
-use crate::domain::types::{DateTime, ResultAttestation};
+use crate::control::{AgentHello, PollControlCommands, ReportActionResult};
+use crate::control::types::{DateTime, ResultAttestation};
 use crate::infra::{
     load_install_script_public_key_pem, sha256_hex, AdminConfig, AdminStore,
     StoredEnrollmentTokenStatus,

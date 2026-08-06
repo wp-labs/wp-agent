@@ -1,7 +1,7 @@
 // @moju generated
 // @moju hash=91638372490551d3
 
-use crate::domain::messages::SubmitEnrollmentRequest;
+use crate::control::SubmitEnrollmentRequest;
 
 #[derive(::moju_derive::MoJu)]
 #[moju(kind = "interface", domain = "Control", module = "Control.AgentFacingInterface")]

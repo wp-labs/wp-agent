@@ -5,11 +5,11 @@ use axum::{
     Json,
 };
 
-use crate::domain::messages::{
+use crate::control::{
     ActionResultAccepted, AgentControlCommandsReturned, AgentHello, AgentStatusAccepted,
     PollControlCommands, ReportActionResult,
 };
-use crate::domain::types::{
+use crate::control::types::{
     ActionResultReceipt, DateTime, MetricsHealthSnapshot, RuntimeHealthSnapshot,
 };
 use crate::infra::{

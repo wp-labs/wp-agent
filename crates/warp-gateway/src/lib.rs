@@ -3,7 +3,8 @@
 
 pub mod api;
 pub mod app;
-pub mod domain;
+pub mod control;
+pub mod reporting;
 pub mod infra;
 
 pub type AppError = Box<dyn std::error::Error + Send + Sync>;
