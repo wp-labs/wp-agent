@@ -2,6 +2,13 @@
 
 本项目的显著变更按版本记录，格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### 变更
+- **crate 重命名**：`warp-insightd` → `warp-agentd`、`warp-insight-admin` → `warp-gateway`、
+  `warp-insight-admin-web` → `warp-gateway-web`；同步更新 workspace members、配置文件
+  （`warp-gateway.toml`）、守护进程配置目录（`.warp-agentd` / `agentd.toml`）与 MoJu 模型服务名。
+
 ## [0.1.1] - 2026-08-03
 
 ### 新增

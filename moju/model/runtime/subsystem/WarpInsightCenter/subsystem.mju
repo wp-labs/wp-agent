@@ -2,20 +2,30 @@
 
 // WarpInsightCenter — WarpGateWay 的上级聚合控制系统
 // 汇总各 WarpGateWay 实例的状态、健康与总览，并下发全局策略与控制指令。
-// 骨架阶段先组合 Control 域既有模块作为基础；网关舰队视图、全局指令派发、
-// 网关注册等聚合域契约在后续迭代建模。
+// 同时承载中心侧资源目录与安全治理：主机资产与运行态（HostInventory）、责任归属
+// 与外部同步（HostResponsibility）、host/pod/network 与业务/服务拓扑（Topology）、
+// 软件归一化与漏洞情报（SoftwareVulnerability）。
 
 subsystem WarpInsightCenter {
   meta {
     label zh "全局控制中心"
     label en "Warp Control Center"
-    summary zh "WarpGateWay 的上级聚合控制系统，汇总各 WarpGateWay 实例的状态、健康与总览，并下发全局策略与控制指令。"
+    summary zh "WarpGateWay 的上级聚合控制系统，汇总各 WarpGateWay 实例的状态、健康与总览，下发全局策略与控制指令，并提供中心侧资源目录与安全治理能力。"
     tag "control-plane"
     tag "aggregation"
     tag "global"
   }
 
-  uses module Control.Registry, Control.Protocol
-  uses module Control.AgentdStatusManagement, Control.AgentCommandControl
-  uses module Control.GatewaySupervision
+  uses module Control.AgentRegistry, Control.Protocol
+  uses module Control.AgentStatus, Control.AgentCommand
+  uses module Control.GatewaySupervision, Control.GatewayInstanceManagement
+  uses module Control.GateWayIdentity
+  uses module Control.PlatformRelease
+  uses module Observed.HostInventory, Observed.HostInventoryQuery, Observed.HostResponsibility, Observed.HostResponsibilityService
+  uses module Observed.NetworkTopology, Observed.ServiceTopology, Observed.TopologyQuery
+  uses module Security.SoftwareVulnerability, Security.SoftwareVulnerabilityService
+  uses module Control.InsightCenterWeb
+  uses module Control.GateWayFacingInterface
+  uses module Control.AdminFacingInterface
+  uses module Control.WarpInsightCenter
 }

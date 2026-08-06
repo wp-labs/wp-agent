@@ -23,6 +23,20 @@ message<command> AdminUpgradeAgent {
   requested_by: String
 }
 
+message<command> AdminViewGateWayManagementState {
+  requested_by: String
+}
+
+message<command> AdminLookupAgentRegistryEntry {
+  agent_id: String
+  requested_by: String
+}
+
+message<command> AdminQueryAgentCapabilityIndex {
+  agent_id: String
+  requested_by: String
+}
+
 message<response> AdminAgentInstallCodeReturned {
   install_code: AgentInstallCode
 }
@@ -41,6 +55,18 @@ message<response> AdminPauseAgentDispatchReturned {
 
 message<response> AdminUpgradeAgentDispatchReturned {
   result: DispatchReceipt
+}
+
+message<response> AdminGateWayManagementStateReturned {
+  state: GateWayManagementStateView
+}
+
+message<response> AdminAgentRegistryEntryReturned {
+  entry: AgentRegistryEntry
+}
+
+message<response> AdminAgentCapabilityIndexReturned {
+  index: AgentCapabilityIndex
 }
 
 interface WarpGateWayPublicInstallInterface {
@@ -95,6 +121,24 @@ interface WarpGateWayManagementInterface {
     actor AdminOperator
     output AdminUpgradeAgentDispatchReturned
     calls AdminUpgradeAgentFlow
+  }
+
+  entry AdminViewGateWayManagementState {
+    actor AdminOperator
+    output AdminGateWayManagementStateReturned
+    calls AdminViewGateWayManagementStateFlow
+  }
+
+  entry AdminLookupAgentRegistryEntry {
+    actor AdminOperator
+    output AdminAgentRegistryEntryReturned
+    calls AdminLookupAgentRegistryEntryFlow
+  }
+
+  entry AdminQueryAgentCapabilityIndex {
+    actor AdminOperator
+    output AdminAgentCapabilityIndexReturned
+    calls AdminQueryAgentCapabilityIndexFlow
   }
 }
 
@@ -290,6 +334,90 @@ flow AdminUpgradeAgentFlow {
       dispatch_id = "admin-upgrade-dispatch"
       status = "accepted"
       created_at = "now"
+    }
+  }
+}
+
+flow AdminViewGateWayManagementStateFlow {
+  meta {
+    label zh "查看网关管理状态"
+    label en "View GateWay Management State Flow"
+    summary zh "管理员查看 WarpGateWay 控制平台自身的实例、控制面配置与健康状态聚合视图。"
+    tag "admin"
+    tag "gateway"
+    tag "management"
+  }
+
+  actor AdminOperator
+  trigger AdminViewGateWayManagementState
+
+  depends WarpGateWayInstance, GateWayControlConfig, GateWayHealth
+
+  creates GateWayManagementStateView
+
+  step BuildManagementState {
+    create GateWayManagementStateView {
+      gateway_id = "gateway-001"
+      instance_id = "gateway-001/boot-20260801"
+      version = "0.1.0"
+      status = "online"
+      config = GateWayControlConfig
+      health = GateWayHealth
+      last_seen_at = "now"
+    }
+  }
+}
+
+flow AdminLookupAgentRegistryEntryFlow {
+  meta {
+    label zh "查询 Agent 登记记录"
+    label en "Lookup Agent AgentRegistry Entry Flow"
+    summary zh "管理员按 agent_id 查询 Agent 登记记录。"
+    tag "admin"
+    tag "agentd"
+    tag "registry"
+  }
+
+  actor AdminOperator
+  trigger AdminLookupAgentRegistryEntry
+
+  creates AgentRegistryEntry
+
+  step LookupEntry {
+    create AgentRegistryEntry {
+      agent_id = AdminLookupAgentRegistryEntry.agent_id
+      tenant_id = "tenant-default"
+      environment_id = "env-default"
+      node_id = "node-default"
+      current_instance_id = "instance-default"
+      registered_at = "2026-08-01T00:00:00Z"
+      updated_at = "now"
+    }
+  }
+}
+
+flow AdminQueryAgentCapabilityIndexFlow {
+  meta {
+    label zh "查询 Agent 能力索引"
+    label en "Query Agent Capability Index Flow"
+    summary zh "管理员按 agent 查询能力索引。"
+    tag "admin"
+    tag "agentd"
+    tag "registry"
+  }
+
+  actor AdminOperator
+  trigger AdminQueryAgentCapabilityIndex
+
+  creates AgentCapabilityIndex
+
+  step LookupIndex {
+    create AgentCapabilityIndex {
+      agent_id = AdminQueryAgentCapabilityIndex.agent_id
+      instance_id = "instance-default"
+      capability_report_id = "cap-report-001"
+      generated_at = "2026-08-01T00:00:00Z"
+      indexed_at = "now"
     }
   }
 }

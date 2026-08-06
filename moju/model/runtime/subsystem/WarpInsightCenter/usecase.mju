@@ -3,6 +3,97 @@
 // 网关级事实（Control.WarpGateway、Control.GatewayOperator 及 GatewaySupervision
 // 模块下的 command/struct）在 Control 域 gateway-supervision.mju 中建模。
 
+// 创建GateWay管理实例
+usecase CreateGatewayInstance {
+  meta {
+    label zh "创建 GateWay 管理实例"
+    label en "Create Gateway Instance"
+    summary zh "客户服务工程师在 WarpInsightCenter 创建 GateWay 管理实例，作为后续接入与状态聚合的管理对象。"
+    tag "gateway"
+    tag "provisioning"
+  }
+
+  actor Control.CustomerServiceEngineer
+  trigger Control.CreateGatewayInstance
+  outcome Control.GatewayInstance
+}
+
+// 绑定客户ID
+usecase BindGatewayCustomer {
+  meta {
+    label zh "绑定客户 ID"
+    label en "Bind Gateway Customer"
+    summary zh "客户服务工程师把 GateWay 管理实例绑定到客户 ID，建立实例与客户的归属关系。"
+    tag "gateway"
+    tag "provisioning"
+    tag "customer"
+  }
+
+  actor Control.CustomerServiceEngineer
+  trigger Control.BindGatewayCustomer
+  outcome Control.GatewayCustomerBinding
+}
+
+// 发布WarpAgentd
+usecase PublishWarpAgentd {
+  meta {
+    label zh "发布 WarpAgentd"
+    label en "Publish WarpAgentd"
+    summary zh "平台维护工程师在 WarpInsightCenter 发布 WarpAgentd 新版本，供各 WarpGateWay 实例拉取升级。"
+    tag "release"
+    tag "warp-agentd"
+  }
+
+  actor Control.PlatformMaintenanceEngineer
+  trigger Control.PublishWarpAgentd
+  outcome Control.WarpAgentdRelease
+}
+
+// 发布WarpGateWay
+usecase PublishWarpGateWay {
+  meta {
+    label zh "发布 WarpGateWay"
+    label en "Publish WarpGateWay"
+    summary zh "平台维护工程师在 WarpInsightCenter 发布 WarpGateWay 新版本，供各 WarpGateWay 管理实例升级。"
+    tag "release"
+    tag "warp-gateway"
+  }
+
+  actor Control.PlatformMaintenanceEngineer
+  trigger Control.PublishWarpGateWay
+  outcome Control.WarpGateWayRelease
+}
+
+// 创建升级计划
+usecase CreateUpgradePlan {
+  meta {
+    label zh "创建升级计划"
+    label en "Create Upgrade Plan"
+    summary zh "平台维护工程师在 WarpInsightCenter 创建升级计划，指定目标组件、目标版本与升级范围，用于分批升级 WarpAgentd / WarpGateWay。"
+    tag "release"
+    tag "upgrade"
+  }
+
+  actor Control.PlatformMaintenanceEngineer
+  trigger Control.CreateUpgradePlan
+  outcome Control.UpgradePlan
+}
+
+// 批准升级计划
+usecase ApproveUpgradePlan {
+  meta {
+    label zh "批准升级计划"
+    label en "Approve Upgrade Plan"
+    summary zh "客户服务工程师批准升级计划，同意对指定范围内的 WarpAgentd / WarpGateWay 执行升级。"
+    tag "release"
+    tag "upgrade"
+  }
+
+  actor Control.CustomerServiceEngineer
+  trigger Control.ApproveUpgradePlan
+  outcome Control.UpgradePlanApproval
+}
+
 // 获取初始配置信息
 usecase GetInitialConfig {
   meta {
@@ -49,4 +140,130 @@ usecase ViewGatewayStatus {
   actor Control.CustomerServiceEngineer
   trigger Control.ShowGatewayStatus
   outcome Control.GatewayStatusView
+}
+
+// ── 中心侧资源目录与安全治理用例 ──
+
+// 查询主机资产目录
+usecase QueryHostInventory {
+  meta {
+    label zh "查询主机资产目录"
+    label en "Query Host HostInventory"
+    summary zh "安全分析师在 WarpInsightCenter 按租户、环境或主机名查询主机资产目录（HostInventory），获取主机静态资产事实。"
+    tag "asset"
+    tag "inventory"
+    tag "security"
+  }
+
+  actor Control.SecurityAnalyst
+  trigger Observed.QueryHostInventory
+  outcome Observed.HostInventory
+}
+
+// 查看主机运行状态
+usecase ViewHostRuntimeState {
+  meta {
+    label zh "查看主机运行状态"
+    label en "View Host Runtime State"
+    summary zh "安全分析师在 WarpInsightCenter 查看指定主机的当前运行态快照（HostRuntimeState），了解负载、资源水位与 agent 健康。"
+    tag "asset"
+    tag "runtime-state"
+    tag "security"
+  }
+
+  actor Control.SecurityAnalyst
+  trigger Observed.ViewHostRuntimeState
+  outcome Observed.HostRuntimeState
+}
+
+// 查看主机有效责任
+usecase ViewEffectiveHostResponsibility {
+  meta {
+    label zh "查看主机有效责任"
+    label en "View Effective Host HostResponsibility"
+    summary zh "安全分析师在 WarpInsightCenter 查看指定主机的有效责任主体（owner/maintainer/oncall/security_owner）及其继承来源。"
+    tag "responsibility"
+    tag "security"
+  }
+
+  actor Control.SecurityAnalyst
+  trigger Observed.ViewEffectiveHostResponsibility
+  outcome Observed.EffectiveHostResponsibility
+}
+
+// 查看网络拓扑
+usecase ViewNetworkTopology {
+  meta {
+    label zh "查看网络拓扑"
+    label en "View Network Topology"
+    summary zh "安全分析师在 WarpInsightCenter 查看 host / pod / network 拓扑，了解主机、pod 与网络段的挂接关系。"
+    tag "topology"
+    tag "network"
+    tag "security"
+  }
+
+  actor Control.SecurityAnalyst
+  trigger Observed.ViewNetworkTopology
+  outcome Observed.NetworkSegment
+}
+
+// 查看业务/服务拓扑
+usecase ViewServiceTopology {
+  meta {
+    label zh "查看业务/服务拓扑"
+    label en "View Service Topology"
+    summary zh "安全分析师在 WarpInsightCenter 查看业务、系统、服务及其依赖、入口与实例分布。"
+    tag "topology"
+    tag "service"
+    tag "security"
+  }
+
+  actor Control.SecurityAnalyst
+  trigger Observed.ViewServiceTopology
+  outcome Observed.ServiceEntity
+}
+
+// 查看软件漏洞
+usecase ViewSoftwareVulnerabilities {
+  meta {
+    label zh "查看软件漏洞"
+    label en "View Software Vulnerabilities"
+    summary zh "安全分析师在 WarpInsightCenter 按软件或主机查看软件漏洞发现，用于安全分析与整改跟进。"
+    tag "vulnerability"
+    tag "security"
+  }
+
+  actor Control.SecurityAnalyst
+  trigger Security.ViewSoftwareVulnerabilities
+  outcome Security.SoftwareVulnerabilityFinding
+}
+
+// 同步外部责任关系
+usecase SyncExternalResponsibility {
+  meta {
+    label zh "同步外部责任关系"
+    label en "Sync External HostResponsibility"
+    summary zh "CMDB / LDAP / IAM / HR / Oncall 等外部系统向 WarpInsightCenter 同步责任主体、主机组与责任分配关系，更新同步游标。"
+    tag "responsibility"
+    tag "external-sync"
+  }
+
+  actor Control.ExternalIdentitySource
+  trigger Observed.SyncExternalResponsibility
+  outcome Observed.ExternalSyncCursor
+}
+
+// 接入公开漏洞源
+usecase IngestVulnerabilityAdvisory {
+  meta {
+    label zh "接入公开漏洞源"
+    label en "Ingest SoftwareVulnerability Advisory"
+    summary zh "OSV / NVD / GitHub Security Advisory / 厂商公告等公开漏洞源向 WarpInsightCenter 接入原始漏洞情报并更新同步游标。"
+    tag "vulnerability"
+    tag "advisory"
+  }
+
+  actor Control.PublicVulnerabilityFeed
+  trigger Security.IngestVulnerabilityAdvisory
+  outcome Security.VulnerabilityFeedSyncState
 }

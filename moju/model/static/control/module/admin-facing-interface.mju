@@ -1,0 +1,55 @@
+module<interface> AdminFacingInterface {
+  meta {
+    label zh "全局控制中心管理接口"
+    label en "WarpInsightCenter Admin Facing Interface"
+    summary zh "WarpInsightCenter 面向管理员/安全分析师/平台维护工程师暴露的 HTTP 管理接口，承载舰队/策略编排、网关实例管理与资产/安全查询。"
+    tag "center"
+    tag "admin-facing"
+    tag "management"
+    tag "backend"
+    tag "http"
+    tag "interface"
+  }
+
+  layer Application
+  owns WarpInsightCenterAdminInterface
+  owns AdminViewGatewayFleet
+  owns AdminGatewayFleetReturned
+  owns AdminViewGatewayFleetFlow
+  owns AdminDispatchGlobalPolicy
+  owns AdminGlobalPolicyDispatchReturned
+  owns AdminDispatchGlobalPolicyFlow
+  owns AdminShowGatewayStatus
+  owns AdminGatewayStatusReturned
+  owns AdminShowGatewayStatusFlow
+  owns AdminCreateGatewayInstance
+  owns AdminGatewayInstanceReturned
+  owns AdminCreateGatewayInstanceFlow
+  owns AdminBindGatewayCustomer
+  owns AdminGatewayCustomerBindingReturned
+  owns AdminBindGatewayCustomerFlow
+  owns AdminQueryHostInventory
+  owns AdminHostInventoryReturned
+  owns AdminQueryHostInventoryFlow
+  owns AdminViewHostRuntimeState
+  owns AdminHostRuntimeStateReturned
+  owns AdminViewHostRuntimeStateFlow
+  owns AdminViewEffectiveResponsibility
+  owns AdminEffectiveResponsibilityReturned
+  owns AdminViewEffectiveResponsibilityFlow
+  owns AdminViewNetworkTopology
+  owns AdminNetworkTopologyReturned
+  owns AdminViewNetworkTopologyFlow
+  owns AdminViewServiceTopology
+  owns AdminServiceTopologyReturned
+  owns AdminViewServiceTopologyFlow
+  owns AdminViewSoftwareVulnerabilities
+  owns AdminSoftwareVulnerabilitiesReturned
+  owns AdminViewSoftwareVulnerabilitiesFlow
+  provides WarpInsightCenterAdminInterface by protocol<http>
+  depends WarpInsightCenter
+  depends GatewaySupervision, GatewayInstanceManagement
+  depends Observed.HostInventory, Observed.HostInventoryQuery, Observed.HostResponsibility, Observed.HostResponsibilityService, Observed.NetworkTopology, Observed.ServiceTopology, Observed.TopologyQuery
+  depends Security.SoftwareVulnerability, Security.SoftwareVulnerabilityService
+  responsible_for "WarpInsightCenter 管理接口：作为管理员与自动化系统的 Application 层入口，承载舰队/策略编排、网关实例管理与资产/安全查询。"
+}

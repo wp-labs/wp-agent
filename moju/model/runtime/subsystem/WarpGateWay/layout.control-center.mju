@@ -34,7 +34,7 @@ region AgentControlUsecaseBoard {
 region AdminOperatorIdentity {
   meta {
     label zh "操作者身份"
-    label en "Admin Operator Identity"
+    label en "Admin Operator AgentIdentity"
     summary zh "表达 AdminOperator 是控制中心操作的发起者。"
     tag "admin"
     tag "actor"

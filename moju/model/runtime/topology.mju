@@ -16,7 +16,7 @@ node AgentHost1 {
   meta {
     label zh "现有业务服务器节点 1"
     label en "Agent Host 1"
-    summary zh "在线业务区内已经存在的业务服务器节点，安装 WpAgent 后运行 warp-insightd 和 warp-insight-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
+    summary zh "在线业务区内已经存在的业务服务器节点，安装 WpAgent 后运行 warp-agentd 和 warp-insight-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
     tag "edge"
     tag "online-business-zone"
     tag "existing-host"
@@ -27,7 +27,7 @@ node AgentHost2 {
   meta {
     label zh "现有业务服务器节点 2"
     label en "Agent Host 2"
-    summary zh "在线业务区内已经存在的业务服务器节点，安装 WpAgent 后运行 warp-insightd 和 warp-insight-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
+    summary zh "在线业务区内已经存在的业务服务器节点，安装 WpAgent 后运行 warp-agentd 和 warp-insight-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
     tag "edge"
     tag "online-business-zone"
     tag "existing-host"
@@ -109,8 +109,8 @@ bind AgentHost2ControlClient to AgentHost2 with topology
 bind ManagedServiceHostControlClient to ManagedServiceHost with topology
 // Agent 主机部署 WpAgent：先绑 agent 数据面模块，再绑管理节点，使控制面模块
 // 最终归属管理节点，Agent 节点保留 Discovery/Observed/Reporting 数据面。
-bind warp-insightd to AgentHost1 with topology
-bind warp-insightd to AgentHost2 with topology
+bind warp-agentd to AgentHost1 with topology
+bind warp-agentd to AgentHost2 with topology
 bind warp-gateway-web to WarpGateWayHost with topology
 bind warp-gateway to WarpGateWayHost with topology
 

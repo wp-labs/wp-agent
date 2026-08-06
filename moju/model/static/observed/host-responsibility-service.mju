@@ -1,0 +1,77 @@
+// Module: HostResponsibilityService — 责任归属逻辑
+//
+// HostResponsibility 的逻辑（逻辑型 module<logic>）：有效责任查询、外部同步命令
+// 与派生视图/同步游标，实体事实由 HostResponsibility 承载。
+
+struct EffectiveHostResponsibility {
+  meta {
+    label zh "有效责任视图"
+    label en "Effective Host HostResponsibility"
+    summary zh "主机当前有效责任主体与来源的派生视图，由分配与继承规则计算，非 source of truth。"
+    tag "center"
+    tag "responsibility"
+    tag "effective-view"
+  }
+
+  unique host_id: String
+  owner_subject_id: String?
+  maintainer_subject_id: String?
+  oncall_subject_id: String?
+  security_owner_subject_id: String?
+  owner_resolved_from: String?
+  maintainer_resolved_from: String?
+  oncall_resolved_from: String?
+  security_owner_resolved_from: String?
+  resolved_at: DateTime
+}
+
+struct ExternalSyncCursor {
+  meta {
+    label zh "外部同步游标"
+    label en "External Sync Cursor"
+    summary zh "各同步源的增量进度与同步状态，支持增量刷新与全量校准。"
+    tag "center"
+    tag "responsibility"
+    tag "external-sync"
+  }
+
+  unique cursor_id: String
+  tenant_id: String
+  system_type: ExternalSystemType
+  scope_key: String
+  cursor_value: String?
+  full_sync_token: String?
+  last_success_at: DateTime?
+  last_attempt_at: DateTime?
+  last_error: String?
+  updated_at: DateTime
+}
+
+command ViewEffectiveHostResponsibility {
+  meta {
+    label zh "查看主机有效责任"
+    label en "View Effective Host HostResponsibility"
+    summary zh "安全分析师查看指定主机的有效责任主体（owner/maintainer/oncall/security_owner）及其来源。"
+    tag "center"
+    tag "responsibility"
+    tag "effective-view"
+  }
+
+  host_id: String
+  requested_by: String
+}
+
+command SyncExternalResponsibility {
+  meta {
+    label zh "同步外部责任关系"
+    label en "Sync External HostResponsibility"
+    summary zh "外部系统（CMDB/LDAP/HR/Oncall）向中心同步责任主体、主机组与责任分配关系。"
+    tag "center"
+    tag "responsibility"
+    tag "external-sync"
+  }
+
+  system_type: ExternalSystemType
+  scope_key: String
+  requested_by: String
+}

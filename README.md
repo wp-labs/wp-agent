@@ -11,11 +11,11 @@ Workspace layout:
   Static validators for plans, results, config, and state.
 - `crates/warp-insight-shared`
   Shared errors, IDs, paths, and common runtime helpers.
-- `crates/warp-insight-admin`
+- `crates/warp-gateway`
   Admin WEB backend skeleton for install links, Agent status, and remote upgrades.
-- `crates/warp-insight-admin-web`
-  Browser WEB frontend for the WarpInsightAdmin console.
-- `crates/warp-insightd`
+- `crates/warp-gateway-web`
+  Browser WEB frontend for the WarpGateWay console.
+- `crates/warp-agentd`
   Edge daemon skeleton.
 - `crates/warp-insight-exec`
   ActionPlan runtime skeleton.

@@ -1484,7 +1484,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "warp-insight-admin"
+name = "warp-agentd"
+version = "0.1.1"
+dependencies = [
+ "libc",
+ "moju-core",
+ "moju-derive 0.1.2",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "time",
+ "tokio",
+ "toml",
+ "warp-insight-contracts",
+ "warp-insight-shared",
+ "warp-insight-validate",
+]
+
+[[package]]
+name = "warp-gateway"
 version = "0.1.0"
 dependencies = [
  "axum",
@@ -1508,7 +1526,7 @@ dependencies = [
 
 [[package]]
 name = "warp-insight-contracts"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -1516,14 +1534,14 @@ dependencies = [
 
 [[package]]
 name = "warp-insight-control"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "warp-insight-contracts",
 ]
 
 [[package]]
 name = "warp-insight-exec"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "warp-insight-contracts",
@@ -1533,14 +1551,14 @@ dependencies = [
 
 [[package]]
 name = "warp-insight-gateway"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "warp-insight-contracts",
 ]
 
 [[package]]
 name = "warp-insight-shared"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -1549,34 +1567,16 @@ dependencies = [
 
 [[package]]
 name = "warp-insight-upgrader"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "warp-insight-validate"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde_json",
  "time",
  "toml",
  "warp-insight-contracts",
-]
-
-[[package]]
-name = "warp-insightd"
-version = "0.1.0"
-dependencies = [
- "libc",
- "moju-core",
- "moju-derive 0.1.2",
- "reqwest",
- "serde",
- "serde_json",
- "time",
- "tokio",
- "toml",
- "warp-insight-contracts",
- "warp-insight-shared",
- "warp-insight-validate",
 ]
 
 [[package]]

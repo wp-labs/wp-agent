@@ -1,0 +1,286 @@
+// Module: AdminFacingInterface — 全局控制中心管理接口（forAdmin）
+//
+// WarpInsightCenter 面向管理员/安全分析师/平台维护工程师的 HTTP 管理接口，
+// 与面向 WarpGateWay 实例的 GateWayFacingInterface（forGateway）拆分。
+// 承载三类入口：舰队/策略编排、网关实例管理、资产/安全查询。
+// 请求/响应为 wire 契约（Admin 前缀），组合中心各 Domain/Application 模块事实。
+
+// ── 舰队/策略编排 ──
+
+message<command> AdminViewGatewayFleet {
+  requested_by: String
+}
+
+message<response> AdminGatewayFleetReturned {
+  fleet: GatewayFleetView
+}
+
+message<command> AdminDispatchGlobalPolicy {
+  policy_version: String
+  gateway_ids: List<String>
+  requested_by: String
+}
+
+message<response> AdminGlobalPolicyDispatchReturned {
+  dispatch: GlobalPolicyDispatch
+}
+
+// ── 网关实例管理 ──
+
+message<command> AdminShowGatewayStatus {
+  gateway_id: String
+  requested_by: String
+}
+
+message<response> AdminGatewayStatusReturned {
+  status: GatewayStatusView
+}
+
+message<command> AdminCreateGatewayInstance {
+  gateway_name: String
+  requested_by: String
+}
+
+message<response> AdminGatewayInstanceReturned {
+  instance: GatewayInstance
+}
+
+message<command> AdminBindGatewayCustomer {
+  gateway_id: String
+  customer_id: String
+  requested_by: String
+}
+
+message<response> AdminGatewayCustomerBindingReturned {
+  binding: GatewayCustomerBinding
+}
+
+// ── 资产/安全查询 ──
+
+message<command> AdminQueryHostInventory {
+  tenant_id: String?
+  environment_id: String?
+  host_name: String?
+  requested_by: String
+}
+
+message<response> AdminHostInventoryReturned {
+  hosts: List<Observed.HostInventory>
+}
+
+message<command> AdminViewHostRuntimeState {
+  host_id: String
+  requested_by: String
+}
+
+message<response> AdminHostRuntimeStateReturned {
+  runtime: Observed.HostRuntimeState
+}
+
+message<command> AdminViewEffectiveResponsibility {
+  host_id: String
+  requested_by: String
+}
+
+message<response> AdminEffectiveResponsibilityReturned {
+  responsibility: Observed.EffectiveHostResponsibility
+}
+
+message<command> AdminViewNetworkTopology {
+  requested_by: String
+}
+
+message<response> AdminNetworkTopologyReturned {
+  segments: List<Observed.NetworkSegment>
+}
+
+message<command> AdminViewServiceTopology {
+  business_id: String?
+  service_id: String?
+  requested_by: String
+}
+
+message<response> AdminServiceTopologyReturned {
+  services: List<Observed.ServiceEntity>
+}
+
+message<command> AdminViewSoftwareVulnerabilities {
+  software_id: String?
+  host_id: String?
+  requested_by: String
+}
+
+message<response> AdminSoftwareVulnerabilitiesReturned {
+  findings: List<Security.SoftwareVulnerabilityFinding>
+}
+
+// ── 接口 ──
+
+interface WarpInsightCenterAdminInterface {
+  meta {
+    label zh "WarpInsightCenter 管理接口"
+    label en "WarpInsightCenter Admin Interface"
+    summary zh "面向管理员、安全分析师与平台维护工程师的 WarpInsightCenter 管理接口，承载舰队/策略编排、网关实例管理与资产/安全查询。"
+    tag "center"
+    tag "admin-facing"
+    tag "management"
+    tag "http"
+    tag "interface"
+  }
+
+  entry AdminViewGatewayFleet {
+    actor GatewayOperator
+    output AdminGatewayFleetReturned
+    calls AdminViewGatewayFleetFlow
+  }
+
+  entry AdminDispatchGlobalPolicy {
+    actor PlatformMaintenanceEngineer
+    output AdminGlobalPolicyDispatchReturned
+    calls AdminDispatchGlobalPolicyFlow
+  }
+
+  entry AdminShowGatewayStatus {
+    actor CustomerServiceEngineer
+    output AdminGatewayStatusReturned
+    calls AdminShowGatewayStatusFlow
+  }
+
+  entry AdminCreateGatewayInstance {
+    actor CustomerServiceEngineer
+    output AdminGatewayInstanceReturned
+    calls AdminCreateGatewayInstanceFlow
+  }
+
+  entry AdminBindGatewayCustomer {
+    actor CustomerServiceEngineer
+    output AdminGatewayCustomerBindingReturned
+    calls AdminBindGatewayCustomerFlow
+  }
+
+  entry AdminQueryHostInventory {
+    actor SecurityAnalyst
+    output AdminHostInventoryReturned
+    calls AdminQueryHostInventoryFlow
+  }
+
+  entry AdminViewHostRuntimeState {
+    actor SecurityAnalyst
+    output AdminHostRuntimeStateReturned
+    calls AdminViewHostRuntimeStateFlow
+  }
+
+  entry AdminViewEffectiveResponsibility {
+    actor SecurityAnalyst
+    output AdminEffectiveResponsibilityReturned
+    calls AdminViewEffectiveResponsibilityFlow
+  }
+
+  entry AdminViewNetworkTopology {
+    actor SecurityAnalyst
+    output AdminNetworkTopologyReturned
+    calls AdminViewNetworkTopologyFlow
+  }
+
+  entry AdminViewServiceTopology {
+    actor SecurityAnalyst
+    output AdminServiceTopologyReturned
+    calls AdminViewServiceTopologyFlow
+  }
+
+  entry AdminViewSoftwareVulnerabilities {
+    actor SecurityAnalyst
+    output AdminSoftwareVulnerabilitiesReturned
+    calls AdminViewSoftwareVulnerabilitiesFlow
+  }
+}
+
+// ── 编排/查询流程 ──
+
+flow AdminViewGatewayFleetFlow {
+  actor GatewayOperator
+  trigger AdminViewGatewayFleet
+
+  step ViewFleet {
+  }
+}
+
+flow AdminDispatchGlobalPolicyFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminDispatchGlobalPolicy
+
+  step DispatchPolicy {
+  }
+}
+
+flow AdminShowGatewayStatusFlow {
+  actor CustomerServiceEngineer
+  trigger AdminShowGatewayStatus
+
+  step ShowStatus {
+  }
+}
+
+flow AdminCreateGatewayInstanceFlow {
+  actor CustomerServiceEngineer
+  trigger AdminCreateGatewayInstance
+
+  step CreateInstance {
+  }
+}
+
+flow AdminBindGatewayCustomerFlow {
+  actor CustomerServiceEngineer
+  trigger AdminBindGatewayCustomer
+
+  step BindCustomer {
+  }
+}
+
+flow AdminQueryHostInventoryFlow {
+  actor SecurityAnalyst
+  trigger AdminQueryHostInventory
+
+  step QueryInventory {
+  }
+}
+
+flow AdminViewHostRuntimeStateFlow {
+  actor SecurityAnalyst
+  trigger AdminViewHostRuntimeState
+
+  step ViewRuntime {
+  }
+}
+
+flow AdminViewEffectiveResponsibilityFlow {
+  actor SecurityAnalyst
+  trigger AdminViewEffectiveResponsibility
+
+  step ViewResponsibility {
+  }
+}
+
+flow AdminViewNetworkTopologyFlow {
+  actor SecurityAnalyst
+  trigger AdminViewNetworkTopology
+
+  step ViewNetwork {
+  }
+}
+
+flow AdminViewServiceTopologyFlow {
+  actor SecurityAnalyst
+  trigger AdminViewServiceTopology
+
+  step ViewService {
+  }
+}
+
+flow AdminViewSoftwareVulnerabilitiesFlow {
+  actor SecurityAnalyst
+  trigger AdminViewSoftwareVulnerabilities
+
+  step ViewVulnerabilities {
+  }
+}

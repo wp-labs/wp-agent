@@ -1,0 +1,20 @@
+module<logic> PlatformRelease {
+  meta {
+    label zh "平台版本发布"
+    label en "Platform Release"
+    summary zh "负责 WarpAgentd 与 WarpGateWay 新版本的发布。"
+    tag "control"
+    tag "release"
+  }
+
+  layer Domain
+  owns PublishWarpAgentd
+  owns WarpAgentdRelease
+  owns PublishWarpGateWay
+  owns WarpGateWayRelease
+  owns CreateUpgradePlan
+  owns UpgradePlan
+  owns ApproveUpgradePlan
+  owns UpgradePlanApproval
+  responsible_for "平台版本发布与升级：WarpAgentd 与 WarpGateWay 新版本发布记录、升级计划与批准。"
+}

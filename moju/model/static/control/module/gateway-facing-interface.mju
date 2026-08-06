@@ -1,0 +1,24 @@
+module<interface> GateWayFacingInterface {
+  meta {
+    label zh "GateWay 侧服务接口"
+    label en "GateWay Facing Service Interface"
+    summary zh "WarpInsightCenter 面向各 WarpGateWay 实例暴露的 HTTP 接口，承载初始配置获取与状态上报。"
+    tag "gateway-facing"
+    tag "gateway"
+    tag "bootstrap"
+    tag "status"
+    tag "backend"
+    tag "http"
+    tag "interface"
+  }
+
+  layer Application
+  owns WarpInsightCenterGatewayInterface
+  owns GatewayInitialConfigReturned
+  owns GatewayStatusAcceptedReturned
+  owns GetGatewayInitialConfigFlow
+  owns ReportGatewayStatusFlow
+  provides WarpInsightCenterGatewayInterface by protocol<http>
+  depends GatewaySupervision
+  responsible_for "GateWay 侧服务接口：作为 WarpGateWay 实例的 Application 层入口，接收初始配置获取和状态上报请求。"
+}

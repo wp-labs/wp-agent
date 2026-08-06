@@ -35,7 +35,7 @@ moju/draft/
 .moju-gen.json
 
 # Local agent runtime data directory (may contain credentials)
-/warp-insightd/
+/warp-agentd/
 
 # Local run/test artifacts
 .run/

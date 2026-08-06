@@ -1,0 +1,29 @@
+module<entity> AgentEnrollment {
+  meta {
+    label zh "注册与引导实体"
+    label en "AgentEnrollment"
+    summary zh "负责 Agent 注册领域实体：安装引导包、注册 token 与校验、注册结果、认证配置与安装代码；注册流程由 AgentRegistration 承载。"
+    tag "control"
+    tag "enrollment"
+  }
+
+  layer Domain
+  owns AgentBootstrapBundle
+  owns ManagementEndpointTrustBundle
+  owns AgentEnrollmentToken
+  owns AgentEnrollmentTokenStatus
+  owns AgentEnrollmentTokenValidation
+  owns AgentEnrollmentTokenValidationStatus
+  owns AgentEnrollmentResult
+  owns AgentEnrollmentResultStatus
+  owns AgentEnrollmentTokenAccepted
+  owns AgentEnrollmentTokenRejected
+  owns AgentEnrollmentAccepted
+  owns AgentEnrollmentRejected
+  owns DuplicateRegistrationDetected
+  owns AgentEnrollmentAuthProfile
+  owns AgentInstallCode
+  depends AgentIdentity
+  depends AgentRegistry
+  responsible_for "注册与引导：bootstrap 信息、注册 token、校验/结果、注册事件、认证配置与安装代码；注册流程由 AgentRegistration 承载。"
+}

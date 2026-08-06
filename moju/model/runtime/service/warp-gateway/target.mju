@@ -2,8 +2,8 @@
 
 target<bin,http> warp-gateway {
   modules Control.UserFacingInterface, Control.AgentFacingInterface
-  modules Control.Enrollment, Control.Identity, Control.AgentdStatusManagement
-  modules Control.AgentCommandControl
-  modules Control.Protocol, Control.Registry
+  modules Control.AgentEnrollment, Control.AgentRegistration, Control.AgentIdentity, Control.AgentCredential, Control.AgentStatus
+  modules Control.AgentCommand
+  modules Control.Protocol, Control.AgentRegistry, Control.AgentStatus
   modules Reporting.Protocol
 }

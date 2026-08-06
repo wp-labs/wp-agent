@@ -91,7 +91,7 @@ INSTALL_PUBLIC_KEY="${TMP_ROOT}/install.pub.pem"
 RESPONSE_JSON="${TMP_ROOT}/install-code.json"
 INSTALL_HOME="${WARP_INSIGHT_HOME:-${TMP_ROOT}/agent}"
 TEST_AGENT_INSTANCE="install-test-$(basename "${TMP_ROOT}" | tr -c '[:alnum:]-' '-')"
-ADMIN_CONFIG="${TMP_ROOT}/warp-insight-admin.toml"
+ADMIN_CONFIG="${TMP_ROOT}/warp-gateway.toml"
 INSTALL_SIGNING_PRIVATE_KEY="${TMP_ROOT}/install-signing-ed25519.pkcs8.pem"
 ADMIN_TLS_CA_CERT="${TMP_ROOT}/admin-tls-ca.crt.pem"
 ADMIN_TLS_CA_KEY="${TMP_ROOT}/admin-tls-ca.key.pem"
@@ -99,10 +99,10 @@ ADMIN_TLS_CERT="${TMP_ROOT}/admin-tls.crt.pem"
 ADMIN_TLS_KEY="${TMP_ROOT}/admin-tls.key.pem"
 ADMIN_TLS_CSR="${TMP_ROOT}/admin-tls.csr.pem"
 ADMIN_TLS_EXT="${TMP_ROOT}/admin-tls.ext"
-ADMIN_LOG="${TMP_ROOT}/warp-insight-admin.log"
+ADMIN_LOG="${TMP_ROOT}/warp-gateway.log"
 ADMIN_PID=""
 ADMIN_WEB_BASE_URL="${ADMIN_WEB_BASE_URL:-http://${LAN_IP}:5173}"
-ADMIN_WEB_LOG="${TMP_ROOT}/warp-insight-admin-web.log"
+ADMIN_WEB_LOG="${TMP_ROOT}/warp-gateway-web.log"
 ADMIN_WEB_PID=""
 SKIP_ADMIN_WEB="${SKIP_ADMIN_WEB:-0}"
 STOP_STARTED_SERVICES="${STOP_STARTED_SERVICES:-0}"
@@ -245,8 +245,8 @@ start_admin_service() {
 
   require_cmd cargo
   require_cmd openssl
-  echo "admin service is not running; building and starting warp-insight-admin..."
-  cargo build --manifest-path "${REPO_ROOT}/Cargo.toml" -p warp-insightd -p warp-insight-admin
+  echo "admin service is not running; building and starting warp-gateway..."
+  cargo build --manifest-path "${REPO_ROOT}/Cargo.toml" -p warp-agentd -p warp-gateway
   openssl genpkey -algorithm ED25519 -out "${INSTALL_SIGNING_PRIVATE_KEY}" >/dev/null 2>&1
   openssl req -x509 -newkey rsa:2048 -nodes \
     -keyout "${ADMIN_TLS_CA_KEY}" \
@@ -289,7 +289,7 @@ tls_key_file = "${ADMIN_TLS_KEY}"
 admin_api_token = "${ADMIN_API_TOKEN}"
 
 [agent]
-package_file = "${REPO_ROOT}/target/debug/warp-insightd"
+package_file = "${REPO_ROOT}/target/debug/warp-agentd"
 bootstrap_token_ttl_seconds = 900
 credential_ttl_seconds = 2592000
 store_file = "${TMP_ROOT}/admin-state/admin-store.json"
@@ -303,26 +303,26 @@ EOF
 
   (
     cd "${REPO_ROOT}"
-    exec nohup env WARP_INSIGHT_ADMIN_CONFIG="${ADMIN_CONFIG}" \
-      "${REPO_ROOT}/target/debug/warp-insight-admin" \
+    exec nohup env WARP_GATEWAY_CONFIG="${ADMIN_CONFIG}" \
+      "${REPO_ROOT}/target/debug/warp-gateway" \
       >"${ADMIN_LOG}" 2>&1
   ) &
   ADMIN_PID=$!
 
   for _ in {1..100}; do
     if ! kill -0 "${ADMIN_PID}" 2>/dev/null; then
-      echo "warp-insight-admin failed to start; log:" >&2
+      echo "warp-gateway failed to start; log:" >&2
       cat "${ADMIN_LOG}" >&2
       exit 1
     fi
     if [[ "$(install_code_status)" == "200" ]]; then
-      echo "started warp-insight-admin pid=${ADMIN_PID}"
+      echo "started warp-gateway pid=${ADMIN_PID}"
       return
     fi
     sleep 0.1
   done
 
-  echo "warp-insight-admin did not become ready; log:" >&2
+  echo "warp-gateway did not become ready; log:" >&2
   cat "${ADMIN_LOG}" >&2
   exit 1
 }
@@ -338,7 +338,7 @@ ensure_install_code_endpoint() {
   fi
   if [[ "${status}" != "200" ]]; then
     if [[ "${status}" == "401" ]]; then
-      echo "another warp-insight-admin appears to be running at ${ADMIN_BASE_URL%/} with a different admin API token." >&2
+      echo "another warp-gateway appears to be running at ${ADMIN_BASE_URL%/} with a different admin API token." >&2
       echo "stop it, or set ADMIN_API_TOKEN to match the running admin." >&2
     else
       echo "admin install-code endpoint check failed: ${ADMIN_BASE_URL%/}/api/v1/agent/install-code returned ${status}." >&2
@@ -363,15 +363,15 @@ start_admin_web_service() {
   port="$(admin_web_listen_options | sed -n '2p')"
 
   require_cmd npm
-  if [[ ! -d "${REPO_ROOT}/crates/warp-insight-admin-web/node_modules" ]]; then
-    echo "admin-web dependencies are missing: crates/warp-insight-admin-web/node_modules" >&2
-    echo "run npm install in crates/warp-insight-admin-web before running this script." >&2
+  if [[ ! -d "${REPO_ROOT}/crates/warp-gateway-web/node_modules" ]]; then
+    echo "admin-web dependencies are missing: crates/warp-gateway-web/node_modules" >&2
+    echo "run npm install in crates/warp-gateway-web before running this script." >&2
     exit 1
   fi
 
-  echo "admin-web is not running; starting warp-insight-admin-web..."
+  echo "admin-web is not running; starting warp-gateway-web..."
   (
-    cd "${REPO_ROOT}/crates/warp-insight-admin-web"
+    cd "${REPO_ROOT}/crates/warp-gateway-web"
     exec nohup npm run dev -- --host "${host}" --port "${port}" --strictPort \
       >"${ADMIN_WEB_LOG}" 2>&1
   ) &
@@ -379,19 +379,19 @@ start_admin_web_service() {
 
   for _ in {1..100}; do
     if ! kill -0 "${ADMIN_WEB_PID}" 2>/dev/null; then
-      echo "warp-insight-admin-web failed to start; log:" >&2
+      echo "warp-gateway-web failed to start; log:" >&2
       cat "${ADMIN_WEB_LOG}" >&2
       exit 1
     fi
     if [[ "$(admin_web_status)" == "200" ]]; then
-      echo "started warp-insight-admin-web pid=${ADMIN_WEB_PID}"
+      echo "started warp-gateway-web pid=${ADMIN_WEB_PID}"
       echo "admin web url: ${ADMIN_WEB_BASE_URL}"
       return
     fi
     sleep 0.1
   done
 
-  echo "warp-insight-admin-web did not become ready; log:" >&2
+  echo "warp-gateway-web did not become ready; log:" >&2
   cat "${ADMIN_WEB_LOG}" >&2
   exit 1
 }
@@ -951,7 +951,7 @@ run_frontend_display_test() {
     echo "skipping frontend normalizer display test (npx not found)" >&2
     return 0
   fi
-  if [[ ! -d "${REPO_ROOT}/crates/warp-insight-admin-web/node_modules" ]]; then
+  if [[ ! -d "${REPO_ROOT}/crates/warp-gateway-web/node_modules" ]]; then
     echo "skipping frontend normalizer display test (admin-web node_modules missing)" >&2
     return 0
   fi
@@ -960,7 +960,7 @@ run_frontend_display_test() {
     args+=("${host_flag}")
   fi
   (
-    cd "${REPO_ROOT}/crates/warp-insight-admin-web"
+    cd "${REPO_ROOT}/crates/warp-gateway-web"
     npx tsx tests/overview-display.test.ts "${args[@]}"
   )
 }
@@ -1103,9 +1103,9 @@ env \
   "${INSTALL_ENV[@]}" \
   sh "${INSTALL_SCRIPT}"
 
-BIN_PATH="${INSTALL_HOME}/bin/warp-insightd"
-CONFIG_DIR="${INSTALL_HOME}/.warp-insightd"
-CONFIG_PATH="${CONFIG_DIR}/insightd.toml"
+BIN_PATH="${INSTALL_HOME}/bin/warp-agentd"
+CONFIG_DIR="${INSTALL_HOME}/.warp-agentd"
+CONFIG_PATH="${CONFIG_DIR}/agentd.toml"
 STATE_PATH="${INSTALL_HOME}/state/agent_runtime.json"
 
 if [[ ! -x "${BIN_PATH}" ]]; then
@@ -1126,7 +1126,7 @@ echo "checking installed daemon executable..."
 
 echo "running installed daemon once for enrollment..."
 env \
-  WARP_INSIGHTD_RUN_ONCE=1 \
+  WARP_AGENTD_RUN_ONCE=1 \
   NO_PROXY="${NOPROXY_HOSTS}" \
   no_proxy="${NOPROXY_HOSTS}" \
   HTTP_PROXY="" \

@@ -1,0 +1,31 @@
+// Module: TopologyQuery — 资源拓扑查询
+//
+// Topology 的查询逻辑（逻辑型 module<service>），实体事实由 Topology 承载。
+
+command ViewNetworkTopology {
+  meta {
+    label zh "查看网络拓扑"
+    label en "View Network Topology"
+    summary zh "安全分析师查看 host / pod / network 拓扑：主机、pod、网络段及其挂接关系。"
+    tag "center"
+    tag "topology"
+    tag "network"
+  }
+
+  requested_by: String
+}
+
+command ViewServiceTopology {
+  meta {
+    label zh "查看业务/服务拓扑"
+    label en "View Service Topology"
+    summary zh "安全分析师查看业务、系统、服务及其依赖、入口与实例分布。"
+    tag "center"
+    tag "topology"
+    tag "service"
+  }
+
+  business_id: String?
+  service_id: String?
+  requested_by: String
+}

@@ -1,19 +1,6 @@
 // Module: GatewaySupervision — WarpGateWay 上级聚合
-// 覆盖 WarpGateWay 实例接入 WarpInsightCenter 的初始配置获取、状态上报与全局状态视图。
-
-command GetGatewayInitialConfig {
-  meta {
-    label zh "获取初始配置"
-    label en "Get Initial Config"
-    summary zh "WarpGateWay 实例向 WarpInsightCenter 请求初始配置信息。"
-    tag "gateway"
-    tag "bootstrap"
-    tag "config"
-  }
-
-  instance_id: String
-  requested_at: DateTime
-}
+// 覆盖 WarpGateWay 实例接入 WarpInsightCenter 的初始配置获取、状态上报与状态/实例/客户/舰队视图实体。
+// 实例管理命令由 GatewayInstanceManagement 承载。
 
 struct GatewayInitialConfig {
   meta {
@@ -27,23 +14,6 @@ struct GatewayInitialConfig {
   control_center_endpoint: String
   policy_version: String
   telemetry_output: String
-}
-
-command ReportGatewayStatus {
-  meta {
-    label zh "上报 Gateway 状态"
-    label en "Report Gateway Status"
-    summary zh "WarpGateWay 实例定期向 WarpInsightCenter 上报在线状态、版本与健康信息。"
-    tag "gateway"
-    tag "status"
-  }
-
-  gateway_id: String
-  instance_id: String
-  version: String
-  status: String
-  health: String
-  reported_at: DateTime
 }
 
 struct GatewayStatusAccepted {
@@ -60,24 +30,11 @@ struct GatewayStatusAccepted {
   accepted_at: DateTime
 }
 
-command ShowGatewayStatus {
-  meta {
-    label zh "展示 Gateway 状态"
-    label en "Show Gateway Status"
-    summary zh "全局操作者查看各 WarpGateWay 实例的聚合状态视图。"
-    tag "gateway"
-    tag "status"
-    tag "global-view"
-  }
-
-  requested_by: String
-}
-
 struct GatewayStatusView {
   meta {
     label zh "Gateway 状态视图"
     label en "Gateway Status View"
-    summary zh "WarpInsightCenter 展示单个 WarpGateWay 实例在线状态、版本、健康状态和最后上报时间的聚合视图。"
+    summary zh "中心监管视角：WarpInsightCenter 查看单个 WarpGateWay 实例的在线状态、版本、健康状态和最后上报时间（对应网关状态上报聚合）。"
     tag "gateway"
     tag "status"
     tag "global-view"
@@ -89,4 +46,84 @@ struct GatewayStatusView {
   status: String
   health: String
   last_seen_at: DateTime
+}
+
+struct GatewayInstance {
+  meta {
+    label zh "GateWay 管理实例"
+    label en "Gateway Instance"
+    summary zh "WarpInsightCenter 创建的 GateWay 管理实例，作为后续接入与状态聚合的管理对象。"
+    tag "gateway"
+    tag "provisioning"
+  }
+
+  gateway_id: String
+  instance_id: String
+  status: String
+  created_at: DateTime
+}
+
+struct GatewayCustomerBinding {
+  meta {
+    label zh "GateWay 客户绑定"
+    label en "Gateway Customer Binding"
+    summary zh "GateWay 管理实例与客户 ID 的绑定关系，作为实例归属客户的管理依据。"
+    tag "gateway"
+    tag "provisioning"
+    tag "customer"
+  }
+
+  gateway_id: String
+  customer_id: String
+  status: String
+  bound_at: DateTime
+}
+
+struct GatewayFleetView {
+  meta {
+    label zh "网关舰队视图"
+    label en "Gateway Fleet View"
+    summary zh "WarpInsightCenter 展示的 WarpGateWay 实例舰队聚合视图：总数、在线、降级与离线计数。"
+    tag "center"
+    tag "gateway"
+    tag "fleet"
+  }
+
+  gateway_count: Int
+  online_count: Int
+  degraded_count: Int
+  offline_count: Int
+  updated_at: DateTime
+}
+
+struct GlobalPolicyDispatch {
+  meta {
+    label zh "全局策略下发回执"
+    label en "Global Policy Dispatch"
+    summary zh "WarpInsightCenter 下发全局策略后的派发回执，记录策略版本、目标数与下发状态。"
+    tag "center"
+    tag "policy"
+  }
+
+  unique dispatch_id: String
+  policy_version: String
+  target_count: Int
+  status: String
+  dispatched_at: DateTime
+}
+
+// ── 网关接入（forGateway：WarpGateWay 实例 → WarpInsightCenter） ──
+
+message<command> GetGatewayInitialConfig {
+  instance_id: String
+  requested_at: DateTime
+}
+
+message<command> ReportGatewayStatus {
+  gateway_id: String
+  instance_id: String
+  version: String
+  status: String
+  health: String
+  reported_at: DateTime
 }

@@ -1,6 +1,15 @@
 // Control domain actors
 
-actor Agentd {
+actor<system> Agentd {
+  meta {
+    label zh "WpAgent 守护进程"
+    label en "WpAgent Daemon"
+    summary zh "运行在业务服务器上的 warp-agentd 守护进程，作为系统 actor 发起注册、凭据轮换、状态上报与控制指令轮询。"
+    tag "edge"
+    tag "agentd"
+    tag "daemon"
+  }
+
   access protocol<http>
   can SubmitEnrollmentRequest
   can RenewAgentCredential
@@ -35,17 +44,23 @@ actor AdminOperator {
   can AdminShowAgentRuntimeStatus
   can AdminPauseAgent
   can AdminUpgradeAgent
+  can ViewGateWayOverview
+  can DispatchAgentFleetCommand
+  can AdminViewGateWayManagementState
+  can AdminLookupAgentRegistryEntry
+  can AdminQueryAgentCapabilityIndex
 }
 
 actor<system> WarpGateway {
   meta {
     label zh "WarpGateWay 实例"
     label en "Warp GateWay Instance"
-    summary zh "接入 WarpInsightCenter 的一个 WarpGateWay 实例，作为系统 actor 定期上报状态。"
+    summary zh "接入 WarpInsightCenter 的一个 WarpGateWay 实例，作为系统 actor 获取初始配置并定期上报状态。"
     tag "gateway"
   }
 
   access protocol<http>
+  can GetGatewayInitialConfig
   can ReportGatewayStatus
 }
 
@@ -60,19 +75,96 @@ actor GatewayOperator {
 
   access protocol<http>
   can ShowGatewayStatus
+  can AdminViewGatewayFleet
 }
 
 actor CustomerServiceEngineer {
   meta {
     label zh "客户服务工程师"
     label en "Customer Service Engineer"
-    summary zh "面向客户提供服务的工程师，可在 WarpInsightCenter 获取指定 WarpGateWay 实例的初始配置信息、查看各 WarpGateWay 实例的运行状态，用于协助排查与配置核对。"
+    summary zh "面向客户提供服务的工程师，可在 WarpInsightCenter 创建 GateWay 管理实例并绑定客户 ID、获取指定 WarpGateWay 实例的初始配置信息、查看各 WarpGateWay 实例的运行状态、批准升级计划，用于协助客户接入与排查。"
     tag "ops"
     tag "customer-service"
     tag "gateway"
   }
 
   access protocol<http>
+  can CreateGatewayInstance
+  can BindGatewayCustomer
   can GetGatewayInitialConfig
   can ShowGatewayStatus
+  can ApproveUpgradePlan
+  can AdminShowGatewayStatus
+  can AdminCreateGatewayInstance
+  can AdminBindGatewayCustomer
+}
+
+actor PlatformMaintenanceEngineer {
+  meta {
+    label zh "平台维护工程师"
+    label en "Platform Maintenance Engineer"
+    summary zh "负责 WarpInsight 平台维护的工程师，可在 WarpInsightCenter 发布 WarpAgentd 与 WarpGateWay 的新版本、创建升级计划。"
+    tag "ops"
+    tag "platform-maintenance"
+    tag "release"
+  }
+
+  access protocol<http>
+  can PublishWarpAgentd
+  can PublishWarpGateWay
+  can CreateUpgradePlan
+  can AdminDispatchGlobalPolicy
+}
+
+actor SecurityAnalyst {
+  meta {
+    label zh "安全分析工程师"
+    label en "Security Analyst"
+    summary zh "负责在 WarpInsightCenter 查看主机资产目录与运行状态、主机责任归属、网络与服务拓扑以及软件漏洞发现，用于安全分析与整改跟进。"
+    tag "ops"
+    tag "security"
+    tag "center"
+  }
+
+  access protocol<http>
+  can Observed.QueryHostInventory
+  can Observed.ViewHostRuntimeState
+  can Observed.ViewEffectiveHostResponsibility
+  can Observed.ViewNetworkTopology
+  can Observed.ViewServiceTopology
+  can Security.ViewSoftwareVulnerabilities
+  can AdminQueryHostInventory
+  can AdminViewHostRuntimeState
+  can AdminViewEffectiveResponsibility
+  can AdminViewNetworkTopology
+  can AdminViewServiceTopology
+  can AdminViewSoftwareVulnerabilities
+}
+
+actor<system> ExternalIdentitySource {
+  meta {
+    label zh "外部身份来源"
+    label en "External AgentIdentity Source"
+    summary zh "CMDB / LDAP / IAM / HR / Oncall 等外部系统，作为系统 actor 向 WarpInsightCenter 同步责任主体、主机组与责任分配关系。"
+    tag "external"
+    tag "sync"
+    tag "responsibility"
+  }
+
+  access protocol<http>
+  can Observed.SyncExternalResponsibility
+}
+
+actor<system> PublicVulnerabilityFeed {
+  meta {
+    label zh "公开漏洞情报源"
+    label en "Public SoftwareVulnerability Feed"
+    summary zh "OSV / NVD / GitHub Security Advisory / 厂商公告等公开漏洞源，作为系统 actor 向 WarpInsightCenter 接入原始漏洞情报。"
+    tag "external"
+    tag "sync"
+    tag "vulnerability"
+  }
+
+  access protocol<http>
+  can Security.IngestVulnerabilityAdvisory
 }

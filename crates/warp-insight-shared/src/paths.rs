@@ -1,6 +1,6 @@
 //! Shared filesystem path helpers.
 
-pub const INSIGHTD_CONFIG_FILE: &str = "insightd.toml";
+pub const AGENTD_CONFIG_FILE: &str = "agentd.toml";
 pub const LEGACY_AGENT_CONFIG_FILE: &str = "agent.toml";
 pub const STATE_DIR: &str = "state";
 pub const RUN_DIR: &str = "run";

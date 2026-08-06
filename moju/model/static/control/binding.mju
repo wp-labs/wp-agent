@@ -42,6 +42,30 @@ bind WarpGateWayManagementInterface {
     status AdminUpgradeAgentDispatchReturned 202
     outcome AdminUpgradeAgentDispatchReturned on DispatchReceipt
   }
+
+  entry AdminViewGateWayManagementState {
+    route GET "/api/v1/admin/gateway/management-state"
+    auth bearer
+    actor_identity AdminOperator.id from jwt.sub
+    status AdminGateWayManagementStateReturned 200
+    outcome AdminGateWayManagementStateReturned on GateWayManagementStateView
+  }
+
+  entry AdminLookupAgentRegistryEntry {
+    route GET "/api/v1/admin/agents/{agent_id}/registry-entry"
+    auth bearer
+    actor_identity AdminOperator.id from jwt.sub
+    status AdminAgentRegistryEntryReturned 200
+    outcome AdminAgentRegistryEntryReturned on AgentRegistryEntry
+  }
+
+  entry AdminQueryAgentCapabilityIndex {
+    route GET "/api/v1/admin/agents/{agent_id}/capability-index"
+    auth bearer
+    actor_identity AdminOperator.id from jwt.sub
+    status AdminAgentCapabilityIndexReturned 200
+    outcome AdminAgentCapabilityIndexReturned on AgentCapabilityIndex
+  }
 }
 
 bind WpAgentOnlineRegistrationInterface {
@@ -82,5 +106,113 @@ bind WpAgentOnlineRegistrationInterface {
     actor_identity Agentd.id from credential.agent_id
     status Reporting.ActionResultAccepted 202
     outcome Reporting.ActionResultAccepted on Reporting.ActionResultReceipt
+  }
+}
+
+bind WarpInsightCenterGatewayInterface {
+  entry GetGatewayInitialConfig {
+    route GET "/api/v1/gateway/initial-config"
+    auth bearer
+    actor_identity WarpGateway.id from credential.gateway_id
+    status GatewayInitialConfigReturned 200
+    outcome GatewayInitialConfigReturned on GatewayInitialConfig
+  }
+
+  entry ReportGatewayStatus {
+    route POST "/api/v1/gateway/status"
+    auth bearer
+    actor_identity WarpGateway.id from credential.gateway_id
+    status GatewayStatusAcceptedReturned 200
+    outcome GatewayStatusAcceptedReturned on GatewayStatusAccepted
+  }
+}
+
+bind WarpInsightCenterAdminInterface {
+  entry AdminViewGatewayFleet {
+    route GET "/api/v1/admin/gateways/fleet"
+    auth bearer
+    actor_identity GatewayOperator.id from jwt.sub
+    status AdminGatewayFleetReturned 200
+    outcome AdminGatewayFleetReturned on GatewayFleetView
+  }
+
+  entry AdminDispatchGlobalPolicy {
+    route POST "/api/v1/admin/policies/global"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status AdminGlobalPolicyDispatchReturned 200
+    outcome AdminGlobalPolicyDispatchReturned on GlobalPolicyDispatch
+  }
+
+  entry AdminShowGatewayStatus {
+    route GET "/api/v1/admin/gateways/{gateway_id}/status"
+    auth bearer
+    actor_identity CustomerServiceEngineer.id from jwt.sub
+    status AdminGatewayStatusReturned 200
+    outcome AdminGatewayStatusReturned on GatewayStatusView
+  }
+
+  entry AdminCreateGatewayInstance {
+    route POST "/api/v1/admin/gateways"
+    auth bearer
+    actor_identity CustomerServiceEngineer.id from jwt.sub
+    status AdminGatewayInstanceReturned 201
+    outcome AdminGatewayInstanceReturned on GatewayInstance
+  }
+
+  entry AdminBindGatewayCustomer {
+    route POST "/api/v1/admin/gateways/{gateway_id}/customer"
+    auth bearer
+    actor_identity CustomerServiceEngineer.id from jwt.sub
+    status AdminGatewayCustomerBindingReturned 200
+    outcome AdminGatewayCustomerBindingReturned on GatewayCustomerBinding
+  }
+
+  entry AdminQueryHostInventory {
+    route GET "/api/v1/admin/hosts/inventory"
+    auth bearer
+    actor_identity SecurityAnalyst.id from jwt.sub
+    status AdminHostInventoryReturned 200
+    outcome AdminHostInventoryReturned on Observed.HostInventory
+  }
+
+  entry AdminViewHostRuntimeState {
+    route GET "/api/v1/admin/hosts/{host_id}/runtime-state"
+    auth bearer
+    actor_identity SecurityAnalyst.id from jwt.sub
+    status AdminHostRuntimeStateReturned 200
+    outcome AdminHostRuntimeStateReturned on Observed.HostRuntimeState
+  }
+
+  entry AdminViewEffectiveResponsibility {
+    route GET "/api/v1/admin/hosts/{host_id}/responsibility"
+    auth bearer
+    actor_identity SecurityAnalyst.id from jwt.sub
+    status AdminEffectiveResponsibilityReturned 200
+    outcome AdminEffectiveResponsibilityReturned on Observed.EffectiveHostResponsibility
+  }
+
+  entry AdminViewNetworkTopology {
+    route GET "/api/v1/admin/topology/network"
+    auth bearer
+    actor_identity SecurityAnalyst.id from jwt.sub
+    status AdminNetworkTopologyReturned 200
+    outcome AdminNetworkTopologyReturned on Observed.NetworkSegment
+  }
+
+  entry AdminViewServiceTopology {
+    route GET "/api/v1/admin/topology/services"
+    auth bearer
+    actor_identity SecurityAnalyst.id from jwt.sub
+    status AdminServiceTopologyReturned 200
+    outcome AdminServiceTopologyReturned on Observed.ServiceEntity
+  }
+
+  entry AdminViewSoftwareVulnerabilities {
+    route GET "/api/v1/admin/vulnerabilities"
+    auth bearer
+    actor_identity SecurityAnalyst.id from jwt.sub
+    status AdminSoftwareVulnerabilitiesReturned 200
+    outcome AdminSoftwareVulnerabilitiesReturned on Security.SoftwareVulnerabilityFinding
   }
 }
