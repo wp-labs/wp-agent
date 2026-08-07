@@ -8,11 +8,11 @@ use axum::{
 };
 use serde::Deserialize;
 
-use crate::control::{
+use insight_control::{
     AdminAgentRuntimeStatusReturned, AdminPauseAgentDispatchReturned,
     AdminUpgradeAgentDispatchReturned,
 };
-use crate::control::types::{AgentRuntimeStatusView, DateTime, DispatchReceipt};
+use insight_control::types::{AgentRuntimeStatusView, DateTime, DispatchReceipt};
 
 use super::{admin_auth::require_admin_bearer, rate_limit, ApiState};
 

@@ -5,13 +5,12 @@ use axum::{
     Json,
 };
 
-use crate::control::{
+use insight_control::{
     ActionResultAccepted, AgentControlCommandsReturned, AgentHello, AgentStatusAccepted,
     PollControlCommands, ReportActionResult,
 };
-use crate::control::types::{
-    ActionResultReceipt, DateTime, MetricsHealthSnapshot, RuntimeHealthSnapshot,
-};
+use insight_control::types::{DateTime};
+use warp_insight_reporting::{ActionResultReceipt, HealthState, MetricsHealthSnapshot, RuntimeHealthSnapshot};
 use crate::infra::{
     new_secret_token, sha256_hex, AgentMetricSample, StoredAgentRegistration, StoredCredentialStatus,
 };
@@ -69,7 +68,7 @@ pub async fn submit_agent_status(
                 Json(AgentStatusAccepted {
                     snapshot: RuntimeHealthSnapshot {
                         running_count: 0,
-                        state: "healthy".to_string(),
+                        state: HealthState::Healthy,
                         queue_depth: 0,
                         metrics: MetricsHealthSnapshot {
                             sample_count: 0,

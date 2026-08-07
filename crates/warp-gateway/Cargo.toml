@@ -21,6 +21,8 @@ rustls = { version = "0.23", default-features = false, features = ["std", "ring"
 rustls-pki-types = "1"
 tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
 warp-insight-contracts = { path = "../warp-insight-contracts" }
+insight-control = { path = "../insight-control" }
+warp-insight-reporting = { path = "../warp-insight-reporting" }
 ring = "0.17"
 serde_json = "1"
 

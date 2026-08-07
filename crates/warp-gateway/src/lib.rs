@@ -3,8 +3,9 @@
 
 pub mod api;
 pub mod app;
-pub mod control;
-pub mod reporting;
 pub mod infra;
+
+pub use insight_control::*;
+pub use warp_insight_reporting::*;
 
 pub type AppError = Box<dyn std::error::Error + Send + Sync>;

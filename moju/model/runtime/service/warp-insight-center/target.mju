@@ -1,0 +1,13 @@
+// warp-insight 生成与部署目标
+// WarpInsightCenter 上级聚合控制中心服务：网关舰队监管、发布/升级、资产/责任/拓扑/漏洞治理。
+
+target<bin,http> warp-insight-center {
+  modules Control.WarpInsightCenter
+  modules Control.GatewaySupervision, Control.GatewayInstanceManagement
+  modules Control.PlatformRelease, Control.GateWayIdentity, Control.GateWayManagement
+  modules Control.AdminFacingInterface, Control.GateWayFacingInterface
+  modules Observed.HostInventory, Observed.HostInventoryQuery
+  modules Observed.HostResponsibility, Observed.HostResponsibilityService
+  modules Observed.NetworkTopology, Observed.ServiceTopology, Observed.TopologyQuery
+  modules Security.SoftwareVulnerability, Security.SoftwareVulnerabilityService
+}

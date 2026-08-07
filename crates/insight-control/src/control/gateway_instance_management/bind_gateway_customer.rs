@@ -1,0 +1,9 @@
+// @moju generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
+#[moju(kind = "message", role = "command", domain = "Control", module = "Control.GatewayInstanceManagement")]
+pub struct BindGatewayCustomer {
+    pub gateway_id: String,
+    pub customer_id: String,
+    pub requested_by: String,
+    pub requested_at: crate::DateTime,
+}

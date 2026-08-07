@@ -1,7 +1,7 @@
 // @moju generated
 // @moju hash=5cd0b68d5b14ca27
 
-use crate::control::AdminShowAgentRuntimeStatus;
+use insight_control::AdminShowAgentRuntimeStatus;
 
 #[derive(::moju_derive::MoJu)]
 #[moju(kind = "interface", domain = "Control", module = "Control.UserFacingInterface")]

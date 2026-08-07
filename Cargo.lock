@@ -577,6 +577,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "insight-control"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "moju-core",
+ "moju-derive 0.1.2",
+ "serde",
+ "warp-insight-observed",
+ "warp-insight-reporting",
+ "warp-insight-security",
+ "warp-insight-shared",
+]
+
+[[package]]
 name = "ipnet"
 version = "2.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1510,6 +1524,7 @@ dependencies = [
  "chrono",
  "hyper",
  "hyper-util",
+ "insight-control",
  "moju-core",
  "moju-derive 0.1.2",
  "ring",
@@ -1522,6 +1537,25 @@ dependencies = [
  "toml",
  "tower",
  "warp-insight-contracts",
+ "warp-insight-reporting",
+]
+
+[[package]]
+name = "warp-insight-center"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "chrono",
+ "insight-control",
+ "moju-core",
+ "moju-derive 0.1.2",
+ "serde",
+ "serde_json",
+ "tokio",
+ "warp-insight-contracts",
+ "warp-insight-observed",
+ "warp-insight-reporting",
+ "warp-insight-security",
 ]
 
 [[package]]
@@ -1530,13 +1564,6 @@ version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "warp-insight-control"
-version = "0.1.1"
-dependencies = [
- "warp-insight-contracts",
 ]
 
 [[package]]
@@ -1557,9 +1584,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "warp-insight-observed"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "moju-core",
+ "moju-derive 0.1.2",
+ "serde",
+ "warp-insight-shared",
+]
+
+[[package]]
+name = "warp-insight-reporting"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "moju-core",
+ "moju-derive 0.1.2",
+ "serde",
+ "warp-insight-shared",
+]
+
+[[package]]
+name = "warp-insight-security"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "moju-core",
+ "moju-derive 0.1.2",
+ "serde",
+ "warp-insight-shared",
+]
+
+[[package]]
 name = "warp-insight-shared"
 version = "0.1.1"
 dependencies = [
+ "chrono",
  "serde",
  "serde_json",
  "time",

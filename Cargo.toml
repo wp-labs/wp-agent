@@ -8,7 +8,11 @@ members = [
   "crates/warp-insight-exec",
   "crates/warp-insight-upgrader",
   "crates/warp-insight-gateway",
-  "crates/warp-insight-control",
+  "crates/insight-control",
+  "crates/warp-insight-center",
+  "crates/warp-insight-observed",
+  "crates/warp-insight-security",
+  "crates/warp-insight-reporting",
 ]
 resolver = "2"
 

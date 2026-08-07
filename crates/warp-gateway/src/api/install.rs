@@ -9,8 +9,8 @@ use axum::{
     Json,
 };
 
-use crate::control::AdminAgentInstallCodeReturned;
-use crate::control::types::{AgentBootstrapBundle, AgentInstallCode, DateTime};
+use insight_control::AdminAgentInstallCodeReturned;
+use insight_control::types::{AgentBootstrapBundle, AgentInstallCode, DateTime};
 use crate::infra::{
     bytes_sha256_hex, new_secret_token, sha256_hex, sign_install_script, AdminConfig, AdminStore,
     StoredEnrollmentToken, StoredEnrollmentTokenStatus,

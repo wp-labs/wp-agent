@@ -13,3 +13,11 @@ profile WebTs for warp-gateway-web.target<site,web> {
   scaffold dto, client, route
   path "crates/warp-gateway-web"
 }
+
+profile HttpRust for warp-insight-center.target<bin,http> {
+  language rust
+  runtime async
+  deps axum, tokio, serde
+  scaffold api, route, dto, handler
+  path "crates/warp-insight-center"
+}

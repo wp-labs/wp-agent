@@ -1,0 +1,19 @@
+[package]
+name = "insight-control"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+moju-core = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-core" }
+moju-derive = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-derive" }
+serde = { version = "1", features = ["derive"] }
+chrono = { version = "0.4", features = ["serde"] }
+warp-insight-shared = { path = "../warp-insight-shared" }
+warp-insight-observed = { path = "../warp-insight-observed" }
+warp-insight-security = { path = "../warp-insight-security" }
+warp-insight-reporting = { path = "../warp-insight-reporting" }
+
+[lib]
+path = "src/lib.rs"

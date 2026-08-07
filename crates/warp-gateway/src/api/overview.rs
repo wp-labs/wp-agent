@@ -8,7 +8,7 @@ use axum::{
 };
 use serde::Serialize;
 
-use crate::control::types::{AgentRuntimeStatusView, DateTime};
+use insight_control::types::{AgentRuntimeStatusView, DateTime};
 use crate::infra::{AgentMetricSample, StoredAgentRegistration};
 
 use super::admin_auth::require_admin_bearer;
