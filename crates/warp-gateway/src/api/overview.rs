@@ -16,7 +16,7 @@ use super::{rate_limit, AdminRuntimeState, ApiState};
 
 #[derive(Debug, Clone, Serialize, ::moju_derive::MoJu)]
 #[serde(rename_all = "camelCase")]
-#[moju(kind = "struct", domain = "Control", module = "Control.AgentStatus")]
+#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Status")]
 pub struct AgentOverviewMetrics {
     pub total_agents: i64,
     pub online_agents: i64,
@@ -26,7 +26,7 @@ pub struct AgentOverviewMetrics {
 
 #[derive(Debug, Clone, Serialize, ::moju_derive::MoJu)]
 #[serde(rename_all = "camelCase")]
-#[moju(kind = "struct", domain = "Control", module = "Control.AgentStatus")]
+#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Status")]
 pub struct RecentOnlineRegisteredAgent {
     pub agent_id: String,
     pub instance_id: String,
@@ -50,7 +50,7 @@ pub enum RecentOnlineRegisteredAgentSource {
 
 #[derive(Debug, Clone, Serialize, ::moju_derive::MoJu)]
 #[serde(rename_all = "camelCase")]
-#[moju(kind = "struct", domain = "Control", module = "Control.AgentStatus")]
+#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Status")]
 pub struct AgentOverview {
     pub metrics: AgentOverviewMetrics,
     pub recent_online_agents: Vec<RecentOnlineRegisteredAgent>,

@@ -4,7 +4,7 @@
 use insight_control::AdminGetAgentInstallCode;
 
 #[derive(::moju_derive::MoJu)]
-#[moju(kind = "interface", domain = "Control", module = "Control.UserFacingInterface")]
+#[moju(kind = "interface", domain = "Control", module = "Control.GatewayApp.UserFacingInterface")]
 pub struct WarpGateWayPublicInstallInterface;
 
 impl WarpGateWayPublicInstallInterface {

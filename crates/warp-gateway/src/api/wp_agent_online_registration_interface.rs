@@ -4,7 +4,7 @@
 use insight_control::SubmitEnrollmentRequest;
 
 #[derive(::moju_derive::MoJu)]
-#[moju(kind = "interface", domain = "Control", module = "Control.AgentFacingInterface")]
+#[moju(kind = "interface", domain = "Control", module = "Control.AgentApp.FacingInterface")]
 pub struct WpAgentOnlineRegistrationInterface;
 
 impl WpAgentOnlineRegistrationInterface {
