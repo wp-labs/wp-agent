@@ -1,39 +1,104 @@
-.wrapper {
-  width: 100%;
-  max-width: 1120px;
+.wrapper,
+.section,
+.empty {
+  width: min(100%, var(--wi-content-width));
   margin: 0 auto;
-  padding: 24px;
+  padding-right: 28px;
+  padding-left: 28px;
+}
+
+.wrapper {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  color: var(--wi-text);
+  font-size: 16px;
+  font-weight: 760;
+}
+
+.subtitle {
+  margin-top: 3px;
+  color: var(--wi-text-muted);
+  font-size: 12px;
+}
+
+.count {
+  padding: 4px 9px;
+  border: 1px solid var(--wi-border);
+  border-radius: 999px;
+  background: var(--wi-bg-panel);
+  color: var(--wi-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   align-items: stretch;
-  gap: 14px;
-  width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 24px;
+  gap: 12px;
 }
 
 .empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 48px 24px;
-  border: 1px dashed #c9d3e1;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.6);
+  gap: 7px;
+  padding-top: 56px;
+  padding-bottom: 56px;
+  border: 1px dashed var(--wi-border-strong);
+  border-radius: var(--wi-radius-lg);
+  background: color-mix(in srgb, var(--wi-bg-panel) 72%, transparent);
+}
+
+.empty::before {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--wi-border);
+  border-radius: 9px;
+  background: var(--wi-bg-muted);
+  content: "";
 }
 
 .emptyTitle {
-  color: #526073;
+  color: var(--wi-text-secondary);
   font-size: 14px;
   font-weight: 750;
 }
-
 .emptyHint {
-  color: #8a96a8;
+  color: var(--wi-text-muted);
   font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .wrapper,
+  .section,
+  .empty {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }

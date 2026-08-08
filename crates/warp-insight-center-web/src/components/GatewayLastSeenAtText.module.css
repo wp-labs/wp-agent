@@ -1,5 +1,5 @@
 .text {
-  color: #5f6f86;
+  color: var(--wi-text-secondary);
   font-size: 13px;
   white-space: nowrap;
 }

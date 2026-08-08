@@ -1,124 +1,178 @@
-.backLink {
-  display: inline-block;
-  margin-bottom: 16px;
-  color: #1f6feb;
-  text-decoration: none;
-  font-size: 14px;
+.backLink,
+.section {
+  width: min(100%, var(--wi-content-width));
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 28px;
+  padding-left: 28px;
 }
 
-.section {
-  margin-bottom: 20px;
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  outline: none;
+  color: var(--wi-primary);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--wi-primary-hover);
+}
+.backLink:focus-visible {
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px var(--wi-focus-ring);
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid #dbe3ee;
-  border-radius: 8px;
-  padding: 20px;
+  overflow: hidden;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-lg);
+  background: var(--wi-bg-panel);
+  box-shadow: var(--wi-shadow-sm);
 }
 
 .cardHeader {
-  margin-bottom: 16px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--wi-border);
+  background: linear-gradient(135deg, var(--wi-bg-muted), var(--wi-bg-panel));
 }
 
 .gatewayId {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1f2d3d;
+  color: var(--wi-text);
+  font-size: 23px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
 }
-
 .instanceId {
-  color: #5f6f86;
-  font-size: 14px;
-  margin-top: 4px;
+  margin-top: 5px;
+  color: var(--wi-text-secondary);
+  font-size: 13px;
 }
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 4px 0;
 }
 
 .metric {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
+  min-width: 0;
+  padding: 18px 20px;
+  border-right: 1px solid var(--wi-border);
 }
 
+.metric:last-child {
+  border-right: 0;
+}
 .metricLabel {
-  color: #718095;
-  font-size: 12px;
+  color: var(--wi-text-muted);
+  font-size: 11px;
+  font-weight: 650;
 }
-
 .metricValue {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f6feb;
+  color: var(--wi-primary);
+  font-size: 17px;
+  font-weight: 740;
 }
 
 .sectionHeader {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
 .sectionTitle {
-  font-size: 18px;
-  font-weight: 600;
+  color: var(--wi-text);
+  font-size: 16px;
+  font-weight: 760;
 }
-
 .sectionMeta {
-  color: #718095;
-  font-size: 13px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--wi-neutral-soft);
+  color: var(--wi-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .empty {
-  color: #718095;
-  padding: 20px;
-  background: #ffffff;
-  border: 1px solid #edf1f6;
-  border-radius: 8px;
+  padding: 34px 20px;
+  border: 1px dashed var(--wi-border-strong);
+  border-radius: var(--wi-radius-lg);
+  background: color-mix(in srgb, var(--wi-bg-panel) 75%, transparent);
+  color: var(--wi-text-muted);
+  font-size: 13px;
+  text-align: center;
 }
 
 .agentGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 12px;
 }
 
 .agentCard {
-  background: #ffffff;
-  border: 1px solid #dbe3ee;
-  border-radius: 8px;
-  padding: 14px;
+  padding: 16px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-md);
+  background: var(--wi-bg-panel);
+  box-shadow: var(--wi-shadow-sm);
 }
 
 .agentHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 13px;
 }
 
 .agentId {
-  font-weight: 600;
-  color: #1f2d3d;
   overflow-wrap: anywhere;
+  color: var(--wi-text);
+  font-weight: 700;
 }
-
 .agentMeta {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #5f6f86;
-  font-size: 13px;
+  color: var(--wi-text-secondary);
+  font-size: 12px;
+}
+.agentLastSeen {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--wi-border);
+  color: var(--wi-text-muted);
+  font-size: 11px;
 }
 
-.agentLastSeen {
-  margin-top: 8px;
-  color: #718095;
-  font-size: 12px;
+@media (max-width: 800px) {
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .metric {
+    border-bottom: 1px solid var(--wi-border);
+  }
+}
+
+@media (max-width: 640px) {
+  .backLink,
+  .section {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+  .agentGrid {
+    grid-template-columns: 1fr;
+  }
 }

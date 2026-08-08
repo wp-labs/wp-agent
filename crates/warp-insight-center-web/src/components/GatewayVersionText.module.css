@@ -1,5 +1,5 @@
 .version {
-  color: #26364d;
+  color: var(--wi-text);
   font-size: 13px;
   font-weight: 750;
   white-space: nowrap;

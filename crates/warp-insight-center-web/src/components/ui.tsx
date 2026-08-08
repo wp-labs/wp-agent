@@ -6,9 +6,6 @@ import type {
 import { GlobalTopNavigation } from "./GlobalTopNavigation";
 import styles from "./ui.module.css";
 
-// ── 设计系统原语：延续 warp-gateway-web 的管理台视觉 ──
-// 浅灰背景、白色卡片、#1f6feb 主色、圆角徽标。
-
 export function formatDateTime(value: string | Date): string {
   return new Intl.DateTimeFormat("zh-CN", {
     month: "2-digit",
@@ -34,6 +31,7 @@ export function formatRelativeTime(value: string | Date): string {
   return `${days} 天前`;
 }
 
+/** 提供控制中心页面共享的导航、标题层级和主内容布局。 */
 export function PageShell({
   title,
   summary,
@@ -47,15 +45,33 @@ export function PageShell({
     <div className={styles.pageShell}>
       <GlobalTopNavigation />
       <header className={styles.pageHeader}>
+        <div className={styles.pageEyebrow}>WarpInsight Control Plane</div>
         <h1 className={styles.pageTitle}>{title}</h1>
         <p className={styles.pageSummary}>{summary}</p>
       </header>
-      {children}
+      <main className={styles.pageMain}>{children}</main>
     </div>
   );
 }
 
 export type BadgeTone = "green" | "amber" | "red" | "gray" | "blue";
+
+const BADGE_TONE_CLASS: Record<BadgeTone, string> = {
+  green: styles.badgeGreen,
+  amber: styles.badgeAmber,
+  red: styles.badgeRed,
+  gray: styles.badgeGray,
+  blue: styles.badgeBlue,
+};
+
+type MetricTone = "accent" | "green" | "amber" | "red";
+
+const METRIC_TONE_CLASS: Record<MetricTone, string> = {
+  accent: styles.metricToneAccent,
+  green: styles.metricToneGreen,
+  amber: styles.metricToneAmber,
+  red: styles.metricToneRed,
+};
 
 export function Badge({
   tone,
@@ -65,7 +81,7 @@ export function Badge({
   children: ReactNode;
 }) {
   return (
-    <span className={`${styles.badge} ${styles[`badge${tone}`]}`}>
+    <span className={`${styles.badge} ${BADGE_TONE_CLASS[tone]}`}>
       {children}
     </span>
   );
@@ -98,9 +114,9 @@ export function MetricCard({
 }: {
   label: string;
   value: ReactNode;
-  tone?: "accent" | "green" | "amber" | "red";
+  tone?: MetricTone;
 }) {
-  const toneClass = tone ? styles[`metricTone${tone}`] : undefined;
+  const toneClass = tone ? METRIC_TONE_CLASS[tone] : undefined;
   return (
     <div className={styles.metric}>
       <div className={styles.metricLabel}>{label}</div>

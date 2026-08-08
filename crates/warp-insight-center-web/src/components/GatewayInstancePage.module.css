@@ -4,7 +4,15 @@
   align-items: start;
   gap: 16px;
   width: 100%;
-  max-width: 1120px;
+  max-width: var(--wi-content-width);
   margin: 0 auto;
-  padding: 8px 24px 0;
+  padding: 0 28px;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    padding-right: 18px;
+    padding-left: 18px;
+  }
 }
