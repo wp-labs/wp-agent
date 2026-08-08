@@ -31,9 +31,24 @@ module<interface> InsightCenterApp.AdminFacingInterface {
   owns AdminBindGatewayCustomer
   owns AdminGatewayCustomerBindingReturned
   owns AdminBindGatewayCustomerFlow
+  owns AdminQueryHostInventory
+  owns AdminHostInventoryReturned
+  owns AdminViewHostRuntimeState
+  owns AdminHostRuntimeStateReturned
+  owns AdminViewNetworkTopology
+  owns AdminNetworkTopologyReturned
+  owns AdminViewServiceTopology
+  owns AdminServiceTopologyReturned
+  owns AdminViewSoftwareVulnerabilities
+  owns AdminSoftwareVulnerabilitiesReturned
+  owns AdminViewEffectiveResponsibility
+  owns AdminEffectiveResponsibilityReturned
   provides WarpInsightCenterAdminInterface by protocol<http>
   depends Control.InsightCenterApp.WarpInsightCenter
   depends Control.Gateway.Supervision, Control.Gateway.InstanceManagement
+  depends Observed.HostInventory, Observed.HostResponsibility
+  depends Observed.NetworkTopology, Observed.ServiceTopology
+  depends Security.SoftwareVulnerability
   responsible_for "WarpInsightCenter 管理接口：作为管理员与自动化系统的 Application 层入口，承载网关列表/策略编排与网关实例管理。"
 }
 
@@ -101,6 +116,63 @@ message<command> AdminBindGatewayCustomer {
 
 message<response> AdminGatewayCustomerBindingReturned {
   binding: GatewayCustomerBinding
+}
+
+message<command> AdminQueryHostInventory {
+  tenant_id: String?
+  environment_id: String?
+  host_name: String?
+  requested_by: String
+}
+
+message<response> AdminHostInventoryReturned {
+  hosts: HostInventory[]
+}
+
+message<command> AdminViewHostRuntimeState {
+  host_id: String
+  requested_by: String
+}
+
+message<response> AdminHostRuntimeStateReturned {
+  runtime: HostRuntimeState
+}
+
+message<command> AdminViewNetworkTopology {
+  requested_by: String
+}
+
+message<response> AdminNetworkTopologyReturned {
+  segments: NetworkSegment[]
+}
+
+message<command> AdminViewServiceTopology {
+  business_id: String?
+  service_id: String?
+  requested_by: String
+}
+
+message<response> AdminServiceTopologyReturned {
+  services: ServiceEntity[]
+}
+
+message<command> AdminViewSoftwareVulnerabilities {
+  software_id: String?
+  host_id: String?
+  requested_by: String
+}
+
+message<response> AdminSoftwareVulnerabilitiesReturned {
+  findings: SoftwareVulnerabilityFinding[]
+}
+
+message<command> AdminViewEffectiveResponsibility {
+  host_id: String
+  requested_by: String
+}
+
+message<response> AdminEffectiveResponsibilityReturned {
+  responsibility: EffectiveHostResponsibility
 }
 
 // ── 接口 ──

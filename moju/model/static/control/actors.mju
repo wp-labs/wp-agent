@@ -116,3 +116,15 @@ actor PlatformMaintenanceEngineer {
   can CreateUpgradePlan
   can AdminDispatchGlobalPolicy
 }
+
+actor PublicInstallClient {
+  meta {
+    label zh "公开安装客户端"
+    label en "Public Install Client"
+    summary zh "通过 WarpGateWay 公开安装入口进行引导接入的客户端。"
+    tag "install"
+    tag "client"
+  }
+
+  access protocol<http>
+}
