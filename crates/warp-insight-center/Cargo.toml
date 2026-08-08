@@ -10,12 +10,17 @@ edition = "2021"
 moju-core = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-core" }
 moju-derive = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-derive" }
 axum = "0.7"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net"] }
 serde = { version = "1", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 serde_json = "1"
+ring = "0.17"
 warp-insight-contracts = { path = "../warp-insight-contracts" }
 insight-control = { path = "../insight-control" }
 warp-insight-observed = { path = "../warp-insight-observed" }
 warp-insight-security = { path = "../warp-insight-security" }
 warp-insight-reporting = { path = "../warp-insight-reporting" }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"

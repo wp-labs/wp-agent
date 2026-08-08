@@ -1,0 +1,14 @@
+module<ui> InsightCenterApp.InsightCenterWeb {
+  meta {
+    label zh "全局控制中心前端 WEB"
+    label en "WarpInsightCenter Web Frontend"
+    summary zh "WarpInsightCenter 的浏览器端 WEB 前端，承载资产总览、网络拓扑、服务拓扑与软件漏洞视图，供安全分析师与全局操作者使用。"
+    tag "center"
+    tag "web"
+    tag "frontend"
+  }
+
+  layer Application
+  depends Control.InsightCenterApp.AdminFacingInterface
+  responsible_for "WarpInsightCenter 前端 WEB：主机资产目录与运行状态、有效责任、网络与服务拓扑、软件漏洞视图等查询入口，通过管理接口消费。"
+}

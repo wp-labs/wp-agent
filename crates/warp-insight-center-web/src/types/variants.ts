@@ -1,0 +1,1 @@
+// No variant types defined

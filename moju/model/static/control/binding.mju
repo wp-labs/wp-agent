@@ -128,12 +128,12 @@ bind WarpInsightCenterGatewayInterface {
 }
 
 bind WarpInsightCenterAdminInterface {
-  entry AdminViewGatewayFleet {
-    route GET "/api/v1/admin/gateways/fleet"
+  entry AdminViewGatewayList {
+    route GET "/api/v1/admin/gateways"
     auth bearer
     actor_identity GatewayOperator.id from jwt.sub
-    status AdminGatewayFleetReturned 200
-    outcome AdminGatewayFleetReturned on GatewayFleetView
+    status AdminGatewayListReturned 200
+    outcome AdminGatewayListReturned on GatewayListView
   }
 
   entry AdminDispatchGlobalPolicy {
@@ -152,6 +152,14 @@ bind WarpInsightCenterAdminInterface {
     outcome AdminGatewayStatusReturned on GatewayStatusView
   }
 
+  entry AdminListGatewayStatus {
+    route GET "/api/v1/admin/gateways/status"
+    auth bearer
+    actor_identity CustomerServiceEngineer.id from jwt.sub
+    status AdminGatewayStatusListReturned 200
+    outcome AdminGatewayStatusListReturned on GatewayStatusView
+  }
+
   entry AdminCreateGatewayInstance {
     route POST "/api/v1/admin/gateways"
     auth bearer
@@ -166,53 +174,5 @@ bind WarpInsightCenterAdminInterface {
     actor_identity CustomerServiceEngineer.id from jwt.sub
     status AdminGatewayCustomerBindingReturned 200
     outcome AdminGatewayCustomerBindingReturned on GatewayCustomerBinding
-  }
-
-  entry AdminQueryHostInventory {
-    route GET "/api/v1/admin/hosts/inventory"
-    auth bearer
-    actor_identity SecurityAnalyst.id from jwt.sub
-    status AdminHostInventoryReturned 200
-    outcome AdminHostInventoryReturned on Observed.HostInventory
-  }
-
-  entry AdminViewHostRuntimeState {
-    route GET "/api/v1/admin/hosts/{host_id}/runtime-state"
-    auth bearer
-    actor_identity SecurityAnalyst.id from jwt.sub
-    status AdminHostRuntimeStateReturned 200
-    outcome AdminHostRuntimeStateReturned on Observed.HostRuntimeState
-  }
-
-  entry AdminViewEffectiveResponsibility {
-    route GET "/api/v1/admin/hosts/{host_id}/responsibility"
-    auth bearer
-    actor_identity SecurityAnalyst.id from jwt.sub
-    status AdminEffectiveResponsibilityReturned 200
-    outcome AdminEffectiveResponsibilityReturned on Observed.EffectiveHostResponsibility
-  }
-
-  entry AdminViewNetworkTopology {
-    route GET "/api/v1/admin/topology/network"
-    auth bearer
-    actor_identity SecurityAnalyst.id from jwt.sub
-    status AdminNetworkTopologyReturned 200
-    outcome AdminNetworkTopologyReturned on Observed.NetworkSegment
-  }
-
-  entry AdminViewServiceTopology {
-    route GET "/api/v1/admin/topology/services"
-    auth bearer
-    actor_identity SecurityAnalyst.id from jwt.sub
-    status AdminServiceTopologyReturned 200
-    outcome AdminServiceTopologyReturned on Observed.ServiceEntity
-  }
-
-  entry AdminViewSoftwareVulnerabilities {
-    route GET "/api/v1/admin/vulnerabilities"
-    auth bearer
-    actor_identity SecurityAnalyst.id from jwt.sub
-    status AdminSoftwareVulnerabilitiesReturned 200
-    outcome AdminSoftwareVulnerabilitiesReturned on Security.SoftwareVulnerabilityFinding
   }
 }

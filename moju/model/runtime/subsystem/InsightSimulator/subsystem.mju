@@ -1,0 +1,22 @@
+// 系统分解：顶层子系统边界
+
+// InsightSimulator — 开发/联调仿真器
+// 可扮演 WarpGateWay（网关）或 WpAgent（Agentd）角色，向各自上层节点发送数据：
+// 网关角色连 WarpInsightCenter 上报状态并拉取初始配置；Agentd 角色连 WarpGateWay
+// 上报 Agent 状态与动作结果。非部署组件，不入 warp-insight-managed 平台 target。
+
+subsystem InsightSimulator {
+  meta {
+    label zh "Insight 仿真器"
+    label en "Insight Simulator"
+    summary zh "用于开发与联调的仿真器，可扮演 WarpGateWay（网关）或 WpAgent（Agentd）角色，向各自上层节点发送数据：网关角色向 WarpInsightCenter 上报状态并拉取初始配置，Agentd 角色向 WarpGateWay 上报 Agent 状态与动作结果。"
+    tag "dev"
+    tag "simulator"
+    tag "testing"
+  }
+
+  uses module Control.GatewayApp.FacingInterface
+  uses module Control.AgentApp.FacingInterface
+  uses module Control.Protocol
+  uses module Reporting.Protocol
+}

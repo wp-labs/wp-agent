@@ -1,13 +1,18 @@
 // WarpInsightCenter WEB Layout index
 //
-// 全局控制中心轻量布局：顶部导航 + 资产/安全治理四个页面。
-// 页面内部与可复用区域可后续按页拆到 ./layout/*.mju。
+// 每页只实现一个目标：
+// - GatewayListPage      查看网关列表状态（ViewGatewayStatus）
+// - GatewayInstancePage   网关实例管理（CreateGatewayInstance / BindGatewayCustomer）
+// - GatewayConfigPage     网关初始配置查询（GetInitialConfig）
+// - ReleasePage           版本发布（PublishWarpAgentd / PublishWarpGateWay）
+// - UpgradePlanPage       升级计划管理（CreateUpgradePlan / ApproveUpgradePlan）
+// ReceiveGatewayStatusReport 为系统上报（WarpGateway 后台），喂给状态展示，无独立页面。
 
 region GlobalTopNavigation {
   meta {
     label zh "顶部导航"
     label en "Top Navigation"
-    summary zh "WarpInsightCenter 的顶部导航区，作为四个独立页面共享的页面级导航，提供资产、网络拓扑、服务拓扑和漏洞入口。"
+    summary zh "WarpInsightCenter 的顶部导航区，作为各页面共享的页面级导航，提供网关列表、网关实例、配置、发布与升级计划入口。"
     tag "center"
     tag "navigation"
     tag "top-navigation"
@@ -17,144 +22,287 @@ region GlobalTopNavigation {
   orientation horizontal
 }
 
-region<page> AssetOverviewPage {
+// ── 目标 1：查看网关列表状态 ──
+
+region<page> GatewayListPage {
   meta {
-    label zh "资产总览"
-    label en "Asset Overview"
-    summary zh "WarpInsightCenter 的资产总览页，展示主机资产目录、运行状态与有效责任。"
+    label zh "网关列表"
+    label en "Gateway List"
+    summary zh "查看各 WarpGateWay 实例的在线状态、版本、健康状态与最后上报时间。"
     tag "center"
-    tag "asset"
+    tag "gateway"
+    tag "list"
     tag "page"
   }
 
   orientation vertical
   contains GlobalTopNavigation
-  contains HostHostInventoryQuery { slot_usecase: QueryHostInventory }
-  contains HostRuntimeStateView { slot_usecase: ViewHostRuntimeState }
-  contains EffectiveResponsibilityView { slot_usecase: ViewEffectiveHostResponsibility }
+  contains GatewayStatusList { slot_usecase: ViewGatewayStatus }
   layout fill_remaining
 }
 
-region<section> HostHostInventoryQuery {
+region<section> GatewayStatusList {
   meta {
-    label zh "主机资产查询"
-    label en "Host HostInventory Query"
-    summary zh "按租户、环境或主机名查询主机资产目录的查询区域。"
+    label zh "网关列表状态列表"
+    label en "Gateway List Status List"
+    summary zh "按卡片展示各 WarpGateWay 实例的状态摘要。"
     tag "center"
-    tag "asset"
-    tag "query"
+    tag "gateway"
+    tag "status"
+    tag "list"
   }
 
   orientation vertical
+  repeat GatewayStatusCard for gateway in GatewayStatusView
+  layout scrollable
 }
 
-region<section> HostRuntimeStateView {
+region<section> GatewayStatusCard {
   meta {
-    label zh "主机运行状态"
-    label en "Host Runtime State View"
-    summary zh "展示指定主机当前运行态快照的区域。"
+    label zh "网关状态卡片"
+    label en "Gateway Status Card"
+    summary zh "单个 WarpGateWay 实例的状态摘要卡片。"
     tag "center"
-    tag "asset"
-    tag "runtime-state"
-  }
-
-  orientation vertical
-}
-
-region<section> EffectiveResponsibilityView {
-  meta {
-    label zh "有效责任"
-    label en "Effective HostResponsibility View"
-    summary zh "展示主机有效责任主体（owner/maintainer/oncall/security_owner）及其来源的区域。"
-    tag "center"
-    tag "responsibility"
-  }
-
-  orientation vertical
-}
-
-region<page> NetworkTopologyPage {
-  meta {
-    label zh "网络拓扑"
-    label en "Network Topology"
-    summary zh "WarpInsightCenter 的网络拓扑页，展示 host / pod / network 的挂接关系。"
-    tag "center"
-    tag "topology"
-    tag "page"
-  }
-
-  orientation vertical
-  contains GlobalTopNavigation
-  contains NetworkTopologyView { slot_usecase: ViewNetworkTopology }
-  layout fill_remaining
-}
-
-region<section> NetworkTopologyView {
-  meta {
-    label zh "网络拓扑视图"
-    label en "Network Topology View"
-    summary zh "展示主机、pod 与网络段挂接关系的拓扑区域。"
-    tag "center"
-    tag "topology"
-    tag "network"
+    tag "gateway"
+    tag "status"
+    tag "card"
   }
 
   orientation grid
+  contains GatewayInstanceText { area: gateway_instance_text, row: 1, col: 1, width: 100%, slot_field: instance_id }
+  contains GatewayVersionText { area: gateway_version_text, row: 2, col: 1, width: 50%, slot_field: version }
+  contains GatewayOnlineStatusBadge { area: gateway_online_status_badge, row: 3, col: 1, width: 50%, slot_field: status }
+  contains GatewayHealthBadge { area: gateway_health_badge, row: 4, col: 1, width: 50%, slot_field: health }
+  contains GatewayLastSeenAtText { area: gateway_last_seen_at_text, row: 5, col: 1, width: 100%, slot_field: last_seen_at }
 }
 
-region<page> ServiceTopologyPage {
+// ── 目标 2：网关实例管理（创建与绑定客户） ──
+
+region<page> GatewayInstancePage {
   meta {
-    label zh "服务拓扑"
-    label en "Service Topology"
-    summary zh "WarpInsightCenter 的服务拓扑页，展示业务、系统、服务及其依赖与实例分布。"
+    label zh "网关实例管理"
+    label en "Gateway Instance Management"
+    summary zh "创建 GateWay 管理实例并为实例绑定客户 ID。"
     tag "center"
-    tag "topology"
-    tag "service"
+    tag "gateway"
+    tag "instance"
+    tag "provisioning"
     tag "page"
   }
 
   orientation vertical
   contains GlobalTopNavigation
-  contains ServiceTopologyView { slot_usecase: ViewServiceTopology }
+  contains GatewayInstanceCreatePanel { slot_usecase: CreateGatewayInstance }
+  contains GatewayCustomerBindPanel { slot_usecase: BindGatewayCustomer }
   layout fill_remaining
 }
 
-region<section> ServiceTopologyView {
+region<section> GatewayInstanceCreatePanel {
   meta {
-    label zh "服务拓扑视图"
-    label en "Service Topology View"
-    summary zh "展示业务、系统、服务及其依赖、入口与实例分布的拓扑区域。"
+    label zh "创建网关实例"
+    label en "Create Gateway Instance"
+    summary zh "客户服务工程师创建 GateWay 管理实例的入口。"
     tag "center"
-    tag "topology"
-    tag "service"
+    tag "gateway"
+    tag "provisioning"
   }
 
-  orientation grid
+  orientation vertical
 }
 
-region<page> VulnerabilityPage {
+region<section> GatewayCustomerBindPanel {
   meta {
-    label zh "漏洞"
-    label en "SoftwareVulnerability"
-    summary zh "WarpInsightCenter 的漏洞页，展示软件漏洞发现与整改跟进。"
+    label zh "绑定客户"
+    label en "Bind Gateway Customer"
+    summary zh "客户服务工程师为 GateWay 管理实例绑定客户 ID 的入口。"
     tag "center"
-    tag "vulnerability"
+    tag "gateway"
+    tag "customer"
+  }
+
+  orientation vertical
+}
+
+// ── 目标 3：网关初始配置查询 ──
+
+region<page> GatewayConfigPage {
+  meta {
+    label zh "网关初始配置"
+    label en "Gateway Initial Config"
+    summary zh "查看指定 WarpGateWay 实例的初始配置信息（控制中心地址、策略版本、遥测输出）。"
+    tag "center"
+    tag "gateway"
+    tag "config"
     tag "page"
   }
 
   orientation vertical
   contains GlobalTopNavigation
-  contains SoftwareVulnerabilityView { slot_usecase: ViewSoftwareVulnerabilities }
+  contains GatewayInitialConfigPanel { slot_usecase: GetInitialConfig }
   layout fill_remaining
 }
 
-region<section> SoftwareVulnerabilityView {
+region<section> GatewayInitialConfigPanel {
   meta {
-    label zh "软件漏洞视图"
-    label en "Software SoftwareVulnerability View"
-    summary zh "展示软件漏洞发现列表与整改跟进状态的区域。"
+    label zh "初始配置详情"
+    label en "Gateway Initial Config Detail"
+    summary zh "展示网关初始配置：控制中心地址、策略版本与遥测输出。"
     tag "center"
-    tag "vulnerability"
+    tag "gateway"
+    tag "config"
+  }
+
+  orientation vertical
+}
+
+// ── 目标 4：版本发布 ──
+
+region<page> ReleasePage {
+  meta {
+    label zh "版本发布"
+    label en "Release"
+    summary zh "发布 WarpAgentd / WarpGateWay 新版本，供各 WarpGateWay 实例或管理实例升级。"
+    tag "center"
+    tag "release"
+    tag "page"
+  }
+
+  orientation vertical
+  contains GlobalTopNavigation
+  contains WarpAgentdReleasePanel { slot_usecase: PublishWarpAgentd }
+  contains WarpGateWayReleasePanel { slot_usecase: PublishWarpGateWay }
+  layout fill_remaining
+}
+
+region<section> WarpAgentdReleasePanel {
+  meta {
+    label zh "WarpAgentd 发布"
+    label en "Publish WarpAgentd"
+    summary zh "平台维护工程师发布 WarpAgentd 新版本。"
+    tag "center"
+    tag "release"
+    tag "warp-agentd"
+  }
+
+  orientation vertical
+}
+
+region<section> WarpGateWayReleasePanel {
+  meta {
+    label zh "WarpGateWay 发布"
+    label en "Publish WarpGateWay"
+    summary zh "平台维护工程师发布 WarpGateWay 新版本。"
+    tag "center"
+    tag "release"
+    tag "warp-gateway"
+  }
+
+  orientation vertical
+}
+
+// ── 目标 5：升级计划管理（创建与批准） ──
+
+region<page> UpgradePlanPage {
+  meta {
+    label zh "升级计划"
+    label en "Upgrade Plan"
+    summary zh "创建与批准 WarpAgentd / WarpGateWay 升级计划。"
+    tag "center"
+    tag "release"
+    tag "upgrade"
+    tag "page"
+  }
+
+  orientation vertical
+  contains GlobalTopNavigation
+  contains UpgradePlanCreatePanel { slot_usecase: CreateUpgradePlan }
+  contains UpgradePlanApprovePanel { slot_usecase: ApproveUpgradePlan }
+  layout fill_remaining
+}
+
+region<section> UpgradePlanCreatePanel {
+  meta {
+    label zh "创建升级计划"
+    label en "Create Upgrade Plan"
+    summary zh "平台维护工程师创建升级计划，指定目标组件、目标版本与升级范围。"
+    tag "center"
+    tag "release"
+    tag "upgrade"
+  }
+
+  orientation vertical
+}
+
+region<section> UpgradePlanApprovePanel {
+  meta {
+    label zh "批准升级计划"
+    label en "Approve Upgrade Plan"
+    summary zh "客户服务工程师批准升级计划。"
+    tag "center"
+    tag "release"
+    tag "upgrade"
+  }
+
+  orientation vertical
+}
+
+// ── 卡片输出区域 ──
+
+region GatewayInstanceText {
+  meta {
+    label zh "网关实例"
+    label en "Gateway Instance"
+    summary zh "展示网关实例 ID。"
+    tag "center"
+    tag "output"
+  }
+
+  orientation vertical
+}
+
+region GatewayVersionText {
+  meta {
+    label zh "网关版本"
+    label en "Gateway Version"
+    summary zh "展示网关运行版本。"
+    tag "center"
+    tag "output"
+  }
+
+  orientation vertical
+}
+
+region GatewayOnlineStatusBadge {
+  meta {
+    label zh "在线状态"
+    label en "Gateway Online Status"
+    summary zh "展示网关在线状态徽标。"
+    tag "center"
+    tag "output"
+  }
+
+  orientation vertical
+}
+
+region GatewayHealthBadge {
+  meta {
+    label zh "健康状态"
+    label en "Gateway Health"
+    summary zh "展示网关健康状态徽标。"
+    tag "center"
+    tag "output"
+  }
+
+  orientation vertical
+}
+
+region GatewayLastSeenAtText {
+  meta {
+    label zh "最后上报时间"
+    label en "Last Seen At"
+    summary zh "展示网关最后上报时间。"
+    tag "center"
+    tag "output"
   }
 
   orientation vertical

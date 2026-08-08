@@ -16,16 +16,13 @@ subsystem WarpInsightCenter {
     tag "global"
   }
 
-  uses module Control.AgentRegistry, Control.Protocol
-  uses module Control.AgentStatus, Control.AgentCommand
-  uses module Control.GatewaySupervision, Control.GatewayInstanceManagement
-  uses module Control.GateWayIdentity
-  uses module Control.PlatformRelease
-  uses module Observed.HostInventory, Observed.HostInventoryQuery, Observed.HostResponsibility, Observed.HostResponsibilityService
-  uses module Observed.NetworkTopology, Observed.ServiceTopology, Observed.TopologyQuery
-  uses module Security.SoftwareVulnerability, Security.SoftwareVulnerabilityService
-  uses module Control.InsightCenterWeb
-  uses module Control.GateWayFacingInterface
-  uses module Control.AdminFacingInterface
-  uses module Control.WarpInsightCenter
+  uses module Control.Agent.Registry, Control.Protocol
+  uses module Control.Agent.Status, Control.Agent.Command
+  uses module Control.Gateway.Supervision, Control.Gateway.InstanceManagement
+  uses module Control.Gateway.Identity
+  uses module Control.InsightCenter.PlatformRelease
+  uses module Control.InsightCenterApp.InsightCenterWeb
+  uses module Control.GatewayApp.FacingInterface
+  uses module Control.InsightCenterApp.AdminFacingInterface
+  uses module Control.InsightCenterApp.WarpInsightCenter
 }

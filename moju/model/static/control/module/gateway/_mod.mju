@@ -1,0 +1,15 @@
+// Control.Gateway 有界上下文包：WarpGateWay 控制平台自身。
+// 承载网关自管、应用编排、前端 WEB 与用户侧接口。
+
+module<package> Gateway {
+  meta {
+    label zh "网关自管"
+    label en "Gateway"
+    summary zh "WarpGateWay 控制平台自身的职责边界：网关自管、应用编排、前端 WEB 与用户侧接口。"
+    tag "control"
+    tag "gateway"
+    tag "package"
+  }
+
+  layer Domain
+}

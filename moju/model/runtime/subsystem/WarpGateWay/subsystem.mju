@@ -7,11 +7,11 @@ subsystem WarpGateWay {
     tag "control-plane"
   }
 
-  uses module Control.GateWayWebFrontend
-  uses module Control.UserFacingInterface, Control.AgentFacingInterface
-  uses module Control.AgentEnrollment, Control.AgentRegistration, Control.AgentIdentity, Control.AgentCredential, Control.AgentStatus
-  uses module Control.AgentCommand
-  uses module Control.Protocol, Control.AgentRegistry, Control.AgentStatus
-  uses module Control.GateWayManagement, Control.GateWayManagement
-  uses module Control.GateWayApplication
+  uses module Control.GatewayApp.WebFrontend
+  uses module Control.GatewayApp.UserFacingInterface, Control.AgentApp.FacingInterface
+  uses module Control.Agent.Enrollment, Control.Agent.Registration, Control.Agent.Identity, Control.Agent.Credential, Control.Agent.Status
+  uses module Control.Agent.Command
+  uses module Control.Protocol, Control.Agent.Registry, Control.Agent.Status
+  uses module Control.Gateway.Management, Control.Gateway.Management
+  uses module Control.GatewayApp.Application
 }

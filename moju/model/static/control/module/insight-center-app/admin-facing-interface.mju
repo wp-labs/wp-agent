@@ -1,0 +1,205 @@
+module<interface> InsightCenterApp.AdminFacingInterface {
+  meta {
+    label zh "全局控制中心管理接口"
+    label en "WarpInsightCenter Admin Facing Interface"
+    summary zh "WarpInsightCenter 面向管理员暴露的 HTTP 管理接口，承载网关列表/策略编排与网关实例管理。"
+    tag "center"
+    tag "admin-facing"
+    tag "management"
+    tag "backend"
+    tag "http"
+    tag "interface"
+  }
+
+  layer Application
+  owns WarpInsightCenterAdminInterface
+  owns AdminViewGatewayList
+  owns AdminGatewayListReturned
+  owns AdminViewGatewayListFlow
+  owns AdminDispatchGlobalPolicy
+  owns AdminGlobalPolicyDispatchReturned
+  owns AdminDispatchGlobalPolicyFlow
+  owns AdminShowGatewayStatus
+  owns AdminGatewayStatusReturned
+  owns AdminShowGatewayStatusFlow
+  owns AdminListGatewayStatus
+  owns AdminGatewayStatusListReturned
+  owns AdminListGatewayStatusFlow
+  owns AdminCreateGatewayInstance
+  owns AdminGatewayInstanceReturned
+  owns AdminCreateGatewayInstanceFlow
+  owns AdminBindGatewayCustomer
+  owns AdminGatewayCustomerBindingReturned
+  owns AdminBindGatewayCustomerFlow
+  provides WarpInsightCenterAdminInterface by protocol<http>
+  depends Control.InsightCenterApp.WarpInsightCenter
+  depends Control.Gateway.Supervision, Control.Gateway.InstanceManagement
+  responsible_for "WarpInsightCenter 管理接口：作为管理员与自动化系统的 Application 层入口，承载网关列表/策略编排与网关实例管理。"
+}
+
+// Module: AdminFacingInterface — 全局控制中心管理接口（forAdmin）
+//
+// WarpInsightCenter 面向管理员的 HTTP 管理接口，与面向 WarpGateWay 实例的
+// GateWayFacingInterface（forGateway）拆分。承载网关列表/策略编排与网关实例管理。
+// 请求/响应为 wire 契约（Admin 前缀），组合中心各 Domain/Application 模块事实。
+
+// ── 列表/策略编排 ──
+
+message<command> AdminViewGatewayList {
+  requested_by: String
+}
+
+message<response> AdminGatewayListReturned {
+  list: GatewayListView
+}
+
+message<command> AdminDispatchGlobalPolicy {
+  policy_version: String
+  gateway_ids: List<String>
+  requested_by: String
+}
+
+message<response> AdminGlobalPolicyDispatchReturned {
+  dispatch: GlobalPolicyDispatch
+}
+
+// ── 网关实例管理 ──
+
+message<command> AdminShowGatewayStatus {
+  gateway_id: String
+  requested_by: String
+}
+
+message<response> AdminGatewayStatusReturned {
+  status: GatewayStatusView
+}
+
+// 状态卡片列表（喂前端网关列表页卡片栅格，代码实现对应 GET /api/v1/admin/gateways/status）
+
+message<command> AdminListGatewayStatus {
+  requested_by: String
+}
+
+message<response> AdminGatewayStatusListReturned {
+  statuses: List<GatewayStatusView>
+}
+
+message<command> AdminCreateGatewayInstance {
+  gateway_name: String
+  requested_by: String
+}
+
+message<response> AdminGatewayInstanceReturned {
+  instance: GatewayInstance
+}
+
+message<command> AdminBindGatewayCustomer {
+  gateway_id: String
+  customer_id: String
+  requested_by: String
+}
+
+message<response> AdminGatewayCustomerBindingReturned {
+  binding: GatewayCustomerBinding
+}
+
+// ── 接口 ──
+
+interface WarpInsightCenterAdminInterface {
+  meta {
+    label zh "WarpInsightCenter 管理接口"
+    label en "WarpInsightCenter Admin Interface"
+    summary zh "面向管理员的 WarpInsightCenter 管理接口，承载网关列表/策略编排与网关实例管理。"
+    tag "center"
+    tag "admin-facing"
+    tag "management"
+    tag "http"
+    tag "interface"
+  }
+
+  entry AdminViewGatewayList {
+    actor GatewayOperator
+    output AdminGatewayListReturned
+    calls AdminViewGatewayListFlow
+  }
+
+  entry AdminDispatchGlobalPolicy {
+    actor PlatformMaintenanceEngineer
+    output AdminGlobalPolicyDispatchReturned
+    calls AdminDispatchGlobalPolicyFlow
+  }
+
+  entry AdminShowGatewayStatus {
+    actor CustomerServiceEngineer
+    output AdminGatewayStatusReturned
+    calls AdminShowGatewayStatusFlow
+  }
+
+  entry AdminListGatewayStatus {
+    actor CustomerServiceEngineer
+    output AdminGatewayStatusListReturned
+    calls AdminListGatewayStatusFlow
+  }
+
+  entry AdminCreateGatewayInstance {
+    actor CustomerServiceEngineer
+    output AdminGatewayInstanceReturned
+    calls AdminCreateGatewayInstanceFlow
+  }
+
+  entry AdminBindGatewayCustomer {
+    actor CustomerServiceEngineer
+    output AdminGatewayCustomerBindingReturned
+    calls AdminBindGatewayCustomerFlow
+  }
+}
+
+// ── 编排流程 ──
+
+flow AdminViewGatewayListFlow {
+  actor GatewayOperator
+  trigger AdminViewGatewayList
+
+  step ViewList {
+  }
+}
+
+flow AdminDispatchGlobalPolicyFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminDispatchGlobalPolicy
+
+  step DispatchPolicy {
+  }
+}
+
+flow AdminShowGatewayStatusFlow {
+  actor CustomerServiceEngineer
+  trigger AdminShowGatewayStatus
+
+  step ShowStatus {
+  }
+}
+
+flow AdminListGatewayStatusFlow {
+  actor CustomerServiceEngineer
+  trigger AdminListGatewayStatus
+
+  step ListStatus {
+  }
+}
+
+flow AdminCreateGatewayInstanceFlow {
+  actor CustomerServiceEngineer
+  trigger AdminCreateGatewayInstance
+
+  step CreateInstance {
+  }
+}
+
+flow AdminBindGatewayCustomerFlow {
+  actor CustomerServiceEngineer
+  trigger AdminBindGatewayCustomer
+
+  step BindCustomer {
+  }
+}

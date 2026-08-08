@@ -1,0 +1,53 @@
+module<entity> Gateway.Identity {
+  meta {
+    label zh "GateWay 身份"
+    label en "GateWay Identity"
+    summary zh "负责 WarpGateWay 实例接入 WarpInsightCenter 后的稳定身份与身份状态实体。"
+    tag "control"
+    tag "gateway"
+    tag "identity"
+  }
+
+  layer Domain
+  owns GateWayIdentity
+  owns GateWayIdentityStatus
+  responsible_for "GateWay 身份实体：gateway_id、实例、租户/环境/节点绑定与身份状态；对中心的接入由 GatewaySupervision 表达。"
+}
+
+// Module: GateWayIdentity — WarpGateWay 身份与凭据生命周期
+// 对应 AgentIdentity：WarpGateWay 实例接入 WarpInsightCenter 后的稳定身份。
+// 身份实体事实；续期、校验命令与流程由后续逻辑模块承载。
+
+struct GateWayIdentity {
+  meta {
+    label zh "GateWay 身份"
+    label en "GateWay Identity"
+    summary zh "WarpGateWay 实例接入 WarpInsightCenter 后的稳定身份，绑定租户、环境、节点与身份状态。"
+    tag "gateway"
+    tag "identity"
+  }
+
+  unique gateway_id: String
+  instance_id: String
+  tenant_id: String
+  environment_id: String
+  node_id: String
+  issued_at: DateTime
+  expires_at: DateTime
+  status: GateWayIdentityStatus
+}
+
+variant GateWayIdentityStatus {
+  meta {
+    label zh "GateWay 身份状态"
+    label en "GateWay Identity Status"
+    summary zh "描述 WarpGateWay 身份是否有效、吊销、过期或待续期。"
+    tag "gateway"
+    tag "identity"
+  }
+
+  Active
+  Revoked
+  Expired
+  RenewalRequired
+}

@@ -13,6 +13,7 @@ members = [
   "crates/warp-insight-observed",
   "crates/warp-insight-security",
   "crates/warp-insight-reporting",
+  "crates/insight-simulator",
 ]
 resolver = "2"
 

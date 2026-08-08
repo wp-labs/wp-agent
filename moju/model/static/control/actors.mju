@@ -75,7 +75,7 @@ actor GatewayOperator {
 
   access protocol<http>
   can ShowGatewayStatus
-  can AdminViewGatewayFleet
+  can AdminViewGatewayList
 }
 
 actor CustomerServiceEngineer {
@@ -95,6 +95,7 @@ actor CustomerServiceEngineer {
   can ShowGatewayStatus
   can ApproveUpgradePlan
   can AdminShowGatewayStatus
+  can AdminListGatewayStatus
   can AdminCreateGatewayInstance
   can AdminBindGatewayCustomer
 }
@@ -114,57 +115,4 @@ actor PlatformMaintenanceEngineer {
   can PublishWarpGateWay
   can CreateUpgradePlan
   can AdminDispatchGlobalPolicy
-}
-
-actor SecurityAnalyst {
-  meta {
-    label zh "安全分析工程师"
-    label en "Security Analyst"
-    summary zh "负责在 WarpInsightCenter 查看主机资产目录与运行状态、主机责任归属、网络与服务拓扑以及软件漏洞发现，用于安全分析与整改跟进。"
-    tag "ops"
-    tag "security"
-    tag "center"
-  }
-
-  access protocol<http>
-  can Observed.QueryHostInventory
-  can Observed.ViewHostRuntimeState
-  can Observed.ViewEffectiveHostResponsibility
-  can Observed.ViewNetworkTopology
-  can Observed.ViewServiceTopology
-  can Security.ViewSoftwareVulnerabilities
-  can AdminQueryHostInventory
-  can AdminViewHostRuntimeState
-  can AdminViewEffectiveResponsibility
-  can AdminViewNetworkTopology
-  can AdminViewServiceTopology
-  can AdminViewSoftwareVulnerabilities
-}
-
-actor<system> ExternalIdentitySource {
-  meta {
-    label zh "外部身份来源"
-    label en "External AgentIdentity Source"
-    summary zh "CMDB / LDAP / IAM / HR / Oncall 等外部系统，作为系统 actor 向 WarpInsightCenter 同步责任主体、主机组与责任分配关系。"
-    tag "external"
-    tag "sync"
-    tag "responsibility"
-  }
-
-  access protocol<http>
-  can Observed.SyncExternalResponsibility
-}
-
-actor<system> PublicVulnerabilityFeed {
-  meta {
-    label zh "公开漏洞情报源"
-    label en "Public SoftwareVulnerability Feed"
-    summary zh "OSV / NVD / GitHub Security Advisory / 厂商公告等公开漏洞源，作为系统 actor 向 WarpInsightCenter 接入原始漏洞情报。"
-    tag "external"
-    tag "sync"
-    tag "vulnerability"
-  }
-
-  access protocol<http>
-  can Security.IngestVulnerabilityAdvisory
 }
