@@ -29,6 +29,9 @@ pub async fn report_gateway_status(
             .health
             .clone()
             .unwrap_or_else(|| "healthy".to_string()),
+        // 模拟 gateway 自身运行指标（2GB 内存、~35% CPU）。
+        memory_bytes: Some(2 * 1024 * 1024 * 1024),
+        cpu_percent: Some(35.0),
         reported_at: DateTime::now(),
     };
     let response = client::send_json(|| client.post(&url).json(&report), &config.token).await?;
@@ -65,6 +68,9 @@ pub async fn report_agents_status(
                 "version": "v0.3.2",
                 "status": "online",
                 "health": "healthy",
+                "memory_bytes": 512 * 1024 * 1024,
+                "cpu_percent": 20.0,
+                "admin_latency_ms": 8,
                 "last_seen_at": now,
             },
             {
@@ -73,6 +79,9 @@ pub async fn report_agents_status(
                 "version": "v0.3.0",
                 "status": "online",
                 "health": "degraded",
+                "memory_bytes": 384 * 1024 * 1024,
+                "cpu_percent": 45.0,
+                "admin_latency_ms": 15,
                 "last_seen_at": now,
             },
         ],

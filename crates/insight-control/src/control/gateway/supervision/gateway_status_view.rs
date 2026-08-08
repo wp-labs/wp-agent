@@ -7,5 +7,7 @@ pub struct GatewayStatusView {
     pub version: String,
     pub status: String,
     pub health: String,
+    pub memory_bytes: Option<i64>,
+    pub cpu_percent: Option<f64>,
     pub last_seen_at: crate::DateTime,
 }

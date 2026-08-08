@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { GatewayStatusView } from "../api";
-import { formatRelativeTime } from "./ui";
+import { formatBytes, formatPercent, formatRelativeTime } from "./ui";
 import { GatewayHealthBadge } from "./GatewayHealthBadge";
 import { GatewayInstanceText } from "./GatewayInstanceText";
 import { GatewayOnlineStatusBadge } from "./GatewayOnlineStatusBadge";
@@ -57,6 +57,14 @@ export function GatewayStatusCard({
             >
               {uptimeText}
             </div>
+          </div>
+          <div className={styles.item}>
+            <div className={styles.label}>内存</div>
+            <div>{formatBytes(gateway.memoryBytes)}</div>
+          </div>
+          <div className={styles.item}>
+            <div className={styles.label}>CPU</div>
+            <div>{formatPercent(gateway.cpuPercent)}</div>
           </div>
           <div className={styles.item}>
             <div className={styles.label}>版本</div>

@@ -15,6 +15,20 @@ export function formatDateTime(value: string | Date): string {
   }).format(typeof value === "string" ? new Date(value) : value);
 }
 
+/** 字节数 → 可读大小（MB/GB）。 */
+export function formatBytes(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  const mb = value / (1024 * 1024);
+  if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`;
+  return `${mb.toFixed(0)} MB`;
+}
+
+/** CPU/时延百分比格式化。 */
+export function formatPercent(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  return `${value.toFixed(1)}%`;
+}
+
 /** 相对时间："x 秒前 / x 分钟前 / x 小时前 / x 天前"。 */
 export function formatRelativeTime(value: string | Date): string {
   const then =

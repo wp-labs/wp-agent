@@ -12,8 +12,9 @@ mod gateway_ops;
 mod rate_limit;
 
 use admin_ops::{
-    admin_create_gateway_instance, admin_get_gateway_uptime, admin_list_gateway_agents,
-    admin_list_gateway_status, admin_show_gateway_status, admin_view_gateway_list,
+    admin_create_gateway_instance, admin_get_agent_history, admin_get_gateway_history,
+    admin_get_gateway_uptime, admin_list_gateway_agents, admin_list_gateway_status,
+    admin_show_gateway_status, admin_view_gateway_list,
 };
 use gateway_ops::{submit_agent_status, submit_gateway_status};
 
@@ -60,6 +61,16 @@ pub fn router_for(state: ApiState) -> Router {
         .route(
             "/api/v1/admin/gateways/:gateway_id/status/uptime",
             get(admin_get_gateway_uptime),
+        )
+        // 管理面：网关历史趋势（转发 VM query_range）
+        .route(
+            "/api/v1/admin/gateways/:gateway_id/status/history",
+            get(admin_get_gateway_history),
+        )
+        // 管理面：单 Agent 历史趋势（转发 VM query_range）
+        .route(
+            "/api/v1/admin/gateways/:gateway_id/agents/:agent_id/history",
+            get(admin_get_agent_history),
         )
         // 管理面：某 gateway 下的 Agent 状态列表
         .route(

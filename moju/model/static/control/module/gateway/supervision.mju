@@ -68,6 +68,8 @@ struct GatewayStatusView {
   version: String
   status: String
   health: String
+  memory_bytes: Int?
+  cpu_percent: Float?
   last_seen_at: DateTime
 }
 
@@ -148,5 +150,7 @@ message<command> ReportGatewayStatus {
   version: String
   status: String
   health: String
+  memory_bytes: Int?
+  cpu_percent: Float?
   reported_at: DateTime
 }

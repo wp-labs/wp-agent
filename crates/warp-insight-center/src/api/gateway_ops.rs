@@ -37,6 +37,12 @@ pub struct AgentStatusEntry {
     pub version: String,
     pub status: String,
     pub health: String,
+    #[serde(default)]
+    pub memory_bytes: Option<i64>,
+    #[serde(default)]
+    pub cpu_percent: Option<f64>,
+    #[serde(default)]
+    pub admin_latency_ms: Option<i64>,
     pub last_seen_at: insight_control::types::DateTime,
 }
 
@@ -60,6 +66,9 @@ pub async fn submit_agent_status(
                     version: agent.version.clone(),
                     status: agent.status.clone(),
                     health: agent.health.clone(),
+                    memory_bytes: agent.memory_bytes,
+                    cpu_percent: agent.cpu_percent,
+                    admin_latency_ms: agent.admin_latency_ms,
                     last_seen_at: agent.last_seen_at.clone(),
                 })
                 .collect();
@@ -120,6 +129,8 @@ pub async fn submit_gateway_status(
                 version: input.version.clone(),
                 status: input.status.clone(),
                 health: input.health.clone(),
+                memory_bytes: input.memory_bytes,
+                cpu_percent: input.cpu_percent,
                 last_seen_at: accepted_at.clone(),
             };
             let update_result = state.store.upsert_gateway_status(&update).await;

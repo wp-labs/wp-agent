@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS gateways (
   version TEXT,
   status TEXT,
   health TEXT,
+  memory_bytes BIGINT,
+  cpu_percent DOUBLE PRECISION,
   last_seen_at TIMESTAMPTZ
 );
 
@@ -21,6 +23,9 @@ CREATE TABLE IF NOT EXISTS agent_status (
   version TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'online',
   health TEXT NOT NULL DEFAULT 'healthy',
+  memory_bytes BIGINT,
+  cpu_percent DOUBLE PRECISION,
+  admin_latency_ms BIGINT,
   last_seen_at TIMESTAMPTZ NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_agent_status_gateway ON agent_status (gateway_id);

@@ -7,5 +7,7 @@ pub struct ReportGatewayStatus {
     pub version: String,
     pub status: String,
     pub health: String,
+    pub memory_bytes: Option<i64>,
+    pub cpu_percent: Option<f64>,
     pub reported_at: crate::DateTime,
 }

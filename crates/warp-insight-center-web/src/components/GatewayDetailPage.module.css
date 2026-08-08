@@ -149,6 +149,14 @@
   color: var(--wi-text-secondary);
   font-size: 12px;
 }
+.agentMetrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 10px;
+  color: var(--wi-text-secondary);
+  font-size: 12px;
+}
 .agentLastSeen {
   margin-top: 11px;
   padding-top: 10px;

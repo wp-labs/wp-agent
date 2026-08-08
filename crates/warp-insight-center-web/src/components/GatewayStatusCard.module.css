@@ -99,7 +99,7 @@
 
 .details {
   display: grid;
-  grid-template-columns: 0.85fr 1fr 1.2fr;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   padding-top: 13px;
   border-top: 1px solid var(--wi-border);

@@ -92,6 +92,31 @@ pub struct GatewayUptimeReturned {
     pub uptime: Option<f64>,
 }
 
+/// 网关历史查询参数；当前控制台使用 1h，保留 6h/24h 供后续切换。
+#[derive(serde::Deserialize)]
+pub struct GatewayHistoryQueryParams {
+    pub window: Option<String>,
+}
+
+/// 网关历史接口返回，采样来自 VictoriaMetrics range query。
+#[derive(serde::Serialize)]
+pub struct GatewayHistoryReturned {
+    pub gateway_id: String,
+    pub window: String,
+    pub step_seconds: i64,
+    pub samples: Vec<crate::infra::vm::GatewayMetricSample>,
+}
+
+/// 单个 Agent 历史接口返回。
+#[derive(serde::Serialize)]
+pub struct AgentHistoryReturned {
+    pub gateway_id: String,
+    pub agent_id: String,
+    pub window: String,
+    pub step_seconds: i64,
+    pub samples: Vec<crate::infra::vm::AgentMetricSample>,
+}
+
 /// 查询网关在线率：GET /api/v1/admin/gateways/:gateway_id/status/uptime。
 /// 转发 VM `avg_over_time(gateway_up{gateway_id="X"}[window])`；
 /// VM 未配置 / 查询失败 / 无历史样本 → uptime None（HTTP 200，列表页平滑显示"—"）。
@@ -134,6 +159,122 @@ pub async fn admin_get_gateway_uptime(
     .into_response()
 }
 
+/// 查询网关最近一段时间的在线、内存和 CPU 历史。
+///
+/// VM 未配置或暂时不可用时返回空 samples，页面保留快照并显示历史空态。
+pub async fn admin_get_gateway_history(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path(gateway_id): Path<String>,
+    Query(params): Query<GatewayHistoryQueryParams>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let window = params.window.as_deref().unwrap_or("1h");
+    let Some((window_seconds, step_seconds)) = history_window_config(window) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            "window must be one of: 1h, 6h, 24h",
+        )
+            .into_response();
+    };
+    let now = chrono::Utc::now().timestamp();
+    let end = now - now.rem_euclid(step_seconds);
+    let start = end - window_seconds;
+    let samples = match &state.config.victoriametrics_url {
+        Some(vm_url) => match crate::infra::vm::query_gateway_history(
+            crate::infra::vm::shared_vm_client(),
+            vm_url,
+            &gateway_id,
+            start,
+            end,
+            step_seconds,
+        )
+        .await
+        {
+            Ok(samples) => samples,
+            Err(err) => {
+                eprintln!("warn gateway history vm query failed: {err}");
+                Vec::new()
+            }
+        },
+        None => Vec::new(),
+    };
+    Json(GatewayHistoryReturned {
+        gateway_id,
+        window: window.to_string(),
+        step_seconds,
+        samples,
+    })
+    .into_response()
+}
+
+/// 查询单个 Agent 最近一段时间的在线、内存、CPU 和管理时延历史。
+pub async fn admin_get_agent_history(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path((gateway_id, agent_id)): Path<(String, String)>,
+    Query(params): Query<GatewayHistoryQueryParams>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let window = params.window.as_deref().unwrap_or("1h");
+    let Some((window_seconds, step_seconds)) = history_window_config(window) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            "window must be one of: 1h, 6h, 24h",
+        )
+            .into_response();
+    };
+    let now = chrono::Utc::now().timestamp();
+    let end = now - now.rem_euclid(step_seconds);
+    let start = end - window_seconds;
+    let samples = match &state.config.victoriametrics_url {
+        Some(vm_url) => match crate::infra::vm::query_agent_history(
+            crate::infra::vm::shared_vm_client(),
+            vm_url,
+            &gateway_id,
+            &agent_id,
+            start,
+            end,
+            step_seconds,
+        )
+        .await
+        {
+            Ok(samples) => samples,
+            Err(err) => {
+                eprintln!("warn agent history vm query failed: {err}");
+                Vec::new()
+            }
+        },
+        None => Vec::new(),
+    };
+    Json(AgentHistoryReturned {
+        gateway_id,
+        agent_id,
+        window: window.to_string(),
+        step_seconds,
+        samples,
+    })
+    .into_response()
+}
+
+/// 将公开窗口收敛为固定秒数和采样步长，避免把任意字符串带入 PromQL。
+fn history_window_config(window: &str) -> Option<(i64, i64)> {
+    match window {
+        "1h" => Some((60 * 60, 60)),
+        "6h" => Some((6 * 60 * 60, 5 * 60)),
+        "24h" => Some((24 * 60 * 60, 15 * 60)),
+        _ => None,
+    }
+}
+
 /// 查询某 gateway 下的 Agent 状态：GET /api/v1/admin/gateways/:gateway_id/agents。
 pub async fn admin_list_gateway_agents(
     State(state): State<ApiState>,
@@ -163,6 +304,9 @@ pub async fn admin_list_gateway_agents(
             version: agent.version,
             status: agent.status,
             health: agent.health,
+            memory_bytes: agent.memory_bytes,
+            cpu_percent: agent.cpu_percent,
+            admin_latency_ms: agent.admin_latency_ms,
             last_seen_at: agent.last_seen_at,
         })
         .collect();
@@ -290,6 +434,8 @@ fn gateway_status_view(stored: &StoredGateway) -> GatewayStatusView {
         version: stored.version.clone().unwrap_or_default(),
         status: stored.status.clone().unwrap_or_else(|| "offline".to_string()),
         health: stored.health.clone().unwrap_or_else(|| "unknown".to_string()),
+        memory_bytes: stored.memory_bytes,
+        cpu_percent: stored.cpu_percent,
         last_seen_at: stored
             .last_seen_at
             .clone()
@@ -362,6 +508,72 @@ mod tests {
                 super::super::rate_limit::RateLimitState::default(),
             )),
         }
+    }
+
+    #[test]
+    fn history_windows_use_bounded_steps() {
+        assert_eq!(history_window_config("1h"), Some((3600, 60)));
+        assert_eq!(history_window_config("6h"), Some((21_600, 300)));
+        assert_eq!(history_window_config("24h"), Some((86_400, 900)));
+        assert_eq!(history_window_config("7d"), None);
+    }
+
+    #[tokio::test]
+    async fn history_without_vm_returns_empty_samples() {
+        use axum::{body::Body, http::Request};
+        use http_body_util::BodyExt;
+        use tower::ServiceExt;
+
+        let app = super::super::router_for(test_state());
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/admin/gateways/gw-001/status/history?window=1h")
+                    .header("authorization", "Bearer admin-tok")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let returned: serde_json::Value = serde_json::from_slice(&body).expect("json");
+        assert_eq!(returned["gateway_id"], "gw-001");
+        assert_eq!(returned["window"], "1h");
+        assert_eq!(returned["step_seconds"], 60);
+        assert_eq!(returned["samples"], serde_json::json!([]));
+    }
+
+    #[tokio::test]
+    async fn agent_history_without_vm_returns_empty_samples() {
+        use axum::{body::Body, http::Request};
+        use http_body_util::BodyExt;
+        use tower::ServiceExt;
+
+        let app = super::super::router_for(test_state());
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri(
+                        "/api/v1/admin/gateways/gw-001/agents/agent-1/history?window=1h",
+                    )
+                    .header("authorization", "Bearer admin-tok")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
+        let returned: serde_json::Value = serde_json::from_slice(&body).expect("json");
+        assert_eq!(returned["gateway_id"], "gw-001");
+        assert_eq!(returned["agent_id"], "agent-1");
+        assert_eq!(returned["samples"], serde_json::json!([]));
     }
 
     #[tokio::test]

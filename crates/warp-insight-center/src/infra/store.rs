@@ -91,6 +91,10 @@ pub struct StoredGateway {
     #[serde(default)]
     pub health: Option<String>,
     #[serde(default)]
+    pub memory_bytes: Option<i64>,
+    #[serde(default)]
+    pub cpu_percent: Option<f64>,
+    #[serde(default)]
     pub last_seen_at: Option<DateTime>,
 }
 
@@ -110,6 +114,8 @@ impl StoredGateway {
             version: None,
             status: None,
             health: None,
+            memory_bytes: None,
+            cpu_percent: None,
             last_seen_at: None,
         }
     }
@@ -132,6 +138,9 @@ pub struct StoredAgent {
     pub version: String,
     pub status: String,
     pub health: String,
+    pub memory_bytes: Option<i64>,
+    pub cpu_percent: Option<f64>,
+    pub admin_latency_ms: Option<i64>,
     pub last_seen_at: DateTime,
 }
 
@@ -143,6 +152,8 @@ pub struct GatewayStatusUpdate {
     pub version: String,
     pub status: String,
     pub health: String,
+    pub memory_bytes: Option<i64>,
+    pub cpu_percent: Option<f64>,
     pub last_seen_at: DateTime,
 }
 
@@ -375,6 +386,8 @@ impl Store for FileStore {
                 stored.version = Some(update.version.clone());
                 stored.status = Some(update.status.clone());
                 stored.health = Some(update.health.clone());
+                stored.memory_bytes = update.memory_bytes;
+                stored.cpu_percent = update.cpu_percent;
                 stored.last_seen_at = Some(update.last_seen_at.clone());
             }
         })

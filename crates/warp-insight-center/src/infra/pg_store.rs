@@ -39,6 +39,8 @@ struct GatewayRow {
     version: Option<String>,
     status: Option<String>,
     health: Option<String>,
+    memory_bytes: Option<i64>,
+    cpu_percent: Option<f64>,
     last_seen_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
@@ -53,6 +55,8 @@ impl GatewayRow {
             version: self.version,
             status: self.status,
             health: self.health,
+            memory_bytes: self.memory_bytes,
+            cpu_percent: self.cpu_percent,
             last_seen_at: self
                 .last_seen_at
                 .map(|value| {
@@ -71,6 +75,9 @@ struct AgentRow {
     version: String,
     status: String,
     health: String,
+    memory_bytes: Option<i64>,
+    cpu_percent: Option<f64>,
+    admin_latency_ms: Option<i64>,
     last_seen_at: chrono::DateTime<chrono::Utc>,
 }
 
@@ -83,6 +90,9 @@ impl AgentRow {
             version: self.version,
             status: self.status,
             health: self.health,
+            memory_bytes: self.memory_bytes,
+            cpu_percent: self.cpu_percent,
+            admin_latency_ms: self.admin_latency_ms,
             last_seen_at: DateTime::from_rfc3339(&self.last_seen_at.to_rfc3339())
                 .unwrap_or_else(DateTime::now),
         }
@@ -107,7 +117,7 @@ fn parse_optional_timestamptz(value: &Option<String>) -> Option<chrono::DateTime
 
 const GATEWAY_COLUMNS: &str = "gateway_id, instance_id, credential_token_hash, \
                                credential_status, credential_expires_at, \
-                               version, status, health, last_seen_at";
+                               version, status, health, memory_bytes, cpu_percent, last_seen_at";
 
 #[async_trait::async_trait]
 impl Store for PgStore {
@@ -154,7 +164,8 @@ impl Store for PgStore {
         let last_seen_at = update.last_seen_at.to_chrono();
         sqlx::query(
             "UPDATE gateways \
-             SET instance_id = $2, version = $3, status = $4, health = $5, last_seen_at = $6 \
+             SET instance_id = $2, version = $3, status = $4, health = $5, \
+                 memory_bytes = $6, cpu_percent = $7, last_seen_at = $8 \
              WHERE gateway_id = $1",
         )
         .bind(&update.gateway_id)
@@ -162,6 +173,8 @@ impl Store for PgStore {
         .bind(&update.version)
         .bind(&update.status)
         .bind(&update.health)
+        .bind(update.memory_bytes)
+        .bind(update.cpu_percent)
         .bind(last_seen_at)
         .execute(&self.pool)
         .await?;
@@ -207,12 +220,16 @@ impl Store for PgStore {
             let last_seen_at = agent.last_seen_at.to_chrono();
             sqlx::query(
                 "INSERT INTO agent_status \
-                    (agent_id, gateway_id, instance_id, version, status, health, last_seen_at) \
-                 VALUES ($1, $2, $3, $4, $5, $6, $7) \
+                    (agent_id, gateway_id, instance_id, version, status, health, \
+                     memory_bytes, cpu_percent, admin_latency_ms, last_seen_at) \
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) \
                  ON CONFLICT (agent_id) DO UPDATE SET \
                    gateway_id = EXCLUDED.gateway_id, instance_id = EXCLUDED.instance_id, \
                    version = EXCLUDED.version, status = EXCLUDED.status, \
-                   health = EXCLUDED.health, last_seen_at = EXCLUDED.last_seen_at",
+                   health = EXCLUDED.health, memory_bytes = EXCLUDED.memory_bytes, \
+                   cpu_percent = EXCLUDED.cpu_percent, \
+                   admin_latency_ms = EXCLUDED.admin_latency_ms, \
+                   last_seen_at = EXCLUDED.last_seen_at",
             )
             .bind(&agent.agent_id)
             .bind(gateway_id)
@@ -220,6 +237,9 @@ impl Store for PgStore {
             .bind(&agent.version)
             .bind(&agent.status)
             .bind(&agent.health)
+            .bind(agent.memory_bytes)
+            .bind(agent.cpu_percent)
+            .bind(agent.admin_latency_ms)
             .bind(last_seen_at)
             .execute(&self.pool)
             .await?;
@@ -232,7 +252,8 @@ impl Store for PgStore {
         gateway_id: &str,
     ) -> Result<Vec<StoredAgent>, StoreError> {
         let rows: Vec<AgentRow> = sqlx::query_as(
-            "SELECT agent_id, gateway_id, instance_id, version, status, health, last_seen_at \
+            "SELECT agent_id, gateway_id, instance_id, version, status, health, \
+                    memory_bytes, cpu_percent, admin_latency_ms, last_seen_at \
              FROM agent_status WHERE gateway_id = $1 ORDER BY agent_id",
         )
         .bind(gateway_id)
@@ -323,6 +344,8 @@ mod tests {
                 version: "v9.9.9".to_string(),
                 status: "online".to_string(),
                 health: "healthy".to_string(),
+                memory_bytes: Some(1_073_741_824),
+                cpu_percent: Some(18.2),
                 last_seen_at: reported_at.clone(),
             })
             .await

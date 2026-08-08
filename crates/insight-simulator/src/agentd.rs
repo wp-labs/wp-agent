@@ -64,9 +64,10 @@ fn build_agent_hello(config: &SimConfig) -> AgentHello {
         agent_id: config.id.clone(),
         instance_id: config.instance_id.clone(),
         version: config.version.clone(),
-        memory_bytes: None,
-        cpu_percent: None,
-        admin_latency_ms: None,
+        // 模拟运行指标（512MB 内存、~20% CPU、~8ms 时延）。
+        memory_bytes: Some(512 * 1024 * 1024),
+        cpu_percent: Some(20.0 + (config.id.len() as f64) * 2.5),
+        admin_latency_ms: Some(8),
     }
 }
 

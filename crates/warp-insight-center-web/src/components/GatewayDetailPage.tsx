@@ -1,11 +1,20 @@
 import { Link, useParams } from "react-router-dom";
 import {
+  useAgentHistories,
   useGatewayAgents,
+  useGatewayHistory,
   useGatewayStatus,
   useGatewayUptimes,
 } from "../hooks";
-import { formatRelativeTime, LoadingDots, PageShell } from "./ui";
+import {
+  formatBytes,
+  formatPercent,
+  formatRelativeTime,
+  LoadingDots,
+  PageShell,
+} from "./ui";
 import { GatewayHealthBadge } from "./GatewayHealthBadge";
+import { GatewayHistoryChart } from "./GatewayHistoryChart";
 import { GatewayOnlineStatusBadge } from "./GatewayOnlineStatusBadge";
 import { GatewayVersionText } from "./GatewayVersionText";
 import styles from "./GatewayDetailPage.module.css";
@@ -14,6 +23,10 @@ export function GatewayDetailPage() {
   const { gatewayId = "" } = useParams();
   const { data: statusData, isLoading } = useGatewayStatus(gatewayId);
   const { data: agentsData } = useGatewayAgents(gatewayId);
+  const agentIds = agentsData?.data?.map((agent) => agent.agentId) ?? [];
+  const { data: agentHistoriesData } = useAgentHistories(gatewayId, agentIds);
+  const { data: historyData, isLoading: isHistoryLoading } =
+    useGatewayHistory(gatewayId);
   const { data: uptimesData } = useGatewayUptimes([gatewayId]);
 
   const gateway = statusData?.data ?? null;
@@ -56,6 +69,14 @@ export function GatewayDetailPage() {
                 <div className={styles.metricValue}>{uptimeText}</div>
               </div>
               <div className={styles.metric}>
+                <div className={styles.metricLabel}>内存</div>
+                <div>{formatBytes(gateway.memoryBytes)}</div>
+              </div>
+              <div className={styles.metric}>
+                <div className={styles.metricLabel}>CPU</div>
+                <div>{formatPercent(gateway.cpuPercent)}</div>
+              </div>
+              <div className={styles.metric}>
                 <div className={styles.metricLabel}>版本</div>
                 <GatewayVersionText value={gateway.version} />
               </div>
@@ -63,6 +84,11 @@ export function GatewayDetailPage() {
                 <div className={styles.metricLabel}>最后上报</div>
                 <div>{formatRelativeTime(gateway.lastSeenAt)}</div>
               </div>
+              <GatewayHistoryChart
+                history={historyData?.data}
+                loading={isHistoryLoading}
+                source={historyData?.source}
+              />
             </div>
           </div>
         </section>
@@ -87,6 +113,17 @@ export function GatewayDetailPage() {
                   <span>版本 {agent.version}</span>
                   <GatewayHealthBadge value={agent.health} />
                 </div>
+                <div className={styles.agentMetrics}>
+                  <span>内存 {formatBytes(agent.memoryBytes)}</span>
+                  <span>CPU {formatPercent(agent.cpuPercent)}</span>
+                  <span>时延 {agent.adminLatencyMs ?? "—"}ms</span>
+                </div>
+                <GatewayHistoryChart
+                  history={agentHistoriesData?.[agent.agentId]?.data}
+                  source={agentHistoriesData?.[agent.agentId]?.source}
+                  compact
+                  title="Agent 最近 1 小时"
+                />
                 <div className={styles.agentLastSeen}>
                   {formatRelativeTime(agent.lastSeenAt)}
                 </div>

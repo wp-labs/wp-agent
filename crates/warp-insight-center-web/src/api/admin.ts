@@ -14,6 +14,8 @@ export interface GatewayStatusView {
   version: string;
   status: GatewayStatus;
   health: GatewayHealth;
+  memoryBytes: number | null;
+  cpuPercent: number | null;
   lastSeenAt: string;
 }
 
@@ -32,12 +34,44 @@ export interface GatewayUptime {
   uptime: number | null;
 }
 
+/** 网关在一个 Unix 秒时间戳上的历史指标采样。 */
+export interface GatewayHistorySample {
+  at: number;
+  online: number | null;
+  memoryBytes: number | null;
+  cpuPercent: number | null;
+}
+
+/** 网关历史趋势；当前详情页请求最近 1 小时、每分钟一个采样点。 */
+export interface GatewayHistory {
+  gatewayId: string;
+  window: string;
+  stepSeconds: number;
+  samples: GatewayHistorySample[];
+}
+
+/** 单个 Agent 的历史采样，额外包含管理接口时延。 */
+export interface AgentHistorySample extends GatewayHistorySample {
+  adminLatencyMs: number | null;
+}
+
+export interface AgentHistory {
+  agentId: string;
+  gatewayId: string;
+  window: string;
+  stepSeconds: number;
+  samples: AgentHistorySample[];
+}
+
 export interface AgentStatusView {
   agentId: string;
   instanceId: string;
   version: string;
   status: GatewayStatus;
   health: GatewayHealth;
+  memoryBytes: number | null;
+  cpuPercent: number | null;
+  adminLatencyMs: number | null;
   lastSeenAt: string;
 }
 
@@ -251,9 +285,15 @@ function pick(obj: any, ...names: string[]): unknown {
   return undefined;
 }
 
+function nullableNumber(payload: any, ...names: string[]): number | null {
+  const value = pick(payload, ...names);
+  return typeof value === "number" ? value : null;
+}
+
 function normalizeGatewayStatus(value: unknown): GatewayStatus {
   // 模型 status 为 String，取值域未收紧；异常上报值不击穿整个列表，原样透传（徽标兜底显示离线）。
-  if (typeof value === "string" && value.length > 0) return value as GatewayStatus;
+  if (typeof value === "string" && value.length > 0)
+    return value as GatewayStatus;
   throw new Error("Invalid API response: invalid gateway status");
 }
 
@@ -266,40 +306,84 @@ function normalizeGatewayHealth(value: unknown): GatewayHealth {
 
 function normalizeGatewayStatusView(payload: any): GatewayStatusView {
   return {
-    gatewayId: requiredString(pick(payload, "gateway_id", "gatewayId"), "gateway.gatewayId"),
-    instanceId: requiredString(pick(payload, "instance_id", "instanceId"), "gateway.instanceId"),
+    gatewayId: requiredString(
+      pick(payload, "gateway_id", "gatewayId"),
+      "gateway.gatewayId",
+    ),
+    instanceId: requiredString(
+      pick(payload, "instance_id", "instanceId"),
+      "gateway.instanceId",
+    ),
     version: requiredString(payload.version, "gateway.version"),
     status: normalizeGatewayStatus(payload.status),
     health: normalizeGatewayHealth(payload.health),
-    lastSeenAt: requiredString(pick(payload, "last_seen_at", "lastSeenAt"), "gateway.lastSeenAt"),
+    memoryBytes: nullableNumber(payload, "memory_bytes", "memoryBytes"),
+    cpuPercent: nullableNumber(payload, "cpu_percent", "cpuPercent"),
+    lastSeenAt: requiredString(
+      pick(payload, "last_seen_at", "lastSeenAt"),
+      "gateway.lastSeenAt",
+    ),
   };
 }
 
 function normalizeGatewayListView(payload: any): GatewayListView {
   return {
-    gatewayCount: requiredNumber(pick(payload, "gateway_count", "gatewayCount"), "list.gatewayCount"),
-    onlineCount: requiredNumber(pick(payload, "online_count", "onlineCount"), "list.onlineCount"),
-    degradedCount: requiredNumber(pick(payload, "degraded_count", "degradedCount"), "list.degradedCount"),
-    offlineCount: requiredNumber(pick(payload, "offline_count", "offlineCount"), "list.offlineCount"),
-    updatedAt: requiredString(pick(payload, "updated_at", "updatedAt"), "list.updatedAt"),
+    gatewayCount: requiredNumber(
+      pick(payload, "gateway_count", "gatewayCount"),
+      "list.gatewayCount",
+    ),
+    onlineCount: requiredNumber(
+      pick(payload, "online_count", "onlineCount"),
+      "list.onlineCount",
+    ),
+    degradedCount: requiredNumber(
+      pick(payload, "degraded_count", "degradedCount"),
+      "list.degradedCount",
+    ),
+    offlineCount: requiredNumber(
+      pick(payload, "offline_count", "offlineCount"),
+      "list.offlineCount",
+    ),
+    updatedAt: requiredString(
+      pick(payload, "updated_at", "updatedAt"),
+      "list.updatedAt",
+    ),
   };
 }
 
 function normalizeGatewayInstance(payload: any): GatewayInstance {
   return {
-    gatewayId: requiredString(pick(payload, "gateway_id", "gatewayId"), "instance.gatewayId"),
-    instanceId: requiredString(pick(payload, "instance_id", "instanceId"), "instance.instanceId"),
+    gatewayId: requiredString(
+      pick(payload, "gateway_id", "gatewayId"),
+      "instance.gatewayId",
+    ),
+    instanceId: requiredString(
+      pick(payload, "instance_id", "instanceId"),
+      "instance.instanceId",
+    ),
     status: requiredString(payload.status, "instance.status"),
-    createdAt: requiredString(pick(payload, "created_at", "createdAt"), "instance.createdAt"),
+    createdAt: requiredString(
+      pick(payload, "created_at", "createdAt"),
+      "instance.createdAt",
+    ),
   };
 }
 
 function normalizeGatewayCustomerBinding(payload: any): GatewayCustomerBinding {
   return {
-    gatewayId: requiredString(pick(payload, "gateway_id", "gatewayId"), "binding.gatewayId"),
-    customerId: requiredString(pick(payload, "customer_id", "customerId"), "binding.customerId"),
+    gatewayId: requiredString(
+      pick(payload, "gateway_id", "gatewayId"),
+      "binding.gatewayId",
+    ),
+    customerId: requiredString(
+      pick(payload, "customer_id", "customerId"),
+      "binding.customerId",
+    ),
     status: requiredString(payload.status, "binding.status"),
-    boundAt: requiredString(pick(payload, "bound_at", "boundAt"), "binding.boundAt"),
+    boundAt: requiredString(
+      pick(payload, "bound_at", "boundAt"),
+      "binding.boundAt",
+    ),
   };
 }
 
@@ -309,17 +393,29 @@ function normalizeGatewayInitialConfig(payload: any): GatewayInitialConfig {
       pick(payload, "control_center_endpoint", "controlCenterEndpoint"),
       "config.controlCenterEndpoint",
     ),
-    policyVersion: requiredString(pick(payload, "policy_version", "policyVersion"), "config.policyVersion"),
-    telemetryOutput: requiredString(pick(payload, "telemetry_output", "telemetryOutput"), "config.telemetryOutput"),
+    policyVersion: requiredString(
+      pick(payload, "policy_version", "policyVersion"),
+      "config.policyVersion",
+    ),
+    telemetryOutput: requiredString(
+      pick(payload, "telemetry_output", "telemetryOutput"),
+      "config.telemetryOutput",
+    ),
   };
 }
 
 function normalizeRelease(payload: any): WarpAgentdRelease {
   return {
     version: requiredString(payload.version, "release.version"),
-    artifactUrl: requiredString(pick(payload, "artifact_url", "artifactUrl"), "release.artifactUrl"),
+    artifactUrl: requiredString(
+      pick(payload, "artifact_url", "artifactUrl"),
+      "release.artifactUrl",
+    ),
     status: requiredString(payload.status, "release.status"),
-    publishedAt: requiredString(pick(payload, "published_at", "publishedAt"), "release.publishedAt"),
+    publishedAt: requiredString(
+      pick(payload, "published_at", "publishedAt"),
+      "release.publishedAt",
+    ),
   };
 }
 
@@ -327,19 +423,37 @@ function normalizeUpgradePlan(payload: any): UpgradePlan {
   return {
     planId: requiredString(pick(payload, "plan_id", "planId"), "plan.planId"),
     component: requiredString(payload.component, "plan.component"),
-    targetVersion: requiredString(pick(payload, "target_version", "targetVersion"), "plan.targetVersion"),
-    targetCount: requiredNumber(pick(payload, "target_count", "targetCount"), "plan.targetCount"),
+    targetVersion: requiredString(
+      pick(payload, "target_version", "targetVersion"),
+      "plan.targetVersion",
+    ),
+    targetCount: requiredNumber(
+      pick(payload, "target_count", "targetCount"),
+      "plan.targetCount",
+    ),
     status: requiredString(payload.status, "plan.status"),
-    createdAt: requiredString(pick(payload, "created_at", "createdAt"), "plan.createdAt"),
+    createdAt: requiredString(
+      pick(payload, "created_at", "createdAt"),
+      "plan.createdAt",
+    ),
   };
 }
 
 function normalizeUpgradePlanApproval(payload: any): UpgradePlanApproval {
   return {
-    planId: requiredString(pick(payload, "plan_id", "planId"), "approval.planId"),
+    planId: requiredString(
+      pick(payload, "plan_id", "planId"),
+      "approval.planId",
+    ),
     status: requiredString(payload.status, "approval.status"),
-    approvedBy: requiredString(pick(payload, "approved_by", "approvedBy"), "approval.approvedBy"),
-    approvedAt: requiredString(pick(payload, "approved_at", "approvedAt"), "approval.approvedAt"),
+    approvedBy: requiredString(
+      pick(payload, "approved_by", "approvedBy"),
+      "approval.approvedBy",
+    ),
+    approvedAt: requiredString(
+      pick(payload, "approved_at", "approvedAt"),
+      "approval.approvedAt",
+    ),
   };
 }
 
@@ -351,12 +465,66 @@ function isoMinutesAgo(minutes: number): string {
 
 function exampleGatewayStatusView(): GatewayStatusView[] {
   return [
-    { gatewayId: "gw-001", instanceId: "inst-7f2a", version: "v2.4.1", status: "online", health: "healthy", lastSeenAt: isoMinutesAgo(1) },
-    { gatewayId: "gw-002", instanceId: "inst-9c31", version: "v2.4.1", status: "online", health: "degraded", lastSeenAt: isoMinutesAgo(4) },
-    { gatewayId: "gw-003", instanceId: "inst-1d8b", version: "v2.3.0", status: "offline", health: "unhealthy", lastSeenAt: isoMinutesAgo(138) },
-    { gatewayId: "gw-004", instanceId: "inst-4e77", version: "v2.4.0", status: "online", health: "healthy", lastSeenAt: isoMinutesAgo(2) },
-    { gatewayId: "gw-005", instanceId: "inst-aa21", version: "v2.2.2", status: "offline", health: "unhealthy", lastSeenAt: isoMinutesAgo(420) },
-    { gatewayId: "gw-006", instanceId: "inst-38c4", version: "v2.4.1", status: "online", health: "healthy", lastSeenAt: isoMinutesAgo(0) },
+    {
+      gatewayId: "gw-001",
+      instanceId: "inst-7f2a",
+      version: "v2.4.1",
+      status: "online",
+      health: "healthy",
+      memoryBytes: 2 * 1024 ** 3,
+      cpuPercent: 35,
+      lastSeenAt: isoMinutesAgo(1),
+    },
+    {
+      gatewayId: "gw-002",
+      instanceId: "inst-9c31",
+      version: "v2.4.1",
+      status: "online",
+      health: "degraded",
+      memoryBytes: 1536 * 1024 ** 2,
+      cpuPercent: 68,
+      lastSeenAt: isoMinutesAgo(4),
+    },
+    {
+      gatewayId: "gw-003",
+      instanceId: "inst-1d8b",
+      version: "v2.3.0",
+      status: "offline",
+      health: "unhealthy",
+      memoryBytes: 768 * 1024 ** 2,
+      cpuPercent: 12,
+      lastSeenAt: isoMinutesAgo(138),
+    },
+    {
+      gatewayId: "gw-004",
+      instanceId: "inst-4e77",
+      version: "v2.4.0",
+      status: "online",
+      health: "healthy",
+      memoryBytes: 2 * 1024 ** 3,
+      cpuPercent: 41,
+      lastSeenAt: isoMinutesAgo(2),
+    },
+    {
+      gatewayId: "gw-005",
+      instanceId: "inst-aa21",
+      version: "v2.2.2",
+      status: "offline",
+      health: "unhealthy",
+      memoryBytes: 512 * 1024 ** 2,
+      cpuPercent: 5,
+      lastSeenAt: isoMinutesAgo(420),
+    },
+    {
+      gatewayId: "gw-006",
+      instanceId: "inst-38c4",
+      version: "v2.4.1",
+      status: "online",
+      health: "healthy",
+      memoryBytes: 2 * 1024 ** 3,
+      cpuPercent: 28,
+      lastSeenAt: isoMinutesAgo(0),
+    },
   ];
 }
 
@@ -371,7 +539,10 @@ function exampleGatewayListView(): GatewayListView {
 }
 
 // 每个网关稳定的示例在线率（0.5~0.99，由 gateway_id 派生）。
-function exampleGatewayUptime(gatewayId: string, window: string): GatewayUptime {
+function exampleGatewayUptime(
+  gatewayId: string,
+  window: string,
+): GatewayUptime {
   let hash = 0;
   for (const ch of gatewayId) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
   const uptime = 0.5 + (hash % 50) / 100;
@@ -385,17 +556,167 @@ function normalizeGatewayUptime(
 ): GatewayUptime {
   return {
     gatewayId:
-      requiredString(pick(payload, "gateway_id", "gatewayId"), "uptime.gatewayId") ||
-      fallbackGatewayId,
+      requiredString(
+        pick(payload, "gateway_id", "gatewayId"),
+        "uptime.gatewayId",
+      ) || fallbackGatewayId,
     window:
-      requiredString(pick(payload, "window"), "uptime.window") || fallbackWindow,
+      requiredString(pick(payload, "window"), "uptime.window") ||
+      fallbackWindow,
     uptime: typeof payload.uptime === "number" ? payload.uptime : null,
+  };
+}
+
+function exampleGatewayHistory(
+  gatewayId: string,
+  window: string,
+): GatewayHistory {
+  let hash = 0;
+  for (const ch of gatewayId) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  const stepSeconds = window === "24h" ? 900 : window === "6h" ? 300 : 60;
+  const pointCount = Math.floor(
+    (window === "24h" ? 86_400 : window === "6h" ? 21_600 : 3_600) /
+      stepSeconds,
+  );
+  const end = Math.floor(Date.now() / stepSeconds / 1000) * stepSeconds;
+  const baseMemory = (1.4 + (hash % 8) / 10) * 1024 ** 3;
+  const samples = Array.from({ length: pointCount + 1 }, (_, index) => {
+    const phase = (index + (hash % 17)) / 6;
+    return {
+      at: end - (pointCount - index) * stepSeconds,
+      online: index === Math.floor(pointCount * 0.28) ? 0 : 1,
+      memoryBytes: baseMemory + Math.sin(phase * 0.7) * 110 * 1024 ** 2,
+      cpuPercent: 34 + Math.sin(phase) * 11 + Math.cos(phase * 0.35) * 5,
+    };
+  });
+  return { gatewayId, window, stepSeconds, samples };
+}
+
+function normalizeGatewayHistory(
+  payload: unknown,
+  fallbackGatewayId: string,
+  fallbackWindow: string,
+): GatewayHistory {
+  const record =
+    typeof payload === "object" && payload !== null
+      ? (payload as Record<string, unknown>)
+      : {};
+  const rawSamples = pick(record, "samples");
+  const samples = Array.isArray(rawSamples)
+    ? rawSamples.map((sample, index): GatewayHistorySample => {
+        const item =
+          typeof sample === "object" && sample !== null
+            ? (sample as Record<string, unknown>)
+            : {};
+        return {
+          at: requiredNumber(pick(item, "at"), `history.samples[${index}].at`),
+          online: nullableNumber(item, "online"),
+          memoryBytes: nullableNumber(item, "memory_bytes", "memoryBytes"),
+          cpuPercent: nullableNumber(item, "cpu_percent", "cpuPercent"),
+        };
+      })
+    : [];
+  return {
+    gatewayId:
+      requiredString(
+        pick(record, "gateway_id", "gatewayId"),
+        "history.gatewayId",
+      ) || fallbackGatewayId,
+    window:
+      requiredString(pick(record, "window"), "history.window") ||
+      fallbackWindow,
+    stepSeconds: requiredNumber(
+      pick(record, "step_seconds", "stepSeconds"),
+      "history.stepSeconds",
+    ),
+    samples,
+  };
+}
+
+function exampleAgentHistory(
+  gatewayId: string,
+  agentId: string,
+  window: string,
+): AgentHistory {
+  let hash = 0;
+  for (const ch of agentId) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  const stepSeconds = window === "24h" ? 900 : window === "6h" ? 300 : 60;
+  const pointCount = Math.floor(
+    (window === "24h" ? 86_400 : window === "6h" ? 21_600 : 3_600) /
+      stepSeconds,
+  );
+  const end = Math.floor(Date.now() / stepSeconds / 1000) * stepSeconds;
+  const samples = Array.from({ length: pointCount + 1 }, (_, index) => {
+    const phase = (index + (hash % 19)) / 5;
+    return {
+      at: end - (pointCount - index) * stepSeconds,
+      online: index === Math.floor(pointCount * 0.42) && hash % 3 === 0 ? 0 : 1,
+      memoryBytes:
+        (0.3 + (hash % 5) / 10) * 1024 ** 3 +
+        Math.sin(phase * 0.65) * 32 * 1024 ** 2,
+      cpuPercent: 24 + Math.sin(phase) * 15 + Math.cos(phase * 0.32) * 6,
+      adminLatencyMs: 8 + Math.round(Math.abs(Math.sin(phase * 0.8)) * 9),
+    };
+  });
+  return { agentId, gatewayId, window, stepSeconds, samples };
+}
+
+function normalizeAgentHistory(
+  payload: unknown,
+  fallbackGatewayId: string,
+  fallbackAgentId: string,
+  fallbackWindow: string,
+): AgentHistory {
+  const record =
+    typeof payload === "object" && payload !== null
+      ? (payload as Record<string, unknown>)
+      : {};
+  const rawSamples = pick(record, "samples");
+  const samples = Array.isArray(rawSamples)
+    ? rawSamples.map((sample, index): AgentHistorySample => {
+        const item =
+          typeof sample === "object" && sample !== null
+            ? (sample as Record<string, unknown>)
+            : {};
+        return {
+          at: requiredNumber(pick(item, "at"), `history.samples[${index}].at`),
+          online: nullableNumber(item, "online"),
+          memoryBytes: nullableNumber(item, "memory_bytes", "memoryBytes"),
+          cpuPercent: nullableNumber(item, "cpu_percent", "cpuPercent"),
+          adminLatencyMs: nullableNumber(
+            item,
+            "admin_latency_ms",
+            "adminLatencyMs",
+          ),
+        };
+      })
+    : [];
+  return {
+    gatewayId:
+      requiredString(
+        pick(record, "gateway_id", "gatewayId"),
+        "history.gatewayId",
+      ) || fallbackGatewayId,
+    agentId:
+      requiredString(pick(record, "agent_id", "agentId"), "history.agentId") ||
+      fallbackAgentId,
+    window:
+      requiredString(pick(record, "window"), "history.window") ||
+      fallbackWindow,
+    stepSeconds: requiredNumber(
+      pick(record, "step_seconds", "stepSeconds"),
+      "history.stepSeconds",
+    ),
+    samples,
   };
 }
 
 function normalizeAgentStatusView(payload: any): AgentStatusView {
   return {
-    agentId: requiredString(pick(payload, "agent_id", "agentId"), "agent.agentId"),
+    agentId: requiredString(
+      pick(payload, "agent_id", "agentId"),
+      "agent.agentId",
+    ),
     instanceId: requiredString(
       pick(payload, "instance_id", "instanceId"),
       "agent.instanceId",
@@ -403,6 +724,13 @@ function normalizeAgentStatusView(payload: any): AgentStatusView {
     version: requiredString(payload.version, "agent.version"),
     status: requiredString(payload.status, "agent.status") as GatewayStatus,
     health: requiredString(payload.health, "agent.health") as GatewayHealth,
+    memoryBytes: nullableNumber(payload, "memory_bytes", "memoryBytes"),
+    cpuPercent: nullableNumber(payload, "cpu_percent", "cpuPercent"),
+    adminLatencyMs: nullableNumber(
+      payload,
+      "admin_latency_ms",
+      "adminLatencyMs",
+    ),
     lastSeenAt: requiredString(
       pick(payload, "last_seen_at", "lastSeenAt"),
       "agent.lastSeenAt",
@@ -418,6 +746,9 @@ function exampleAgentStatus(gatewayId: string): AgentStatusView[] {
       version: "v0.3.2",
       status: "online",
       health: "healthy",
+      memoryBytes: 512 * 1024 * 1024,
+      cpuPercent: 20,
+      adminLatencyMs: 8,
       lastSeenAt: isoMinutesAgo(0),
     },
     {
@@ -426,12 +757,17 @@ function exampleAgentStatus(gatewayId: string): AgentStatusView[] {
       version: "v0.3.0",
       status: "online",
       health: "degraded",
+      memoryBytes: 384 * 1024 * 1024,
+      cpuPercent: 45,
+      adminLatencyMs: 15,
       lastSeenAt: isoMinutesAgo(1),
     },
   ];
 }
 
-function exampleGatewayInstance(command: CreateGatewayInstanceCommand): GatewayInstance {
+function exampleGatewayInstance(
+  command: CreateGatewayInstanceCommand,
+): GatewayInstance {
   return {
     gatewayId: `gw-${Math.random().toString(36).slice(2, 8)}`,
     instanceId: `inst-${Math.random().toString(36).slice(2, 6)}`,
@@ -440,7 +776,9 @@ function exampleGatewayInstance(command: CreateGatewayInstanceCommand): GatewayI
   };
 }
 
-function exampleBinding(command: BindGatewayCustomerCommand): GatewayCustomerBinding {
+function exampleBinding(
+  command: BindGatewayCustomerCommand,
+): GatewayCustomerBinding {
   return {
     gatewayId: command.gatewayId,
     customerId: command.customerId,
@@ -449,7 +787,9 @@ function exampleBinding(command: BindGatewayCustomerCommand): GatewayCustomerBin
   };
 }
 
-function exampleInitialConfig(command: GetGatewayInitialConfigCommand): GatewayInitialConfig {
+function exampleInitialConfig(
+  command: GetGatewayInitialConfigCommand,
+): GatewayInitialConfig {
   return {
     controlCenterEndpoint: "https://center.example.com",
     policyVersion: "policy-v12",
@@ -477,7 +817,9 @@ function exampleUpgradePlan(command: CreateUpgradePlanCommand): UpgradePlan {
   };
 }
 
-function exampleApproval(command: ApproveUpgradePlanCommand): UpgradePlanApproval {
+function exampleApproval(
+  command: ApproveUpgradePlanCommand,
+): UpgradePlanApproval {
   return {
     planId: command.planId,
     status: "approved",
@@ -488,26 +830,31 @@ function exampleApproval(command: ApproveUpgradePlanCommand): UpgradePlanApprova
 
 // ── 接口调用 ──
 
-export async function fetchGatewayStatusView(): Promise<ExampleResult<GatewayStatusView[]>> {
-  return fetchOrFallback("/api/v1/admin/gateways/status", exampleGatewayStatusView).then(
-    async (result) => {
-      if (result.source !== "real") return result;
-      const raw = result.data as any;
-      const items = Array.isArray(raw)
-        ? raw
-        : Array.isArray(raw?.statuses)
-          ? raw.statuses
-          : Array.isArray(raw?.gateways)
-            ? raw.gateways
-            : raw?.status
-              ? [raw.status]
-              : [];
-      return { ...result, data: items.map(normalizeGatewayStatusView) };
-    },
-  );
+export async function fetchGatewayStatusView(): Promise<
+  ExampleResult<GatewayStatusView[]>
+> {
+  return fetchOrFallback(
+    "/api/v1/admin/gateways/status",
+    exampleGatewayStatusView,
+  ).then(async (result) => {
+    if (result.source !== "real") return result;
+    const raw = result.data as any;
+    const items = Array.isArray(raw)
+      ? raw
+      : Array.isArray(raw?.statuses)
+        ? raw.statuses
+        : Array.isArray(raw?.gateways)
+          ? raw.gateways
+          : raw?.status
+            ? [raw.status]
+            : [];
+    return { ...result, data: items.map(normalizeGatewayStatusView) };
+  });
 }
 
-export async function fetchGatewayList(): Promise<ExampleResult<GatewayListView>> {
+export async function fetchGatewayList(): Promise<
+  ExampleResult<GatewayListView>
+> {
   return fetchOrFallback("/api/v1/admin/gateways", exampleGatewayListView).then(
     async (result) => {
       if (result.source !== "real") return result;
@@ -527,9 +874,8 @@ export async function fetchGatewayUptime(
   const path = `/api/v1/admin/gateways/${encodeURIComponent(
     gatewayId,
   )}/status/uptime?window=${encodeURIComponent(window)}`;
-  return fetchOrFallback(
-    path,
-    () => exampleGatewayUptime(gatewayId, window),
+  return fetchOrFallback(path, () =>
+    exampleGatewayUptime(gatewayId, window),
   ).then(async (result) => {
     if (result.source !== "real") return result;
     return {
@@ -539,23 +885,63 @@ export async function fetchGatewayUptime(
   });
 }
 
+/** 获取网关历史趋势；请求失败时返回稳定的示例序列供独立前端演示。 */
+export async function fetchGatewayHistory(
+  gatewayId: string,
+  window = "1h",
+): Promise<ExampleResult<GatewayHistory>> {
+  const path = `/api/v1/admin/gateways/${encodeURIComponent(
+    gatewayId,
+  )}/status/history?window=${encodeURIComponent(window)}`;
+  return fetchOrFallback(path, () =>
+    exampleGatewayHistory(gatewayId, window),
+  ).then(async (result) => {
+    if (result.source !== "real") return result;
+    return {
+      ...result,
+      data: normalizeGatewayHistory(result.data, gatewayId, window),
+    };
+  });
+}
+
+/** 获取单个 Agent 的历史趋势；没有真实数据时回退为稳定示例序列。 */
+export async function fetchAgentHistory(
+  gatewayId: string,
+  agentId: string,
+  window = "1h",
+): Promise<ExampleResult<AgentHistory>> {
+  const path = `/api/v1/admin/gateways/${encodeURIComponent(
+    gatewayId,
+  )}/agents/${encodeURIComponent(agentId)}/history?window=${encodeURIComponent(
+    window,
+  )}`;
+  return fetchOrFallback(path, () =>
+    exampleAgentHistory(gatewayId, agentId, window),
+  ).then(async (result) => {
+    if (result.source !== "real") return result;
+    return {
+      ...result,
+      data: normalizeAgentHistory(result.data, gatewayId, agentId, window),
+    };
+  });
+}
+
 export async function fetchGatewayAgents(
   gatewayId: string,
 ): Promise<ExampleResult<AgentStatusView[]>> {
   const path = `/api/v1/admin/gateways/${encodeURIComponent(gatewayId)}/agents`;
-  return fetchOrFallback(
-    path,
-    () => exampleAgentStatus(gatewayId),
-  ).then(async (result) => {
-    if (result.source !== "real") return result;
-    const raw = result.data as any;
-    const items = Array.isArray(raw)
-      ? raw
-      : Array.isArray(raw?.agents)
-        ? raw.agents
-        : [];
-    return { ...result, data: items.map(normalizeAgentStatusView) };
-  });
+  return fetchOrFallback(path, () => exampleAgentStatus(gatewayId)).then(
+    async (result) => {
+      if (result.source !== "real") return result;
+      const raw = result.data as any;
+      const items = Array.isArray(raw)
+        ? raw
+        : Array.isArray(raw?.agents)
+          ? raw.agents
+          : [];
+      return { ...result, data: items.map(normalizeAgentStatusView) };
+    },
+  );
 }
 
 export async function fetchGatewayStatus(
@@ -578,7 +964,10 @@ export async function createGatewayInstance(
     () => exampleGatewayInstance(command),
     {
       method: "POST",
-      body: JSON.stringify({ gateway_name: command.gatewayName, requested_by: command.requestedBy }),
+      body: JSON.stringify({
+        gateway_name: command.gatewayName,
+        requested_by: command.requestedBy,
+      }),
     },
   ).then(async (result) => {
     if (result.source === "real") {
@@ -632,7 +1021,11 @@ export async function publishWarpAgentd(
     () => exampleRelease(command),
     {
       method: "POST",
-      body: JSON.stringify({ version: command.version, artifact_url: command.artifactUrl, requested_by: command.requestedBy }),
+      body: JSON.stringify({
+        version: command.version,
+        artifact_url: command.artifactUrl,
+        requested_by: command.requestedBy,
+      }),
     },
   ).then(async (result) => {
     if (result.source === "real") {
@@ -650,7 +1043,11 @@ export async function publishWarpGateWay(
     () => exampleRelease(command),
     {
       method: "POST",
-      body: JSON.stringify({ version: command.version, artifact_url: command.artifactUrl, requested_by: command.requestedBy }),
+      body: JSON.stringify({
+        version: command.version,
+        artifact_url: command.artifactUrl,
+        requested_by: command.requestedBy,
+      }),
     },
   ).then(async (result) => {
     if (result.source === "real") {
@@ -691,7 +1088,10 @@ export async function approveUpgradePlan(
     () => exampleApproval(command),
     {
       method: "POST",
-      body: JSON.stringify({ plan_id: command.planId, approved_by: command.approvedBy }),
+      body: JSON.stringify({
+        plan_id: command.planId,
+        approved_by: command.approvedBy,
+      }),
     },
   ).then(async (result) => {
     if (result.source === "real") {

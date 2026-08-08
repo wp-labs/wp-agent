@@ -7,6 +7,7 @@ export { GatewayInstanceText } from "./GatewayInstanceText";
 export { GatewayVersionText } from "./GatewayVersionText";
 export { GatewayOnlineStatusBadge } from "./GatewayOnlineStatusBadge";
 export { GatewayHealthBadge } from "./GatewayHealthBadge";
+export { GatewayHistoryChart } from "./GatewayHistoryChart";
 export { GatewayLastSeenAtText } from "./GatewayLastSeenAtText";
 export { GatewayInstancePage } from "./GatewayInstancePage";
 export { GatewayInstanceCreatePanel } from "./GatewayInstanceCreatePanel";

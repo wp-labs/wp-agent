@@ -1,11 +1,30 @@
 // VictoriaMetrics 时序推送：把网关状态上报转成 Prometheus 文本写 /api/v1/import/prometheus。
 // 属于独立外部系统（不属于 Store 抽象）：push 失败仅记日志，不阻塞上报主流程。
 
-use std::time::Duration;
+use std::{collections::BTreeMap, time::Duration};
 
 use reqwest::Client;
 
 use super::{GatewayStatusUpdate, StoredAgent};
+
+/// 网关在一个采样时刻的历史指标；字段缺失表示该指标在 VM 中没有样本。
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+pub struct GatewayMetricSample {
+    pub at: i64,
+    pub online: Option<f64>,
+    pub memory_bytes: Option<f64>,
+    pub cpu_percent: Option<f64>,
+}
+
+/// Agent 在一个采样时刻的历史指标。
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+pub struct AgentMetricSample {
+    pub at: i64,
+    pub online: Option<f64>,
+    pub memory_bytes: Option<f64>,
+    pub cpu_percent: Option<f64>,
+    pub admin_latency_ms: Option<f64>,
+}
 
 /// VM 推送 HTTP 客户端：短超时，push 失败快速返回。
 pub fn build_vm_client() -> Client {
@@ -135,9 +154,218 @@ pub async fn query_uptime(
     Ok(Some(total / count as f64))
 }
 
+/// 查询网关在指定时间范围内的在线、内存和 CPU 序列，并按时间戳合并。
+///
+/// PromQL 先按 gateway 聚合多个 instance series，确保前端收到一条稳定时间线。
+pub async fn query_gateway_history(
+    client: &Client,
+    base_url: &str,
+    gateway_id: &str,
+    start: i64,
+    end: i64,
+    step_seconds: i64,
+) -> Result<Vec<GatewayMetricSample>, String> {
+    let gateway_id = escape_label(gateway_id);
+    let online_query = format!("avg(gateway_up{{gateway_id=\"{gateway_id}\"}})");
+    let memory_query = format!("avg(gateway_memory_bytes{{gateway_id=\"{gateway_id}\"}})");
+    let cpu_query = format!("avg(gateway_cpu_percent{{gateway_id=\"{gateway_id}\"}})");
+
+    let (online, memory, cpu) = tokio::try_join!(
+        query_range_metric(client, base_url, &online_query, start, end, step_seconds),
+        query_range_metric(client, base_url, &memory_query, start, end, step_seconds),
+        query_range_metric(client, base_url, &cpu_query, start, end, step_seconds),
+    )?;
+
+    Ok(merge_gateway_history(online, memory, cpu))
+}
+
+/// 查询单个 Agent 的在线、内存、CPU 和管理时延历史。
+pub async fn query_agent_history(
+    client: &Client,
+    base_url: &str,
+    gateway_id: &str,
+    agent_id: &str,
+    start: i64,
+    end: i64,
+    step_seconds: i64,
+) -> Result<Vec<AgentMetricSample>, String> {
+    let gateway_id = escape_label(gateway_id);
+    let agent_id = escape_label(agent_id);
+    let online_query = format!(
+        "avg(agent_up{{gateway_id=\"{gateway_id}\",agent_id=\"{agent_id}\"}})"
+    );
+    let memory_query = format!(
+        "avg(agent_memory_bytes{{gateway_id=\"{gateway_id}\",agent_id=\"{agent_id}\"}})"
+    );
+    let cpu_query = format!(
+        "avg(agent_cpu_percent{{gateway_id=\"{gateway_id}\",agent_id=\"{agent_id}\"}})"
+    );
+    let latency_query = format!(
+        "avg(agent_admin_latency_ms{{gateway_id=\"{gateway_id}\",agent_id=\"{agent_id}\"}})"
+    );
+
+    let (online, memory, cpu, latency) = tokio::try_join!(
+        query_range_metric(client, base_url, &online_query, start, end, step_seconds),
+        query_range_metric(client, base_url, &memory_query, start, end, step_seconds),
+        query_range_metric(client, base_url, &cpu_query, start, end, step_seconds),
+        query_range_metric(client, base_url, &latency_query, start, end, step_seconds),
+    )?;
+
+    Ok(merge_agent_history(online, memory, cpu, latency))
+}
+
+/// 执行单条 VM range query，并收敛为时间戳和值的序列。
+async fn query_range_metric(
+    client: &Client,
+    base_url: &str,
+    query: &str,
+    start: i64,
+    end: i64,
+    step_seconds: i64,
+) -> Result<Vec<(i64, f64)>, String> {
+    let url = format!("{}/api/v1/query_range", base_url.trim_end_matches('/'));
+    let response = client
+        .get(&url)
+        .query(&[
+            ("query", query.to_string()),
+            ("start", start.to_string()),
+            ("end", end.to_string()),
+            ("step", step_seconds.to_string()),
+        ])
+        .send()
+        .await
+        .map_err(|err| format!("vm range query request failed: {err}"))?;
+    if !response.status().is_success() {
+        return Err(format!(
+            "vm range query rejected: HTTP {}",
+            response.status()
+        ));
+    }
+    let payload: serde_json::Value = response
+        .json()
+        .await
+        .map_err(|err| format!("failed to decode vm range query response: {err}"))?;
+    Ok(parse_range_values(&payload))
+}
+
+/// 解析 Prometheus matrix 响应；异常点按缺失处理，不影响同批其他样本。
+fn parse_range_values(payload: &serde_json::Value) -> Vec<(i64, f64)> {
+    let mut values = Vec::new();
+    let Some(results) = payload
+        .get("data")
+        .and_then(|data| data.get("result"))
+        .and_then(serde_json::Value::as_array)
+    else {
+        return values;
+    };
+    for series in results {
+        let Some(samples) = series.get("values").and_then(serde_json::Value::as_array) else {
+            continue;
+        };
+        for sample in samples {
+            let Some(pair) = sample.as_array() else {
+                continue;
+            };
+            let timestamp = pair.first().and_then(serde_json::Value::as_f64);
+            let value = pair
+                .get(1)
+                .and_then(serde_json::Value::as_str)
+                .and_then(|text| text.parse::<f64>().ok());
+            if let (Some(timestamp), Some(value)) = (timestamp, value) {
+                if value.is_finite() {
+                    values.push((timestamp.round() as i64, value));
+                }
+            }
+        }
+    }
+    values
+}
+
+/// 把三条独立指标序列合并成按时间升序的历史采样。
+fn merge_gateway_history(
+    online: Vec<(i64, f64)>,
+    memory: Vec<(i64, f64)>,
+    cpu: Vec<(i64, f64)>,
+) -> Vec<GatewayMetricSample> {
+    let mut samples = BTreeMap::<i64, GatewayMetricSample>::new();
+    for (at, value) in online {
+        samples
+            .entry(at)
+            .or_insert_with(|| empty_gateway_sample(at))
+            .online = Some(value);
+    }
+    for (at, value) in memory {
+        samples
+            .entry(at)
+            .or_insert_with(|| empty_gateway_sample(at))
+            .memory_bytes = Some(value);
+    }
+    for (at, value) in cpu {
+        samples
+            .entry(at)
+            .or_insert_with(|| empty_gateway_sample(at))
+            .cpu_percent = Some(value);
+    }
+    samples.into_values().collect()
+}
+
+fn merge_agent_history(
+    online: Vec<(i64, f64)>,
+    memory: Vec<(i64, f64)>,
+    cpu: Vec<(i64, f64)>,
+    latency: Vec<(i64, f64)>,
+) -> Vec<AgentMetricSample> {
+    let mut samples = BTreeMap::<i64, AgentMetricSample>::new();
+    for (at, value) in online {
+        samples
+            .entry(at)
+            .or_insert_with(|| empty_agent_sample(at))
+            .online = Some(value);
+    }
+    for (at, value) in memory {
+        samples
+            .entry(at)
+            .or_insert_with(|| empty_agent_sample(at))
+            .memory_bytes = Some(value);
+    }
+    for (at, value) in cpu {
+        samples
+            .entry(at)
+            .or_insert_with(|| empty_agent_sample(at))
+            .cpu_percent = Some(value);
+    }
+    for (at, value) in latency {
+        samples
+            .entry(at)
+            .or_insert_with(|| empty_agent_sample(at))
+            .admin_latency_ms = Some(value);
+    }
+    samples.into_values().collect()
+}
+
+fn empty_gateway_sample(at: i64) -> GatewayMetricSample {
+    GatewayMetricSample {
+        at,
+        online: None,
+        memory_bytes: None,
+        cpu_percent: None,
+    }
+}
+
+fn empty_agent_sample(at: i64) -> AgentMetricSample {
+    AgentMetricSample {
+        at,
+        online: None,
+        memory_bytes: None,
+        cpu_percent: None,
+        admin_latency_ms: None,
+    }
+}
+
 /// 构造 Prometheus 文本：
 /// - gateway_up：status=online → 1，否则 0（可算 uptime、告警）；
-/// - gateway_info / gateway_health：info-style，version/health 作为 label。
+/// - gateway_info / gateway_health：info-style，version/health 作为 label；
+/// - gateway_memory_bytes / gateway_cpu_percent：指标（可选，有值才推）。
 fn render_prometheus_lines(update: &GatewayStatusUpdate) -> String {
     let ts = update.last_seen_at.to_chrono().timestamp_millis();
     let up = if update.status == "online" { 1 } else { 0 };
@@ -145,14 +373,25 @@ fn render_prometheus_lines(update: &GatewayStatusUpdate) -> String {
     let instance_id = escape_label(&update.instance_id);
     let version = escape_label(&update.version);
     let health = escape_label(&update.health);
-    format!(
+    let mut text = format!(
         "gateway_up{{gateway_id=\"{gateway_id}\",instance_id=\"{instance_id}\"}} {up} {ts}\n\
          gateway_info{{gateway_id=\"{gateway_id}\",instance_id=\"{instance_id}\",version=\"{version}\"}} 1 {ts}\n\
          gateway_health{{gateway_id=\"{gateway_id}\",instance_id=\"{instance_id}\",health=\"{health}\"}} 1 {ts}\n"
-    )
+    );
+    if let Some(memory) = update.memory_bytes {
+        text.push_str(&format!(
+            "gateway_memory_bytes{{gateway_id=\"{gateway_id}\",instance_id=\"{instance_id}\"}} {memory} {ts}\n"
+        ));
+    }
+    if let Some(cpu) = update.cpu_percent {
+        text.push_str(&format!(
+            "gateway_cpu_percent{{gateway_id=\"{gateway_id}\",instance_id=\"{instance_id}\"}} {cpu} {ts}\n"
+        ));
+    }
+    text
 }
 
-/// 构造 agent 的 Prometheus 文本三行（agent_up=online→1 / agent_info / agent_health）。
+/// 构造 agent 的 Prometheus 文本（agent_up=online→1 / agent_info / agent_health / 指标可选）。
 fn render_agent_lines(gateway_id: &str, agent: &StoredAgent) -> String {
     let ts = agent.last_seen_at.to_chrono().timestamp_millis();
     let up = if agent.status == "online" { 1 } else { 0 };
@@ -160,11 +399,27 @@ fn render_agent_lines(gateway_id: &str, agent: &StoredAgent) -> String {
     let agent_id = escape_label(&agent.agent_id);
     let version = escape_label(&agent.version);
     let health = escape_label(&agent.health);
-    format!(
+    let mut text = format!(
         "agent_up{{agent_id=\"{agent_id}\",gateway_id=\"{gateway_id}\"}} {up} {ts}\n\
          agent_info{{agent_id=\"{agent_id}\",gateway_id=\"{gateway_id}\",version=\"{version}\"}} 1 {ts}\n\
          agent_health{{agent_id=\"{agent_id}\",gateway_id=\"{gateway_id}\",health=\"{health}\"}} 1 {ts}\n"
-    )
+    );
+    if let Some(memory) = agent.memory_bytes {
+        text.push_str(&format!(
+            "agent_memory_bytes{{agent_id=\"{agent_id}\",gateway_id=\"{gateway_id}\"}} {memory} {ts}\n"
+        ));
+    }
+    if let Some(cpu) = agent.cpu_percent {
+        text.push_str(&format!(
+            "agent_cpu_percent{{agent_id=\"{agent_id}\",gateway_id=\"{gateway_id}\"}} {cpu} {ts}\n"
+        ));
+    }
+    if let Some(latency) = agent.admin_latency_ms {
+        text.push_str(&format!(
+            "agent_admin_latency_ms{{agent_id=\"{agent_id}\",gateway_id=\"{gateway_id}\"}} {latency} {ts}\n"
+        ));
+    }
+    text
 }
 
 /// Prometheus 文本 label 值转义：`\` → `\\`，`"` → `\"`，换行 → `\n`。
@@ -187,6 +442,8 @@ mod tests {
             version: "v2.4.1".to_string(),
             status: status.to_string(),
             health: health.to_string(),
+            memory_bytes: Some(536_870_912),
+            cpu_percent: Some(21.5),
             last_seen_at: DateTime::from_rfc3339("2026-08-08T12:00:00Z").expect("ts"),
         }
     }
@@ -232,6 +489,9 @@ mod tests {
             version: "v0.3.2".to_string(),
             status: "online".to_string(),
             health: "healthy".to_string(),
+            memory_bytes: Some(268_435_456),
+            cpu_percent: Some(33.0),
+            admin_latency_ms: Some(12),
             last_seen_at: DateTime::from_rfc3339("2026-08-08T12:00:00Z").expect("ts"),
         };
         let text = render_agent_lines("gw-x", &agent);
@@ -251,5 +511,47 @@ mod tests {
         assert!(render_agent_lines("gw-x", &offline).starts_with(
             "agent_up{agent_id=\"agent-1\",gateway_id=\"gw-x\"} 0 "
         ));
+    }
+
+    #[test]
+    fn parses_and_merges_range_samples_by_timestamp() {
+        let payload = serde_json::json!({
+            "data": {
+                "result": [{
+                    "values": [[1000.0, "1"], [1060.0, "0.5"], [1120.0, "NaN"]]
+                }]
+            }
+        });
+        let online = parse_range_values(&payload);
+        assert_eq!(online, vec![(1000, 1.0), (1060, 0.5)]);
+
+        let samples = merge_gateway_history(
+            online,
+            vec![(1000, 536_870_912.0), (1120, 545_259_520.0)],
+            vec![(1060, 32.5)],
+        );
+        assert_eq!(samples.len(), 3);
+        assert_eq!(samples[0].at, 1000);
+        assert_eq!(samples[0].online, Some(1.0));
+        assert_eq!(samples[0].memory_bytes, Some(536_870_912.0));
+        assert_eq!(samples[1].cpu_percent, Some(32.5));
+        assert_eq!(samples[2].memory_bytes, Some(545_259_520.0));
+    }
+
+    #[test]
+    fn merges_agent_history_with_latency_series() {
+        let samples = merge_agent_history(
+            vec![(1000, 1.0)],
+            vec![(1000, 268_435_456.0)],
+            vec![(1000, 20.0)],
+            vec![(1000, 8.0)],
+        );
+        assert_eq!(samples, vec![AgentMetricSample {
+            at: 1000,
+            online: Some(1.0),
+            memory_bytes: Some(268_435_456.0),
+            cpu_percent: Some(20.0),
+            admin_latency_ms: Some(8.0),
+        }]);
     }
 }

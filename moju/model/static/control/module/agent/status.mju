@@ -64,6 +64,9 @@ struct AgentRuntimeStatusView {
   status: String
   last_seen_at: DateTime
   health: String
+  memory_bytes: Int?
+  cpu_percent: Float?
+  admin_latency_ms: Int?
 }
 
 struct AgentOverviewMetrics {

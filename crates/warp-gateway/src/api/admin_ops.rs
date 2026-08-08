@@ -61,6 +61,9 @@ pub async fn get_agent_runtime_status(
             &agent.version,
             "online",
             "healthy",
+            agent.last_memory_bytes,
+            agent.last_cpu_percent,
+            agent.last_admin_latency_ms,
         ),
     })
     .into_response()
@@ -149,6 +152,9 @@ fn runtime_status(
     version: &str,
     status: &str,
     health: &str,
+    memory_bytes: Option<u64>,
+    cpu_percent: Option<f64>,
+    admin_latency_ms: Option<u64>,
 ) -> AgentRuntimeStatusView {
     AgentRuntimeStatusView {
         agent_id: agent_id.to_string(),
@@ -156,6 +162,9 @@ fn runtime_status(
         version: version.to_string(),
         status: status.to_string(),
         health: health.to_string(),
+        memory_bytes: memory_bytes.map(|value| value as i64),
+        cpu_percent,
+        admin_latency_ms: admin_latency_ms.map(|value| value as i64),
         last_seen_at: DateTime::now(),
     }
 }

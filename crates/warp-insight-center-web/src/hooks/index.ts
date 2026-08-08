@@ -7,6 +7,8 @@ import {
   createGatewayInstance,
   createUpgradePlan,
   fetchGatewayAgents,
+  fetchAgentHistory,
+  fetchGatewayHistory,
   fetchGatewayList,
   fetchGatewayInitialConfig,
   fetchGatewayStatus,
@@ -56,6 +58,38 @@ export function useGatewayStatus(gatewayId: string) {
   });
 }
 
+/** 轮询网关历史序列；Query key 包含窗口，避免不同时间范围共享缓存。 */
+export function useGatewayHistory(gatewayId: string, window = "1h") {
+  useAuthVersion();
+  const enabled = Boolean(gatewayId);
+  return useQuery({
+    queryKey: ["gateway-history", gatewayId, window],
+    queryFn: () => fetchGatewayHistory(gatewayId, window),
+    refetchInterval: getAdminApiToken() ? 15_000 : 30_000,
+    enabled,
+  });
+}
+
+/** 批量查询当前网关下 Agent 的历史，保持每个 Agent 独立缓存和错误回退。 */
+export function useAgentHistories(gatewayId: string, agentIds: string[]) {
+  useAuthVersion();
+  const hasAdminToken = Boolean(getAdminApiToken());
+  const enabled = Boolean(gatewayId) && agentIds.length > 0;
+  return useQuery({
+    queryKey: ["agent-histories", gatewayId, agentIds],
+    queryFn: async () => {
+      const results = await Promise.all(
+        agentIds.map((agentId) => fetchAgentHistory(gatewayId, agentId)),
+      );
+      return Object.fromEntries(
+        results.map((result) => [result.data.agentId, result]),
+      );
+    },
+    refetchInterval: hasAdminToken ? 15_000 : 30_000,
+    enabled,
+  });
+}
+
 export function useGatewayAgents(gatewayId: string) {
   useAuthVersion();
   const enabled = Boolean(getAdminApiToken());
@@ -80,7 +114,9 @@ export function useGatewayList() {
 /** 一次拉取多个网关的在线率，返回 { gateway_id: uptime|null } 映射（列表页用）。 */
 export function useGatewayUptimes(gatewayIds: string[]) {
   useAuthVersion();
-  const enabled = Boolean(getAdminApiToken()) && gatewayIds.length > 0;
+  const hasAdminToken = Boolean(getAdminApiToken());
+  // 无 Token 时仍请求一次，让 fetchOrFallback 提供与历史趋势一致的示例在线率。
+  const enabled = gatewayIds.length > 0;
   return useQuery({
     queryKey: ["gateway-uptimes", gatewayIds],
     queryFn: async () => {
@@ -94,7 +130,7 @@ export function useGatewayUptimes(gatewayIds: string[]) {
       return map;
     },
     enabled,
-    refetchInterval: enabled ? 5_000 : 30_000,
+    refetchInterval: hasAdminToken ? 5_000 : 30_000,
   });
 }
 
@@ -127,14 +163,14 @@ export function usePublishWarpAgentd() {
 
 export function usePublishWarpGateWay() {
   return useMutation({
-    mutationFn: (command: PublishReleaseCommand) =>
-      publishWarpGateWay(command),
+    mutationFn: (command: PublishReleaseCommand) => publishWarpGateWay(command),
   });
 }
 
 export function useCreateUpgradePlan() {
   return useMutation({
-    mutationFn: (command: CreateUpgradePlanCommand) => createUpgradePlan(command),
+    mutationFn: (command: CreateUpgradePlanCommand) =>
+      createUpgradePlan(command),
   });
 }
 
