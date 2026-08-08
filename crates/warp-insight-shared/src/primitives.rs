@@ -12,6 +12,10 @@ impl DateTime {
     pub fn from_rfc3339(value: &str) -> Option<Self> {
         chrono::DateTime::parse_from_rfc3339(value).ok().map(|v| Self(v.with_timezone(&chrono::Utc)))
     }
+    /// 取底层 chrono 值（如 sqlx TIMESTAMPTZ 绑定）。
+    pub fn to_chrono(&self) -> chrono::DateTime<chrono::Utc> {
+        self.0
+    }
     pub fn seconds_until(&self, later: &Self) -> i64 {
         later.0.signed_duration_since(self.0).num_seconds().max(0)
     }

@@ -128,6 +128,7 @@ mod tests {
             status: None,
             health: None,
             fetch_config: false,
+            report_agents: false,
             report_action: true,
         }
     }

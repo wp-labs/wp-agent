@@ -5,9 +5,11 @@ import styles from "./GatewayStatusList.module.css";
 
 export function GatewayStatusList({
   items,
+  uptimes,
   loading,
 }: {
   items?: GatewayStatusView[];
+  uptimes?: Record<string, number | null>;
   loading?: boolean;
 }) {
   if (loading && (!items || items.length === 0)) {
@@ -30,7 +32,11 @@ export function GatewayStatusList({
   return (
     <div className={styles.grid}>
       {items.map((gateway) => (
-        <GatewayStatusCard key={gateway.gatewayId} gateway={gateway} />
+        <GatewayStatusCard
+          key={gateway.gatewayId}
+          gateway={gateway}
+          uptime={uptimes?.[gateway.gatewayId]}
+        />
       ))}
     </div>
   );

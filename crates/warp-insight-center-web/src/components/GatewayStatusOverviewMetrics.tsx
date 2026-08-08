@@ -4,9 +4,15 @@ import styles from "./GatewayStatusOverviewMetrics.module.css";
 
 export function GatewayStatusOverviewMetrics({
   list,
+  averageUptime,
 }: {
   list?: GatewayListView | null;
+  averageUptime?: number | null;
 }) {
+  const uptimeText =
+    averageUptime === null || averageUptime === undefined
+      ? "—"
+      : `${(averageUptime * 100).toFixed(1)}%`;
   return (
     <div className={styles.section}>
       <div className={styles.header}>
@@ -22,6 +28,7 @@ export function GatewayStatusOverviewMetrics({
         <MetricCard label="在线" value={list?.onlineCount ?? "—"} tone="green" />
         <MetricCard label="降级" value={list?.degradedCount ?? "—"} tone="amber" />
         <MetricCard label="离线" value={list?.offlineCount ?? "—"} tone="red" />
+        <MetricCard label="平均在线率" value={uptimeText} tone="green" />
       </div>
     </div>
   );

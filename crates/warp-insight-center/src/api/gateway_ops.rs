@@ -15,11 +15,94 @@ use insight_control::{
     GatewayStatusAccepted, GatewayStatusAcceptedReturned, ReportGatewayStatus,
 };
 
-use crate::infra::{sha256_hex, StoredGateway, StoredGatewayCredentialStatus};
+use crate::infra::{
+    sha256_hex, GatewayStatusUpdate, StoredAgent, StoredGateway, StoredGatewayCredentialStatus,
+};
 
 use super::{rate_limit, ApiState};
 
 const GATEWAY_AUTH_SCOPE: &str = "gateway";
+
+/// Gateway 上报其下 Agent 状态（POST /api/v1/gateway/agents/status）。
+#[derive(serde::Deserialize)]
+pub struct AgentStatusReportRequest {
+    pub gateway_id: String,
+    pub agents: Vec<AgentStatusEntry>,
+}
+
+#[derive(serde::Deserialize)]
+pub struct AgentStatusEntry {
+    pub agent_id: String,
+    pub instance_id: String,
+    pub version: String,
+    pub status: String,
+    pub health: String,
+    pub last_seen_at: insight_control::types::DateTime,
+}
+
+/// 接收 Gateway 上报的 Agent 状态：Bearer 按 gateway_id 凭证鉴权 → store upsert → VM 推送。
+pub async fn submit_agent_status(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(input): Json<AgentStatusReportRequest>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    match authenticate_gateway(&state, &headers, &input.gateway_id, &client_key).await {
+        Ok(_) => {
+            let stored: Vec<StoredAgent> = input
+                .agents
+                .iter()
+                .map(|agent| StoredAgent {
+                    agent_id: agent.agent_id.clone(),
+                    gateway_id: input.gateway_id.clone(),
+                    instance_id: agent.instance_id.clone(),
+                    version: agent.version.clone(),
+                    status: agent.status.clone(),
+                    health: agent.health.clone(),
+                    last_seen_at: agent.last_seen_at.clone(),
+                })
+                .collect();
+            if let Err(err) = state
+                .store
+                .upsert_agent_status(&input.gateway_id, &stored)
+                .await
+            {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("failed to update agent status: {err}"),
+                )
+                    .into_response();
+            }
+            if let Some(vm_url) = &state.config.victoriametrics_url {
+                if let Err(err) = crate::infra::vm::push_agent_status(
+                    vm_client(),
+                    vm_url,
+                    &input.gateway_id,
+                    &stored,
+                )
+                .await
+                {
+                    eprintln!("warn agent_status vm push failed: {err}");
+                }
+            }
+            (
+                StatusCode::OK,
+                Json(serde_json::json!({
+                    "gateway_id": input.gateway_id,
+                    "agents_accepted": stored.len(),
+                })),
+            )
+                .into_response()
+        }
+        Err(response) => response,
+    }
+}
+
+/// VM 推送全局 HTTP 客户端（进程内复用连接池）。
+fn vm_client() -> &'static reqwest::Client {
+    crate::infra::vm::shared_vm_client()
+}
 
 pub async fn submit_gateway_status(
     State(state): State<ApiState>,
@@ -28,25 +111,32 @@ pub async fn submit_gateway_status(
     Json(input): Json<ReportGatewayStatus>,
 ) -> Response {
     let client_key = rate_limit::client_key(client);
-    match authenticate_gateway(&state, &headers, &input.gateway_id, &client_key) {
+    match authenticate_gateway(&state, &headers, &input.gateway_id, &client_key).await {
         Ok(_) => {
             let accepted_at = input.reported_at.clone();
-            let instance_id = input.instance_id.clone();
-            let update_result = state.store.update(|snapshot| {
-                if let Some(stored) = snapshot.gateways.get_mut(&input.gateway_id) {
-                    stored.instance_id = instance_id;
-                    stored.version = Some(input.version.clone());
-                    stored.status = Some(input.status.clone());
-                    stored.health = Some(input.health.clone());
-                    stored.last_seen_at = Some(accepted_at.clone());
-                }
-            });
+            let update = GatewayStatusUpdate {
+                gateway_id: input.gateway_id.clone(),
+                instance_id: input.instance_id.clone(),
+                version: input.version.clone(),
+                status: input.status.clone(),
+                health: input.health.clone(),
+                last_seen_at: accepted_at.clone(),
+            };
+            let update_result = state.store.upsert_gateway_status(&update).await;
             if let Err(err) = update_result {
                 return (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     format!("failed to update gateway status: {err}"),
                 )
                     .into_response();
+            }
+            // 时序历史：配置了 VictoriaMetrics 则推送指标（失败仅告警，不影响上报成功）。
+            if let Some(vm_url) = &state.config.victoriametrics_url {
+                if let Err(err) =
+                    crate::infra::vm::push_gateway_status(vm_client(), vm_url, &update).await
+                {
+                    eprintln!("warn gateway_status vm push failed: {err}");
+                }
             }
             (
                 StatusCode::OK,
@@ -67,7 +157,7 @@ pub async fn submit_gateway_status(
 /// 按 binding 的 `actor_identity WarpGateway.id from credential.gateway_id`：
 /// bearer token → 匹配 store 中该 gateway 的凭证 hash（常数时间比较）→
 /// Active 且未过期 → 与上报 gateway_id 一致。
-fn authenticate_gateway(
+async fn authenticate_gateway(
     state: &ApiState,
     headers: &HeaderMap,
     gateway_id: &str,
@@ -81,14 +171,17 @@ fn authenticate_gateway(
         return Err((StatusCode::UNAUTHORIZED, "missing bearer credential").into_response());
     };
     let token_hash = sha256_hex(token);
-    let snapshot = state.store.load().map_err(|err| {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("failed to load gateway credential store: {err}"),
-        )
-            .into_response()
-    })?;
-    let Some(gateway) = snapshot.gateways.get(gateway_id) else {
+    let gateway = match state.store.get_gateway(gateway_id).await {
+        Ok(gateway) => gateway,
+        Err(err) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to load gateway credential store: {err}"),
+            )
+                .into_response());
+        }
+    };
+    let Some(gateway) = gateway else {
         rate_limit::record_auth_failure(state, client_key, GATEWAY_AUTH_SCOPE);
         return Err((StatusCode::UNAUTHORIZED, "unknown gateway credential").into_response());
     };
@@ -107,7 +200,7 @@ fn authenticate_gateway(
         }
     }
     rate_limit::clear_auth_failures(state, client_key, GATEWAY_AUTH_SCOPE);
-    Ok(gateway.clone())
+    Ok(gateway)
 }
 
 fn bearer_token(headers: &HeaderMap) -> Option<&str> {
@@ -149,7 +242,7 @@ mod tests {
     use crate::{
         api::ApiState,
         config::GatewayCredentialSeed,
-        infra::CenterStore,
+        infra::FileStore,
     };
 
     fn test_state() -> ApiState {
@@ -158,7 +251,7 @@ mod tests {
             .expect("time")
             .as_nanos();
         let path = std::env::temp_dir().join(format!("wic-api-test-{nanos}.json"));
-        let store = CenterStore::new(path);
+        let store = FileStore::new(path);
         store
             .seed(&[GatewayCredentialSeed {
                 gateway_id: "gw-001".to_string(),
@@ -172,8 +265,10 @@ mod tests {
                 store_path: std::env::temp_dir().join(format!("wic-api-test-{nanos}.json")),
                 gateway_credentials: Vec::new(),
                 admin_token_hash: None,
+                database_url: None,
+                victoriametrics_url: None,
             },
-            store,
+            store: std::sync::Arc::new(store),
             rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
                 super::super::rate_limit::RateLimitState::default(),
             )),

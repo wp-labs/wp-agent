@@ -1,9 +1,6 @@
 .card {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
   min-width: 0;
-  padding: 16px;
+  padding: 0;
   border: 1px solid #dbe3ee;
   border-radius: 8px;
   background: #ffffff;
@@ -11,9 +8,28 @@
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
+.cardLink {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink:hover .gatewayId {
+  color: #1f6feb;
+}
+
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 28px rgba(33, 48, 73, 0.09);
+}
+
+.offlineCard {
+  border-color: #f2c8c8;
+  background: #fffbfb;
 }
 
 .top {
@@ -28,10 +44,17 @@
 }
 
 .gatewayId {
-  margin-top: 3px;
-  color: #5f6f86;
-  font-size: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2d3d;
   overflow-wrap: anywhere;
+}
+
+.statusGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
 }
 
 .details {
@@ -52,5 +75,25 @@
 
 .label {
   color: #718095;
+  font-size: 12px;
+}
+
+.uptimeValue {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f6feb;
+  line-height: 1;
+}
+
+.uptimeLow {
+  color: #d3322f;
+}
+
+.staleValue {
+  color: #d3322f;
+}
+
+.staleHint {
+  color: #a6b0bf;
   font-size: 12px;
 }

@@ -25,6 +25,22 @@ export interface GatewayListView {
   updatedAt: string;
 }
 
+export interface GatewayUptime {
+  gatewayId: string;
+  window: string;
+  /** 在线率 0..1；无历史数据 / VM 不可达 → null。 */
+  uptime: number | null;
+}
+
+export interface AgentStatusView {
+  agentId: string;
+  instanceId: string;
+  version: string;
+  status: GatewayStatus;
+  health: GatewayHealth;
+  lastSeenAt: string;
+}
+
 export interface GatewayInstance {
   gatewayId: string;
   instanceId: string;
@@ -354,6 +370,67 @@ function exampleGatewayListView(): GatewayListView {
   };
 }
 
+// 每个网关稳定的示例在线率（0.5~0.99，由 gateway_id 派生）。
+function exampleGatewayUptime(gatewayId: string, window: string): GatewayUptime {
+  let hash = 0;
+  for (const ch of gatewayId) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  const uptime = 0.5 + (hash % 50) / 100;
+  return { gatewayId, window, uptime };
+}
+
+function normalizeGatewayUptime(
+  payload: any,
+  fallbackGatewayId: string,
+  fallbackWindow: string,
+): GatewayUptime {
+  return {
+    gatewayId:
+      requiredString(pick(payload, "gateway_id", "gatewayId"), "uptime.gatewayId") ||
+      fallbackGatewayId,
+    window:
+      requiredString(pick(payload, "window"), "uptime.window") || fallbackWindow,
+    uptime: typeof payload.uptime === "number" ? payload.uptime : null,
+  };
+}
+
+function normalizeAgentStatusView(payload: any): AgentStatusView {
+  return {
+    agentId: requiredString(pick(payload, "agent_id", "agentId"), "agent.agentId"),
+    instanceId: requiredString(
+      pick(payload, "instance_id", "instanceId"),
+      "agent.instanceId",
+    ),
+    version: requiredString(payload.version, "agent.version"),
+    status: requiredString(payload.status, "agent.status") as GatewayStatus,
+    health: requiredString(payload.health, "agent.health") as GatewayHealth,
+    lastSeenAt: requiredString(
+      pick(payload, "last_seen_at", "lastSeenAt"),
+      "agent.lastSeenAt",
+    ),
+  };
+}
+
+function exampleAgentStatus(gatewayId: string): AgentStatusView[] {
+  return [
+    {
+      agentId: `${gatewayId}-agent-1`,
+      instanceId: `inst-${gatewayId}-a1`,
+      version: "v0.3.2",
+      status: "online",
+      health: "healthy",
+      lastSeenAt: isoMinutesAgo(0),
+    },
+    {
+      agentId: `${gatewayId}-agent-2`,
+      instanceId: `inst-${gatewayId}-a2`,
+      version: "v0.3.0",
+      status: "online",
+      health: "degraded",
+      lastSeenAt: isoMinutesAgo(1),
+    },
+  ];
+}
+
 function exampleGatewayInstance(command: CreateGatewayInstanceCommand): GatewayInstance {
   return {
     gatewayId: `gw-${Math.random().toString(36).slice(2, 8)}`,
@@ -441,6 +518,56 @@ export async function fetchGatewayList(): Promise<ExampleResult<GatewayListView>
       };
     },
   );
+}
+
+export async function fetchGatewayUptime(
+  gatewayId: string,
+  window = "1h",
+): Promise<ExampleResult<GatewayUptime>> {
+  const path = `/api/v1/admin/gateways/${encodeURIComponent(
+    gatewayId,
+  )}/status/uptime?window=${encodeURIComponent(window)}`;
+  return fetchOrFallback(
+    path,
+    () => exampleGatewayUptime(gatewayId, window),
+  ).then(async (result) => {
+    if (result.source !== "real") return result;
+    return {
+      ...result,
+      data: normalizeGatewayUptime(result.data as any, gatewayId, window),
+    };
+  });
+}
+
+export async function fetchGatewayAgents(
+  gatewayId: string,
+): Promise<ExampleResult<AgentStatusView[]>> {
+  const path = `/api/v1/admin/gateways/${encodeURIComponent(gatewayId)}/agents`;
+  return fetchOrFallback(
+    path,
+    () => exampleAgentStatus(gatewayId),
+  ).then(async (result) => {
+    if (result.source !== "real") return result;
+    const raw = result.data as any;
+    const items = Array.isArray(raw)
+      ? raw
+      : Array.isArray(raw?.agents)
+        ? raw.agents
+        : [];
+    return { ...result, data: items.map(normalizeAgentStatusView) };
+  });
+}
+
+export async function fetchGatewayStatus(
+  gatewayId: string,
+): Promise<ExampleResult<GatewayStatusView | null>> {
+  const path = `/api/v1/admin/gateways/${encodeURIComponent(gatewayId)}/status`;
+  return fetchOrFallback(path, () => null).then(async (result) => {
+    if (result.source !== "real") return result;
+    const raw = result.data as any;
+    const item = raw?.status ?? raw;
+    return { ...result, data: item ? normalizeGatewayStatusView(item) : null };
+  });
 }
 
 export async function createGatewayInstance(

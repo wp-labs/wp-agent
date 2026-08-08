@@ -1,24 +1,173 @@
-// 管理面读取接口：网关列表聚合 / 状态卡片列表 / 单网关状态。
+// 管理面接口：网关创建 + 列表聚合 / 状态卡片列表 / 单网关状态。
 // 数据来自 center store（ReceiveGatewayStatusReport 落库的最新状态）。
 
 use std::net::SocketAddr;
 
 use axum::{
-    extract::{connect_info::ConnectInfo, Path, State},
+    extract::{connect_info::ConnectInfo, Path, Query, State},
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
 
 use insight_control::{
-    AdminGatewayListReturned, AdminGatewayStatusListReturned, AdminGatewayStatusReturned,
-    GatewayListView, GatewayStatusView,
+    AdminGatewayInstanceReturned, AdminGatewayListReturned, AdminGatewayStatusListReturned,
+    AdminGatewayStatusReturned, AgentRuntimeStatusView, GatewayInstance, GatewayListView,
+    GatewayStatusView,
 };
 use insight_control::types::DateTime;
 
-use crate::infra::StoredGateway;
+use crate::infra::{StoreError, StoredGateway};
 
 use super::{admin_auth::require_admin_bearer, rate_limit, ApiState};
+
+/// 创建网关实例请求体：对齐模型 `AdminCreateGatewayInstance`（gateway_name/requested_by），
+/// 额外扩展可选 `token`（脚本传入；前端表单不传则创建无凭证网关，无法上报状态）。
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AdminCreateGatewayInstanceRequest {
+    pub gateway_name: String,
+    pub requested_by: String,
+    pub token: Option<String>,
+}
+
+/// 创建网关实例：POST /api/v1/admin/gateways/instances。
+/// gateway_id 由 gateway_name 派生；重复 → 409。
+pub async fn admin_create_gateway_instance(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(request): Json<AdminCreateGatewayInstanceRequest>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let gateway_id = request.gateway_name.trim();
+    if gateway_id.is_empty() || request.requested_by.trim().is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            "gateway_name and requested_by must not be empty",
+        )
+            .into_response();
+    }
+    let token = request.token.as_deref().unwrap_or_default();
+    match state.store.create_gateway(gateway_id, token).await {
+        Ok(stored) => (
+            StatusCode::CREATED,
+            Json(AdminGatewayInstanceReturned {
+                instance: GatewayInstance {
+                    gateway_id: stored.gateway_id,
+                    instance_id: stored.instance_id,
+                    status: "active".to_string(),
+                    created_at: DateTime::now(),
+                },
+            }),
+        )
+            .into_response(),
+        Err(StoreError::Conflict(_)) => (
+            StatusCode::CONFLICT,
+            format!("gateway {gateway_id} already exists"),
+        )
+            .into_response(),
+        Err(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("failed to create gateway: {err}"),
+        )
+            .into_response(),
+    }
+}
+
+/// 网关在线率查询参数（默认 1h 窗口）。
+#[derive(serde::Deserialize)]
+pub struct GatewayUptimeQueryParams {
+    pub window: Option<String>,
+}
+
+/// 网关在线率返回（0..1；无历史数据或 VM 不可达 → None）。
+#[derive(serde::Serialize)]
+pub struct GatewayUptimeReturned {
+    pub gateway_id: String,
+    pub window: String,
+    pub uptime: Option<f64>,
+}
+
+/// 查询网关在线率：GET /api/v1/admin/gateways/:gateway_id/status/uptime。
+/// 转发 VM `avg_over_time(gateway_up{gateway_id="X"}[window])`；
+/// VM 未配置 / 查询失败 / 无历史样本 → uptime None（HTTP 200，列表页平滑显示"—"）。
+pub async fn admin_get_gateway_uptime(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path(gateway_id): Path<String>,
+    Query(params): Query<GatewayUptimeQueryParams>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let window = params.window.as_deref().unwrap_or("1h");
+    let uptime = match &state.config.victoriametrics_url {
+        Some(vm_url) => {
+            match crate::infra::vm::query_uptime(
+                crate::infra::vm::shared_vm_client(),
+                vm_url,
+                &gateway_id,
+                window,
+            )
+            .await
+            {
+                Ok(uptime) => uptime,
+                Err(err) => {
+                    eprintln!("warn gateway uptime vm query failed: {err}");
+                    None
+                }
+            }
+        }
+        None => None,
+    };
+    Json(GatewayUptimeReturned {
+        gateway_id,
+        window: window.to_string(),
+        uptime,
+    })
+    .into_response()
+}
+
+/// 查询某 gateway 下的 Agent 状态：GET /api/v1/admin/gateways/:gateway_id/agents。
+pub async fn admin_list_gateway_agents(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path(gateway_id): Path<String>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let agents = match state.store.list_agents_by_gateway(&gateway_id).await {
+        Ok(agents) => agents,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to load gateway agents: {err}"),
+            )
+                .into_response();
+        }
+    };
+    let views: Vec<AgentRuntimeStatusView> = agents
+        .into_iter()
+        .map(|agent| AgentRuntimeStatusView {
+            agent_id: agent.agent_id,
+            instance_id: agent.instance_id,
+            version: agent.version,
+            status: agent.status,
+            health: agent.health,
+            last_seen_at: agent.last_seen_at,
+        })
+        .collect();
+    Json(views).into_response()
+}
 
 pub async fn admin_view_gateway_list(
     State(state): State<ApiState>,
@@ -29,8 +178,8 @@ pub async fn admin_view_gateway_list(
     if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
         return response;
     }
-    let snapshot = match state.store.load() {
-        Ok(snapshot) => snapshot,
+    let gateways = match state.store.list_gateways().await {
+        Ok(gateways) => gateways,
         Err(err) => {
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -39,8 +188,7 @@ pub async fn admin_view_gateway_list(
                 .into_response();
         }
     };
-    let gateways = snapshot.gateways;
-    let (online_count, offline_count, degraded_count) = gateways.values().fold(
+    let (online_count, offline_count, degraded_count) = gateways.iter().fold(
         (0_i64, 0_i64, 0_i64),
         |(online, offline, degraded), stored| {
             let online = online + i64::from(stored.status.as_deref() == Some("online"));
@@ -72,8 +220,8 @@ pub async fn admin_list_gateway_status(
     if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
         return response;
     }
-    let snapshot = match state.store.load() {
-        Ok(snapshot) => snapshot,
+    let gateways = match state.store.list_gateways().await {
+        Ok(gateways) => gateways,
         Err(err) => {
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -83,9 +231,8 @@ pub async fn admin_list_gateway_status(
         }
     };
     // 状态视图只展示「已上报过」的网关；从未上报的网关无状态可展示（聚合 gateway_count 仍计入）。
-    let mut views: Vec<GatewayStatusView> = snapshot
-        .gateways
-        .values()
+    let mut views: Vec<GatewayStatusView> = gateways
+        .iter()
         .filter(|stored| stored.last_seen_at.is_some())
         .map(gateway_status_view)
         .collect();
@@ -103,8 +250,8 @@ pub async fn admin_show_gateway_status(
     if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
         return response;
     }
-    let snapshot = match state.store.load() {
-        Ok(snapshot) => snapshot,
+    let stored = match state.store.get_gateway(&gateway_id).await {
+        Ok(stored) => stored,
         Err(err) => {
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -113,7 +260,7 @@ pub async fn admin_show_gateway_status(
                 .into_response();
         }
     };
-    let Some(stored) = snapshot.gateways.get(&gateway_id) else {
+    let Some(stored) = stored else {
         return (
             StatusCode::NOT_FOUND,
             format!("unknown gateway {gateway_id}"),
@@ -129,7 +276,7 @@ pub async fn admin_show_gateway_status(
             .into_response();
     }
     Json(AdminGatewayStatusReturned {
-        status: gateway_status_view(stored),
+        status: gateway_status_view(&stored),
     })
     .into_response()
 }
@@ -157,16 +304,16 @@ mod tests {
 
     use crate::{
         config::{CenterConfig, GatewayCredentialSeed},
-        infra::CenterStore,
+        infra::FileStore,
     };
 
-    fn test_store() -> CenterStore {
+    fn test_store() -> FileStore {
         let nanos = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("time")
             .as_nanos();
         let path = std::env::temp_dir().join(format!("wic-admin-test-{nanos}.json"));
-        let store = CenterStore::new(&path);
+        let store = FileStore::new(&path);
         store
             .seed(&[
                 GatewayCredentialSeed {
@@ -207,8 +354,10 @@ mod tests {
                 store_path: std::env::temp_dir().join("unused.json"),
                 gateway_credentials: Vec::new(),
                 admin_token_hash: Some(super::super::super::infra::sha256_hex("admin-tok")),
+                database_url: None,
+                victoriametrics_url: None,
             },
-            store: test_store(),
+            store: std::sync::Arc::new(test_store()),
             rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
                 super::super::rate_limit::RateLimitState::default(),
             )),
@@ -226,7 +375,7 @@ mod tests {
             .expect("time")
             .as_nanos();
         let path = std::env::temp_dir().join(format!("wic-never-{nanos}.json"));
-        let store = CenterStore::new(&path);
+        let store = FileStore::new(&path);
         store
             .seed(&[
                 GatewayCredentialSeed {
@@ -257,8 +406,10 @@ mod tests {
                 store_path: std::env::temp_dir().join(format!("wic-never-{nanos}.json")),
                 gateway_credentials: Vec::new(),
                 admin_token_hash: Some(super::super::super::infra::sha256_hex("admin-tok")),
+                database_url: None,
+                victoriametrics_url: None,
             },
-            store,
+            store: std::sync::Arc::new(store),
             rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
                 super::super::rate_limit::RateLimitState::default(),
             )),
@@ -394,6 +545,136 @@ mod tests {
             .await
             .expect("response");
         assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    }
+
+    fn create_state_with_store(store: FileStore) -> ApiState {
+        ApiState {
+            config: CenterConfig {
+                listen_addr: "127.0.0.1:3100".to_string(),
+                store_path: std::env::temp_dir().join("unused.json"),
+                gateway_credentials: Vec::new(),
+                admin_token_hash: Some(super::super::super::infra::sha256_hex("admin-tok")),
+                database_url: None,
+                victoriametrics_url: None,
+            },
+            store: std::sync::Arc::new(store),
+            rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
+                super::super::rate_limit::RateLimitState::default(),
+            )),
+        }
+    }
+
+    fn create_payload(gateway_name: &str) -> String {
+        format!(
+            r#"{{"gateway_name":"{gateway_name}","requested_by":"test","token":"tok-create"}}"#
+        )
+    }
+
+    #[tokio::test]
+    async fn create_gateway_instance_creates_and_conflicts() {
+        use axum::{body::Body, http::Request};
+        use http_body_util::BodyExt;
+        use tower::ServiceExt;
+
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("wic-create-{nanos}.json"));
+        let state = create_state_with_store(FileStore::new(&path));
+        let app = super::super::router_for(state);
+
+        // 创建 → 201 + instance。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/admin/gateways/instances")
+                    .header("content-type", "application/json")
+                    .header("authorization", "Bearer admin-tok")
+                    .body(Body::from(create_payload("gw-create")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::CREATED);
+        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let returned: AdminGatewayInstanceReturned = serde_json::from_slice(&body).expect("json");
+        assert_eq!(returned.instance.gateway_id, "gw-create");
+        assert_eq!(returned.instance.status, "active");
+
+        // 重复创建同一 gateway_id → 409。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/admin/gateways/instances")
+                    .header("content-type", "application/json")
+                    .header("authorization", "Bearer admin-tok")
+                    .body(Body::from(create_payload("gw-create")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+
+        // 用创建时的 token 上报状态 → 200（创建凭证立即可用）。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/status")
+                    .header("content-type", "application/json")
+                    .header("authorization", "Bearer tok-create")
+                    .body(Body::from(
+                        r#"{"gateway_id":"gw-create","instance_id":"inst-1","version":"v2.4.1","status":"online","health":"healthy","reported_at":"2026-08-08T12:00:00Z"}"#,
+                    ))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[tokio::test]
+    async fn create_gateway_instance_rejects_empty_name() {
+        use axum::{body::Body, http::Request};
+        use tower::ServiceExt;
+
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("wic-create-empty-{nanos}.json"));
+        let state = create_state_with_store(FileStore::new(&path));
+        let app = super::super::router_for(state);
+
+        for payload in [
+            r#"{"gateway_name":"  ","requested_by":"test","token":"tok"}"#,
+            r#"{"gateway_name":"gw-x","requested_by":"  ","token":"tok"}"#,
+        ] {
+            let response = app
+                .clone()
+                .oneshot(
+                    Request::builder()
+                        .method("POST")
+                        .uri("/api/v1/admin/gateways/instances")
+                        .header("content-type", "application/json")
+                        .header("authorization", "Bearer admin-tok")
+                        .body(Body::from(payload))
+                        .expect("request"),
+                )
+                .await
+                .expect("response");
+            assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        }
+
+        let _ = std::fs::remove_file(path);
     }
 
     #[tokio::test]

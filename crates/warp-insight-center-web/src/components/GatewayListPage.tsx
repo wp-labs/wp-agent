@@ -1,4 +1,5 @@
-import { useGatewayList, useGatewayStatusView } from "../hooks";
+import { useMemo } from "react";
+import { useGatewayList, useGatewayStatusView, useGatewayUptimes } from "../hooks";
 import { isRateLimitedError } from "../api";
 import { ErrorBanner, PageShell } from "./ui";
 import { GatewayStatusList } from "./GatewayStatusList";
@@ -10,6 +11,21 @@ import {
 export function GatewayListPage() {
   const { data: statusData, isLoading, isError, error } = useGatewayStatusView();
   const { data: listData } = useGatewayList();
+
+  const gatewayIds = useMemo(
+    () => (statusData?.data ?? []).map((gateway) => gateway.gatewayId),
+    [statusData],
+  );
+  const { data: uptimesData } = useGatewayUptimes(gatewayIds);
+  const uptimes = uptimesData ?? {};
+
+  const averageUptime = useMemo(() => {
+    const values = Object.values(uptimes).filter(
+      (value): value is number => typeof value === "number",
+    );
+    if (values.length === 0) return null;
+    return values.reduce((sum, value) => sum + value, 0) / values.length;
+  }, [uptimes]);
 
   return (
     <PageShell
@@ -23,9 +39,13 @@ export function GatewayListPage() {
           <ErrorBanner>无法连接 WarpInsightCenter 管理服务，请确认后端已启动。</ErrorBanner>
         )
       ) : null}
-      <GatewayStatusOverviewMetrics list={listData?.data} />
+      <GatewayStatusOverviewMetrics list={listData?.data} averageUptime={averageUptime} />
       <ExampleDataTag source={statusData?.source} />
-      <GatewayStatusList items={statusData?.data} loading={isLoading} />
+      <GatewayStatusList
+        items={statusData?.data}
+        uptimes={uptimes}
+        loading={isLoading}
+      />
     </PageShell>
   );
 }

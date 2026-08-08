@@ -1,0 +1,124 @@
+.backLink {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #1f6feb;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.cardHeader {
+  margin-bottom: 16px;
+}
+
+.gatewayId {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2d3d;
+}
+
+.instanceId {
+  color: #5f6f86;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.metricLabel {
+  color: #718095;
+  font-size: 12px;
+}
+
+.metricValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f6feb;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sectionMeta {
+  color: #718095;
+  font-size: 13px;
+}
+
+.empty {
+  color: #718095;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #edf1f6;
+  border-radius: 8px;
+}
+
+.agentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.agentCard {
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.agentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.agentId {
+  font-weight: 600;
+  color: #1f2d3d;
+  overflow-wrap: anywhere;
+}
+
+.agentMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5f6f86;
+  font-size: 13px;
+}
+
+.agentLastSeen {
+  margin-top: 8px;
+  color: #718095;
+  font-size: 12px;
+}

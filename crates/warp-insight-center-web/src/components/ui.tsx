@@ -18,6 +18,22 @@ export function formatDateTime(value: string | Date): string {
   }).format(typeof value === "string" ? new Date(value) : value);
 }
 
+/** 相对时间："x 秒前 / x 分钟前 / x 小时前 / x 天前"。 */
+export function formatRelativeTime(value: string | Date): string {
+  const then =
+    typeof value === "string" ? new Date(value).getTime() : value.getTime();
+  const diffMs = Date.now() - then;
+  if (diffMs < 0) return "刚刚";
+  const seconds = Math.floor(diffMs / 1000);
+  if (seconds < 60) return `${seconds} 秒前`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} 分钟前`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} 小时前`;
+  const days = Math.floor(hours / 24);
+  return `${days} 天前`;
+}
+
 export function PageShell({
   title,
   summary,

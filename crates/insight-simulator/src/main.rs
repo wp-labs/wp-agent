@@ -43,6 +43,11 @@ async fn run_gateway(config: &SimConfig, http_client: &reqwest::Client) -> Resul
         if let Err(err) = gateway::report_gateway_status(http_client, config).await {
             eprintln!("gateway status report failed: {err}");
         }
+        if config.report_agents {
+            if let Err(err) = gateway::report_agents_status(http_client, config).await {
+                eprintln!("agent status report failed: {err}");
+            }
+        }
         if config.interval_secs == 0 {
             break;
         }

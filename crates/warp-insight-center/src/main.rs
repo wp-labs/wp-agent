@@ -1,13 +1,19 @@
 // @moju generated
 // WarpInsightCenter 上级聚合控制中心服务：接收 WarpGateWay 状态上报。
 
-use std::error::Error;
+use std::{error::Error, sync::Arc};
+
+use warp_insight_center::infra::{FileStore, PgStore, Store};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let config = warp_insight_center::config::CenterConfig::load_from_env()?;
-    let store = warp_insight_center::infra::CenterStore::new(config.store_path.clone());
-    store.seed(&config.gateway_credentials)?;
+    // 开发期配置 WARP_INSIGHT_CENTER_DATABASE_URL → PostgreSQL；未配置 → JSON 文件回退。
+    let store: Arc<dyn Store> = match &config.database_url {
+        Some(database_url) => Arc::new(PgStore::connect(database_url).await?),
+        None => Arc::new(FileStore::new(config.store_path.clone())),
+    };
+    store.seed(&config.gateway_credentials).await?;
     let addr = config.listen_addr.clone();
     let app = warp_insight_center::api::router(config, store);
     let listener = tokio::net::TcpListener::bind(&addr).await?;

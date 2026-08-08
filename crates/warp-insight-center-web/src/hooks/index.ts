@@ -6,9 +6,12 @@ import {
   bindGatewayCustomer,
   createGatewayInstance,
   createUpgradePlan,
+  fetchGatewayAgents,
   fetchGatewayList,
   fetchGatewayInitialConfig,
+  fetchGatewayStatus,
   fetchGatewayStatusView,
+  fetchGatewayUptime,
   getAdminApiToken,
   publishWarpAgentd,
   publishWarpGateWay,
@@ -42,12 +45,55 @@ export function useGatewayStatusView() {
   });
 }
 
+export function useGatewayStatus(gatewayId: string) {
+  useAuthVersion();
+  const enabled = Boolean(getAdminApiToken());
+  return useQuery({
+    queryKey: ["gateway-status", gatewayId],
+    queryFn: () => fetchGatewayStatus(gatewayId),
+    refetchInterval: enabled ? 5_000 : 30_000,
+    enabled: Boolean(gatewayId),
+  });
+}
+
+export function useGatewayAgents(gatewayId: string) {
+  useAuthVersion();
+  const enabled = Boolean(getAdminApiToken());
+  return useQuery({
+    queryKey: ["gateway-agents", gatewayId],
+    queryFn: () => fetchGatewayAgents(gatewayId),
+    refetchInterval: enabled ? 5_000 : 30_000,
+    enabled: Boolean(gatewayId),
+  });
+}
+
 export function useGatewayList() {
   useAuthVersion();
   const enabled = Boolean(getAdminApiToken());
   return useQuery({
     queryKey: ["gateway-list"],
     queryFn: fetchGatewayList,
+    refetchInterval: enabled ? 5_000 : 30_000,
+  });
+}
+
+/** 一次拉取多个网关的在线率，返回 { gateway_id: uptime|null } 映射（列表页用）。 */
+export function useGatewayUptimes(gatewayIds: string[]) {
+  useAuthVersion();
+  const enabled = Boolean(getAdminApiToken()) && gatewayIds.length > 0;
+  return useQuery({
+    queryKey: ["gateway-uptimes", gatewayIds],
+    queryFn: async () => {
+      const results = await Promise.all(
+        gatewayIds.map((id) => fetchGatewayUptime(id)),
+      );
+      const map: Record<string, number | null> = {};
+      for (const result of results) {
+        map[result.data.gatewayId] = result.data.uptime;
+      }
+      return map;
+    },
+    enabled,
     refetchInterval: enabled ? 5_000 : 30_000,
   });
 }

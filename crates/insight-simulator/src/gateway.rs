@@ -46,6 +46,49 @@ pub async fn report_gateway_status(
     Ok(())
 }
 
+/// 上报其下 2 个模拟 Agent 状态：POST {center}/api/v1/gateway/agents/status。
+pub async fn report_agents_status(
+    client: &reqwest::Client,
+    config: &SimConfig,
+) -> Result<(), String> {
+    let url = format!(
+        "{}/api/v1/gateway/agents/status",
+        config.upstream_url.trim_end_matches('/')
+    );
+    let now = DateTime::now().to_chrono().to_rfc3339();
+    let request = serde_json::json!({
+        "gateway_id": config.id,
+        "agents": [
+            {
+                "agent_id": format!("{}-agent-1", config.id),
+                "instance_id": format!("inst-{}-a1", config.id),
+                "version": "v0.3.2",
+                "status": "online",
+                "health": "healthy",
+                "last_seen_at": now,
+            },
+            {
+                "agent_id": format!("{}-agent-2", config.id),
+                "instance_id": format!("inst-{}-a2", config.id),
+                "version": "v0.3.0",
+                "status": "online",
+                "health": "degraded",
+                "last_seen_at": now,
+            },
+        ],
+    });
+    let response = client::send_json(|| client.post(&url).json(&request), &config.token).await?;
+    let status = response.status();
+    if !status.is_success() {
+        return Err(format!(
+            "agent status report rejected: HTTP {status} body={}",
+            response.text().await.unwrap_or_default()
+        ));
+    }
+    println!("event=AgentsReported status={status} gateway_id={}", config.id);
+    Ok(())
+}
+
 /// 拉取网关初始配置：GET {center}/api/v1/gateway/initial-config。
 /// 注意：中心暂未实现该端点，会返回 404（调用方自行处理）。
 pub async fn fetch_initial_config(

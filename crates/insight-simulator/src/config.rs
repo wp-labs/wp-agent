@@ -35,6 +35,8 @@ pub struct SimConfig {
     pub health: Option<String>,
     /// Gateway 角色：启动时拉一次初始配置。
     pub fetch_config: bool,
+    /// Gateway 角色：每次一并上报其下 2 个模拟 Agent 状态。
+    pub report_agents: bool,
     /// Agentd 角色：每次一并上报一个动作结果。
     pub report_action: bool,
 }
@@ -58,6 +60,7 @@ gateway options:
   --health <h>           健康 healthy|degraded|unhealthy（默认 healthy）
   --version <v>          版本（默认 v2.4.1）
   --fetch-config         启动时拉一次初始配置（GET /api/v1/gateway/initial-config）
+  --report-agents        每次一并上报其下 2 个模拟 Agent 状态
   --insecure             接受无效 TLS 证书
 
 agentd options:
@@ -107,6 +110,7 @@ agentd options:
             status: None,
             health: None,
             fetch_config: false,
+            report_agents: false,
             report_action: false,
         };
 
@@ -115,11 +119,16 @@ agentd options:
         while index < rest.len() {
             let key = rest[index].as_str();
             match key {
-                "--insecure" | "--fetch-config" | "--once" | "--report-action" => {
+                "--insecure"
+                | "--fetch-config"
+                | "--once"
+                | "--report-agents"
+                | "--report-action" => {
                     match key {
                         "--insecure" => cfg.insecure = true,
                         "--fetch-config" => cfg.fetch_config = true,
                         "--once" => cfg.interval_secs = 0,
+                        "--report-agents" => cfg.report_agents = true,
                         _ => cfg.report_action = true,
                     }
                     index += 1;

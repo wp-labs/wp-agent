@@ -22,9 +22,9 @@ pub(super) fn require_admin_bearer(
         return Err(response);
     }
     let Some(expected_hash) = &state.config.admin_token_hash else {
-        return Err(
-            (StatusCode::UNAUTHORIZED, "admin token not configured").into_response(),
-        );
+        // dev 模式：未配置 WARP_INSIGHT_CENTER_ADMIN_TOKEN 时不要求鉴权，
+        // 便于前端/联调直接查看真实数据；生产必须配置 token。
+        return Ok(());
     };
     let Some(token) = bearer_token(headers) else {
         // 缺 token 属未认证请求，不计入暴力尝试（否则无 token 的轮询会锁死客户端）。

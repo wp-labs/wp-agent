@@ -10,6 +10,8 @@ const ENV_LISTEN: &str = "WARP_INSIGHT_CENTER_LISTEN";
 const ENV_STORE_PATH: &str = "WARP_INSIGHT_CENTER_STORE_PATH";
 const ENV_GATEWAY_CREDENTIALS: &str = "WARP_INSIGHT_CENTER_GATEWAY_CREDENTIALS";
 const ENV_ADMIN_TOKEN: &str = "WARP_INSIGHT_CENTER_ADMIN_TOKEN";
+const ENV_DATABASE_URL: &str = "WARP_INSIGHT_CENTER_DATABASE_URL";
+const ENV_VICTORIAMETRICS_URL: &str = "WARP_INSIGHT_CENTER_VICTORIAMETRICS_URL";
 
 #[derive(Debug, Clone)]
 pub struct CenterConfig {
@@ -19,6 +21,12 @@ pub struct CenterConfig {
     pub gateway_credentials: Vec<GatewayCredentialSeed>,
     /// 管理面 token hash（读取接口迭代用，本次未启用）。
     pub admin_token_hash: Option<String>,
+    /// 开发期 PG 连接串：有值 → PgStore；未设置/为空 → FileStore。
+    /// 推荐值即 compose 的 `postgres://demo:demo@127.0.0.1:55432/insight_demo`。
+    pub database_url: Option<String>,
+    /// 时序历史 VictoriaMetrics 基地址（如 compose 的 `http://127.0.0.1:8428`）。
+    /// 有值 → 每次状态上报额外推送指标；未设置/为空 → 不启用（仅存快照）。
+    pub victoriametrics_url: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -42,6 +50,10 @@ impl CenterConfig {
             .ok()
             .filter(|value| !value.trim().is_empty());
         let admin_token_hash = admin_token.as_deref().map(sha256_hex);
+        // 有值 → PgStore；未设置或空串 → 回退 FileStore（无 PG 开发 / cargo test 可用）。
+        let database_url = parse_optional_env_url(ENV_DATABASE_URL);
+        // 有值 → 状态上报推送 VictoriaMetrics；未设置/空 → 不启用时序推送。
+        let victoriametrics_url = parse_optional_env_url(ENV_VICTORIAMETRICS_URL);
         if listen_addr.trim().is_empty() {
             return Err(ConfigError::new("listen addr must not be empty"));
         }
@@ -50,8 +62,18 @@ impl CenterConfig {
             store_path,
             gateway_credentials,
             admin_token_hash,
+            database_url,
+            victoriametrics_url,
         })
     }
+}
+
+/// 读取可选 env URL：未设置或空/纯空白 → None。
+fn parse_optional_env_url(key: &str) -> Option<String> {
+    env::var(key)
+        .ok()
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty())
 }
 
 /// 解析 `gateway_id:token,gateway_id:token,...`。
@@ -121,5 +143,20 @@ mod tests {
     fn empty_credentials_are_fine() {
         assert!(parse_gateway_credentials("").expect("empty").is_empty());
         assert!(parse_gateway_credentials(" , ").expect("blank").is_empty());
+    }
+
+    #[test]
+    fn parses_optional_env_url_trimming_blank() {
+        // 测试专用 env key，避免与其他并行测试互相污染。
+        let key = "WARP_INSIGHT_CENTER_TEST_OPTIONAL_URL";
+        std::env::set_var(key, "http://127.0.0.1:8428");
+        assert_eq!(
+            parse_optional_env_url(key).as_deref(),
+            Some("http://127.0.0.1:8428")
+        );
+        std::env::set_var(key, "  ");
+        assert_eq!(parse_optional_env_url(key), None);
+        std::env::remove_var(key);
+        assert_eq!(parse_optional_env_url(key), None);
     }
 }
