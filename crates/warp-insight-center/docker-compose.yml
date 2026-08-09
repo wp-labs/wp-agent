@@ -16,6 +16,24 @@ services:
       - postgres16-data:/var/lib/postgresql/data
       - ./docker/initdb:/docker-entrypoint-initdb.d:ro
 
+  # 云对象存储（S3 兼容，制品镜像）；center 配置 WARP_INSIGHT_CENTER_OBJECT_STORAGE_* 即启用。
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - minio-data:/data
+
   # 网关状态时序历史（Prometheus 兼容 TSDB；center 配置 WARP_INSIGHT_CENTER_VICTORIAMETRICS_URL 即推送）。
   victoriametrics:
     image: victoriametrics/victoria-metrics:v1.98.0
@@ -35,3 +53,4 @@ services:
 volumes:
   postgres16-data:
   victoriametrics-data:
+  minio-data:

@@ -1,18 +1,222 @@
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  align-items: start;
-  gap: 16px;
-  width: 100%;
-  max-width: var(--wi-content-width);
+.workspace,
+.inventorySection {
+  width: min(100%, var(--wi-content-width));
   margin: 0 auto;
-  padding: 0 28px;
+  padding: 20px 28px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-lg);
+  background: var(--wi-bg-panel);
+  box-shadow: var(--wi-shadow-sm);
+}
+
+.workspaceHeader,
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.workspaceHeader {
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin-bottom: 4px;
+  color: var(--wi-primary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.workspaceTitle {
+  color: var(--wi-text);
+  font-size: 17px;
+  font-weight: 760;
+}
+
+.workspaceSubtitle,
+.sectionSubtitle {
+  margin-top: 4px;
+  color: var(--wi-text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 4px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-md);
+  background: var(--wi-bg-muted);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 48px;
+  padding: 8px 13px;
+  border: 1px solid transparent;
+  border-radius: var(--wi-radius-sm);
+  outline: none;
+  background: transparent;
+  color: var(--wi-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.tab strong {
+  color: inherit;
+  font-size: 13px;
+}
+
+.tab span {
+  color: var(--wi-text-muted);
+  font-size: 11px;
+}
+
+.tab:hover {
+  background: var(--wi-bg-hover);
+  color: var(--wi-text);
+}
+
+.tab:focus-visible {
+  box-shadow: 0 0 0 3px var(--wi-focus-ring);
+}
+
+.tabActive {
+  border-color: var(--wi-primary-border);
+  background: var(--wi-bg-panel);
+  color: var(--wi-primary);
+  box-shadow: var(--wi-shadow-sm);
+}
+
+.tabPanel {
+  margin-top: 14px;
+}
+
+.inventorySection {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.sectionHeader {
+  margin-bottom: 16px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--wi-border);
+}
+
+.sectionTitle {
+  color: var(--wi-text);
+  font-size: 15px;
+  font-weight: 760;
+}
+
+.inventoryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.inventoryCard {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-md);
+  background: var(--wi-bg-muted);
+}
+
+.inventoryTitle {
+  margin-bottom: 11px;
+  color: var(--wi-text);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-bg-panel);
+}
+
+.rowMain {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--wi-text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.rowSub {
+  display: block;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+  color: var(--wi-text-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.rowVersion {
+  flex-shrink: 0;
+}
+
+.empty {
+  padding: 18px 12px;
+  border: 1px dashed var(--wi-border-strong);
+  border-radius: var(--wi-radius-sm);
+  color: var(--wi-text-muted);
+  font-size: 12px;
+  text-align: center;
 }
 
 @media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
+  .workspace,
+  .inventorySection {
     padding-right: 18px;
     padding-left: 18px;
+  }
+
+  .tab {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .inventoryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .rowVersion {
+    grid-column: 1 / 2;
+  }
+
+  .row > :last-child {
+    grid-column: 2 / 3;
+    grid-row: 1 / span 2;
   }
 }

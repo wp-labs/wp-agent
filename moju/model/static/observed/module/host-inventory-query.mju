@@ -1,6 +1,6 @@
 module<logic> HostInventoryQuery {
   meta {
-    label zh "主机资源目录查询"
+    label zh "主机资产目录查询"
     label en "Host HostInventory Query"
     summary zh "负责主机资产目录与运行态的查询逻辑。"
     tag "control"
@@ -12,5 +12,5 @@ module<logic> HostInventoryQuery {
   owns QueryHostInventory
   owns ViewHostRuntimeState
   depends HostInventory
-  responsible_for "主机资源目录查询：按租户/环境/主机名查询资产目录、查看指定主机运行态快照，读取 HostInventory 实体事实。"
+  responsible_for "主机资产目录查询：按租户/环境/主机名查询资产目录、查看指定主机运行态快照，读取 HostInventory 实体事实。"
 }

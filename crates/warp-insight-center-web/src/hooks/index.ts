@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ADMIN_AUTH_CHANGED_EVENT,
   approveUpgradePlan,
@@ -9,11 +9,15 @@ import {
   fetchGatewayAgents,
   fetchAgentHistory,
   fetchGatewayHistory,
+  fetchGatewayInstances,
+  fetchGatewayLifecycle,
   fetchGatewayList,
   fetchGatewayInitialConfig,
   fetchGatewayStatus,
   fetchGatewayStatusView,
   fetchGatewayUptime,
+  fetchReleases,
+  fetchUpgradePlans,
   getAdminApiToken,
   publishWarpAgentd,
   publishWarpGateWay,
@@ -70,6 +74,26 @@ export function useGatewayHistory(gatewayId: string, window = "1h") {
   });
 }
 
+/** 批量查询列表页网关历史，避免每张卡片各自创建一套 Query 生命周期。 */
+export function useGatewayHistories(gatewayIds: string[], window = "1h") {
+  useAuthVersion();
+  const hasAdminToken = Boolean(getAdminApiToken());
+  const enabled = gatewayIds.length > 0;
+  return useQuery({
+    queryKey: ["gateway-histories", gatewayIds, window],
+    queryFn: async () => {
+      const results = await Promise.all(
+        gatewayIds.map((gatewayId) => fetchGatewayHistory(gatewayId, window)),
+      );
+      return Object.fromEntries(
+        results.map((result) => [result.data.gatewayId, result]),
+      );
+    },
+    refetchInterval: hasAdminToken ? 15_000 : 30_000,
+    enabled,
+  });
+}
+
 /** 批量查询当前网关下 Agent 的历史，保持每个 Agent 独立缓存和错误回退。 */
 export function useAgentHistories(gatewayId: string, agentIds: string[]) {
   useAuthVersion();
@@ -86,6 +110,39 @@ export function useAgentHistories(gatewayId: string, agentIds: string[]) {
       );
     },
     refetchInterval: hasAdminToken ? 15_000 : 30_000,
+    enabled,
+  });
+}
+
+export function useGatewayLifecycle(gatewayId: string) {
+  useAuthVersion();
+  const enabled = Boolean(getAdminApiToken());
+  return useQuery({
+    queryKey: ["gateway-lifecycle", gatewayId],
+    queryFn: () => fetchGatewayLifecycle(gatewayId),
+    refetchInterval: enabled ? 10_000 : 30_000,
+    enabled: Boolean(gatewayId),
+  });
+}
+
+/** 批量查询多网关下的 Agent 状态（版本发布页展示各 Agent 当前版本）。 */
+export function useGatewayAgentsForAll(gatewayIds: string[]) {
+  useAuthVersion();
+  const enabled = gatewayIds.length > 0;
+  return useQuery({
+    queryKey: ["all-gateway-agents", gatewayIds],
+    queryFn: async () => {
+      const results = await Promise.all(
+        gatewayIds.map((gatewayId) => fetchGatewayAgents(gatewayId)),
+      );
+      return results.flatMap((result, index) =>
+        (result.data ?? []).map((agent) => ({
+          ...agent,
+          gatewayId: gatewayIds[index],
+        })),
+      );
+    },
+    refetchInterval: getAdminApiToken() ? 15_000 : 30_000,
     enabled,
   });
 }
@@ -112,6 +169,26 @@ export function useGatewayList() {
 }
 
 /** 一次拉取多个网关的在线率，返回 { gateway_id: uptime|null } 映射（列表页用）。 */
+export function useReleases(component: string) {
+  useAuthVersion();
+  const enabled = Boolean(getAdminApiToken());
+  return useQuery({
+    queryKey: ["releases", component],
+    queryFn: () => fetchReleases(component),
+    refetchInterval: enabled ? 15_000 : 30_000,
+  });
+}
+
+export function useGatewayInstances() {
+  useAuthVersion();
+  const enabled = Boolean(getAdminApiToken());
+  return useQuery({
+    queryKey: ["gateway-instances"],
+    queryFn: fetchGatewayInstances,
+    refetchInterval: enabled ? 10_000 : 30_000,
+  });
+}
+
 export function useGatewayUptimes(gatewayIds: string[]) {
   useAuthVersion();
   const hasAdminToken = Boolean(getAdminApiToken());
@@ -135,9 +212,13 @@ export function useGatewayUptimes(gatewayIds: string[]) {
 }
 
 export function useCreateGatewayInstance() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (command: CreateGatewayInstanceCommand) =>
       createGatewayInstance(command),
+    // 创建成功后立即刷新总览，避免等待轮询周期才能看到新实例。
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["gateway-instances"] }),
   });
 }
 
@@ -156,14 +237,32 @@ export function useGatewayInitialConfig() {
 }
 
 export function usePublishWarpAgentd() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (command: PublishReleaseCommand) => publishWarpAgentd(command),
+    // 发布成功后刷新当前组件的历史，立即反馈新版本已进入发布记录。
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["releases", "warp-agentd"] }),
   });
 }
 
 export function usePublishWarpGateWay() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (command: PublishReleaseCommand) => publishWarpGateWay(command),
+    // 发布成功后刷新当前组件的历史，立即反馈新版本已进入发布记录。
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["releases", "warp-gateway"] }),
+  });
+}
+
+export function useUpgradePlans() {
+  useAuthVersion();
+  const enabled = Boolean(getAdminApiToken());
+  return useQuery({
+    queryKey: ["upgrade-plans"],
+    queryFn: fetchUpgradePlans,
+    refetchInterval: enabled ? 15_000 : 30_000,
   });
 }
 

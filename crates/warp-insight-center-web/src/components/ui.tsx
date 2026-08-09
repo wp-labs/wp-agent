@@ -29,6 +29,36 @@ export function formatPercent(value: number | null | undefined): string {
   return `${value.toFixed(1)}%`;
 }
 
+/** 实例生命周期状态的中文标签。 */
+export function lifecycleLabel(state: string): string {
+  switch (state) {
+    case "Provisioned":
+      return "已创建（待部署）";
+    case "Initializing":
+      return "初始化中";
+    case "Running":
+      return "已运行";
+    case "Failed":
+      return "失败";
+    default:
+      return state;
+  }
+}
+
+/** 实例生命周期状态对应的徽标色调。 */
+export function lifecycleTone(state: string): BadgeTone {
+  switch (state) {
+    case "Running":
+      return "green";
+    case "Initializing":
+      return "blue";
+    case "Failed":
+      return "red";
+    default:
+      return "gray";
+  }
+}
+
 /** 相对时间："x 秒前 / x 分钟前 / x 小时前 / x 天前"。 */
 export function formatRelativeTime(value: string | Date): string {
   const then =

@@ -1,3 +1,5 @@
+pub mod artifacts;
+pub use artifacts::*;
 pub mod pg_store;
 pub use pg_store::*;
 pub mod secret;

@@ -1,0 +1,153 @@
+.form {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.65fr) minmax(280px, 1.35fr) auto;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.formAction {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 7px;
+  justify-content: flex-end;
+}
+
+.actionHint {
+  color: var(--wi-text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.history {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--wi-border);
+}
+
+.historyHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.historyTitle {
+  color: var(--wi-text);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.historyHint {
+  color: var(--wi-text-muted);
+  font-size: 11px;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.historyItem {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.35fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-bg-muted);
+}
+
+.historyVersion {
+  color: var(--wi-text);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.artifactLink {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--wi-primary);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.historyMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--wi-text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.historyEmpty {
+  padding: 15px 12px;
+  border: 1px dashed var(--wi-border-strong);
+  border-radius: var(--wi-radius-sm);
+  color: var(--wi-text-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .formAction {
+    grid-column: 1 / -1;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .historyItem {
+    grid-template-columns: minmax(90px, 0.4fr) minmax(0, 1fr);
+  }
+
+  .historyMeta {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .formAction {
+    grid-column: auto;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actionHint {
+    white-space: normal;
+  }
+
+  .historyHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .historyItem {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .historyMeta {
+    grid-column: auto;
+  }
+
+  .artifactLink {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}

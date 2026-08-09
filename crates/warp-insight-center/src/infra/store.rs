@@ -15,6 +15,9 @@ use std::{
 };
 
 use insight_control::types::DateTime;
+use insight_control::{
+    GatewayInstanceLifecycleState, UpgradeStep, UpgradeTarget,
+};
 use serde::{Deserialize, Serialize};
 
 use super::sha256_hex;
@@ -73,6 +76,54 @@ pub struct CenterStoreSnapshot {
     pub gateways: HashMap<String, StoredGateway>,
     /// key = agent_id（Gateway 上报的其下 Agent 状态快照）。
     pub agents: HashMap<String, StoredAgent>,
+    /// 网关生命周期转变历史（key = gateway_id，有界保留最近 ~100 条）。
+    pub lifecycle_events: HashMap<String, Vec<LifecycleEvent>>,
+    /// 版本发布记录（key = component，如 warp-agentd / warp-gateway）。
+    pub releases: HashMap<String, Vec<ReleaseRecord>>,
+    /// 升级计划（按创建顺序，新→旧）。
+    pub upgrade_plans: Vec<UpgradePlanRecord>,
+    /// 网关-客户绑定记录。
+    pub customer_bindings: Vec<GatewayCustomerBindingRecord>,
+}
+
+/// 网关-客户绑定记录（映射模型 GatewayCustomerBinding）。
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GatewayCustomerBindingRecord {
+    pub gateway_id: String,
+    pub customer_id: String,
+    pub status: String,
+    pub bound_at: DateTime,
+}
+
+/// 一次升级计划记录（映射模型 UpgradePlan）。
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpgradePlanRecord {
+    pub plan_id: String,
+    pub targets: Vec<UpgradeTarget>,
+    pub target_count: i64,
+    pub status: String,
+    pub created_at: DateTime,
+    pub steps: Vec<UpgradeStep>,
+    pub approved_by: Option<String>,
+    pub approved_at: Option<DateTime>,
+}
+
+/// 一次版本发布记录（映射模型 WarpAgentdRelease / WarpGateWayRelease）。
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReleaseRecord {
+    pub version: String,
+    pub artifact_url: String,
+    pub status: String,
+    pub published_at: DateTime,
+}
+
+/// 网关生命周期一次状态转变记录（过程历史，append-only）。
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LifecycleEvent {
+    pub gateway_id: String,
+    pub from_state: Option<GatewayInstanceLifecycleState>,
+    pub to_state: GatewayInstanceLifecycleState,
+    pub at: DateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -95,6 +146,12 @@ pub struct StoredGateway {
     #[serde(default)]
     pub cpu_percent: Option<f64>,
     #[serde(default)]
+    pub lifecycle_state: Option<GatewayInstanceLifecycleState>,
+    #[serde(default)]
+    pub initialized_at: Option<DateTime>,
+    #[serde(default)]
+    pub created_at: Option<DateTime>,
+    #[serde(default)]
     pub last_seen_at: Option<DateTime>,
 }
 
@@ -116,6 +173,9 @@ impl StoredGateway {
             health: None,
             memory_bytes: None,
             cpu_percent: None,
+            lifecycle_state: None,
+            initialized_at: None,
+            created_at: None,
             last_seen_at: None,
         }
     }
@@ -183,6 +243,52 @@ pub trait Store: Send + Sync + std::fmt::Debug {
         gateway_id: &str,
         agents: &[StoredAgent],
     ) -> Result<(), StoreError>;
+    /// 生命周期：Provisioned → Initializing（Gateway 首次拉取初始配置时）。
+    async fn mark_gateway_initializing(&self, gateway_id: &str) -> Result<(), StoreError>;
+    /// 记录一次生命周期转变事件（append-only 过程历史）。
+    async fn record_lifecycle_event(
+        &self,
+        gateway_id: &str,
+        from: Option<GatewayInstanceLifecycleState>,
+        to: GatewayInstanceLifecycleState,
+    ) -> Result<(), StoreError>;
+    /// 查询某网关的生命周期转变历史（按时间升序）。
+    async fn list_lifecycle_events(
+        &self,
+        gateway_id: &str,
+    ) -> Result<Vec<LifecycleEvent>, StoreError>;
+    /// 记录一次版本发布（component = warp-agentd / warp-gateway），返回记录。
+    async fn publish_release(
+        &self,
+        component: &str,
+        version: &str,
+        artifact_url: &str,
+    ) -> Result<ReleaseRecord, StoreError>;
+    /// 查询某组件的历史发布记录（新→旧）。
+    async fn list_releases(&self, component: &str) -> Result<Vec<ReleaseRecord>, StoreError>;
+    /// 创建升级计划（多目标 + 网关范围 + 多步执行），status=pending。
+    async fn create_upgrade_plan(
+        &self,
+        plan: &UpgradePlanRecord,
+    ) -> Result<UpgradePlanRecord, StoreError>;
+    /// 查询全部升级计划（新→旧）。
+    async fn list_upgrade_plans(&self) -> Result<Vec<UpgradePlanRecord>, StoreError>;
+    /// 批准升级计划：status → approved，记录批准人/时间。
+    async fn approve_upgrade_plan(
+        &self,
+        plan_id: &str,
+        approved_by: &str,
+    ) -> Result<UpgradePlanRecord, StoreError>;
+    /// 绑定网关到客户（幂等：同网关重复绑定更新客户）。
+    async fn bind_gateway_customer(
+        &self,
+        gateway_id: &str,
+        customer_id: &str,
+    ) -> Result<GatewayCustomerBindingRecord, StoreError>;
+    /// 查询全部网关-客户绑定。
+    async fn list_customer_bindings(
+        &self,
+    ) -> Result<Vec<GatewayCustomerBindingRecord>, StoreError>;
     /// 查询某 gateway 下的全部 Agent 状态（按 agent_id 排序）。
     async fn list_agents_by_gateway(
         &self,
@@ -252,24 +358,34 @@ impl FileStore {
         gateway_id: &str,
         token: &str,
     ) -> Result<StoredGateway, StoreError> {
-        self.update(|snapshot| {
-            if snapshot.gateways.contains_key(gateway_id) {
-                return Err(StoreError::Conflict(gateway_id.to_string()));
-            }
-            let token_hash = if token.is_empty() {
-                String::new()
-            } else {
-                sha256_hex(token)
-            };
-            let stored = StoredGateway::provisioned(
-                gateway_id.to_string(),
-                String::new(),
-                token_hash,
-                None,
-            );
-            snapshot.gateways.insert(gateway_id.to_string(), stored.clone());
-            Ok(stored)
-        })?
+        let stored = self
+            .update(|snapshot| {
+                if snapshot.gateways.contains_key(gateway_id) {
+                    return Err(StoreError::Conflict(gateway_id.to_string()));
+                }
+                let token_hash = if token.is_empty() {
+                    String::new()
+                } else {
+                    sha256_hex(token)
+                };
+                let mut stored = StoredGateway::provisioned(
+                    gateway_id.to_string(),
+                    String::new(),
+                    token_hash,
+                    None,
+                );
+                stored.lifecycle_state = Some(GatewayInstanceLifecycleState::Provisioned);
+                stored.created_at = Some(DateTime::now());
+                snapshot.gateways.insert(gateway_id.to_string(), stored.clone());
+                Ok(stored)
+            })??;
+        FileStore::record_lifecycle_event(
+            self,
+            gateway_id,
+            None,
+            GatewayInstanceLifecycleState::Provisioned,
+        )?;
+        Ok(stored)
     }
 
     /// 落库 Agent 状态（同步，供测试与 trait 委托）：按 agent_id upsert，归属以 gateway_id 参数为准。
@@ -284,6 +400,180 @@ impl FileStore {
                 snapshot.agents.insert(agent.agent_id.clone(), agent);
             }
         })
+    }
+
+    /// 生命周期：Provisioned → Initializing（幂等，Running 后不降级），并记录转变事件。
+    pub fn mark_gateway_initializing(&self, gateway_id: &str) -> Result<(), StoreError> {
+        let changed: bool = self.update(|snapshot| {
+            if let Some(stored) = snapshot.gateways.get_mut(gateway_id) {
+                if stored.lifecycle_state == Some(GatewayInstanceLifecycleState::Provisioned) {
+                    stored.lifecycle_state = Some(GatewayInstanceLifecycleState::Initializing);
+                    return true;
+                }
+            }
+            false
+        })?;
+        if changed {
+            FileStore::record_lifecycle_event(
+                self,
+                gateway_id,
+                Some(GatewayInstanceLifecycleState::Provisioned),
+                GatewayInstanceLifecycleState::Initializing,
+            )?;
+        }
+        Ok(())
+    }
+
+    /// 记录一次生命周期转变事件（有界保留最近 ~100 条）。
+    pub fn record_lifecycle_event(
+        &self,
+        gateway_id: &str,
+        from: Option<GatewayInstanceLifecycleState>,
+        to: GatewayInstanceLifecycleState,
+    ) -> Result<(), StoreError> {
+        self.update(|snapshot| {
+            let events = snapshot
+                .lifecycle_events
+                .entry(gateway_id.to_string())
+                .or_default();
+            events.push(LifecycleEvent {
+                gateway_id: gateway_id.to_string(),
+                from_state: from,
+                to_state: to,
+                at: DateTime::now(),
+            });
+            const MAX_EVENTS: usize = 100;
+            if events.len() > MAX_EVENTS {
+                let excess = events.len() - MAX_EVENTS;
+                events.drain(..excess);
+            }
+        })
+    }
+
+    pub fn list_lifecycle_events(
+        &self,
+        gateway_id: &str,
+    ) -> Result<Vec<LifecycleEvent>, StoreError> {
+        let snapshot = self.load()?;
+        Ok(snapshot
+            .lifecycle_events
+            .get(gateway_id)
+            .cloned()
+            .unwrap_or_default())
+    }
+
+    /// 记录一次版本发布（同步，供测试与 trait 委托）。
+    pub fn publish_release(
+        &self,
+        component: &str,
+        version: &str,
+        artifact_url: &str,
+    ) -> Result<ReleaseRecord, StoreError> {
+        let record = ReleaseRecord {
+            version: version.to_string(),
+            artifact_url: artifact_url.to_string(),
+            status: "published".to_string(),
+            published_at: DateTime::now(),
+        };
+        self.update(|snapshot| {
+            snapshot
+                .releases
+                .entry(component.to_string())
+                .or_default()
+                .push(record.clone());
+        })?;
+        Ok(record)
+    }
+
+    pub fn list_releases(&self, component: &str) -> Result<Vec<ReleaseRecord>, StoreError> {
+        let snapshot = self.load()?;
+        let mut records = snapshot
+            .releases
+            .get(component)
+            .cloned()
+            .unwrap_or_default();
+        records.sort_by(|left, right| {
+            right
+                .published_at
+                .to_chrono()
+                .cmp(&left.published_at.to_chrono())
+        });
+        Ok(records)
+    }
+
+    /// 创建升级计划（同步，供测试与 trait 委托）：status=pending，插入最前（新→旧）。
+    pub fn create_upgrade_plan(
+        &self,
+        plan: &UpgradePlanRecord,
+    ) -> Result<UpgradePlanRecord, StoreError> {
+        self.update(|snapshot| {
+            snapshot.upgrade_plans.insert(0, plan.clone());
+        })?;
+        Ok(plan.clone())
+    }
+
+    pub fn list_upgrade_plans(&self) -> Result<Vec<UpgradePlanRecord>, StoreError> {
+        let snapshot = self.load()?;
+        Ok(snapshot.upgrade_plans)
+    }
+
+    pub fn approve_upgrade_plan(
+        &self,
+        plan_id: &str,
+        approved_by: &str,
+    ) -> Result<UpgradePlanRecord, StoreError> {
+        let plan = self
+            .update(|snapshot| {
+                let Some(plan) = snapshot
+                    .upgrade_plans
+                    .iter_mut()
+                    .find(|plan| plan.plan_id == plan_id)
+                else {
+                    return Err(StoreError::Conflict(plan_id.to_string()));
+                };
+                plan.status = "approved".to_string();
+                plan.approved_by = Some(approved_by.to_string());
+                plan.approved_at = Some(DateTime::now());
+                Ok(plan.clone())
+            })??;
+        Ok(plan)
+    }
+
+    /// 绑定网关到客户（同步，供测试与 trait 委托）：同网关重复绑定更新客户。
+    pub fn bind_gateway_customer(
+        &self,
+        gateway_id: &str,
+        customer_id: &str,
+    ) -> Result<GatewayCustomerBindingRecord, StoreError> {
+        let binding = self
+            .update::<Result<GatewayCustomerBindingRecord, StoreError>>(|snapshot| {
+                if let Some(existing) = snapshot
+                    .customer_bindings
+                    .iter_mut()
+                    .find(|binding| binding.gateway_id == gateway_id)
+                {
+                    existing.customer_id = customer_id.to_string();
+                    existing.status = "bound".to_string();
+                    existing.bound_at = DateTime::now();
+                    return Ok(existing.clone());
+                }
+                let binding = GatewayCustomerBindingRecord {
+                    gateway_id: gateway_id.to_string(),
+                    customer_id: customer_id.to_string(),
+                    status: "bound".to_string(),
+                    bound_at: DateTime::now(),
+                };
+                snapshot.customer_bindings.push(binding.clone());
+                Ok(binding)
+            })??;
+        Ok(binding)
+    }
+
+    pub fn list_customer_bindings(
+        &self,
+    ) -> Result<Vec<GatewayCustomerBindingRecord>, StoreError> {
+        let snapshot = self.load()?;
+        Ok(snapshot.customer_bindings)
     }
 
     pub fn list_agents_by_gateway(
@@ -380,17 +670,36 @@ impl Store for FileStore {
     }
 
     async fn upsert_gateway_status(&self, update: &GatewayStatusUpdate) -> Result<(), StoreError> {
-        self.update(|snapshot| {
-            if let Some(stored) = snapshot.gateways.get_mut(&update.gateway_id) {
-                stored.instance_id = update.instance_id.clone();
-                stored.version = Some(update.version.clone());
-                stored.status = Some(update.status.clone());
-                stored.health = Some(update.health.clone());
-                stored.memory_bytes = update.memory_bytes;
-                stored.cpu_percent = update.cpu_percent;
-                stored.last_seen_at = Some(update.last_seen_at.clone());
-            }
-        })
+        let (changed, from): (bool, Option<GatewayInstanceLifecycleState>) = self.update(
+            |snapshot| {
+                if let Some(stored) = snapshot.gateways.get_mut(&update.gateway_id) {
+                    stored.instance_id = update.instance_id.clone();
+                    stored.version = Some(update.version.clone());
+                    stored.status = Some(update.status.clone());
+                    stored.health = Some(update.health.clone());
+                    stored.memory_bytes = update.memory_bytes;
+                    stored.cpu_percent = update.cpu_percent;
+                    stored.last_seen_at = Some(update.last_seen_at.clone());
+                    // 首次上报 → Running（初始化完成，记录 initialized_at + 转变事件）。
+                    if stored.lifecycle_state != Some(GatewayInstanceLifecycleState::Running) {
+                        let prev = stored.lifecycle_state;
+                        stored.lifecycle_state = Some(GatewayInstanceLifecycleState::Running);
+                        stored.initialized_at = Some(DateTime::now());
+                        return (true, prev);
+                    }
+                }
+                (false, None)
+            },
+        )?;
+        if changed {
+            FileStore::record_lifecycle_event(
+                self,
+                &update.gateway_id,
+                from,
+                GatewayInstanceLifecycleState::Running,
+            )?;
+        }
+        Ok(())
     }
 
     async fn create_gateway(
@@ -415,6 +724,72 @@ impl Store for FileStore {
         gateway_id: &str,
     ) -> Result<Vec<StoredAgent>, StoreError> {
         FileStore::list_agents_by_gateway(self, gateway_id)
+    }
+
+    async fn mark_gateway_initializing(&self, gateway_id: &str) -> Result<(), StoreError> {
+        FileStore::mark_gateway_initializing(self, gateway_id)
+    }
+
+    async fn record_lifecycle_event(
+        &self,
+        gateway_id: &str,
+        from: Option<GatewayInstanceLifecycleState>,
+        to: GatewayInstanceLifecycleState,
+    ) -> Result<(), StoreError> {
+        FileStore::record_lifecycle_event(self, gateway_id, from, to)
+    }
+
+    async fn list_lifecycle_events(
+        &self,
+        gateway_id: &str,
+    ) -> Result<Vec<LifecycleEvent>, StoreError> {
+        FileStore::list_lifecycle_events(self, gateway_id)
+    }
+
+    async fn publish_release(
+        &self,
+        component: &str,
+        version: &str,
+        artifact_url: &str,
+    ) -> Result<ReleaseRecord, StoreError> {
+        FileStore::publish_release(self, component, version, artifact_url)
+    }
+
+    async fn list_releases(&self, component: &str) -> Result<Vec<ReleaseRecord>, StoreError> {
+        FileStore::list_releases(self, component)
+    }
+
+    async fn create_upgrade_plan(
+        &self,
+        plan: &UpgradePlanRecord,
+    ) -> Result<UpgradePlanRecord, StoreError> {
+        FileStore::create_upgrade_plan(self, plan)
+    }
+
+    async fn list_upgrade_plans(&self) -> Result<Vec<UpgradePlanRecord>, StoreError> {
+        FileStore::list_upgrade_plans(self)
+    }
+
+    async fn approve_upgrade_plan(
+        &self,
+        plan_id: &str,
+        approved_by: &str,
+    ) -> Result<UpgradePlanRecord, StoreError> {
+        FileStore::approve_upgrade_plan(self, plan_id, approved_by)
+    }
+
+    async fn bind_gateway_customer(
+        &self,
+        gateway_id: &str,
+        customer_id: &str,
+    ) -> Result<GatewayCustomerBindingRecord, StoreError> {
+        FileStore::bind_gateway_customer(self, gateway_id, customer_id)
+    }
+
+    async fn list_customer_bindings(
+        &self,
+    ) -> Result<Vec<GatewayCustomerBindingRecord>, StoreError> {
+        FileStore::list_customer_bindings(self)
     }
 }
 

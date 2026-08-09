@@ -1,4 +1,4 @@
-// Module: HostInventory — 主机资源目录与运行态
+// Module: HostInventory — 主机资产目录与运行态
 // 来源：doc/design/center/models/host-inventory-and-runtime-state.md
 //
 // 主机静态事实（HostInventory，慢变目录对象）与主机动态运行态

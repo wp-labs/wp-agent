@@ -108,11 +108,16 @@ pub async fn fetch_initial_config(
         "{}/api/v1/gateway/initial-config",
         config.upstream_url.trim_end_matches('/')
     );
+    // initial-config 按 gateway 凭证鉴权，instance_id 参数用 gateway_id（与创建时生成的 init_url 一致）。
     let request = GetGatewayInitialConfig {
-        instance_id: config.instance_id.clone(),
+        instance_id: config.id.clone(),
         requested_at: DateTime::now(),
     };
-    let response = client::send_json(|| client.get(&url).json(&request), &config.token).await?;
+    let response = client::send_json(
+        || client.get(&url).query(&[("instance_id", request.instance_id.as_str())]),
+        &config.token,
+    )
+    .await?;
     if response.status() == StatusCode::NOT_FOUND {
         return Err("initial config endpoint not implemented on center (HTTP 404)".to_string());
     }

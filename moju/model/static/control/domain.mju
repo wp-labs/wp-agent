@@ -13,6 +13,7 @@
 // - gateway-identity.mju         # WarpGateWay 身份与状态（实体）
 // - gateway-facing-interface.mju # WarpGateWay -> WarpInsightCenter 接入接口（forGateway）
 // - admin-facing-interface.mju   # WarpInsightCenter 管理接口（forAdmin）
+// - admin-facing-interface-flow.mju # WarpInsightCenter 管理接口编排流程（forAdmin）
 // - platform-release.mju         # WarpAgentd / WarpGateWay 版本发布与升级计划
 //   module/insight-center-web.mju # WarpInsightCenter 前端 WEB
 // - warp-insight-center.mju      # 全局控制中心应用编排（Application）
@@ -39,4 +40,5 @@
 // ── 横切（保持根目录） ──
 // - actors.mju                   # 全部角色（跨层）
 // - binding.mju                  # 全部 HTTP 绑定
+//   module/operator-context.mju  # 操作请求上下文（Admin* 接口命令共享）
 //   module/layers.mju            # 层级与依赖规则

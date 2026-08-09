@@ -10,14 +10,15 @@ use axum::{
     Json,
 };
 
-use insight_control::{
-    AdminGatewayInstanceReturned, AdminGatewayListReturned, AdminGatewayStatusListReturned,
-    AdminGatewayStatusReturned, AgentRuntimeStatusView, GatewayInstance, GatewayListView,
-    GatewayStatusView,
-};
 use insight_control::types::DateTime;
+use insight_control::{
+    AdminGatewayCustomerBindingReturned, AdminGatewayListReturned, AdminGatewayStatusListReturned,
+    AdminGatewayStatusReturned, AgentRuntimeStatusView, GatewayCustomerBinding, GatewayInitialConfig,
+    GatewayInitialConfigReturned, GatewayInstance, GatewayInstanceLifecycleState, GatewayListView,
+    GatewayStatusView, UpgradeStep, UpgradeTarget,
+};
 
-use crate::infra::{StoreError, StoredGateway};
+use crate::infra::{StoreError, StoredGateway, UpgradePlanRecord};
 
 use super::{admin_auth::require_admin_bearer, rate_limit, ApiState};
 
@@ -29,6 +30,32 @@ pub struct AdminCreateGatewayInstanceRequest {
     pub gateway_name: String,
     pub requested_by: String,
     pub token: Option<String>,
+}
+
+/// 网关实例安装指引（api 层交付信息，不模型化）：docker 安装命令 + 云镜像地址 + 初始化 URL。
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct GatewayInstallInfo {
+    pub install_command: String,
+    pub cloud_image: String,
+    pub init_url: String,
+}
+
+/// 创建网关实例返回：实例视图 + 安装指引（Gateway 启动后基于 init_url 初始化）。
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct AdminCreateGatewayInstanceReturned {
+    pub instance: GatewayInstance,
+    pub install: GatewayInstallInfo,
+}
+
+/// 管理端实例列表项：在生命周期信息之外公开不含凭证的初始化入口。
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct AdminGatewayInstanceView {
+    pub gateway_id: String,
+    pub instance_id: String,
+    pub lifecycle_state: GatewayInstanceLifecycleState,
+    pub created_at: DateTime,
+    pub initialized_at: Option<DateTime>,
+    pub init_url: String,
 }
 
 /// 创建网关实例：POST /api/v1/admin/gateways/instances。
@@ -53,18 +80,35 @@ pub async fn admin_create_gateway_instance(
     }
     let token = request.token.as_deref().unwrap_or_default();
     match state.store.create_gateway(gateway_id, token).await {
-        Ok(stored) => (
-            StatusCode::CREATED,
-            Json(AdminGatewayInstanceReturned {
-                instance: GatewayInstance {
-                    gateway_id: stored.gateway_id,
-                    instance_id: stored.instance_id,
-                    status: "active".to_string(),
-                    created_at: DateTime::now(),
-                },
-            }),
-        )
-            .into_response(),
+        Ok(stored) => {
+            let init_url = format!(
+                "{}/api/v1/gateway/initial-config?instance_id={}",
+                state.config.public_url.trim_end_matches('/'),
+                stored.gateway_id
+            );
+            let install = GatewayInstallInfo {
+                install_command: format!(
+                    "docker run -d --name warp-gateway-{} -e WARP_GATEWAY_INIT_URL=\"{}\" -e WARP_GATEWAY_TOKEN=\"{}\" {}",
+                    stored.gateway_id, init_url, token, state.config.gateway_image
+                ),
+                cloud_image: state.config.gateway_image.clone(),
+                init_url,
+            };
+            (
+                StatusCode::CREATED,
+                Json(AdminCreateGatewayInstanceReturned {
+                    instance: GatewayInstance {
+                        gateway_id: stored.gateway_id,
+                        instance_id: stored.instance_id,
+                        lifecycle_state: GatewayInstanceLifecycleState::Provisioned,
+                        created_at: DateTime::now(),
+                        initialized_at: None,
+                    },
+                    install,
+                }),
+            )
+                .into_response()
+        }
         Err(StoreError::Conflict(_)) => (
             StatusCode::CONFLICT,
             format!("gateway {gateway_id} already exists"),
@@ -275,6 +319,395 @@ fn history_window_config(window: &str) -> Option<(i64, i64)> {
     }
 }
 
+/// 实例列表：GET /api/v1/admin/gateways/instances（含生命周期状态）。
+pub async fn admin_list_gateway_instances(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let gateways = match state.store.list_gateways().await {
+        Ok(gateways) => gateways,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to load gateway instances: {err}"),
+            )
+                .into_response();
+        }
+    };
+    let instances: Vec<AdminGatewayInstanceView> = gateways
+        .into_iter()
+        .map(|gateway| {
+            let init_url = format!(
+                "{}/api/v1/gateway/initial-config?instance_id={}",
+                state.config.public_url.trim_end_matches('/'),
+                gateway.gateway_id
+            );
+            AdminGatewayInstanceView {
+                gateway_id: gateway.gateway_id,
+                instance_id: gateway.instance_id,
+                lifecycle_state: gateway
+                    .lifecycle_state
+                    .unwrap_or(GatewayInstanceLifecycleState::Provisioned),
+                created_at: gateway.created_at.unwrap_or_else(DateTime::now),
+                initialized_at: gateway.initialized_at,
+                init_url,
+            }
+        })
+        .collect();
+    Json(instances).into_response()
+}
+
+/// 版本发布请求体：version + 外部 artifact_url（可能 GitHub/制品库，中心会下载镜像到本地/对象存储）。
+#[derive(serde::Deserialize)]
+pub struct PublishReleaseRequest {
+    pub version: String,
+    pub artifact_url: String,
+    pub requested_by: String,
+}
+
+fn artifact_filename(url: &str, component: &str, version: &str) -> String {
+    url.split('/')
+        .next_back()
+        .filter(|segment| !segment.is_empty())
+        .map(str::to_string)
+        .unwrap_or_else(|| format!("{component}-{version}.bin"))
+}
+
+async fn download_artifact(client: &reqwest::Client, url: &str) -> Result<Vec<u8>, String> {
+    let response = client
+        .get(url)
+        .send()
+        .await
+        .map_err(|err| format!("download artifact failed: {err}"))?;
+    if !response.status().is_success() {
+        return Err(format!(
+            "download artifact rejected: HTTP {}",
+            response.status()
+        ));
+    }
+    response
+        .bytes()
+        .await
+        .map(|bytes| bytes.to_vec())
+        .map_err(|err| format!("read artifact body failed: {err}"))
+}
+
+/// 发布版本：POST /api/v1/admin/releases/:component（warp-agentd / warp-gateway）。
+/// 从外部 artifact_url 下载制品 → 镜像到本地文件/对象存储 → 返回快的下载地址。
+pub async fn admin_publish_release(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path(component): Path<String>,
+    Json(request): Json<PublishReleaseRequest>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    if request.version.trim().is_empty()
+        || request.artifact_url.trim().is_empty()
+        || request.requested_by.trim().is_empty()
+    {
+        return (
+            StatusCode::BAD_REQUEST,
+            "version, artifact_url and requested_by must not be empty",
+        )
+            .into_response();
+    }
+    let bytes = match download_artifact(crate::infra::vm::shared_vm_client(), &request.artifact_url)
+        .await
+    {
+        Ok(bytes) => bytes,
+        Err(err) => {
+            return (
+                StatusCode::BAD_GATEWAY,
+                format!("failed to fetch artifact: {err}"),
+            )
+                .into_response();
+        }
+    };
+    let filename = artifact_filename(&request.artifact_url, &component, &request.version);
+    let mirrored_url = match state
+        .artifact_store
+        .store(&component, &request.version, &filename, bytes)
+        .await
+    {
+        Ok(url) => url,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to store artifact: {err}"),
+            )
+                .into_response();
+        }
+    };
+    let record = match state
+        .store
+        .publish_release(&component, &request.version, &mirrored_url)
+        .await
+    {
+        Ok(record) => record,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to record release: {err}"),
+            )
+                .into_response();
+        }
+    };
+    Json(record).into_response()
+}
+
+/// 查询某组件的发布记录：GET /api/v1/admin/releases/:component（新→旧）。
+pub async fn admin_list_releases(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path(component): Path<String>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let releases = match state.store.list_releases(&component).await {
+        Ok(releases) => releases,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to load releases: {err}"),
+            )
+                .into_response();
+        }
+    };
+    Json(releases).into_response()
+}
+
+/// 绑定客户请求体：对齐模型 AdminBindGatewayCustomer。
+#[derive(serde::Deserialize)]
+pub struct BindGatewayCustomerRequest {
+    pub gateway_id: String,
+    pub customer_id: String,
+    pub requested_by: String,
+}
+
+/// 绑定网关到客户：POST /api/v1/admin/gateways/bind。
+pub async fn admin_bind_gateway_customer(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(request): Json<BindGatewayCustomerRequest>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    if request.gateway_id.trim().is_empty()
+        || request.customer_id.trim().is_empty()
+        || request.requested_by.trim().is_empty()
+    {
+        return (
+            StatusCode::BAD_REQUEST,
+            "gateway_id, customer_id and requested_by must not be empty",
+        )
+            .into_response();
+    }
+    let binding = match state
+        .store
+        .bind_gateway_customer(&request.gateway_id, &request.customer_id)
+        .await
+    {
+        Ok(binding) => binding,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to bind gateway customer: {err}"),
+            )
+                .into_response();
+        }
+    };
+    Json(AdminGatewayCustomerBindingReturned {
+        binding: GatewayCustomerBinding {
+            gateway_id: binding.gateway_id,
+            customer_id: binding.customer_id,
+            status: binding.status,
+            bound_at: binding.bound_at,
+        },
+    })
+    .into_response()
+}
+
+/// 查询实例初始配置（admin 侧）：GET /api/v1/admin/gateways/instances/:instance_id/config。
+pub async fn admin_get_gateway_initial_config(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path(instance_id): Path<String>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let host = state
+        .config
+        .public_url
+        .trim_start_matches("http://")
+        .trim_start_matches("https://")
+        .split(':')
+        .next()
+        .unwrap_or("127.0.0.1");
+    let _ = instance_id;
+    Json(GatewayInitialConfigReturned {
+        config: GatewayInitialConfig {
+            control_center_endpoint: state.config.public_url.clone(),
+            policy_version: "policy-v1".to_string(),
+            telemetry_output: format!("otlp://{host}:4317"),
+        },
+    })
+    .into_response()
+}
+
+/// 创建升级计划请求体：多组件目标版本 + 网关范围 + 多步执行。
+#[derive(serde::Deserialize)]
+pub struct CreateUpgradePlanRequest {
+    pub targets: Vec<UpgradeTarget>,
+    pub gateway_ids: Vec<String>,
+    pub steps: Vec<UpgradeStep>,
+    pub requested_by: String,
+}
+
+#[derive(serde::Deserialize)]
+pub struct ApproveUpgradePlanRequest {
+    pub plan_id: String,
+    pub approved_by: String,
+}
+
+/// 创建升级计划：POST /api/v1/admin/upgrade-plans。
+pub async fn admin_create_upgrade_plan(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(request): Json<CreateUpgradePlanRequest>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    if request.targets.is_empty()
+        || request.gateway_ids.is_empty()
+        || request.requested_by.trim().is_empty()
+    {
+        return (
+            StatusCode::BAD_REQUEST,
+            "targets, gateway_ids and requested_by must not be empty",
+        )
+            .into_response();
+    }
+    let plan_id = format!(
+        "plan-{}",
+        chrono::Utc::now()
+            .timestamp_nanos_opt()
+            .unwrap_or_default()
+    );
+    let record = UpgradePlanRecord {
+        plan_id,
+        targets: request.targets,
+        target_count: request.gateway_ids.len() as i64,
+        status: "pending".to_string(),
+        created_at: DateTime::now(),
+        steps: request.steps,
+        approved_by: None,
+        approved_at: None,
+    };
+    match state.store.create_upgrade_plan(&record).await {
+        Ok(plan) => (StatusCode::CREATED, Json(plan)).into_response(),
+        Err(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("failed to create upgrade plan: {err}"),
+        )
+            .into_response(),
+    }
+}
+
+/// 查询升级计划列表：GET /api/v1/admin/upgrade-plans。
+pub async fn admin_list_upgrade_plans(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    match state.store.list_upgrade_plans().await {
+        Ok(plans) => Json(plans).into_response(),
+        Err(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("failed to load upgrade plans: {err}"),
+        )
+            .into_response(),
+    }
+}
+
+/// 批准升级计划：POST /api/v1/admin/upgrade-plans/approve。
+pub async fn admin_approve_upgrade_plan(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(request): Json<ApproveUpgradePlanRequest>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    match state
+        .store
+        .approve_upgrade_plan(&request.plan_id, &request.approved_by)
+        .await
+    {
+        Ok(plan) => Json(plan).into_response(),
+        Err(StoreError::Conflict(_)) => (
+            StatusCode::NOT_FOUND,
+            format!("upgrade plan {} not found", request.plan_id),
+        )
+            .into_response(),
+        Err(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("failed to approve upgrade plan: {err}"),
+        )
+            .into_response(),
+    }
+}
+
+/// 查询某 gateway 的生命周期转变历史：GET /api/v1/admin/gateways/:gateway_id/lifecycle。
+pub async fn admin_list_gateway_lifecycle(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path(gateway_id): Path<String>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    let events = match state.store.list_lifecycle_events(&gateway_id).await {
+        Ok(events) => events,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to load gateway lifecycle: {err}"),
+            )
+                .into_response();
+        }
+    };
+    Json(events).into_response()
+}
+
 /// 查询某 gateway 下的 Agent 状态：GET /api/v1/admin/gateways/:gateway_id/agents。
 pub async fn admin_list_gateway_agents(
     State(state): State<ApiState>,
@@ -338,8 +771,7 @@ pub async fn admin_view_gateway_list(
             let online = online + i64::from(stored.status.as_deref() == Some("online"));
             // 离线 = 不在线（含已上报离线与从未上报的已接入网关），保证 online + offline = gateway_count。
             let offline = offline + i64::from(stored.status.as_deref() != Some("online"));
-            let degraded =
-                degraded + i64::from(stored.health.as_deref() == Some("degraded"));
+            let degraded = degraded + i64::from(stored.health.as_deref() == Some("degraded"));
             (online, offline, degraded)
         },
     );
@@ -432,14 +864,17 @@ fn gateway_status_view(stored: &StoredGateway) -> GatewayStatusView {
         gateway_id: stored.gateway_id.clone(),
         instance_id: stored.instance_id.clone(),
         version: stored.version.clone().unwrap_or_default(),
-        status: stored.status.clone().unwrap_or_else(|| "offline".to_string()),
-        health: stored.health.clone().unwrap_or_else(|| "unknown".to_string()),
+        status: stored
+            .status
+            .clone()
+            .unwrap_or_else(|| "offline".to_string()),
+        health: stored
+            .health
+            .clone()
+            .unwrap_or_else(|| "unknown".to_string()),
         memory_bytes: stored.memory_bytes,
         cpu_percent: stored.cpu_percent,
-        last_seen_at: stored
-            .last_seen_at
-            .clone()
-            .unwrap_or_else(DateTime::now),
+        last_seen_at: stored.last_seen_at.clone().unwrap_or_else(DateTime::now),
     }
 }
 
@@ -502,8 +937,16 @@ mod tests {
                 admin_token_hash: Some(super::super::super::infra::sha256_hex("admin-tok")),
                 database_url: None,
                 victoriametrics_url: None,
+                public_url: "http://127.0.0.1:3100".to_string(),
+                gateway_image: "warp-gateway:latest".to_string(),
+                artifact_dir: std::env::temp_dir().join("wic-artifacts"),
+                object_storage: None,
             },
             store: std::sync::Arc::new(test_store()),
+            artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
+                std::env::temp_dir().join("wic-artifacts"),
+                "http://127.0.0.1:3100",
+            )),
             rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
                 super::super::rate_limit::RateLimitState::default(),
             )),
@@ -536,7 +979,12 @@ mod tests {
             .await
             .expect("response");
         assert_eq!(response.status(), StatusCode::OK);
-        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
         let returned: serde_json::Value = serde_json::from_slice(&body).expect("json");
         assert_eq!(returned["gateway_id"], "gw-001");
         assert_eq!(returned["window"], "1h");
@@ -554,9 +1002,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri(
-                        "/api/v1/admin/gateways/gw-001/agents/agent-1/history?window=1h",
-                    )
+                    .uri("/api/v1/admin/gateways/gw-001/agents/agent-1/history?window=1h")
                     .header("authorization", "Bearer admin-tok")
                     .body(Body::empty())
                     .expect("request"),
@@ -620,8 +1066,16 @@ mod tests {
                 admin_token_hash: Some(super::super::super::infra::sha256_hex("admin-tok")),
                 database_url: None,
                 victoriametrics_url: None,
+                public_url: "http://127.0.0.1:3100".to_string(),
+                gateway_image: "warp-gateway:latest".to_string(),
+                artifact_dir: std::env::temp_dir().join("wic-artifacts"),
+                object_storage: None,
             },
             store: std::sync::Arc::new(store),
+            artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
+                std::env::temp_dir().join("wic-artifacts"),
+                "http://127.0.0.1:3100",
+            )),
             rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
                 super::super::rate_limit::RateLimitState::default(),
             )),
@@ -640,7 +1094,12 @@ mod tests {
             )
             .await
             .expect("response");
-        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
         let list: AdminGatewayListReturned = serde_json::from_slice(&body).expect("json");
         assert_eq!(list.list.gateway_count, 2);
         assert_eq!(list.list.online_count, 1);
@@ -658,7 +1117,12 @@ mod tests {
             )
             .await
             .expect("response");
-        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
         let list: AdminGatewayStatusListReturned = serde_json::from_slice(&body).expect("json");
         assert_eq!(list.statuses.len(), 1);
         assert_eq!(list.statuses[0].gateway_id, "gw-001");
@@ -696,7 +1160,12 @@ mod tests {
             .await
             .expect("response");
         assert_eq!(response.status(), StatusCode::OK);
-        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
         let returned: AdminGatewayListReturned = serde_json::from_slice(&body).expect("json");
         assert_eq!(returned.list.gateway_count, 2);
         assert_eq!(returned.list.online_count, 1);
@@ -768,8 +1237,16 @@ mod tests {
                 admin_token_hash: Some(super::super::super::infra::sha256_hex("admin-tok")),
                 database_url: None,
                 victoriametrics_url: None,
+                public_url: "http://127.0.0.1:3100".to_string(),
+                gateway_image: "warp-gateway:latest".to_string(),
+                artifact_dir: std::env::temp_dir().join("wic-artifacts"),
+                object_storage: None,
             },
             store: std::sync::Arc::new(store),
+            artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
+                std::env::temp_dir().join("wic-artifacts"),
+                "http://127.0.0.1:3100",
+            )),
             rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
                 super::super::rate_limit::RateLimitState::default(),
             )),
@@ -777,9 +1254,7 @@ mod tests {
     }
 
     fn create_payload(gateway_name: &str) -> String {
-        format!(
-            r#"{{"gateway_name":"{gateway_name}","requested_by":"test","token":"tok-create"}}"#
-        )
+        format!(r#"{{"gateway_name":"{gateway_name}","requested_by":"test","token":"tok-create"}}"#)
     }
 
     #[tokio::test]
@@ -811,10 +1286,59 @@ mod tests {
             .await
             .expect("response");
         assert_eq!(response.status(), StatusCode::CREATED);
-        let body = response.into_body().collect().await.expect("body").to_bytes();
-        let returned: AdminGatewayInstanceReturned = serde_json::from_slice(&body).expect("json");
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
+        let returned: AdminCreateGatewayInstanceReturned =
+            serde_json::from_slice(&body).expect("json");
         assert_eq!(returned.instance.gateway_id, "gw-create");
-        assert_eq!(returned.instance.status, "active");
+        assert_eq!(
+            returned.instance.lifecycle_state,
+            GatewayInstanceLifecycleState::Provisioned
+        );
+        assert!(returned.install.init_url.contains("initial-config"));
+        assert!(returned.install.install_command.starts_with("docker run"));
+
+        // 实例列表公开可重复获取的初始化 URL，但不重复返回安装命令或凭证。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/admin/gateways/instances")
+                    .header("authorization", "Bearer admin-tok")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
+        let json: serde_json::Value = serde_json::from_slice(&body).expect("json");
+        let listed = json
+            .as_array()
+            .and_then(|items| items.iter().find(|item| item["gateway_id"] == "gw-create"))
+            .expect("created instance json");
+        assert!(listed.get("init_url").is_some());
+        assert!(listed.get("install").is_none());
+        assert!(listed.get("install_command").is_none());
+        assert!(listed.get("token").is_none());
+        let instances: Vec<AdminGatewayInstanceView> = serde_json::from_slice(&body).expect("json");
+        let created = instances
+            .iter()
+            .find(|instance| instance.gateway_id == "gw-create")
+            .expect("created instance");
+        assert_eq!(
+            created.init_url,
+            "http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=gw-create"
+        );
 
         // 重复创建同一 gateway_id → 409。
         let response = app

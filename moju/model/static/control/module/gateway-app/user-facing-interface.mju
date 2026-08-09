@@ -49,38 +49,31 @@ module<interface> GatewayApp.UserFacingInterface {
 message<command> AdminGetAgentInstallCode {
 }
 
-message<command> AdminShowAgentRuntimeStatus {
+message<command> AdminShowAgentRuntimeStatus = OperatorRequest {
   agent_id: String
-  requested_by: String
 }
 
-message<command> AdminGetAgentOverview {
-  requested_by: String
+message<command> AdminGetAgentOverview = OperatorRequest {
 }
 
-message<command> AdminPauseAgent {
+message<command> AdminPauseAgent = OperatorRequest {
   agent_id: String
-  requested_by: String
 }
 
-message<command> AdminUpgradeAgent {
+message<command> AdminUpgradeAgent = OperatorRequest {
   agent_id: String
   target_version: String
-  requested_by: String
 }
 
-message<command> AdminViewGateWayManagementState {
-  requested_by: String
+message<command> AdminViewGateWayManagementState = OperatorRequest {
 }
 
-message<command> AdminLookupAgentRegistryEntry {
+message<command> AdminLookupAgentRegistryEntry = OperatorRequest {
   agent_id: String
-  requested_by: String
 }
 
-message<command> AdminQueryAgentCapabilityIndex {
+message<command> AdminQueryAgentCapabilityIndex = OperatorRequest {
   agent_id: String
-  requested_by: String
 }
 
 message<response> AdminAgentInstallCodeReturned {

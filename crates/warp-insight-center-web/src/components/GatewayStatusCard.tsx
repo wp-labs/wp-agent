@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import type { GatewayStatusView } from "../api";
+import type { GatewayHistory, GatewayStatusView } from "../api";
 import { formatBytes, formatPercent, formatRelativeTime } from "./ui";
 import { GatewayHealthBadge } from "./GatewayHealthBadge";
+import { GatewayHistoryChart } from "./GatewayHistoryChart";
 import { GatewayInstanceText } from "./GatewayInstanceText";
 import { GatewayOnlineStatusBadge } from "./GatewayOnlineStatusBadge";
 import { GatewayVersionText } from "./GatewayVersionText";
@@ -11,9 +12,15 @@ import styles from "./GatewayStatusCard.module.css";
 export function GatewayStatusCard({
   gateway,
   uptime,
+  history,
+  historySource,
+  historyLoading,
 }: {
   gateway: GatewayStatusView;
   uptime?: number | null;
+  history?: GatewayHistory | null;
+  historySource?: "real" | "example";
+  historyLoading?: boolean;
 }) {
   const isOffline = gateway.status === "offline";
   const stale =
@@ -80,6 +87,13 @@ export function GatewayStatusCard({
             ) : null}
           </div>
         </div>
+        <GatewayHistoryChart
+          history={history}
+          source={historySource}
+          loading={historyLoading}
+          compact
+          title="最近 1 小时趋势"
+        />
       </Link>
     </article>
   );

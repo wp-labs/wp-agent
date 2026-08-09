@@ -1,4 +1,4 @@
-import type { GatewayStatusView } from "../api";
+import type { ExampleResult, GatewayHistory, GatewayStatusView } from "../api";
 import { GatewayStatusCard } from "./GatewayStatusCard";
 import { LoadingDots } from "./ui";
 import styles from "./GatewayStatusList.module.css";
@@ -7,10 +7,14 @@ import styles from "./GatewayStatusList.module.css";
 export function GatewayStatusList({
   items,
   uptimes,
+  histories,
+  historyLoading,
   loading,
 }: {
   items?: GatewayStatusView[];
   uptimes?: Record<string, number | null>;
+  histories?: Record<string, ExampleResult<GatewayHistory>>;
+  historyLoading?: boolean;
   loading?: boolean;
 }) {
   if (loading && (!items || items.length === 0)) {
@@ -54,6 +58,9 @@ export function GatewayStatusList({
             key={gateway.gatewayId}
             gateway={gateway}
             uptime={uptimes?.[gateway.gatewayId]}
+            history={histories?.[gateway.gatewayId]?.data}
+            historySource={histories?.[gateway.gatewayId]?.source}
+            historyLoading={historyLoading}
           />
         ))}
       </div>

@@ -62,6 +62,7 @@ actor<system> WarpGateway {
   access protocol<http>
   can GetGatewayInitialConfig
   can ReportGatewayStatus
+  can ReportAgentStatus
 }
 
 actor GatewayOperator {
@@ -115,6 +116,18 @@ actor PlatformMaintenanceEngineer {
   can PublishWarpGateWay
   can CreateUpgradePlan
   can AdminDispatchGlobalPolicy
+  can AdminListGatewayInstances
+  can AdminGetGatewayUptime
+  can AdminGetGatewayHistory
+  can AdminGetAgentHistory
+  can AdminListGatewayAgents
+  can AdminGetGatewayLifecycle
+  can AdminGetGatewayInitialConfig
+  can AdminPublishRelease
+  can AdminListReleases
+  can AdminCreateUpgradePlan
+  can AdminListUpgradePlans
+  can AdminApproveUpgradePlan
 }
 
 actor PublicInstallClient {

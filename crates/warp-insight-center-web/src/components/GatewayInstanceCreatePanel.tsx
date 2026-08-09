@@ -1,17 +1,50 @@
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useCreateGatewayInstance } from "../hooks";
 import {
   ErrorBanner,
   FormField,
-  FormStack,
   PrimaryButton,
   ReceiptCard,
-  SectionCard,
   TextInput,
   formatDateTime,
+  lifecycleLabel,
 } from "./ui";
+import styles from "./GatewayInstanceCreatePanel.module.css";
 
+/** 安装指引代码块：展示并复制创建回执中的部署信息。 */
+function CopyBlock({ label, code }: { label: string; code: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // 剪贴板不可用时保留可选中的原始文本，不阻断部署流程。
+    }
+  }
+
+  return (
+    <div className={styles.step}>
+      <div className={styles.stepLabel}>{label}</div>
+      <div className={styles.codeBlock}>
+        <button
+          type="button"
+          className={styles.copyButton}
+          onClick={handleCopy}
+        >
+          {copied ? "已复制" : "复制"}
+        </button>
+        <pre className={styles.codeText}>{code}</pre>
+      </div>
+    </div>
+  );
+}
+
+/** 提供可按需展开的实例创建流程，避免低频表单长期占据实例列表空间。 */
 export function GatewayInstanceCreatePanel() {
+  const [expanded, setExpanded] = useState(false);
   const mutation = useCreateGatewayInstance();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -23,47 +56,91 @@ export function GatewayInstanceCreatePanel() {
     });
   }
 
-  const instance = mutation.data?.data;
+  const created = mutation.data?.data;
+  const instance = created?.instance;
+  const install = created?.install;
 
   return (
-    <SectionCard
-      title="创建网关实例"
-      subtitle="客户服务工程师创建 GateWay 管理实例，作为后续接入与状态聚合的管理对象。"
-    >
-      <form onSubmit={handleSubmit}>
-        <FormStack
-          actions={
-            <PrimaryButton type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "创建中…" : "创建实例"}
-            </PrimaryButton>
-          }
+    <section className={styles.panel}>
+      <header className={styles.header}>
+        <div className={styles.headerText}>
+          <span className={styles.eyebrow}>Gateway Provisioning</span>
+          <h2 className={styles.title}>新增网关实例</h2>
+          <p className={styles.subtitle}>
+            创建待接入实例并生成初始化 URL、镜像信息和一次性安装指引。
+          </p>
+        </div>
+        <button
+          type="button"
+          className={styles.toggleButton}
+          aria-expanded={expanded}
+          aria-controls="gateway-instance-create-content"
+          onClick={() => setExpanded((value) => !value)}
         >
-          <FormField label="网关名称" hint="例如：gw-prod-east">
-            <TextInput
-              name="gatewayName"
-              required
-              placeholder="请输入网关名称"
+          {expanded ? "收起创建" : "+ 创建实例"}
+        </button>
+      </header>
+
+      {expanded ? (
+        <div id="gateway-instance-create-content" className={styles.body}>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <FormField label="网关名称" hint="例如：gw-prod-east">
+              <TextInput
+                name="gatewayName"
+                required
+                placeholder="请输入网关名称"
+              />
+            </FormField>
+            <FormField label="申请者（requested_by）">
+              <TextInput name="requestedBy" defaultValue="admin" required />
+            </FormField>
+            <div className={styles.formAction}>
+              <span className={styles.actionHint}>
+                创建后实例默认进入“待部署”状态。
+              </span>
+              <PrimaryButton type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? "创建中…" : "创建实例"}
+              </PrimaryButton>
+            </div>
+          </form>
+
+          {mutation.error ? (
+            <ErrorBanner>创建失败：{String(mutation.error)}</ErrorBanner>
+          ) : null}
+          {instance ? (
+            <ReceiptCard
+              title="创建回执"
+              fields={[
+                ["网关 ID", instance.gatewayId],
+                ["实例 ID", instance.instanceId],
+                ["生命周期", lifecycleLabel(instance.lifecycleState)],
+                ["创建时间", formatDateTime(instance.createdAt)],
+              ]}
             />
-          </FormField>
-          <FormField label="申请者（requested_by）">
-            <TextInput name="requestedBy" defaultValue="admin" required />
-          </FormField>
-        </FormStack>
-      </form>
-      {mutation.error ? (
-        <ErrorBanner>创建失败：{String(mutation.error)}</ErrorBanner>
+          ) : null}
+          {install ? (
+            <div className={styles.install}>
+              <div className={styles.installTitle}>安装指引</div>
+              <CopyBlock
+                label="① Docker 安装命令（已注入初始化 URL 与网关凭证）"
+                code={install.installCommand}
+              />
+              <CopyBlock
+                label="② 云镜像地址（云服务器直接拉取）"
+                code={install.cloudImage}
+              />
+              <CopyBlock
+                label="③ 初始化 HTTPS URL（Gateway 启动后基于此 URL 初始化）"
+                code={install.initUrl}
+              />
+              <p className={styles.installHint}>
+                Gateway 启动后将携带网关凭证访问初始化
+                URL，获取控制中心地址、策略版本与遥测输出，完成接入。
+              </p>
+            </div>
+          ) : null}
+        </div>
       ) : null}
-      {instance ? (
-        <ReceiptCard
-          title="创建回执"
-          fields={[
-            ["网关 ID", instance.gatewayId],
-            ["实例 ID", instance.instanceId],
-            ["状态", instance.status],
-            ["创建时间", formatDateTime(instance.createdAt)],
-          ]}
-        />
-      ) : null}
-    </SectionCard>
+    </section>
   );
 }

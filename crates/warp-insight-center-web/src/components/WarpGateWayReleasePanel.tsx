@@ -1,18 +1,22 @@
 import type { FormEvent } from "react";
-import { usePublishWarpGateWay } from "../hooks";
+import { usePublishWarpGateWay, useReleases } from "../hooks";
 import {
+  Badge,
   ErrorBanner,
   FormField,
-  FormStack,
   PrimaryButton,
   ReceiptCard,
   SectionCard,
   TextInput,
   formatDateTime,
 } from "./ui";
+import styles from "./ReleasePanel.module.css";
 
+/** 发布 WarpGateWay，并在同一工作区查看该组件最近的发布记录。 */
 export function WarpGateWayReleasePanel() {
   const mutation = usePublishWarpGateWay();
+  const { data: releasesData } = useReleases("warp-gateway");
+  const releases = releasesData?.data ?? [];
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -20,7 +24,8 @@ export function WarpGateWayReleasePanel() {
     mutation.mutate({
       version: String(data.get("version") ?? ""),
       artifactUrl: String(data.get("artifactUrl") ?? ""),
-      requestedBy: String(data.get("requestedBy") ?? ""),
+      // 当前管理端没有独立发布者字段，沿用默认管理身份满足后端审计契约。
+      requestedBy: "admin",
     });
   }
 
@@ -28,45 +33,76 @@ export function WarpGateWayReleasePanel() {
 
   return (
     <SectionCard
-      title="WarpGateWay 发布"
-      subtitle="平台维护工程师发布 WarpGateWay 新版本，供各 WarpGateWay 管理实例升级。"
+      title="发布 WarpGateWay"
+      subtitle="发布网关运行时新版本，供 Gateway 实例升级。"
     >
-      <form onSubmit={handleSubmit}>
-        <FormStack
-          actions={
-            <PrimaryButton type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "发布中…" : "发布"}
-            </PrimaryButton>
-          }
-        >
-          <FormField label="版本号" hint="例如：v3.1.0">
-            <TextInput name="version" required placeholder="请输入版本号" />
-          </FormField>
-          <FormField label="产物地址（artifact_url）">
-            <TextInput
-              name="artifactUrl"
-              required
-              placeholder="https://artifacts.example.com/warp-gateway/v3.1.0"
-            />
-          </FormField>
-          <FormField label="发布者（requested_by）">
-            <TextInput name="requestedBy" defaultValue="admin" required />
-          </FormField>
-        </FormStack>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <FormField label="版本号" hint="例如：v3.1.0">
+          <TextInput name="version" required placeholder="请输入版本号" />
+        </FormField>
+        <FormField label="产物地址（artifact_url）">
+          <TextInput
+            name="artifactUrl"
+            required
+            placeholder="https://artifacts.example.com/warp-gateway/v3.1.0"
+          />
+        </FormField>
+        <div className={styles.formAction}>
+          <span className={styles.actionHint}>发布后将进入发布记录。</span>
+          <PrimaryButton type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "发布中…" : "发布版本"}
+          </PrimaryButton>
+        </div>
       </form>
       {mutation.error ? (
         <ErrorBanner>发布失败：{String(mutation.error)}</ErrorBanner>
       ) : null}
       {release ? (
         <ReceiptCard
-          title="发布回执"
+          title="本次发布回执"
           fields={[
             ["版本", release.version],
             ["状态", release.status],
+            ["产物地址", release.artifactUrl],
             ["发布时间", formatDateTime(release.publishedAt)],
           ]}
         />
       ) : null}
+      <div className={styles.history}>
+        <div className={styles.historyHeader}>
+          <h3 className={styles.historyTitle}>最近发布</h3>
+          <span className={styles.historyHint}>WarpGateWay</span>
+        </div>
+        {releases.length === 0 ? (
+          <div className={styles.historyEmpty}>暂无发布记录。</div>
+        ) : (
+          <div className={styles.historyList}>
+            {releases.map((record) => (
+              <div key={record.version} className={styles.historyItem}>
+                <strong className={styles.historyVersion}>
+                  {record.version}
+                </strong>
+                <a
+                  className={styles.artifactLink}
+                  href={record.artifactUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {record.artifactUrl}
+                </a>
+                <span className={styles.historyMeta}>
+                  <Badge
+                    tone={record.status === "published" ? "green" : "gray"}
+                  >
+                    {record.status}
+                  </Badge>
+                  {formatDateTime(record.publishedAt)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </SectionCard>
   );
 }

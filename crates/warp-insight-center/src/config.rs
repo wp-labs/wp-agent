@@ -12,6 +12,18 @@ const ENV_GATEWAY_CREDENTIALS: &str = "WARP_INSIGHT_CENTER_GATEWAY_CREDENTIALS";
 const ENV_ADMIN_TOKEN: &str = "WARP_INSIGHT_CENTER_ADMIN_TOKEN";
 const ENV_DATABASE_URL: &str = "WARP_INSIGHT_CENTER_DATABASE_URL";
 const ENV_VICTORIAMETRICS_URL: &str = "WARP_INSIGHT_CENTER_VICTORIAMETRICS_URL";
+const ENV_PUBLIC_URL: &str = "WARP_INSIGHT_CENTER_PUBLIC_URL";
+const ENV_GATEWAY_IMAGE: &str = "WARP_INSIGHT_CENTER_GATEWAY_IMAGE";
+const ENV_ARTIFACT_DIR: &str = "WARP_INSIGHT_CENTER_ARTIFACT_DIR";
+const ENV_OBJECT_STORAGE_ENDPOINT: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_ENDPOINT";
+const ENV_OBJECT_STORAGE_BUCKET: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_BUCKET";
+const ENV_OBJECT_STORAGE_ACCESS_KEY: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_ACCESS_KEY";
+const ENV_OBJECT_STORAGE_SECRET_KEY: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_SECRET_KEY";
+
+/// 默认对外地址使用域名（初始化 URL / 控制中心端点需要可被 Gateway 从外网访问）。
+const DEFAULT_PUBLIC_URL: &str = "https://center.warpinsight.example";
+const DEFAULT_GATEWAY_IMAGE: &str = "warp-gateway:latest";
+const DEFAULT_ARTIFACT_DIR: &str = "artifacts";
 
 #[derive(Debug, Clone)]
 pub struct CenterConfig {
@@ -27,6 +39,24 @@ pub struct CenterConfig {
     /// 时序历史 VictoriaMetrics 基地址（如 compose 的 `http://127.0.0.1:8428`）。
     /// 有值 → 每次状态上报额外推送指标；未设置/为空 → 不启用（仅存快照）。
     pub victoriametrics_url: Option<String>,
+    /// center 对外地址（生成网关初始化 URL），默认 `https://center.warpinsight.example`，
+    /// 部署时通过 `WARP_INSIGHT_CENTER_PUBLIC_URL` 配置真实域名。
+    pub public_url: String,
+    /// gateway 镜像名（docker 安装命令 / 云镜像地址），默认 `warp-gateway:latest`。
+    pub gateway_image: String,
+    /// 本地制品目录（版本发布镜像制品落盘），默认 `artifacts/`。
+    pub artifact_dir: PathBuf,
+    /// 云对象存储（可选，S3 兼容 / MinIO）；配置了 endpoint 则发布制品存对象存储，否则本地。
+    pub object_storage: Option<ObjectStorageConfig>,
+}
+
+/// S3 兼容对象存储配置（MinIO 等）。
+#[derive(Debug, Clone)]
+pub struct ObjectStorageConfig {
+    pub endpoint: String,
+    pub bucket: String,
+    pub access_key: String,
+    pub secret_key: String,
 }
 
 #[derive(Debug, Clone)]
@@ -54,6 +84,31 @@ impl CenterConfig {
         let database_url = parse_optional_env_url(ENV_DATABASE_URL);
         // 有值 → 状态上报推送 VictoriaMetrics；未设置/空 → 不启用时序推送。
         let victoriametrics_url = parse_optional_env_url(ENV_VICTORIAMETRICS_URL);
+        // 有值 → 用配置的对外地址/镜像；空 → 默认值。
+        let public_url = env::var(ENV_PUBLIC_URL)
+            .unwrap_or_else(|_| DEFAULT_PUBLIC_URL.to_string());
+        let gateway_image = env::var(ENV_GATEWAY_IMAGE)
+            .unwrap_or_else(|_| DEFAULT_GATEWAY_IMAGE.to_string());
+        let artifact_dir = PathBuf::from(
+            env::var(ENV_ARTIFACT_DIR).unwrap_or_else(|_| DEFAULT_ARTIFACT_DIR.to_string()),
+        );
+        // 对象存储：endpoint/bucket/凭据齐全才启用（否则用本地文件）。
+        let object_storage = match (
+            env::var(ENV_OBJECT_STORAGE_ENDPOINT).ok(),
+            env::var(ENV_OBJECT_STORAGE_BUCKET).ok(),
+            env::var(ENV_OBJECT_STORAGE_ACCESS_KEY).ok(),
+            env::var(ENV_OBJECT_STORAGE_SECRET_KEY).ok(),
+        ) {
+            (Some(endpoint), Some(bucket), Some(access_key), Some(secret_key)) => {
+                Some(ObjectStorageConfig {
+                    endpoint,
+                    bucket,
+                    access_key,
+                    secret_key,
+                })
+            }
+            _ => None,
+        };
         if listen_addr.trim().is_empty() {
             return Err(ConfigError::new("listen addr must not be empty"));
         }
@@ -64,6 +119,10 @@ impl CenterConfig {
             admin_token_hash,
             database_url,
             victoriametrics_url,
+            public_url,
+            gateway_image,
+            artifact_dir,
+            object_storage,
         })
     }
 }

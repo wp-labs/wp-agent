@@ -73,19 +73,36 @@ struct GatewayStatusView {
   last_seen_at: DateTime
 }
 
+variant GatewayInstanceLifecycleState {
+  meta {
+    label zh "GateWay 实例生命周期状态"
+    label en "Gateway Instance Lifecycle State"
+    summary zh "从创建到完成初始化的生命周期：已创建（待部署，可能跨数天）→ 初始化中 → 已运行；失败可重新部署。"
+    tag "gateway"
+    tag "lifecycle"
+    tag "provisioning"
+  }
+
+  Provisioned
+  Initializing
+  Running
+  Failed
+}
+
 struct GatewayInstance {
   meta {
     label zh "GateWay 管理实例"
     label en "Gateway Instance"
-    summary zh "WarpInsightCenter 创建的 GateWay 管理实例，作为后续接入与状态聚合的管理对象。"
+    summary zh "WarpInsightCenter 创建的 GateWay 管理实例，生命周期状态表达创建→初始化→运行的接入过程。"
     tag "gateway"
     tag "provisioning"
   }
 
   gateway_id: String
   instance_id: String
-  status: String
+  lifecycle_state: GatewayInstanceLifecycleState
   created_at: DateTime
+  initialized_at: DateTime?
 }
 
 struct GatewayCustomerBinding {

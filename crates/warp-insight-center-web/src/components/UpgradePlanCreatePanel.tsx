@@ -1,31 +1,96 @@
-import type { FormEvent } from "react";
-import { useCreateUpgradePlan } from "../hooks";
+import { useState, type FormEvent } from "react";
+import type { UpgradeStep, UpgradeTarget } from "../api";
+import {
+  useCreateUpgradePlan,
+  useGatewayStatusView,
+  useReleases,
+} from "../hooks";
 import {
   ErrorBanner,
-  FormField,
-  FormStack,
   PrimaryButton,
   ReceiptCard,
   SectionCard,
-  TextInput,
   formatDateTime,
 } from "./ui";
+import styles from "./UpgradePlanCreatePanel.module.css";
 
+const COMPONENTS = ["warp-agentd", "warp-gateway"] as const;
+
+/** 创建升级计划：多组件目标版本 + Gateway 范围多选 + 分批执行步骤（滚动升级）。 */
 export function UpgradePlanCreatePanel() {
   const mutation = useCreateUpgradePlan();
+  const { data: statusData } = useGatewayStatusView();
+  const gateways = statusData?.data ?? [];
+  const { data: agentdReleases } = useReleases("warp-agentd");
+  const { data: gatewayReleases } = useReleases("warp-gateway");
+
+  // 目标版本从已发布版本中选取（下拉）。
+  function versionsFor(component: string): string[] {
+    const releases =
+      component === "warp-gateway" ? gatewayReleases : agentdReleases;
+    return releases?.data?.map((release) => release.version) ?? [];
+  }
+
+  const [targets, setTargets] = useState<UpgradeTarget[]>([
+    { component: "warp-agentd", targetVersion: "" },
+  ]);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [steps, setSteps] = useState<UpgradeStep[]>([]);
+
+  function updateTarget(index: number, patch: Partial<UpgradeTarget>) {
+    setTargets((prev) =>
+      prev.map((target, i) => (i === index ? { ...target, ...patch } : target)),
+    );
+  }
+  function addTarget() {
+    setTargets((prev) => [
+      ...prev,
+      { component: "warp-agentd", targetVersion: "" },
+    ]);
+  }
+  function removeTarget(index: number) {
+    setTargets((prev) => prev.filter((_, i) => i !== index));
+  }
+  function toggleGateway(id: string) {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
+  function toggleStepGateway(stepIndex: number, id: string) {
+    setSteps((prev) =>
+      prev.map((step, i) =>
+        i === stepIndex
+          ? {
+              ...step,
+              gatewayIds: step.gatewayIds.includes(id)
+                ? step.gatewayIds.filter((x) => x !== id)
+                : [...step.gatewayIds, id],
+            }
+          : step,
+      ),
+    );
+  }
+  function addStep() {
+    setSteps((prev) => [
+      ...prev,
+      { stepIndex: prev.length, gatewayIds: [], status: "pending" },
+    ]);
+  }
+  function removeStep(index: number) {
+    setSteps((prev) =>
+      prev
+        .filter((_, i) => i !== index)
+        .map((step, i) => ({ ...step, stepIndex: i })),
+    );
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const gatewayIds = String(data.get("gatewayIds") ?? "")
-      .split(",")
-      .map((id) => id.trim())
-      .filter(Boolean);
     mutation.mutate({
-      component: String(data.get("component") ?? ""),
-      targetVersion: String(data.get("targetVersion") ?? ""),
-      gatewayIds,
-      requestedBy: String(data.get("requestedBy") ?? ""),
+      targets,
+      gatewayIds: selected,
+      steps: steps.map((step, index) => ({ ...step, stepIndex: index })),
+      requestedBy: "admin",
     });
   }
 
@@ -34,49 +99,150 @@ export function UpgradePlanCreatePanel() {
   return (
     <SectionCard
       title="创建升级计划"
-      subtitle="平台维护工程师创建升级计划，指定目标组件、目标版本与升级范围，用于分批升级。"
+      subtitle="选择多组件目标版本、网关范围与分批执行步骤，用于滚动升级。"
     >
       <form onSubmit={handleSubmit}>
-        <FormStack
-          actions={
-            <PrimaryButton type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "创建中…" : "创建计划"}
-            </PrimaryButton>
-          }
-        >
-          <FormField label="目标组件" hint="warp-agentd 或 warp-gateway">
-            <TextInput
-              name="component"
-              required
-              placeholder="warp-agentd"
-            />
-          </FormField>
-          <FormField label="目标版本" hint="例如：v2.4.1">
-            <TextInput name="targetVersion" required placeholder="请输入目标版本" />
-          </FormField>
-          <FormField label="升级范围（网关 ID）" hint="逗号分隔，例如：gw-001,gw-002">
-            <TextInput
-              name="gatewayIds"
-              required
-              placeholder="gw-001,gw-002"
-            />
-          </FormField>
-          <FormField label="申请者（requested_by）">
-            <TextInput name="requestedBy" defaultValue="admin" required />
-          </FormField>
-        </FormStack>
+        <div className={styles.block}>
+          <div className={styles.blockHeader}>
+            <span className={styles.blockTitle}>升级目标（可多选）</span>
+            <button type="button" className={styles.addButton} onClick={addTarget}>
+              + 添加目标
+            </button>
+          </div>
+          {targets.map((target, index) => (
+            <div key={index} className={styles.targetRow}>
+              <select
+                className={styles.input}
+                value={target.component}
+                onChange={(e) =>
+                  updateTarget(index, { component: e.target.value })
+                }
+              >
+                {COMPONENTS.map((component) => (
+                  <option key={component} value={component}>
+                    {component}
+                  </option>
+                ))}
+              </select>
+              <select
+                className={styles.input}
+                value={target.targetVersion}
+                onChange={(e) =>
+                  updateTarget(index, { targetVersion: e.target.value })
+                }
+              >
+                <option value="">{versionsFor(target.component).length === 0 ? "该组件暂无已发布版本" : "请选择已发布版本"}</option>
+                {versionsFor(target.component).map((version) => (
+                  <option key={version} value={version}>
+                    {version}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className={styles.removeButton}
+                onClick={() => removeTarget(index)}
+                disabled={targets.length <= 1}
+              >
+                删除
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.block}>
+          <div className={styles.blockHeader}>
+            <span className={styles.blockTitle}>
+              Gateway 范围（{selected.length} 已选）
+            </span>
+          </div>
+          {gateways.length === 0 ? (
+            <div className={styles.empty}>暂无网关。</div>
+          ) : (
+            <div className={styles.gatewayGrid}>
+              {gateways.map((gateway) => (
+                <label key={gateway.gatewayId} className={styles.checkbox}>
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(gateway.gatewayId)}
+                    onChange={() => toggleGateway(gateway.gatewayId)}
+                  />
+                  <span>
+                    {gateway.gatewayId}
+                    <span className={styles.checkboxSub}>{gateway.version}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.block}>
+          <div className={styles.blockHeader}>
+            <span className={styles.blockTitle}>执行步骤（分批滚动）</span>
+            <button type="button" className={styles.addButton} onClick={addStep}>
+              + 添加步骤
+            </button>
+          </div>
+          {steps.length === 0 ? (
+            <div className={styles.empty}>
+              尚未配置执行步骤；添加步骤并勾选本批升级的网关。
+            </div>
+          ) : (
+            steps.map((step, index) => (
+              <div key={index} className={styles.stepBlock}>
+                <div className={styles.stepHeader}>
+                  <strong>步骤 {index + 1}</strong>
+                  <button
+                    type="button"
+                    className={styles.removeButton}
+                    onClick={() => removeStep(index)}
+                  >
+                    删除
+                  </button>
+                </div>
+                <div className={styles.gatewayGrid}>
+                  {selected.map((id) => (
+                    <label key={id} className={styles.checkbox}>
+                      <input
+                        type="checkbox"
+                        checked={step.gatewayIds.includes(id)}
+                        onChange={() => toggleStepGateway(index, id)}
+                      />
+                      <span>{id}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className={styles.formAction}>
+          <PrimaryButton
+            type="submit"
+            disabled={mutation.isPending || selected.length === 0}
+          >
+            {mutation.isPending ? "创建中…" : "创建升级计划"}
+          </PrimaryButton>
+        </div>
       </form>
       {mutation.error ? (
         <ErrorBanner>创建失败：{String(mutation.error)}</ErrorBanner>
       ) : null}
       {plan ? (
         <ReceiptCard
-          title="计划回执"
+          title="升级计划回执"
           fields={[
             ["计划 ID", plan.planId],
-            ["组件", plan.component],
-            ["目标版本", plan.targetVersion],
-            ["目标数", String(plan.targetCount)],
+            [
+              "目标",
+              plan.targets
+                .map((t) => `${t.component} ${t.targetVersion}`)
+                .join("，"),
+            ],
+            ["升级范围", `${plan.targetCount} 个网关`],
+            ["执行步骤", `${plan.steps.length} 步`],
             ["状态", plan.status],
             ["创建时间", formatDateTime(plan.createdAt)],
           ]}

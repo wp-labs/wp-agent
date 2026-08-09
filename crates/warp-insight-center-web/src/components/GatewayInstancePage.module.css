@@ -1,7 +1,6 @@
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  align-items: start;
+.content {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   width: 100%;
   max-width: var(--wi-content-width);
@@ -10,8 +9,7 @@
 }
 
 @media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
+  .content {
     padding-right: 18px;
     padding-left: 18px;
   }

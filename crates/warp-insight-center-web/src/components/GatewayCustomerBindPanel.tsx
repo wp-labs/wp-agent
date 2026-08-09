@@ -11,16 +11,23 @@ import {
   formatDateTime,
 } from "./ui";
 
-export function GatewayCustomerBindPanel() {
+/** 绑定客户到网关实例；详情页传入 gatewayId 时只允许编辑客户信息。 */
+export function GatewayCustomerBindPanel({
+  gatewayId,
+}: {
+  gatewayId?: string;
+}) {
   const mutation = useBindGatewayCustomer();
+  const currentGatewayId = gatewayId?.trim() ?? "";
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     mutation.mutate({
-      gatewayId: String(data.get("gatewayId") ?? ""),
+      gatewayId: currentGatewayId || String(data.get("gatewayId") ?? ""),
       customerId: String(data.get("customerId") ?? ""),
-      requestedBy: String(data.get("requestedBy") ?? ""),
+      // 绑定接口仍要求 requested_by；当前管理端没有独立用户字段，沿用默认管理身份。
+      requestedBy: "admin",
     });
   }
 
@@ -39,14 +46,17 @@ export function GatewayCustomerBindPanel() {
             </PrimaryButton>
           }
         >
-          <FormField label="网关 ID" hint="例如：gw-001">
-            <TextInput name="gatewayId" required placeholder="请输入网关 ID" />
-          </FormField>
+          {!currentGatewayId ? (
+            <FormField label="网关 ID" hint="例如：gw-001">
+              <TextInput
+                name="gatewayId"
+                required
+                placeholder="请输入网关 ID"
+              />
+            </FormField>
+          ) : null}
           <FormField label="客户 ID" hint="例如：cust-acme">
             <TextInput name="customerId" required placeholder="请输入客户 ID" />
-          </FormField>
-          <FormField label="申请者（requested_by）">
-            <TextInput name="requestedBy" defaultValue="admin" required />
           </FormField>
         </FormStack>
       </form>

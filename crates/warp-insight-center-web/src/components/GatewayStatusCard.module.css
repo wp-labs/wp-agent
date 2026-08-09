@@ -99,8 +99,8 @@
 
 .details {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: 0.95fr 0.85fr 0.8fr 0.9fr 1.25fr;
+  gap: 8px;
   padding-top: 13px;
   border-top: 1px solid var(--wi-border);
 }
@@ -111,6 +111,10 @@
   align-items: flex-start;
   gap: 6px;
   min-width: 0;
+}
+
+.item:last-child > :not(.label) {
+  white-space: nowrap;
 }
 
 .label {
@@ -127,9 +131,13 @@
 .staleValue {
   color: var(--wi-danger);
 }
+.staleValue {
+  white-space: nowrap;
+}
 .staleHint {
   color: var(--wi-danger);
   font-size: 10px;
+  white-space: nowrap;
 }
 
 @media (max-width: 390px) {

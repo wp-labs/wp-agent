@@ -3,13 +3,17 @@ import {
   useAgentHistories,
   useGatewayAgents,
   useGatewayHistory,
+  useGatewayLifecycle,
   useGatewayStatus,
   useGatewayUptimes,
 } from "../hooks";
 import {
+  Badge,
   formatBytes,
   formatPercent,
   formatRelativeTime,
+  lifecycleLabel,
+  lifecycleTone,
   LoadingDots,
   PageShell,
 } from "./ui";
@@ -28,6 +32,8 @@ export function GatewayDetailPage() {
   const { data: historyData, isLoading: isHistoryLoading } =
     useGatewayHistory(gatewayId);
   const { data: uptimesData } = useGatewayUptimes([gatewayId]);
+  const { data: lifecycleData } = useGatewayLifecycle(gatewayId);
+  const lifecycle = lifecycleData?.data ?? [];
 
   const gateway = statusData?.data ?? null;
   const agents = agentsData?.data ?? [];
@@ -36,6 +42,9 @@ export function GatewayDetailPage() {
     uptime === null || uptime === undefined
       ? "—"
       : `${(uptime * 100).toFixed(1)}%`;
+  // 当前生命周期状态 = 最近一次转变的目标状态（明显位置展示）。
+  const currentState =
+    lifecycle.length > 0 ? lifecycle[lifecycle.length - 1].toState : null;
 
   return (
     <PageShell
@@ -43,7 +52,7 @@ export function GatewayDetailPage() {
       summary="查看该网关的状态与上报的 Agent 状态。"
     >
       <Link to="/" className={styles.backLink}>
-        ← 返回网关列表
+        ← 返回网关态势
       </Link>
 
       {isLoading && !gateway ? <LoadingDots /> : null}
@@ -52,7 +61,14 @@ export function GatewayDetailPage() {
         <section className={styles.section}>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <div className={styles.gatewayId}>{gateway.gatewayId}</div>
+              <div className={styles.headerRow}>
+                <div className={styles.gatewayId}>{gateway.gatewayId}</div>
+                {currentState ? (
+                  <Badge tone={lifecycleTone(currentState)}>
+                    {lifecycleLabel(currentState)}
+                  </Badge>
+                ) : null}
+              </div>
               <div className={styles.instanceId}>{gateway.instanceId}</div>
             </div>
             <div className={styles.metrics}>
@@ -93,6 +109,36 @@ export function GatewayDetailPage() {
           </div>
         </section>
       ) : null}
+
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionTitle}>生命周期过程</div>
+          <span className={styles.sectionMeta}>{lifecycle.length} 次转变</span>
+        </div>
+        {lifecycle.length === 0 ? (
+          <div className={styles.empty}>尚无生命周期记录。</div>
+        ) : (
+          <div className={styles.timeline}>
+            {lifecycle.map((event, index) => (
+              <div key={index} className={styles.timelineItem}>
+                <span className={styles.timelineDot} aria-hidden="true" />
+                <div className={styles.timelineBody}>
+                  <div className={styles.timelineText}>
+                    {event.fromState
+                      ? lifecycleLabel(event.fromState)
+                      : "创建实例"}
+                    {" → "}
+                    {lifecycleLabel(event.toState)}
+                  </div>
+                  <div className={styles.timelineTime}>
+                    {formatRelativeTime(event.at)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>

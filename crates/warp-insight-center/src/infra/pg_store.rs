@@ -3,13 +3,15 @@
 // schema 由 docker/initdb/01_schema.sql 在首次启动时建表。
 
 use insight_control::types::DateTime;
-use sqlx::{postgres::PgPoolOptions, FromRow, PgPool};
+use insight_control::GatewayInstanceLifecycleState;
+use sqlx::{postgres::PgPoolOptions, FromRow, PgPool, Row};
 
 use crate::config::GatewayCredentialSeed;
 
 use super::{
-    sha256_hex, GatewayStatusUpdate, StoredAgent, Store, StoreError, StoredGateway,
-    StoredGatewayCredentialStatus,
+    sha256_hex, GatewayCustomerBindingRecord, GatewayStatusUpdate, LifecycleEvent, ReleaseRecord,
+    StoredAgent, Store, StoreError, StoredGateway, StoredGatewayCredentialStatus,
+    UpgradePlanRecord,
 };
 
 #[derive(Debug, Clone)]
@@ -41,7 +43,48 @@ struct GatewayRow {
     health: Option<String>,
     memory_bytes: Option<i64>,
     cpu_percent: Option<f64>,
+    lifecycle_state: Option<String>,
+    initialized_at: Option<chrono::DateTime<chrono::Utc>>,
+    created_at: Option<chrono::DateTime<chrono::Utc>>,
     last_seen_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+fn parse_lifecycle(value: &str) -> GatewayInstanceLifecycleState {
+    match value {
+        "Initializing" => GatewayInstanceLifecycleState::Initializing,
+        "Running" => GatewayInstanceLifecycleState::Running,
+        "Failed" => GatewayInstanceLifecycleState::Failed,
+        _ => GatewayInstanceLifecycleState::Provisioned,
+    }
+}
+
+fn lifecycle_name(state: GatewayInstanceLifecycleState) -> &'static str {
+    match state {
+        GatewayInstanceLifecycleState::Provisioned => "Provisioned",
+        GatewayInstanceLifecycleState::Initializing => "Initializing",
+        GatewayInstanceLifecycleState::Running => "Running",
+        GatewayInstanceLifecycleState::Failed => "Failed",
+    }
+}
+
+/// gateway_lifecycle_events 表行。
+#[derive(Debug, FromRow)]
+struct LifecycleEventRow {
+    gateway_id: String,
+    from_state: Option<String>,
+    to_state: String,
+    at: chrono::DateTime<chrono::Utc>,
+}
+
+impl LifecycleEventRow {
+    fn into_event(self) -> LifecycleEvent {
+        LifecycleEvent {
+            gateway_id: self.gateway_id,
+            from_state: self.from_state.as_deref().map(parse_lifecycle),
+            to_state: parse_lifecycle(&self.to_state),
+            at: DateTime::from_rfc3339(&self.at.to_rfc3339()).unwrap_or_else(DateTime::now),
+        }
+    }
 }
 
 impl GatewayRow {
@@ -57,6 +100,17 @@ impl GatewayRow {
             health: self.health,
             memory_bytes: self.memory_bytes,
             cpu_percent: self.cpu_percent,
+            lifecycle_state: self.lifecycle_state.as_deref().map(parse_lifecycle),
+            initialized_at: self
+                .initialized_at
+                .map(|value| {
+                    DateTime::from_rfc3339(&value.to_rfc3339()).unwrap_or_else(DateTime::now)
+                }),
+            created_at: self
+                .created_at
+                .map(|value| {
+                    DateTime::from_rfc3339(&value.to_rfc3339()).unwrap_or_else(DateTime::now)
+                }),
             last_seen_at: self
                 .last_seen_at
                 .map(|value| {
@@ -117,7 +171,8 @@ fn parse_optional_timestamptz(value: &Option<String>) -> Option<chrono::DateTime
 
 const GATEWAY_COLUMNS: &str = "gateway_id, instance_id, credential_token_hash, \
                                credential_status, credential_expires_at, \
-                               version, status, health, memory_bytes, cpu_percent, last_seen_at";
+                               version, status, health, memory_bytes, cpu_percent, \
+                               lifecycle_state, initialized_at, created_at, last_seen_at";
 
 #[async_trait::async_trait]
 impl Store for PgStore {
@@ -128,8 +183,9 @@ impl Store for PgStore {
             let expires_at = parse_optional_timestamptz(&seed.expires_at);
             let result = sqlx::query(
                 "INSERT INTO gateways \
-                    (gateway_id, instance_id, credential_token_hash, credential_expires_at) \
-                 VALUES ($1, '', $2, $3) \
+                    (gateway_id, instance_id, credential_token_hash, credential_expires_at, \
+                     lifecycle_state, created_at) \
+                 VALUES ($1, '', $2, $3, 'Provisioned', NOW()) \
                  ON CONFLICT (gateway_id) DO NOTHING",
             )
             .bind(&seed.gateway_id)
@@ -161,11 +217,16 @@ impl Store for PgStore {
     }
 
     async fn upsert_gateway_status(&self, update: &GatewayStatusUpdate) -> Result<(), StoreError> {
+        let current = self.get_gateway(&update.gateway_id).await?;
+        let prev = current.and_then(|gateway| gateway.lifecycle_state);
         let last_seen_at = update.last_seen_at.to_chrono();
         sqlx::query(
             "UPDATE gateways \
              SET instance_id = $2, version = $3, status = $4, health = $5, \
-                 memory_bytes = $6, cpu_percent = $7, last_seen_at = $8 \
+                 memory_bytes = $6, cpu_percent = $7, \
+                 lifecycle_state = 'Running', \
+                 initialized_at = COALESCE(initialized_at, NOW()), \
+                 last_seen_at = $8 \
              WHERE gateway_id = $1",
         )
         .bind(&update.gateway_id)
@@ -178,6 +239,15 @@ impl Store for PgStore {
         .bind(last_seen_at)
         .execute(&self.pool)
         .await?;
+        // 首次上报 → Running（记录转变事件）。
+        if prev != Some(GatewayInstanceLifecycleState::Running) {
+            self.record_lifecycle_event(
+                &update.gateway_id,
+                prev,
+                GatewayInstanceLifecycleState::Running,
+            )
+            .await?;
+        }
         Ok(())
     }
 
@@ -192,8 +262,8 @@ impl Store for PgStore {
             sha256_hex(token)
         };
         let result = sqlx::query(
-            "INSERT INTO gateways (gateway_id, instance_id, credential_token_hash) \
-             VALUES ($1, '', $2) \
+            "INSERT INTO gateways (gateway_id, instance_id, credential_token_hash, lifecycle_state, created_at) \
+             VALUES ($1, '', $2, 'Provisioned', NOW()) \
              ON CONFLICT (gateway_id) DO NOTHING",
         )
         .bind(gateway_id)
@@ -203,6 +273,12 @@ impl Store for PgStore {
         if result.rows_affected() == 0 {
             return Err(StoreError::Conflict(gateway_id.to_string()));
         }
+        self.record_lifecycle_event(
+            gateway_id,
+            None,
+            GatewayInstanceLifecycleState::Provisioned,
+        )
+        .await?;
         Ok(StoredGateway::provisioned(
             gateway_id.to_string(),
             String::new(),
@@ -260,6 +336,222 @@ impl Store for PgStore {
         .fetch_all(&self.pool)
         .await?;
         Ok(rows.into_iter().map(AgentRow::into_stored).collect())
+    }
+
+    async fn mark_gateway_initializing(&self, gateway_id: &str) -> Result<(), StoreError> {
+        let result = sqlx::query(
+            "UPDATE gateways SET lifecycle_state = 'Initializing' \
+             WHERE gateway_id = $1 AND lifecycle_state = 'Provisioned'",
+        )
+        .bind(gateway_id)
+        .execute(&self.pool)
+        .await?;
+        if result.rows_affected() > 0 {
+            self.record_lifecycle_event(
+                gateway_id,
+                Some(GatewayInstanceLifecycleState::Provisioned),
+                GatewayInstanceLifecycleState::Initializing,
+            )
+            .await?;
+        }
+        Ok(())
+    }
+
+    async fn record_lifecycle_event(
+        &self,
+        gateway_id: &str,
+        from: Option<GatewayInstanceLifecycleState>,
+        to: GatewayInstanceLifecycleState,
+    ) -> Result<(), StoreError> {
+        let at = chrono::Utc::now();
+        let from_state = from.map(lifecycle_name);
+        let to_state = lifecycle_name(to);
+        sqlx::query(
+            "INSERT INTO gateway_lifecycle_events (gateway_id, from_state, to_state, at) \
+             VALUES ($1, $2, $3, $4)",
+        )
+        .bind(gateway_id)
+        .bind(from_state)
+        .bind(to_state)
+        .bind(at)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
+    async fn list_lifecycle_events(
+        &self,
+        gateway_id: &str,
+    ) -> Result<Vec<LifecycleEvent>, StoreError> {
+        let rows: Vec<LifecycleEventRow> = sqlx::query_as(
+            "SELECT gateway_id, from_state, to_state, at FROM gateway_lifecycle_events \
+             WHERE gateway_id = $1 ORDER BY at",
+        )
+        .bind(gateway_id)
+        .fetch_all(&self.pool)
+        .await?;
+        Ok(rows.into_iter().map(LifecycleEventRow::into_event).collect())
+    }
+
+    async fn publish_release(
+        &self,
+        component: &str,
+        version: &str,
+        artifact_url: &str,
+    ) -> Result<ReleaseRecord, StoreError> {
+        let published_at = chrono::Utc::now();
+        sqlx::query(
+            "INSERT INTO release_records (component, version, artifact_url, status, published_at) \
+             VALUES ($1, $2, $3, 'published', $4)",
+        )
+        .bind(component)
+        .bind(version)
+        .bind(artifact_url)
+        .bind(published_at)
+        .execute(&self.pool)
+        .await?;
+        Ok(ReleaseRecord {
+            version: version.to_string(),
+            artifact_url: artifact_url.to_string(),
+            status: "published".to_string(),
+            published_at: DateTime::from_rfc3339(&published_at.to_rfc3339())
+                .unwrap_or_else(DateTime::now),
+        })
+    }
+
+    async fn list_releases(&self, component: &str) -> Result<Vec<ReleaseRecord>, StoreError> {
+        let rows: Vec<ReleaseRow> = sqlx::query_as(
+            "SELECT version, artifact_url, status, published_at FROM release_records \
+             WHERE component = $1 ORDER BY published_at DESC",
+        )
+        .bind(component)
+        .fetch_all(&self.pool)
+        .await?;
+        Ok(rows.into_iter().map(ReleaseRow::into_record).collect())
+    }
+
+    async fn create_upgrade_plan(
+        &self,
+        plan: &UpgradePlanRecord,
+    ) -> Result<UpgradePlanRecord, StoreError> {
+        let payload = serde_json::to_value(plan).map_err(StoreError::Json)?;
+        sqlx::query(
+            "INSERT INTO upgrade_plans (plan_id, payload, status) VALUES ($1, $2, 'pending')",
+        )
+        .bind(&plan.plan_id)
+        .bind(payload)
+        .execute(&self.pool)
+        .await?;
+        Ok(plan.clone())
+    }
+
+    async fn list_upgrade_plans(&self) -> Result<Vec<UpgradePlanRecord>, StoreError> {
+        let rows = sqlx::query(
+            "SELECT payload FROM upgrade_plans ORDER BY created_at DESC",
+        )
+        .fetch_all(&self.pool)
+        .await?;
+        let mut plans = Vec::new();
+        for row in rows {
+            let value: serde_json::Value = row.try_get("payload")?;
+            let plan = serde_json::from_value(value).map_err(StoreError::Json)?;
+            plans.push(plan);
+        }
+        Ok(plans)
+    }
+
+    async fn approve_upgrade_plan(
+        &self,
+        plan_id: &str,
+        approved_by: &str,
+    ) -> Result<UpgradePlanRecord, StoreError> {
+        let row: Option<(serde_json::Value,)> =
+            sqlx::query_as("SELECT payload FROM upgrade_plans WHERE plan_id = $1")
+                .bind(plan_id)
+                .fetch_optional(&self.pool)
+                .await?;
+        let Some((payload,)) = row else {
+            return Err(StoreError::Conflict(plan_id.to_string()));
+        };
+        let mut plan: UpgradePlanRecord =
+            serde_json::from_value(payload).map_err(StoreError::Json)?;
+        plan.status = "approved".to_string();
+        plan.approved_by = Some(approved_by.to_string());
+        plan.approved_at = Some(DateTime::now());
+        let payload = serde_json::to_value(&plan).map_err(StoreError::Json)?;
+        sqlx::query("UPDATE upgrade_plans SET payload = $2, status = 'approved' WHERE plan_id = $1")
+            .bind(plan_id)
+            .bind(payload)
+            .execute(&self.pool)
+            .await?;
+        Ok(plan)
+    }
+
+    async fn bind_gateway_customer(
+        &self,
+        gateway_id: &str,
+        customer_id: &str,
+    ) -> Result<GatewayCustomerBindingRecord, StoreError> {
+        let bound_at = chrono::Utc::now();
+        sqlx::query(
+            "INSERT INTO gateway_customer_bindings (gateway_id, customer_id, status, bound_at) \
+             VALUES ($1, $2, 'bound', $3) \
+             ON CONFLICT (gateway_id) DO UPDATE SET customer_id = $2, status = 'bound', bound_at = $3",
+        )
+        .bind(gateway_id)
+        .bind(customer_id)
+        .bind(bound_at)
+        .execute(&self.pool)
+        .await?;
+        Ok(GatewayCustomerBindingRecord {
+            gateway_id: gateway_id.to_string(),
+            customer_id: customer_id.to_string(),
+            status: "bound".to_string(),
+            bound_at: DateTime::from_rfc3339(&bound_at.to_rfc3339()).unwrap_or_else(DateTime::now),
+        })
+    }
+
+    async fn list_customer_bindings(
+        &self,
+    ) -> Result<Vec<GatewayCustomerBindingRecord>, StoreError> {
+        let rows: Vec<(String, String, String, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
+            "SELECT gateway_id, customer_id, status, bound_at FROM gateway_customer_bindings",
+        )
+        .fetch_all(&self.pool)
+        .await?;
+        Ok(rows
+            .into_iter()
+            .map(
+                |(gateway_id, customer_id, status, bound_at)| GatewayCustomerBindingRecord {
+                    gateway_id,
+                    customer_id,
+                    status,
+                    bound_at: DateTime::from_rfc3339(&bound_at.to_rfc3339())
+                        .unwrap_or_else(DateTime::now),
+                },
+            )
+            .collect())
+    }
+}
+
+/// release_records 表行。
+#[derive(Debug, FromRow)]
+struct ReleaseRow {
+    version: String,
+    artifact_url: String,
+    status: String,
+    published_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl ReleaseRow {
+    fn into_record(self) -> ReleaseRecord {
+        ReleaseRecord {
+            version: self.version,
+            artifact_url: self.artifact_url,
+            status: self.status,
+            published_at: DateTime::from_rfc3339(&self.published_at.to_rfc3339())
+                .unwrap_or_else(DateTime::now),
+        }
     }
 }
 

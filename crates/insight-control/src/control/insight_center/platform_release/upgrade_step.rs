@@ -1,13 +1,8 @@
 // @moju generated
-use super::{UpgradeStep, UpgradeTarget};
-
 #[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
 #[moju(kind = "struct", domain = "Control", module = "Control.InsightCenter.PlatformRelease")]
-pub struct UpgradePlan {
-    pub plan_id: String,
-    pub targets: Vec<UpgradeTarget>,
-    pub target_count: i64,
+pub struct UpgradeStep {
+    pub step_index: i64,
+    pub gateway_ids: Vec<String>,
     pub status: String,
-    pub created_at: crate::DateTime,
-    pub steps: Vec<UpgradeStep>,
 }

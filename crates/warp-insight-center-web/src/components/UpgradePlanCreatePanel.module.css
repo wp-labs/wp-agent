@@ -1,1 +1,127 @@
-/* 创建升级计划面板 —— 布局由 SectionCard/FormStack 承担 */
+/* 创建升级计划面板：多目标 + 范围多选 + 分批执行步骤。 */
+
+.block {
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid var(--wi-border);
+  border-radius: 8px;
+  background: var(--wi-bg-muted);
+}
+
+.blockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.blockTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wi-text);
+}
+
+.addButton {
+  border: 1px solid var(--wi-border);
+  border-radius: 6px;
+  background: var(--wi-bg-panel);
+  color: var(--wi-primary);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.targetRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.targetRow:last-child {
+  margin-bottom: 0;
+}
+
+.input {
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--wi-border);
+  border-radius: 6px;
+  background: var(--wi-bg-panel);
+  color: var(--wi-text);
+  font-size: 13px;
+}
+
+.removeButton {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--wi-danger);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.removeButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gatewayGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--wi-border);
+  border-radius: 6px;
+  background: var(--wi-bg-panel);
+  font-size: 12px;
+  color: var(--wi-text);
+  cursor: pointer;
+}
+
+.checkboxSub {
+  display: block;
+  font-size: 11px;
+  color: var(--wi-text-muted);
+}
+
+.stepBlock {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid var(--wi-border);
+  border-radius: 8px;
+  background: var(--wi-bg-panel);
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--wi-text);
+}
+
+.formAction {
+  margin-top: 6px;
+  text-align: right;
+}
+
+.empty {
+  padding: 16px 12px;
+  border: 1px dashed var(--wi-border-strong);
+  border-radius: 6px;
+  color: var(--wi-text-muted);
+  font-size: 12px;
+  text-align: center;
+}

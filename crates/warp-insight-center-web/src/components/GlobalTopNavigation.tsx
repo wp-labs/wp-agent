@@ -16,11 +16,11 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: "/", label: "网关列表", end: true },
-  { to: "/instance", label: "网关实例" },
-  { to: "/config", label: "初始配置" },
+  { to: "/", label: "网关态势", end: true },
+  { to: "/instance", label: "网关管理", end: true },
   { to: "/release", label: "版本发布" },
   { to: "/upgrade-plan", label: "升级计划" },
+  { to: "/upgrade-plan/approve", label: "批准升级计划" },
 ];
 
 /** 渲染全局业务导航，并管理管理端 API Token 的本地应用状态。 */

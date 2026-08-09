@@ -1,0 +1,152 @@
+// Flows: AdminFacingInterface — 全局控制中心管理接口编排流程
+//
+// WarpInsightCenter 管理接口（forAdmin）的全部编排流程定义。
+// 与 admin-facing-interface.mju 拆分：接口契约（命令/响应/接口条目）保留在
+// admin-facing-interface.mju，本文件承载该接口的全部流程。流程仍归属
+// module<interface> InsightCenterApp.AdminFacingInterface。
+
+// ── 编排流程 ──
+
+flow AdminViewGatewayListFlow {
+  actor GatewayOperator
+  trigger AdminViewGatewayList
+
+  step ViewList {
+  }
+}
+
+flow AdminDispatchGlobalPolicyFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminDispatchGlobalPolicy
+
+  step DispatchPolicy {
+  }
+}
+
+flow AdminShowGatewayStatusFlow {
+  actor CustomerServiceEngineer
+  trigger AdminShowGatewayStatus
+
+  step ShowStatus {
+  }
+}
+
+flow AdminListGatewayStatusFlow {
+  actor CustomerServiceEngineer
+  trigger AdminListGatewayStatus
+
+  step ListStatus {
+  }
+}
+
+flow AdminCreateGatewayInstanceFlow {
+  actor CustomerServiceEngineer
+  trigger AdminCreateGatewayInstance
+
+  step CreateInstance {
+  }
+}
+
+flow AdminBindGatewayCustomerFlow {
+  actor CustomerServiceEngineer
+  trigger AdminBindGatewayCustomer
+
+  step BindCustomer {
+  }
+}
+
+flow AdminListGatewayInstancesFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminListGatewayInstances
+
+  step ViewInstances {
+  }
+}
+
+flow AdminGetGatewayUptimeFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminGetGatewayUptime
+
+  step ViewUptime {
+  }
+}
+
+flow AdminGetGatewayHistoryFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminGetGatewayHistory
+
+  step ViewHistory {
+  }
+}
+
+flow AdminGetAgentHistoryFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminGetAgentHistory
+
+  step ViewAgentHistory {
+  }
+}
+
+flow AdminListGatewayAgentsFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminListGatewayAgents
+
+  step ViewAgents {
+  }
+}
+
+flow AdminGetGatewayLifecycleFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminGetGatewayLifecycle
+
+  step ViewLifecycle {
+  }
+}
+
+flow AdminGetGatewayInitialConfigFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminGetGatewayInitialConfig
+
+  step ViewInitialConfig {
+  }
+}
+
+flow AdminPublishReleaseFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminPublishRelease
+
+  step Publish {
+  }
+}
+
+flow AdminListReleasesFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminListReleases
+
+  step ViewReleases {
+  }
+}
+
+flow AdminCreateUpgradePlanFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminCreateUpgradePlan
+
+  step Create {
+  }
+}
+
+flow AdminListUpgradePlansFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminListUpgradePlans
+
+  step ViewPlans {
+  }
+}
+
+flow AdminApproveUpgradePlanFlow {
+  actor PlatformMaintenanceEngineer
+  trigger AdminApproveUpgradePlan
+
+  step Approve {
+  }
+}

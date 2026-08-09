@@ -1,7 +1,7 @@
 // WarpInsightCenter 全局控制中心 Admin API client.
 //
 // 面向 AdminFacingInterface 的 HTTP 管理接口（Control.AdminFacingInterface）：
-// 网关列表 / 状态视图 / 实例管理 / 初始配置 / 版本发布 / 升级计划。
+// 网关态势 / 状态视图 / 网关管理 / 版本发布 / 升级计划。
 // 后端接口尚未实现时，请求失败自动回退到 example 数据（source: "example"），
 // 保证前端独立可渲染；接入真实后端后自动切换为 "real"。
 
@@ -75,11 +75,38 @@ export interface AgentStatusView {
   lastSeenAt: string;
 }
 
+export type GatewayInstanceLifecycleState =
+  "Provisioned" | "Initializing" | "Running" | "Failed";
+
 export interface GatewayInstance {
   gatewayId: string;
   instanceId: string;
-  status: string;
+  lifecycleState: GatewayInstanceLifecycleState;
   createdAt: string;
+  initializedAt: string | null;
+  /** 控制中心生成的不含凭证初始化入口；旧版本接口可能不返回。 */
+  initUrl?: string;
+}
+
+/** 网关实例安装指引（创建后交付给操作者）。 */
+export interface GatewayInstallInfo {
+  installCommand: string;
+  cloudImage: string;
+  initUrl: string;
+}
+
+/** 创建网关实例返回：实例视图 + 安装指引（Gateway 启动后基于 initUrl 初始化）。 */
+export interface AdminCreateGatewayInstanceReturned {
+  instance: GatewayInstance;
+  install: GatewayInstallInfo;
+}
+
+/** 网关生命周期一次状态转变记录（过程历史）。 */
+export interface LifecycleEvent {
+  gatewayId: string;
+  fromState: GatewayInstanceLifecycleState | null;
+  toState: GatewayInstanceLifecycleState;
+  at: string;
 }
 
 export interface GatewayCustomerBinding {
@@ -109,13 +136,24 @@ export interface WarpGateWayRelease {
   publishedAt: string;
 }
 
-export interface UpgradePlan {
-  planId: string;
+export interface UpgradeTarget {
   component: string;
   targetVersion: string;
+}
+
+export interface UpgradeStep {
+  stepIndex: number;
+  gatewayIds: string[];
+  status: string;
+}
+
+export interface UpgradePlan {
+  planId: string;
+  targets: UpgradeTarget[];
   targetCount: number;
   status: string;
   createdAt: string;
+  steps: UpgradeStep[];
 }
 
 export interface UpgradePlanApproval {
@@ -158,9 +196,9 @@ export interface PublishReleaseCommand {
 }
 
 export interface CreateUpgradePlanCommand {
-  component: string;
-  targetVersion: string;
+  targets: UpgradeTarget[];
   gatewayIds: string[];
+  steps: UpgradeStep[];
   requestedBy: string;
 }
 
@@ -351,7 +389,25 @@ function normalizeGatewayListView(payload: any): GatewayListView {
   };
 }
 
+function normalizeGatewayInstallInfo(payload: any): GatewayInstallInfo {
+  return {
+    installCommand: requiredString(
+      pick(payload, "install_command", "installCommand"),
+      "install.installCommand",
+    ),
+    cloudImage: requiredString(
+      pick(payload, "cloud_image", "cloudImage"),
+      "install.cloudImage",
+    ),
+    initUrl: requiredString(
+      pick(payload, "init_url", "initUrl"),
+      "install.initUrl",
+    ),
+  };
+}
+
 function normalizeGatewayInstance(payload: any): GatewayInstance {
+  const rawInitUrl = pick(payload, "init_url", "initUrl");
   return {
     gatewayId: requiredString(
       pick(payload, "gateway_id", "gatewayId"),
@@ -361,11 +417,24 @@ function normalizeGatewayInstance(payload: any): GatewayInstance {
       pick(payload, "instance_id", "instanceId"),
       "instance.instanceId",
     ),
-    status: requiredString(payload.status, "instance.status"),
+    lifecycleState:
+      (requiredString(
+        pick(payload, "lifecycle_state", "lifecycleState"),
+        "instance.lifecycleState",
+      ) as GatewayInstanceLifecycleState) ?? "Provisioned",
+    initializedAt:
+      pick(payload, "initialized_at", "initializedAt") === null ||
+      pick(payload, "initialized_at", "initializedAt") === undefined
+        ? null
+        : String(pick(payload, "initialized_at", "initializedAt")),
     createdAt: requiredString(
       pick(payload, "created_at", "createdAt"),
       "instance.createdAt",
     ),
+    initUrl:
+      rawInitUrl === null || rawInitUrl === undefined
+        ? undefined
+        : String(rawInitUrl),
   };
 }
 
@@ -419,14 +488,43 @@ function normalizeRelease(payload: any): WarpAgentdRelease {
   };
 }
 
-function normalizeUpgradePlan(payload: any): UpgradePlan {
+function normalizeUpgradeTarget(payload: any): UpgradeTarget {
   return {
-    planId: requiredString(pick(payload, "plan_id", "planId"), "plan.planId"),
-    component: requiredString(payload.component, "plan.component"),
+    component: requiredString(payload.component, "target.component"),
     targetVersion: requiredString(
       pick(payload, "target_version", "targetVersion"),
-      "plan.targetVersion",
+      "target.targetVersion",
     ),
+  };
+}
+
+function normalizeUpgradeStep(payload: any): UpgradeStep {
+  return {
+    stepIndex: requiredNumber(
+      pick(payload, "step_index", "stepIndex"),
+      "step.stepIndex",
+    ),
+    gatewayIds: Array.isArray(
+      pick(payload, "gateway_ids", "gatewayIds"),
+    )
+      ? (pick(payload, "gateway_ids", "gatewayIds") as string[])
+      : [],
+    status: requiredString(payload.status, "step.status"),
+  };
+}
+
+function normalizeUpgradePlan(payload: any): UpgradePlan {
+  const rawTargets = Array.isArray(
+    pick(payload, "targets"),
+  )
+    ? (pick(payload, "targets") as any[])
+    : [];
+  const rawSteps = Array.isArray(pick(payload, "steps"))
+    ? (pick(payload, "steps") as any[])
+    : [];
+  return {
+    planId: requiredString(pick(payload, "plan_id", "planId"), "plan.planId"),
+    targets: rawTargets.map(normalizeUpgradeTarget),
     targetCount: requiredNumber(
       pick(payload, "target_count", "targetCount"),
       "plan.targetCount",
@@ -436,6 +534,7 @@ function normalizeUpgradePlan(payload: any): UpgradePlan {
       pick(payload, "created_at", "createdAt"),
       "plan.createdAt",
     ),
+    steps: rawSteps.map(normalizeUpgradeStep),
   };
 }
 
@@ -711,6 +810,47 @@ function normalizeAgentHistory(
   };
 }
 
+function normalizeLifecycleEvent(payload: any): LifecycleEvent {
+  return {
+    gatewayId: requiredString(
+      pick(payload, "gateway_id", "gatewayId"),
+      "lifecycle.gatewayId",
+    ),
+    fromState:
+      (payload.from_state as GatewayInstanceLifecycleState) ??
+      (payload.fromState as GatewayInstanceLifecycleState) ??
+      null,
+    toState: requiredString(
+      pick(payload, "to_state", "toState"),
+      "lifecycle.toState",
+    ) as GatewayInstanceLifecycleState,
+    at: requiredString(pick(payload, "at"), "lifecycle.at"),
+  };
+}
+
+function exampleGatewayLifecycle(gatewayId: string): LifecycleEvent[] {
+  return [
+    {
+      gatewayId,
+      fromState: null,
+      toState: "Provisioned",
+      at: isoMinutesAgo(60 * 24 * 2),
+    },
+    {
+      gatewayId,
+      fromState: "Provisioned",
+      toState: "Initializing",
+      at: isoMinutesAgo(30),
+    },
+    {
+      gatewayId,
+      fromState: "Initializing",
+      toState: "Running",
+      at: isoMinutesAgo(5),
+    },
+  ];
+}
+
 function normalizeAgentStatusView(payload: any): AgentStatusView {
   return {
     agentId: requiredString(
@@ -767,12 +907,22 @@ function exampleAgentStatus(gatewayId: string): AgentStatusView[] {
 
 function exampleGatewayInstance(
   command: CreateGatewayInstanceCommand,
-): GatewayInstance {
+): AdminCreateGatewayInstanceReturned {
+  const gatewayId = `gw-${Math.random().toString(36).slice(2, 8)}`;
+  const initUrl = `http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=${gatewayId}`;
   return {
-    gatewayId: `gw-${Math.random().toString(36).slice(2, 8)}`,
-    instanceId: `inst-${Math.random().toString(36).slice(2, 6)}`,
-    status: "provisioned",
-    createdAt: new Date().toISOString(),
+    instance: {
+      gatewayId,
+      instanceId: `inst-${Math.random().toString(36).slice(2, 6)}`,
+      lifecycleState: "Provisioned",
+      createdAt: new Date().toISOString(),
+      initializedAt: null,
+    },
+    install: {
+      installCommand: `docker run -d --name warp-gateway-${gatewayId} -e WARP_GATEWAY_INIT_URL="${initUrl}" -e WARP_GATEWAY_TOKEN="<token>" warp-gateway:latest`,
+      cloudImage: "warp-gateway:latest",
+      initUrl,
+    },
   };
 }
 
@@ -809,11 +959,11 @@ function exampleRelease(command: PublishReleaseCommand): WarpAgentdRelease {
 function exampleUpgradePlan(command: CreateUpgradePlanCommand): UpgradePlan {
   return {
     planId: `plan-${Math.random().toString(36).slice(2, 8)}`,
-    component: command.component,
-    targetVersion: command.targetVersion,
+    targets: command.targets,
     targetCount: command.gatewayIds.length,
     status: "pending",
     createdAt: new Date().toISOString(),
+    steps: command.steps,
   };
 }
 
@@ -865,6 +1015,62 @@ export async function fetchGatewayList(): Promise<
       };
     },
   );
+}
+
+export async function fetchGatewayInstances(): Promise<
+  ExampleResult<GatewayInstance[]>
+> {
+  return fetchOrFallback(
+    "/api/v1/admin/gateways/instances",
+    exampleGatewayInstances,
+  ).then(async (result) => {
+    if (result.source !== "real") return result;
+    const raw = result.data as any;
+    const items = Array.isArray(raw) ? raw : [];
+    return { ...result, data: items.map(normalizeGatewayInstance) };
+  });
+}
+
+function exampleGatewayInstances(): GatewayInstance[] {
+  const now = new Date().toISOString();
+  return [
+    {
+      gatewayId: "gw-001",
+      instanceId: "inst-7f2a",
+      lifecycleState: "Running",
+      createdAt: now,
+      initializedAt: now,
+      initUrl:
+        "http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=gw-001",
+    },
+    {
+      gatewayId: "gw-002",
+      instanceId: "inst-9c31",
+      lifecycleState: "Initializing",
+      createdAt: now,
+      initializedAt: null,
+      initUrl:
+        "http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=gw-002",
+    },
+    {
+      gatewayId: "gw-003",
+      instanceId: "inst-1d8b",
+      lifecycleState: "Provisioned",
+      createdAt: now,
+      initializedAt: null,
+      initUrl:
+        "http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=gw-003",
+    },
+    {
+      gatewayId: "gw-004",
+      instanceId: "inst-4e77",
+      lifecycleState: "Failed",
+      createdAt: now,
+      initializedAt: null,
+      initUrl:
+        "http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=gw-004",
+    },
+  ];
 }
 
 export async function fetchGatewayUptime(
@@ -944,6 +1150,20 @@ export async function fetchGatewayAgents(
   );
 }
 
+export async function fetchGatewayLifecycle(
+  gatewayId: string,
+): Promise<ExampleResult<LifecycleEvent[]>> {
+  const path = `/api/v1/admin/gateways/${encodeURIComponent(gatewayId)}/lifecycle`;
+  return fetchOrFallback(path, () => exampleGatewayLifecycle(gatewayId)).then(
+    async (result) => {
+      if (result.source !== "real") return result;
+      const raw = result.data as any;
+      const items = Array.isArray(raw) ? raw : [];
+      return { ...result, data: items.map(normalizeLifecycleEvent) };
+    },
+  );
+}
+
 export async function fetchGatewayStatus(
   gatewayId: string,
 ): Promise<ExampleResult<GatewayStatusView | null>> {
@@ -958,7 +1178,7 @@ export async function fetchGatewayStatus(
 
 export async function createGatewayInstance(
   command: CreateGatewayInstanceCommand,
-): Promise<ExampleResult<GatewayInstance>> {
+): Promise<ExampleResult<AdminCreateGatewayInstanceReturned>> {
   return fetchOrFallback(
     "/api/v1/admin/gateways/instances",
     () => exampleGatewayInstance(command),
@@ -971,7 +1191,14 @@ export async function createGatewayInstance(
     },
   ).then(async (result) => {
     if (result.source === "real") {
-      return { ...result, data: normalizeGatewayInstance(result.data) };
+      const raw = result.data as any;
+      return {
+        ...result,
+        data: {
+          instance: normalizeGatewayInstance(raw.instance ?? raw),
+          install: normalizeGatewayInstallInfo(raw.install ?? {}),
+        },
+      };
     }
     return result;
   });
@@ -1011,6 +1238,31 @@ export async function fetchGatewayInitialConfig(
       return result;
     },
   );
+}
+
+export async function fetchReleases(
+  component: string,
+): Promise<ExampleResult<WarpAgentdRelease[]>> {
+  const path = `/api/v1/admin/releases/${encodeURIComponent(component)}`;
+  return fetchOrFallback(path, () => exampleReleases(component)).then(
+    async (result) => {
+      if (result.source !== "real") return result;
+      const raw = result.data as any;
+      const items = Array.isArray(raw) ? raw : [];
+      return { ...result, data: items.map(normalizeRelease) };
+    },
+  );
+}
+
+function exampleReleases(component: string): WarpAgentdRelease[] {
+  return [
+    {
+      version: "v2.4.1",
+      artifactUrl: `http://127.0.0.1:3100/api/v1/releases/artifact/${component}/v2.4.1/${component}-v2.4.1.bin`,
+      status: "published",
+      publishedAt: new Date().toISOString(),
+    },
+  ];
 }
 
 export async function publishWarpAgentd(
@@ -1057,6 +1309,37 @@ export async function publishWarpGateWay(
   });
 }
 
+export async function fetchUpgradePlans(): Promise<ExampleResult<UpgradePlan[]>> {
+  return fetchOrFallback(
+    "/api/v1/admin/upgrade-plans",
+    exampleUpgradePlans,
+  ).then(async (result) => {
+    if (result.source !== "real") return result;
+    const raw = result.data as any;
+    const items = Array.isArray(raw) ? raw : [];
+    return { ...result, data: items.map(normalizeUpgradePlan) };
+  });
+}
+
+function exampleUpgradePlans(): UpgradePlan[] {
+  return [
+    {
+      planId: "plan-example-1",
+      targets: [
+        { component: "warp-agentd", targetVersion: "v2.5.0" },
+        { component: "warp-gateway", targetVersion: "v3.1.0" },
+      ],
+      targetCount: 2,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      steps: [
+        { stepIndex: 0, gatewayIds: ["gw-001"], status: "pending" },
+        { stepIndex: 1, gatewayIds: ["gw-002"], status: "pending" },
+      ],
+    },
+  ];
+}
+
 export async function createUpgradePlan(
   command: CreateUpgradePlanCommand,
 ): Promise<ExampleResult<UpgradePlan>> {
@@ -1066,9 +1349,9 @@ export async function createUpgradePlan(
     {
       method: "POST",
       body: JSON.stringify({
-        component: command.component,
-        target_version: command.targetVersion,
+        targets: command.targets,
         gateway_ids: command.gatewayIds,
+        steps: command.steps,
         requested_by: command.requestedBy,
       }),
     },

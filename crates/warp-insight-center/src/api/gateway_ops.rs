@@ -5,14 +5,15 @@
 use std::net::SocketAddr;
 
 use axum::{
-    extract::{connect_info::ConnectInfo, State},
+    extract::{connect_info::ConnectInfo, Path, Query, State},
     http::{header, HeaderMap, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
 
 use insight_control::{
-    GatewayStatusAccepted, GatewayStatusAcceptedReturned, ReportGatewayStatus,
+    GatewayInitialConfig, GatewayInitialConfigReturned, GatewayStatusAccepted,
+    GatewayStatusAcceptedReturned, ReportGatewayStatus,
 };
 
 use crate::infra::{
@@ -111,6 +112,72 @@ pub async fn submit_agent_status(
 /// VM 推送全局 HTTP 客户端（进程内复用连接池）。
 fn vm_client() -> &'static reqwest::Client {
     crate::infra::vm::shared_vm_client()
+}
+
+/// 下载本地镜像的制品：GET /api/v1/releases/artifact/:component/:version/:filename。
+pub async fn download_release_artifact(
+    State(state): State<ApiState>,
+    Path((component, version, filename)): Path<(String, String, String)>,
+) -> Response {
+    let path = state
+        .config
+        .artifact_dir
+        .join(&component)
+        .join(&version)
+        .join(&filename);
+    match tokio::fs::read(&path).await {
+        Ok(bytes) => (
+            [(axum::http::header::CONTENT_TYPE, "application/octet-stream")],
+            bytes,
+        )
+            .into_response(),
+        Err(_) => (StatusCode::NOT_FOUND, "artifact not found").into_response(),
+    }
+}
+
+#[derive(serde::Deserialize)]
+pub struct InitialConfigQueryParams {
+    pub instance_id: Option<String>,
+}
+
+/// 拉取网关初始配置：GET /api/v1/gateway/initial-config。
+/// 对齐模型 `GetGatewayInitialConfig` entry；gateway 面 Bearer 鉴权
+/// （init_url 里 instance_id = gateway_id，故按 instance_id 匹配凭证）。
+pub async fn get_gateway_initial_config(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Query(params): Query<InitialConfigQueryParams>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    let Some(instance_id) = params.instance_id.as_deref() else {
+        return (StatusCode::BAD_REQUEST, "missing instance_id").into_response();
+    };
+    match authenticate_gateway(&state, &headers, instance_id, &client_key).await {
+        Ok(_) => {
+            // 生命周期：Provisioned → Initializing（Gateway 首次拉取初始配置）。
+            if let Err(err) = state.store.mark_gateway_initializing(instance_id).await {
+                eprintln!("warn mark gateway initializing failed: {err}");
+            }
+            let host = state
+                .config
+                .public_url
+                .trim_start_matches("http://")
+                .trim_start_matches("https://")
+                .split(':')
+                .next()
+                .unwrap_or("127.0.0.1");
+            Json(GatewayInitialConfigReturned {
+                config: GatewayInitialConfig {
+                    control_center_endpoint: state.config.public_url.clone(),
+                    policy_version: "policy-v1".to_string(),
+                    telemetry_output: format!("otlp://{host}:4317"),
+                },
+            })
+            .into_response()
+        }
+        Err(response) => response,
+    }
 }
 
 pub async fn submit_gateway_status(
@@ -278,8 +345,16 @@ mod tests {
                 admin_token_hash: None,
                 database_url: None,
                 victoriametrics_url: None,
+                public_url: "http://127.0.0.1:3100".to_string(),
+                gateway_image: "warp-gateway:latest".to_string(),
+                artifact_dir: std::env::temp_dir().join("wic-artifacts"),
+                object_storage: None,
             },
             store: std::sync::Arc::new(store),
+            artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
+                std::env::temp_dir().join("wic-artifacts"),
+                "http://127.0.0.1:3100",
+            )),
             rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
                 super::super::rate_limit::RateLimitState::default(),
             )),

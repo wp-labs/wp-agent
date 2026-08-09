@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS gateways (
   health TEXT,
   memory_bytes BIGINT,
   cpu_percent DOUBLE PRECISION,
+  lifecycle_state TEXT,
+  initialized_at TIMESTAMPTZ,
   last_seen_at TIMESTAMPTZ
 );
 
@@ -29,3 +31,31 @@ CREATE TABLE IF NOT EXISTS agent_status (
   last_seen_at TIMESTAMPTZ NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_agent_status_gateway ON agent_status (gateway_id);
+
+-- 网关生命周期转变历史（append-only 过程记录）。
+CREATE TABLE IF NOT EXISTS gateway_lifecycle_events (
+  id BIGSERIAL PRIMARY KEY,
+  gateway_id TEXT NOT NULL,
+  from_state TEXT,
+  to_state TEXT NOT NULL,
+  at TIMESTAMPTZ NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_lifecycle_events_gateway ON gateway_lifecycle_events (gateway_id);
+
+-- 版本发布记录（component = warp-agentd / warp-gateway）。
+CREATE TABLE IF NOT EXISTS release_records (
+  id BIGSERIAL PRIMARY KEY,
+  component TEXT NOT NULL,
+  version TEXT NOT NULL,
+  artifact_url TEXT NOT NULL,
+  status TEXT NOT NULL,
+  published_at TIMESTAMPTZ NOT NULL
+);
+
+-- 升级计划（payload 为 JSON，含多目标/网关范围/多步执行）。
+CREATE TABLE IF NOT EXISTS upgrade_plans (
+  plan_id TEXT PRIMARY KEY,
+  payload JSONB NOT NULL,
+  status TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

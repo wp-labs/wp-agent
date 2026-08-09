@@ -1,1 +1,211 @@
-/* 创建网关实例面板 —— 布局由 SectionCard/FormStack 承担 */
+/* 创建区默认收敛为单行操作，展开后仍保持与实例总览相同的内容宽度。 */
+
+.panel {
+  overflow: hidden;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-lg);
+  background: var(--wi-bg-panel);
+  box-shadow: var(--wi-shadow-sm);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 20px;
+}
+
+.headerText {
+  min-width: 0;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--wi-primary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.title {
+  color: var(--wi-text);
+  font-size: 16px;
+  font-weight: 760;
+}
+
+.subtitle {
+  margin-top: 4px;
+  color: var(--wi-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.toggleButton {
+  min-height: 38px;
+  flex-shrink: 0;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--wi-radius-sm);
+  outline: none;
+  background: var(--wi-primary);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.toggleButton:hover {
+  background: var(--wi-primary-hover);
+}
+
+.toggleButton:focus-visible {
+  box-shadow: 0 0 0 3px var(--wi-focus-ring);
+}
+
+.body {
+  padding: 20px;
+  border-top: 1px solid var(--wi-border);
+  background: var(--wi-bg-muted);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(220px, 0.72fr) auto;
+  align-items: end;
+  gap: 16px;
+}
+
+.formAction {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.actionHint {
+  color: var(--wi-text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.install {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-md);
+  background: var(--wi-bg-panel);
+}
+
+.installTitle {
+  margin-bottom: 12px;
+  color: var(--wi-text);
+  font-weight: 700;
+}
+
+.step {
+  margin-bottom: 12px;
+}
+
+.step:last-child {
+  margin-bottom: 0;
+}
+
+.stepLabel {
+  margin-bottom: 6px;
+  color: var(--wi-text-muted);
+  font-size: 12px;
+}
+
+.codeBlock {
+  position: relative;
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-code-bg);
+}
+
+.copyButton {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--wi-code-button-border);
+  border-radius: 4px;
+  background: var(--wi-code-button-bg);
+  color: var(--wi-code-text);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.copyButton:hover {
+  background: var(--wi-code-button-hover);
+}
+
+.copyButton:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--wi-focus-ring);
+}
+
+.codeText {
+  margin: 0;
+  padding: 10px 74px 10px 10px;
+  overflow-x: auto;
+  color: var(--wi-code-text);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.installHint {
+  margin: 10px 0 0;
+  color: var(--wi-text-muted);
+  font-size: 12px;
+}
+
+@media (max-width: 820px) {
+  .form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .formAction {
+    grid-column: 1 / -1;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 560px) {
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .toggleButton {
+    width: 100%;
+  }
+
+  .body {
+    padding: 16px;
+  }
+
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .formAction {
+    grid-column: auto;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actionHint {
+    white-space: normal;
+  }
+}
