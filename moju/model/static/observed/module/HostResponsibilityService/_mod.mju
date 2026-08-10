@@ -8,5 +8,4 @@ module<logic> HostResponsibilityService {
 
   layer Domain
   depends HostResponsibility
-  responsible_for "责任归属逻辑：查看主机有效责任主体、同步外部责任关系、有效责任视图与外部同步游标，读取 HostResponsibility 实体事实。"
 }

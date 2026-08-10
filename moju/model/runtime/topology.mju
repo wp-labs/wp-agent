@@ -45,7 +45,6 @@ module<adapter> AgentHost1ControlClient {
   }
 
   depends Control.Protocol
-  responsible_for "AgentHost1 上的 WpAgent 主动连接 WarpInsight 管理节点控制通道。"
 }
 
 module<adapter> AgentHost2ControlClient {
@@ -57,7 +56,6 @@ module<adapter> AgentHost2ControlClient {
   }
 
   depends Control.Protocol
-  responsible_for "AgentHost2 上的 WpAgent 主动连接 WarpInsight 管理节点控制通道。"
 }
 
 module<adapter> ManagedServiceHostControlClient {
@@ -69,7 +67,6 @@ module<adapter> ManagedServiceHostControlClient {
   }
 
   depends Control.Protocol
-  responsible_for "托管服务节点上的托管服务主动连接 WarpInsight 管理节点控制通道。"
 }
 
 network OnlineBusinessZone {

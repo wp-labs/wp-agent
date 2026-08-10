@@ -7,5 +7,4 @@ module<interface> Protocol {
   }
 
   layer Application
-  responsible_for "与控制面的通信协议：Gateway 握手/派发/ACK/上报 + Ingest 快照上报"
 }

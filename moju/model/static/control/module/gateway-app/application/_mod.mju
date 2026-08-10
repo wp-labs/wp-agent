@@ -11,5 +11,4 @@ module<service> GatewayApp.Application {
   depends Control.Agent.Status, Control.Agent.Command
   depends Protocol, Control.Agent.Registry
   depends Control.Gateway.Management, Control.Gateway.Management
-  responsible_for "网关应用编排：网关总览视图、Agent 列表指令派发与回执，组合控制面与网关管理 Domain 模块完成编排。"
 }

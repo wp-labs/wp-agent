@@ -7,5 +7,4 @@ module<entity> HostResponsibility {
   }
 
   layer Domain
-  responsible_for "主机责任归属实体：责任主体、主机组与成员关系、责任分配（host/host_group 两级）、外部身份映射；有效责任视图与同步游标由 HostResponsibilityService 承载。"
 }

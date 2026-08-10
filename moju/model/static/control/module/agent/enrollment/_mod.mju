@@ -9,5 +9,4 @@ module<entity> Agent.Enrollment {
   layer Domain
   depends Control.Agent.Identity
   depends Control.Agent.Registry
-  responsible_for "注册与引导：bootstrap 信息、注册 token、校验/结果、注册事件、认证配置与安装代码；注册流程由 AgentRegistration 承载。"
 }

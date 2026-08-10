@@ -7,5 +7,4 @@ module<entity> HostInventory {
   }
 
   layer Domain
-  responsible_for "主机资产目录实体：主机静态资产事实、磁盘/网卡子项、主机动态运行态快照、agent 健康与保护状态；查询逻辑由 HostInventoryQuery 承载。"
 }

@@ -7,5 +7,4 @@ module<logic> Agent.Command {
   }
 
   layer Domain
-  responsible_for "Agent 控制指令：管理员控制意图、统一下行控制指令、派发回执、轮询返回结果；执行结果回执由 Reporting.ActionResultReceipt 表达。"
 }

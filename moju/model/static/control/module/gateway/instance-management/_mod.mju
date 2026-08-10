@@ -8,5 +8,4 @@ module<logic> Gateway.InstanceManagement {
 
   layer Domain
   depends Control.Gateway.Supervision
-  responsible_for "网关实例管理：展示网关状态、创建管理实例、绑定客户，读取 GatewaySupervision 实体事实。"
 }

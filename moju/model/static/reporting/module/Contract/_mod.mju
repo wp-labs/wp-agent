@@ -7,5 +7,4 @@ module Contract {
   }
 
   layer Domain
-  responsible_for "业务数据契约：Action 计划/结果、能力上报、遥测记录"
 }

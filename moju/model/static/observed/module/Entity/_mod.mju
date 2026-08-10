@@ -7,5 +7,4 @@ module Entity {
   }
 
   layer Domain
-  responsible_for "探针观测到的原始实体模型：进程、网络、容器、端点"
 }

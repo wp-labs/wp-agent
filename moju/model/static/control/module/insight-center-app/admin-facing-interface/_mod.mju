@@ -14,5 +14,4 @@ module<interface> InsightCenterApp.AdminFacingInterface {
   depends Observed.HostInventory, Observed.HostResponsibility
   depends Observed.NetworkTopology, Observed.ServiceTopology
   depends Security.SoftwareVulnerability
-  responsible_for "WarpInsightCenter 管理接口：作为管理员与自动化系统的 Application 层入口，承载网关列表/策略编排与网关实例管理。"
 }

@@ -12,5 +12,4 @@ module<interface> AgentApp.FacingInterface {
   depends Control.Agent.Credential
   depends Control.Agent.Command
   depends Reporting.Protocol
-  responsible_for "Agent 侧服务接口：作为 WpAgent 的 Application 层入口，接收注册、状态、指令轮询和执行结果上报请求。"
 }

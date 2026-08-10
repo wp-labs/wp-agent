@@ -7,5 +7,4 @@ module Snapshot {
   }
 
   layer Domain
-  responsible_for "发现快照的完整契约：快照结构、资源、目标、采集候选"
 }

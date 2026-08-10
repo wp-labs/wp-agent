@@ -7,5 +7,4 @@ module<service> Health {
   }
 
   layer Domain
-  responsible_for "Agent 自观测与健康上报：发现健康、Metrics 健康、运行时快照、故障计数"
 }

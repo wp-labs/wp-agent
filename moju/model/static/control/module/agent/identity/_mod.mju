@@ -7,5 +7,4 @@ module<entity> Agent.Identity {
   }
 
   layer Domain
-  responsible_for "Agent 身份与凭据生命周期实体：agent_id、宿主机画像、通讯凭据、校验结果与身份事件；续期/校验逻辑由 AgentCredential 承载。"
 }

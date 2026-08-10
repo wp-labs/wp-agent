@@ -7,5 +7,4 @@ module<adapter> Protocol {
   }
 
   layer Infra
-  responsible_for "控制消息通道：HTTPS long polling、上行消息 envelope、下行消息 envelope、消息类型、消息接收或拒绝结果。"
 }

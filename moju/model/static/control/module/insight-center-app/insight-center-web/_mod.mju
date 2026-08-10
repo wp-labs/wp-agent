@@ -8,5 +8,4 @@ module<ui> InsightCenterApp.InsightCenterWeb {
 
   layer Application
   depends Control.InsightCenterApp.AdminFacingInterface
-  responsible_for "WarpInsightCenter 前端 WEB：主机资产目录与运行状态、有效责任、网络与服务拓扑、软件漏洞视图等查询入口，通过管理接口消费。"
 }

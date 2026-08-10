@@ -7,5 +7,4 @@ module<entity> OperatorContext {
   }
 
   layer Domain
-  responsible_for "操作请求上下文：各接口命令（message<command>）通过继承携带的共享请求来源字段，避免每个命令重复声明 requested_by。"
 }

@@ -7,5 +7,4 @@ module<logic> Agent.Status {
   }
 
   layer Domain
-  responsible_for "Agent 状态与登记查询：实例、版本、在线时间、健康状态、运行状态视图、Agent 总览、登记记录与能力索引查询。"
 }

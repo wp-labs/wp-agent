@@ -10,5 +10,4 @@ module<logic> Agent.Registration {
   depends Control.Agent.Enrollment
   depends Control.Agent.Identity
   depends Control.Agent.Registry
-  responsible_for "注册逻辑：安装代码命令、Agentd 注册流程（校验 token、签发身份/凭据、构建初始配置与策略绑定），读取 AgentEnrollment/AgentIdentity/AgentRegistry 实体事实。"
 }

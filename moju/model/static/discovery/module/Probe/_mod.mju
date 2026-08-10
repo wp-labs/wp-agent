@@ -7,5 +7,4 @@ module<service> Probe {
   }
 
   layer Domain
-  responsible_for "发现探针与运行时：探测、刷新、缓存、持久化"
 }

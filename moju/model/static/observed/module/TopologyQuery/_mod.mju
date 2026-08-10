@@ -8,5 +8,4 @@ module<logic> TopologyQuery {
 
   layer Domain
   depends NetworkTopology, ServiceTopology
-  responsible_for "资源拓扑查询：查看网络拓扑与业务/服务拓扑，读取 NetworkTopology / ServiceTopology 实体事实。"
 }

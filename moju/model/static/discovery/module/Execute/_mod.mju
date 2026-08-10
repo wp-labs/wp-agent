@@ -7,5 +7,4 @@ module<worker> Execute {
   }
 
   layer Domain
-  responsible_for "Action 调度执行与状态管理：队列、子进程、运行时状态、执行进度"
 }

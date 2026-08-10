@@ -11,5 +11,4 @@ module<service> InsightCenterApp.WarpInsightCenter {
   depends Observed.HostInventory, Observed.HostResponsibility
   depends Observed.NetworkTopology, Observed.ServiceTopology
   depends Security.SoftwareVulnerability
-  responsible_for "全局控制中心应用编排：网关列表聚合视图、全局策略下发与回执，组合中心各 Domain 模块完成编排。"
 }

@@ -7,5 +7,4 @@ module<pipeline> Collect {
   }
 
   layer Domain
-  responsible_for "数据采集管线：日志文件输入、多行折叠、缓冲输出、Metrics 采集、WarpParse 摄入、位点管理"
 }

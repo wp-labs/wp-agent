@@ -7,5 +7,4 @@ module<pipeline> Pipeline {
   }
 
   layer Application
-  responsible_for "上报管线与编排：报告准备/检查/导出、执行历史、Daemon 主循环"
 }

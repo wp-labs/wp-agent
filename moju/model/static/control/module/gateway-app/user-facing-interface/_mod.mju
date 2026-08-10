@@ -15,5 +15,4 @@ module<interface> GatewayApp.UserFacingInterface {
   depends Control.Agent.Command
   depends Control.Gateway.Management, Control.Gateway.Management
   depends Control.Agent.Status
-  responsible_for "用户侧服务接口：作为浏览器端和管理员用户的 Application 层入口，提供已认证安装代码、状态查询、暂停、升级、网关管理状态与 Agent 登记查询 API。"
 }

@@ -7,5 +7,4 @@ module<entity> Gateway.Identity {
   }
 
   layer Domain
-  responsible_for "GateWay 身份实体：gateway_id、实例、租户/环境/节点绑定与身份状态；对中心的接入由 GatewaySupervision 表达。"
 }

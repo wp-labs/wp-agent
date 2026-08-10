@@ -7,5 +7,4 @@ module<entity> ServiceTopology {
   }
 
   layer Domain
-  responsible_for "业务/服务拓扑实体：业务域、系统边界、业务子系统、逻辑服务、服务实例、服务入口与实例地址、服务依赖；查询逻辑由 TopologyQuery 承载。"
 }

@@ -7,5 +7,4 @@ module<entity> NetworkTopology {
   }
 
   layer Domain
-  responsible_for "网络拓扑实体：pod 目录、网络域/网络段、pod 调度与网络附件、主机网络附件；查询逻辑由 TopologyQuery 承载。"
 }

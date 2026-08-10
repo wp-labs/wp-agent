@@ -7,5 +7,4 @@ module<service> Config {
   }
 
   layer Domain
-  responsible_for "Agent 配置：发现开关、采集参数、路径、输出目标"
 }

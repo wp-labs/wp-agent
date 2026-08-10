@@ -8,5 +8,4 @@ module<ui> GatewayApp.WebFrontend {
 
   layer Application
   depends Control.GatewayApp.UserFacingInterface
-  responsible_for "WarpGateWay 前端 WEB：主界面、Agent 控制界面、状态展示、安装代码复制操作和远程升级操作入口。"
 }
