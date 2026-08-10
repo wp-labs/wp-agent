@@ -27,7 +27,7 @@ struct AgentRuntimeStatusView {
   meta {
     label zh "Agentd 运行状态视图"
     label en "Agentd Runtime Status View"
-    summary zh "WarpGateWay 展示 Agentd 在线状态、版本、健康状态和最后上报时间所需的聚合视图。"
+    summary zh "WarpGateway 展示 Agentd 在线状态、版本、健康状态和最后上报时间所需的聚合视图。"
     tags "agentd", "status-view"
   }
 

@@ -1,4 +1,4 @@
-// WarpGateWay 子系统用例
+// WarpGateway 子系统用例
 
 // 获取 Agent 安装代码
 usecase GetAgentInstallCode {

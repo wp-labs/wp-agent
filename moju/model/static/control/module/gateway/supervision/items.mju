@@ -1,5 +1,5 @@
-// Module: GatewaySupervision — WarpGateWay 上级聚合
-// 覆盖 WarpGateWay 实例接入 WarpInsightCenter 的初始配置获取、状态上报与状态/实例/客户/列表视图实体。
+// Module: GatewaySupervision — WarpGateway 上级聚合
+// 覆盖 WarpGateway 实例接入 WarpInsightCenter 的初始配置获取、状态上报与状态/实例/客户/列表视图实体。
 // 实例管理命令由 GatewayInstanceManagement 承载。
 
 struct GatewayInitialConfig {
@@ -45,7 +45,7 @@ struct GatewayStatusView {
 
 variant GatewayInstanceLifecycleState {
   meta {
-    label zh "GateWay 实例生命周期状态"
+    label zh "Gateway 实例生命周期状态"
     label en "Gateway Instance Lifecycle State"
     tags "gateway", "lifecycle", "provisioning"
   }
@@ -58,7 +58,7 @@ variant GatewayInstanceLifecycleState {
 
 struct GatewayInstance {
   meta {
-    label zh "GateWay 管理实例"
+    label zh "Gateway 管理实例"
     label en "Gateway Instance"
     tags "gateway", "provisioning"
   }
@@ -72,7 +72,7 @@ struct GatewayInstance {
 
 struct GatewayCustomerBinding {
   meta {
-    label zh "GateWay 客户绑定"
+    label zh "Gateway 客户绑定"
     label en "Gateway Customer Binding"
     tags "gateway", "provisioning", "customer"
   }
@@ -111,7 +111,7 @@ struct GlobalPolicyDispatch {
   dispatched_at: DateTime
 }
 
-// ── 网关接入（forGateway：WarpGateWay 实例 → WarpInsightCenter） ──
+// ── 网关接入（forGateway：WarpGateway 实例 → WarpInsightCenter） ──
 
 message<command> GetGatewayInitialConfig {
   instance_id: String

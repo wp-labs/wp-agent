@@ -1,6 +1,6 @@
 // Control domain HTTP bindings
 
-bind WarpGateWayPublicInstallInterface {
+bind WarpGatewayPublicInstallInterface {
   entry AdminGetAgentInstallCode {
     route GET "/api/v1/agent/install-code"
     auth bearer
@@ -9,7 +9,7 @@ bind WarpGateWayPublicInstallInterface {
   }
 }
 
-bind WarpGateWayManagementInterface {
+bind WarpGatewayManagementInterface {
   entry AdminShowAgentRuntimeStatus {
     route GET "/api/v1/admin/agents/{agent_id}/runtime-status"
     auth bearer
@@ -38,11 +38,11 @@ bind WarpGateWayManagementInterface {
     status DispatchReceipt 202
   }
 
-  entry AdminViewGateWayManagementState {
+  entry AdminViewGatewayManagementState {
     route GET "/api/v1/admin/gateway/management-state"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status GateWayManagementStateView 200
+    status GatewayManagementStateView 200
   }
 
   entry AdminLookupAgentRegistryEntry {

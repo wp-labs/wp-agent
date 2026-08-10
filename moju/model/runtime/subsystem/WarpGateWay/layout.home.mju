@@ -1,4 +1,4 @@
-// WarpGateWay home page layout regions
+// WarpGateway home page layout regions
 
 region AgentStatusOverviewMetrics {
   meta {

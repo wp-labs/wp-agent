@@ -1,8 +1,8 @@
 module<logic> Gateway.Management {
   meta {
     label zh "网关自身管理"
-    label en "GateWay Management"
-    summary zh "负责 WarpGateWay 控制平台自身的管理逻辑：网关实例、控制面配置与健康状态、管理状态与总览视图；查询命令由 GateWayManagement 承载。"
+    label en "Gateway Management"
+    summary zh "负责 WarpGateway 控制平台自身的管理逻辑：网关实例、控制面配置与健康状态、管理状态与总览视图；查询命令由 GatewayManagement 承载。"
     tags "control", "gateway", "management"
   }
 

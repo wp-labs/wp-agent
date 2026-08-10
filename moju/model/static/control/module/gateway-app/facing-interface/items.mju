@@ -1,6 +1,6 @@
-// Module: GateWayFacingInterface — GateWay 侧服务接口
+// Module: GatewayFacingInterface — Gateway 侧服务接口
 //
-// WarpInsightCenter 面向各 WarpGateWay 实例暴露的接入入口。
+// WarpInsightCenter 面向各 WarpGateway 实例暴露的接入入口。
 // 请求消息（GetGatewayInitialConfig / ReportGatewayStatus）与结果结构
 // （GatewayInitialConfig / GatewayStatusAccepted）由 GatewaySupervision 建模，
 // 本接口引用它们作为 wire 契约，并定义响应消息与接入流程。
@@ -19,7 +19,7 @@ interface WarpInsightCenterGatewayInterface {
   meta {
     label zh "WarpInsightCenter 网关接入接口"
     label en "WarpInsightCenter Gateway Access Interface"
-    summary zh "WarpGateWay 实例安装后主动访问的接入入口，获取初始配置并定期上报状态，供 WarpInsightCenter 全局聚合与控制。"
+    summary zh "WarpGateway 实例安装后主动访问的接入入口，获取初始配置并定期上报状态，供 WarpInsightCenter 全局聚合与控制。"
     tags "gateway", "gateway-facing", "bootstrap", "status", "http", "interface"
   }
 

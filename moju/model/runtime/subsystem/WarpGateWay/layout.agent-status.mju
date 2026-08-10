@@ -1,4 +1,4 @@
-// WarpGateWay Agent status reusable layout regions
+// WarpGateway Agent status reusable layout regions
 
 region ShowAgentRuntimeStatusUsecaseCard {
   meta {

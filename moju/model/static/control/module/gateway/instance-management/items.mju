@@ -1,6 +1,6 @@
 // Module: GatewayInstanceManagement — 网关实例管理
 //
-// WarpGateWay 实例的北向管理命令（管理员视角），实体事实由 GatewaySupervision 承载。
+// WarpGateway 实例的北向管理命令（管理员视角），实体事实由 GatewaySupervision 承载。
 
 command ShowGatewayStatus = OperatorRequest {
   meta {
@@ -13,7 +13,7 @@ command ShowGatewayStatus = OperatorRequest {
 
 command CreateGatewayInstance = OperatorRequest {
   meta {
-    label zh "创建 GateWay 管理实例"
+    label zh "创建 Gateway 管理实例"
     label en "Create Gateway Instance"
     tags "gateway", "provisioning"
   }

@@ -1,7 +1,7 @@
 // 系统分解：顶层子系统边界
 
-// WarpInsightCenter — WarpGateWay 的上级聚合控制系统
-// 汇总各 WarpGateWay 实例的状态、健康与总览，并下发全局策略与控制指令。
+// WarpInsightCenter — WarpGateway 的上级聚合控制系统
+// 汇总各 WarpGateway 实例的状态、健康与总览，并下发全局策略与控制指令。
 // 同时承载中心侧资源目录与安全治理：主机资产与运行态（HostInventory）、责任归属
 // 与外部同步（HostResponsibility）、host/pod/network 与业务/服务拓扑（Topology）、
 // 软件归一化与漏洞情报（SoftwareVulnerability）。
@@ -10,7 +10,7 @@ subsystem WarpInsightCenter {
   meta {
     label zh "全局控制中心"
     label en "Warp Control Center"
-    summary zh "WarpGateWay 的上级聚合控制系统，汇总各 WarpGateWay 实例的状态、健康与总览，下发全局策略与控制指令，并提供中心侧资源目录与安全治理能力。"
+    summary zh "WarpGateway 的上级聚合控制系统，汇总各 WarpGateway 实例的状态、健康与总览，下发全局策略与控制指令，并提供中心侧资源目录与安全治理能力。"
     tags "control-plane", "aggregation", "global"
   }
 

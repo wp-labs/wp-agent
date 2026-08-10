@@ -1,4 +1,4 @@
-// WarpGateWay WEB Layout index
+// WarpGateway WEB Layout index
 //
 // Keep this file at page/navigation level. Page internals and reusable
 // regions live under ./layout/*.mju so GUI layout overview stays readable.
@@ -7,7 +7,7 @@ region AdminTopNavigation {
   meta {
     label zh "顶部导航"
     label en "Top Navigation"
-    summary zh "WarpGateWay 的顶部导航区，作为三个独立页面共享的页面级导航，提供首页、安装和控制中心入口，并展示在线业务区和操作者上下文。"
+    summary zh "WarpGateway 的顶部导航区，作为三个独立页面共享的页面级导航，提供首页、安装和控制中心入口，并展示在线业务区和操作者上下文。"
     tags "admin", "navigation", "top-navigation", "layout-index"
   }
 
@@ -18,7 +18,7 @@ region<page> AdminHomePage {
   meta {
     label zh "首页"
     label en "Home"
-    summary zh "WarpGateWay 的独立首页，面向 20 到 50 个常见 Agent、最多 200 个 Agent 的客户环境，只展示存在异常的 Agent 卡片；正常 Agent 不在首页主体中显示。"
+    summary zh "WarpGateway 的独立首页，面向 20 到 50 个常见 Agent、最多 200 个 Agent 的客户环境，只展示存在异常的 Agent 卡片；正常 Agent 不在首页主体中显示。"
     tags "admin", "home", "page", "agent-status", "abnormal-agent-only"
   }
 
@@ -34,7 +34,7 @@ region<page> AgentInstallPage {
   meta {
     label zh "安装"
     label en "Install"
-    summary zh "WarpGateWay 的独立安装页，只提供 X86-Linux 和 Arm-Linux 两个 Agent 安装代码；无需输入租户、环境或其它参数，也不展示安装说明。"
+    summary zh "WarpGateway 的独立安装页，只提供 X86-Linux 和 Arm-Linux 两个 Agent 安装代码；无需输入租户、环境或其它参数，也不展示安装说明。"
     tags "admin", "agent-install", "install-code", "page"
   }
 
@@ -48,7 +48,7 @@ region<page> AgentControlCenterPage {
   meta {
     label zh "控制中心"
     label en "Control Center"
-    summary zh "WarpGateWay 的独立控制中心页，面向已接入 Agent，突出两个常见控制任务：暂停 Agent 和升级 Agent。"
+    summary zh "WarpGateway 的独立控制中心页，面向已接入 Agent，突出两个常见控制任务：暂停 Agent 和升级 Agent。"
     tags "admin", "agent-control", "page"
   }
 

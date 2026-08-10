@@ -1,4 +1,4 @@
-// WarpGateWay install page layout regions
+// WarpGateway install page layout regions
 
 region AgentInstallCodeList {
   meta {

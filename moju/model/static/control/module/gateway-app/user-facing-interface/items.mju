@@ -19,7 +19,7 @@ message<command> AdminUpgradeAgent = OperatorRequest {
   target_version: String
 }
 
-message<command> AdminViewGateWayManagementState = OperatorRequest {
+message<command> AdminViewGatewayManagementState = OperatorRequest {
 }
 
 message<command> AdminLookupAgentRegistryEntry = OperatorRequest {
@@ -30,10 +30,10 @@ message<command> AdminQueryAgentCapabilityIndex = OperatorRequest {
   agent_id: String
 }
 
-interface WarpGateWayPublicInstallInterface {
+interface WarpGatewayPublicInstallInterface {
   meta {
-    label zh "WarpGateWay 运维安装接口"
-    label en "WarpGateWay Operations Install Interface"
+    label zh "WarpGateway 运维安装接口"
+    label en "WarpGateway Operations Install Interface"
     summary zh "运维工程师通过管理员 bearer 身份获取 Agent 安装代码；接口只负责安装脚本复制和 bootstrap 引导，不面向未认证访问者开放。"
     tags "authenticated", "bootstrap", "agent-install", "web", "interface"
   }
@@ -44,10 +44,10 @@ interface WarpGateWayPublicInstallInterface {
   }
 }
 
-interface WarpGateWayManagementInterface {
+interface WarpGatewayManagementInterface {
   meta {
-    label zh "WarpGateWay 管理接口"
-    label en "WarpGateWay Management Interface"
+    label zh "WarpGateway 管理接口"
+    label en "WarpGateway Management Interface"
     tags "admin", "authenticated", "web", "interface"
   }
 
@@ -71,9 +71,9 @@ interface WarpGateWayManagementInterface {
     output DispatchReceipt
   }
 
-  entry AdminViewGateWayManagementState {
+  entry AdminViewGatewayManagementState {
     actor AdminOperator
-    output GateWayManagementStateView
+    output GatewayManagementStateView
   }
 
   entry AdminLookupAgentRegistryEntry {
@@ -163,7 +163,7 @@ flow AdminGetAgentOverviewFlow {
   meta {
     label zh "获取 Agent 总览"
     label en "Get Agent Overview Flow"
-    summary zh "管理员打开 WarpGateWay 首页时，聚合 Agent 状态指标、最近上线注册 Agent 和异常 Agent 列表。"
+    summary zh "管理员打开 WarpGateway 首页时，聚合 Agent 状态指标、最近上线注册 Agent 和异常 Agent 列表。"
     tags "admin", "agent-status", "overview", "homepage"
   }
 
@@ -272,29 +272,29 @@ flow AdminUpgradeAgentFlow {
   }
 }
 
-flow AdminViewGateWayManagementStateFlow {
+flow AdminViewGatewayManagementStateFlow {
   meta {
     label zh "查看网关管理状态"
-    label en "View GateWay Management State Flow"
-    summary zh "管理员查看 WarpGateWay 控制平台自身的实例、控制面配置与健康状态聚合视图。"
+    label en "View Gateway Management State Flow"
+    summary zh "管理员查看 WarpGateway 控制平台自身的实例、控制面配置与健康状态聚合视图。"
     tags "admin", "gateway", "management"
   }
 
   actor AdminOperator
-  trigger AdminViewGateWayManagementState
+  trigger AdminViewGatewayManagementState
 
-  depends WarpGateWayInstance, GateWayControlConfig, GateWayHealth
+  depends WarpGatewayInstance, GatewayControlConfig, GatewayHealth
 
-  creates GateWayManagementStateView
+  creates GatewayManagementStateView
 
   step BuildManagementState {
-    create GateWayManagementStateView {
+    create GatewayManagementStateView {
       gateway_id = "gateway-001"
       instance_id = "gateway-001/boot-20260801"
       version = "0.1.0"
       status = "online"
-      config = GateWayControlConfig
-      health = GateWayHealth
+      config = GatewayControlConfig
+      health = GatewayHealth
       last_seen_at = "now"
     }
   }

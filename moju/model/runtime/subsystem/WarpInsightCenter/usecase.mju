@@ -3,10 +3,10 @@
 // 网关级事实（Control.WarpGateway、Control.GatewayOperator 及 GatewaySupervision
 // 模块下的 command/struct）在 Control 域 gateway-supervision.mju 中建模。
 
-// 创建GateWay管理实例
+// 创建Gateway管理实例
 usecase CreateGatewayInstance {
   meta {
-    label zh "创建 GateWay 管理实例"
+    label zh "创建 Gateway 管理实例"
     label en "Create Gateway Instance"
     tags "gateway", "provisioning"
   }
@@ -42,17 +42,17 @@ usecase PublishWarpAgentd {
   outcome Control.WarpAgentdRelease
 }
 
-// 发布WarpGateWay
-usecase PublishWarpGateWay {
+// 发布WarpGateway
+usecase PublishWarpGateway {
   meta {
-    label zh "发布 WarpGateWay"
-    label en "Publish WarpGateWay"
+    label zh "发布 WarpGateway"
+    label en "Publish WarpGateway"
     tags "release", "warp-gateway"
   }
 
   actor Control.PlatformMaintenanceEngineer
-  trigger Control.PublishWarpGateWay
-  outcome Control.WarpGateWayRelease
+  trigger Control.PublishWarpGateway
+  outcome Control.WarpGatewayRelease
 }
 
 // 创建升级计划
@@ -107,10 +107,10 @@ usecase ReceiveGatewayStatusReport {
   outcome Control.GatewayStatusAccepted
 }
 
-// 查看GateWay状态
+// 查看Gateway状态
 usecase ViewGatewayStatus {
   meta {
-    label zh "查看GateWay状态"
+    label zh "查看Gateway状态"
     label en "View Gateway Status"
     tags "gateway", "status", "global-view"
   }

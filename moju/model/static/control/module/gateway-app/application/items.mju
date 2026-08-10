@@ -1,12 +1,12 @@
-// Module: GateWayApplication — 网关应用编排
+// Module: GatewayApplication — 网关应用编排
 //
-// WarpGateWay 控制平台的 Application 层编排：网关总览、Agent 列表指令下发等
+// WarpGateway 控制平台的 Application 层编排：网关总览、Agent 列表指令下发等
 // 用例级命令与流程，组合控制面与网关管理 Domain 模块完成编排。
 
-command ViewGateWayOverview = OperatorRequest {
+command ViewGatewayOverview = OperatorRequest {
   meta {
     label zh "查看网关总览"
-    label en "View GateWay Overview"
+    label en "View Gateway Overview"
     tags "gateway", "overview"
   }
 
@@ -23,20 +23,20 @@ command DispatchAgentFleetCommand = OperatorRequest {
   agent_ids: List<String>
 }
 
-flow ViewGateWayOverviewFlow {
+flow ViewGatewayOverviewFlow {
   meta {
     label zh "查看网关总览"
-    label en "View GateWay Overview Flow"
+    label en "View Gateway Overview Flow"
     tags "gateway", "overview"
   }
 
   actor AdminOperator
-  trigger ViewGateWayOverview
+  trigger ViewGatewayOverview
 
-  creates GateWayOverviewView
+  creates GatewayOverviewView
 
   step BuildOverview {
-    create GateWayOverviewView {
+    create GatewayOverviewView {
       gateway_id = "gateway-001"
       agent_total = 9
       agent_online = 7

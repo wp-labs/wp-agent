@@ -2,7 +2,7 @@ module<logic> Gateway.Supervision {
   meta {
     label zh "网关注册与状态"
     label en "Gateway Supervision"
-    summary zh "负责 WarpGateWay 实例在 WarpInsightCenter 的监管逻辑：初始配置获取、状态上报、状态、实例、客户绑定、列表视图与策略下发回执；实例管理命令由 GatewayInstanceManagement 承载。"
+    summary zh "负责 WarpGateway 实例在 WarpInsightCenter 的监管逻辑：初始配置获取、状态上报、状态、实例、客户绑定、列表视图与策略下发回执；实例管理命令由 GatewayInstanceManagement 承载。"
     tags "control", "gateway", "supervision"
   }
 

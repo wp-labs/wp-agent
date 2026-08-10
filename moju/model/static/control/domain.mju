@@ -1,28 +1,28 @@
 // 控制域 (Control Domain) — HOW an agent joins and is controlled
 //
 // 三级结构：insightcenter（WarpInsightCenter 上级聚合）
-//           -> gateway（WarpGateWay 控制平台）
+//           -> gateway（WarpGateway 控制平台）
 //           -> agentd（WpAgent 边缘）
 //
 // Domain facts in this package are split by module boundary,
 // 并按三级结构归位：
 //
 // ── insightcenter 层（上级聚合与治理） ──
-// - gateway-supervision.mju      # WarpGateWay 接入与监管（初始配置/状态上报 + 实体）
-// - gateway-instance-management.mju # WarpGateWay 实例管理（北向）
-// - gateway-identity.mju         # WarpGateWay 身份与状态（实体）
-// - gateway-facing-interface.mju # WarpGateWay -> WarpInsightCenter 接入接口（forGateway）
+// - gateway-supervision.mju      # WarpGateway 接入与监管（初始配置/状态上报 + 实体）
+// - gateway-instance-management.mju # WarpGateway 实例管理（北向）
+// - gateway-identity.mju         # WarpGateway 身份与状态（实体）
+// - gateway-facing-interface.mju # WarpGateway -> WarpInsightCenter 接入接口（forGateway）
 // - admin-facing-interface.mju   # WarpInsightCenter 管理接口（forAdmin）
 // - admin-facing-interface-flow.mju # WarpInsightCenter 管理接口编排流程（forAdmin）
-// - platform-release.mju         # WarpAgentd / WarpGateWay 版本发布与升级计划
+// - platform-release.mju         # WarpAgentd / WarpGateway 版本发布与升级计划
 //   module/insight-center-web.mju # WarpInsightCenter 前端 WEB
 // - warp-insight-center.mju      # 全局控制中心应用编排（Application）
 //
 // ── gateway 层（控制平台自身） ──
-// - user-facing-interface.mju    # WarpGateWay 用户侧服务接口
+// - user-facing-interface.mju    # WarpGateway 用户侧服务接口
 // - gateway-management.mju       # 网关自身管理域（Domain）
 // - gateway-application.mju      # 网关应用编排（Application）
-//   module/gateway-web-frontend.mju # WarpGateWay 前端 WEB
+//   module/gateway-web-frontend.mju # WarpGateway 前端 WEB
 //
 // ── agentd 层（边缘 agent 控制面） ──
 // - agent-facing-interface.mju   # WpAgent 侧服务接口

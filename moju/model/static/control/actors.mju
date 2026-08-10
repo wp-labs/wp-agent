@@ -40,18 +40,18 @@ actor AdminOperator {
   can AdminShowAgentRuntimeStatus
   can AdminPauseAgent
   can AdminUpgradeAgent
-  can ViewGateWayOverview
+  can ViewGatewayOverview
   can DispatchAgentFleetCommand
-  can AdminViewGateWayManagementState
+  can AdminViewGatewayManagementState
   can AdminLookupAgentRegistryEntry
   can AdminQueryAgentCapabilityIndex
 }
 
 actor<system> WarpGateway {
   meta {
-    label zh "WarpGateWay 实例"
-    label en "Warp GateWay Instance"
-    summary zh "接入 WarpInsightCenter 的一个 WarpGateWay 实例，作为系统 actor 获取初始配置并定期上报状态。"
+    label zh "WarpGateway 实例"
+    label en "Warp Gateway Instance"
+    summary zh "接入 WarpInsightCenter 的一个 WarpGateway 实例，作为系统 actor 获取初始配置并定期上报状态。"
     tag "gateway"
   }
 
@@ -101,7 +101,7 @@ actor PlatformMaintenanceEngineer {
 
   access protocol<http>
   can PublishWarpAgentd
-  can PublishWarpGateWay
+  can PublishWarpGateway
   can CreateUpgradePlan
   can AdminDispatchGlobalPolicy
   can AdminListGatewayInstances

@@ -1,4 +1,4 @@
-// WarpGateWay control center page layout regions
+// WarpGateway control center page layout regions
 
 region AdminOperatorLane {
   meta {

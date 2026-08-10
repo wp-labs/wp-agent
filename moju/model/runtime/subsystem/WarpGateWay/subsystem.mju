@@ -1,6 +1,6 @@
 // 系统分解：顶层子系统边界
 
-subsystem WarpGateWay {
+subsystem WarpGateway {
   meta {
     label zh "控制平台"
     summary zh "中心侧控制、治理、编译、下发、跟踪与风险控制。"

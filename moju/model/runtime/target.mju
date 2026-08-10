@@ -2,7 +2,7 @@
 
 target<platform> warp-insight-managed {
   subsystem WarpInsightCenter
-  subsystem WarpGateWay
+  subsystem WarpGateway
   subsystem DataPlatform
   subsystem WpAgent
 }

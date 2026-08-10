@@ -1,10 +1,10 @@
 // warp-insight 部署视图
 
-node WarpGateWayHost {
+node WarpGatewayHost {
   meta {
-    label zh "WarpGateWay 管理节点"
-    label en "WarpGateWay Host"
-    summary zh "在线业务区内的 WarpGateWay 控制平台节点，运行 WarpGateWay 前端 WEB、后端 WEB 服务接口和控制中心；数据平台能力由托管服务区承载。WarpGateWay 实例接入上级 WarpInsightCenter 聚合控制中心，接收全局策略与控制指令。"
+    label zh "WarpGateway 管理节点"
+    label en "WarpGateway Host"
+    summary zh "在线业务区内的 WarpGateway 控制平台节点，运行 WarpGateway 前端 WEB、后端 WEB 服务接口和控制中心；数据平台能力由托管服务区承载。WarpGateway 实例接入上级 WarpInsightCenter 聚合控制中心，接收全局策略与控制指令。"
     tags "center", "online-business-zone", "control-plane", "warp-gateway"
   }
 }
@@ -69,7 +69,7 @@ module<adapter> ManagedServiceHostControlClient {
 network OnlineBusinessZone {
   ingress controlled_internal
   trust_level business_internal
-  contains WarpGateWayHost
+  contains WarpGatewayHost
   contains AgentHost1
   contains AgentHost2
 }
@@ -93,11 +93,11 @@ bind ManagedServiceHostControlClient to ManagedServiceHost with topology
 // 最终归属管理节点，Agent 节点保留 Discovery/Observed/Reporting 数据面。
 bind warp-agentd to AgentHost1 with topology
 bind warp-agentd to AgentHost2 with topology
-bind warp-gateway-web to WarpGateWayHost with topology
-bind warp-gateway to WarpGateWayHost with topology
+bind warp-gateway-web to WarpGatewayHost with topology
+bind warp-gateway to WarpGatewayHost with topology
 
 // 节点间关系：Agent 主动连接管理节点控制通道。
-link<call> AgentHost1 -> WarpGateWayHost
-link<call> AgentHost2 -> WarpGateWayHost
+link<call> AgentHost1 -> WarpGatewayHost
+link<call> AgentHost2 -> WarpGatewayHost
 // 托管服务节点上的托管服务连接管理节点控制通道。
-link<call> ManagedServiceHost -> WarpGateWayHost
+link<call> ManagedServiceHost -> WarpGatewayHost

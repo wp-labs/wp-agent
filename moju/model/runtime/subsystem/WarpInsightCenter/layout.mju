@@ -4,7 +4,7 @@
 // - GatewayListPage      查看网关列表状态（ViewGatewayStatus）
 // - GatewayInstancePage   网关实例管理（CreateGatewayInstance / BindGatewayCustomer）
 // - GatewayConfigPage     网关初始配置查询（GetInitialConfig）
-// - ReleasePage           版本发布（PublishWarpAgentd / PublishWarpGateWay）
+// - ReleasePage           版本发布（PublishWarpAgentd / PublishWarpGateway）
 // - UpgradePlanPage       升级计划管理（CreateUpgradePlan / ApproveUpgradePlan）
 // ReceiveGatewayStatusReport 为系统上报（WarpGateway 后台），喂给状态展示，无独立页面。
 
@@ -25,7 +25,7 @@ region<page> GatewayListPage {
   meta {
     label zh "网关列表"
     label en "Gateway List"
-    summary zh "查看各 WarpGateWay 实例的在线状态、版本、健康状态与最后上报时间。"
+    summary zh "查看各 WarpGateway 实例的在线状态、版本、健康状态与最后上报时间。"
     tags "center", "gateway", "list", "page"
   }
 
@@ -39,7 +39,7 @@ region<section> GatewayStatusList {
   meta {
     label zh "网关列表状态列表"
     label en "Gateway List Status List"
-    summary zh "按卡片展示各 WarpGateWay 实例的状态摘要。"
+    summary zh "按卡片展示各 WarpGateway 实例的状态摘要。"
     tags "center", "gateway", "status", "list"
   }
 
@@ -69,7 +69,7 @@ region<page> GatewayInstancePage {
   meta {
     label zh "网关实例管理"
     label en "Gateway Instance Management"
-    summary zh "创建 GateWay 管理实例并为实例绑定客户 ID。"
+    summary zh "创建 Gateway 管理实例并为实例绑定客户 ID。"
     tags "center", "gateway", "instance", "provisioning", "page"
   }
 
@@ -84,7 +84,7 @@ region<section> GatewayInstanceCreatePanel {
   meta {
     label zh "创建网关实例"
     label en "Create Gateway Instance"
-    summary zh "客户服务工程师创建 GateWay 管理实例的入口。"
+    summary zh "客户服务工程师创建 Gateway 管理实例的入口。"
     tags "center", "gateway", "provisioning"
   }
 
@@ -95,7 +95,7 @@ region<section> GatewayCustomerBindPanel {
   meta {
     label zh "绑定客户"
     label en "Bind Gateway Customer"
-    summary zh "客户服务工程师为 GateWay 管理实例绑定客户 ID 的入口。"
+    summary zh "客户服务工程师为 Gateway 管理实例绑定客户 ID 的入口。"
     tags "center", "gateway", "customer"
   }
 
@@ -108,7 +108,7 @@ region<page> GatewayConfigPage {
   meta {
     label zh "网关初始配置"
     label en "Gateway Initial Config"
-    summary zh "查看指定 WarpGateWay 实例的初始配置信息（控制中心地址、策略版本、遥测输出）。"
+    summary zh "查看指定 WarpGateway 实例的初始配置信息（控制中心地址、策略版本、遥测输出）。"
     tags "center", "gateway", "config", "page"
   }
 
@@ -135,14 +135,14 @@ region<page> ReleasePage {
   meta {
     label zh "版本发布"
     label en "Release"
-    summary zh "发布 WarpAgentd / WarpGateWay 新版本，供各 WarpGateWay 实例或管理实例升级。"
+    summary zh "发布 WarpAgentd / WarpGateway 新版本，供各 WarpGateway 实例或管理实例升级。"
     tags "center", "release", "page"
   }
 
   orientation vertical
   contains GlobalTopNavigation
   contains WarpAgentdReleasePanel { slot_usecase: PublishWarpAgentd }
-  contains WarpGateWayReleasePanel { slot_usecase: PublishWarpGateWay }
+  contains WarpGatewayReleasePanel { slot_usecase: PublishWarpGateway }
   layout fill_remaining
 }
 
@@ -157,11 +157,11 @@ region<section> WarpAgentdReleasePanel {
   orientation vertical
 }
 
-region<section> WarpGateWayReleasePanel {
+region<section> WarpGatewayReleasePanel {
   meta {
-    label zh "WarpGateWay 发布"
-    label en "Publish WarpGateWay"
-    summary zh "平台维护工程师发布 WarpGateWay 新版本。"
+    label zh "WarpGateway 发布"
+    label en "Publish WarpGateway"
+    summary zh "平台维护工程师发布 WarpGateway 新版本。"
     tags "center", "release", "warp-gateway"
   }
 
@@ -174,7 +174,7 @@ region<page> UpgradePlanPage {
   meta {
     label zh "升级计划"
     label en "Upgrade Plan"
-    summary zh "创建与批准 WarpAgentd / WarpGateWay 升级计划。"
+    summary zh "创建与批准 WarpAgentd / WarpGateway 升级计划。"
     tags "center", "release", "upgrade", "page"
   }
 
