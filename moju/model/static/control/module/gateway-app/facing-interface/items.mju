@@ -90,6 +90,5 @@ flow ReportAgentStatusFlow {
   actor WarpGateway
   trigger ReportAgentStatus
 
-  step AcceptAgentStatus {
-  }
+  
 }

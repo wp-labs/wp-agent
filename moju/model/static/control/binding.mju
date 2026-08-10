@@ -141,8 +141,7 @@ bind WarpInsightCenterAdminInterface {
     route GET "/api/v1/admin/gateways/status"
     auth bearer
     actor_identity CustomerServiceEngineer.id from jwt.sub
-    status AdminGatewayStatusListReturned 200
-    outcome AdminGatewayStatusListReturned on GatewayStatusView
+    status List<GatewayStatusView> 200
   }
 
   entry AdminCreateGatewayInstance {

@@ -11,142 +11,124 @@ flow AdminViewGatewayListFlow {
   actor GatewayOperator
   trigger AdminViewGatewayList
 
-  step ViewList {
-  }
+  
 }
 
 flow AdminDispatchGlobalPolicyFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminDispatchGlobalPolicy
 
-  step DispatchPolicy {
-  }
+  
 }
 
 flow AdminShowGatewayStatusFlow {
   actor CustomerServiceEngineer
   trigger AdminShowGatewayStatus
 
-  step ShowStatus {
-  }
+  
 }
 
 flow AdminListGatewayStatusFlow {
   actor CustomerServiceEngineer
   trigger AdminListGatewayStatus
 
-  step ListStatus {
-  }
+  
 }
 
 flow AdminCreateGatewayInstanceFlow {
   actor CustomerServiceEngineer
   trigger AdminCreateGatewayInstance
 
-  step CreateInstance {
-  }
+  
 }
 
 flow AdminBindGatewayCustomerFlow {
   actor CustomerServiceEngineer
   trigger AdminBindGatewayCustomer
 
-  step BindCustomer {
-  }
+  
 }
 
 flow AdminListGatewayInstancesFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminListGatewayInstances
 
-  step ViewInstances {
-  }
+  
 }
 
 flow AdminGetGatewayUptimeFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminGetGatewayUptime
 
-  step ViewUptime {
-  }
+  
 }
 
 flow AdminGetGatewayHistoryFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminGetGatewayHistory
 
-  step ViewHistory {
-  }
+  
 }
 
 flow AdminGetAgentHistoryFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminGetAgentHistory
 
-  step ViewAgentHistory {
-  }
+  
 }
 
 flow AdminListGatewayAgentsFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminListGatewayAgents
 
-  step ViewAgents {
-  }
+  
 }
 
 flow AdminGetGatewayLifecycleFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminGetGatewayLifecycle
 
-  step ViewLifecycle {
-  }
+  
 }
 
 flow AdminGetGatewayInitialConfigFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminGetGatewayInitialConfig
 
-  step ViewInitialConfig {
-  }
+  
 }
 
 flow AdminPublishReleaseFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminPublishRelease
 
-  step Publish {
-  }
+  
 }
 
 flow AdminListReleasesFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminListReleases
 
-  step ViewReleases {
-  }
+  
 }
 
 flow AdminCreateUpgradePlanFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminCreateUpgradePlan
 
-  step Create {
-  }
+  
 }
 
 flow AdminListUpgradePlansFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminListUpgradePlans
 
-  step ViewPlans {
-  }
+  
 }
 
 flow AdminApproveUpgradePlanFlow {
   actor PlatformMaintenanceEngineer
   trigger AdminApproveUpgradePlan
 
-  step Approve {
-  }
+  
 }

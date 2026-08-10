@@ -25,10 +25,6 @@ message<command> AdminShowGatewayStatus = OperatorRequest {
 message<command> AdminListGatewayStatus = OperatorRequest {
 }
 
-message<response> AdminGatewayStatusListReturned {
-  statuses: List<GatewayStatusView>
-}
-
 message<command> AdminCreateGatewayInstance = OperatorRequest {
   gateway_name: String
 }
@@ -44,10 +40,6 @@ message<command> AdminQueryHostInventory = OperatorRequest {
   host_name: String?
 }
 
-message<response> AdminHostInventoryReturned {
-  hosts: HostInventory[]
-}
-
 message<command> AdminViewHostRuntimeState = OperatorRequest {
   host_id: String
 }
@@ -59,26 +51,14 @@ message<response> AdminHostRuntimeStateReturned {
 message<command> AdminViewNetworkTopology = OperatorRequest {
 }
 
-message<response> AdminNetworkTopologyReturned {
-  segments: NetworkSegment[]
-}
-
 message<command> AdminViewServiceTopology = OperatorRequest {
   business_id: String?
   service_id: String?
 }
 
-message<response> AdminServiceTopologyReturned {
-  services: ServiceEntity[]
-}
-
 message<command> AdminViewSoftwareVulnerabilities = OperatorRequest {
   software_id: String?
   host_id: String?
-}
-
-message<response> AdminSoftwareVulnerabilitiesReturned {
-  findings: SoftwareVulnerabilityFinding[]
 }
 
 message<command> AdminViewEffectiveResponsibility = OperatorRequest {
@@ -92,10 +72,6 @@ message<response> AdminEffectiveResponsibilityReturned {
 // ── 实例 / 运行视图 ──
 
 message<command> AdminListGatewayInstances = OperatorRequest {
-}
-
-message<response> AdminGatewayInstanceListReturned {
-  instances: List<GatewayInstance>
 }
 
 message<command> AdminGetGatewayUptime {
@@ -150,16 +126,8 @@ message<command> AdminListGatewayAgents {
   gateway_id: String
 }
 
-message<response> AdminGatewayAgentsReturned {
-  agents: List<AgentRuntimeStatusView>
-}
-
 message<command> AdminGetGatewayLifecycle {
   gateway_id: String
-}
-
-message<response> AdminGatewayLifecycleReturned {
-  events: List<GatewayLifecycleEvent>
 }
 
 struct GatewayLifecycleEvent {
@@ -210,10 +178,6 @@ message<command> AdminApproveUpgradePlan {
   approved_by: String
 }
 
-message<response> AdminUpgradePlansReturned {
-  plans: List<UpgradePlan>
-}
-
 // ── 接口 ──
 
 interface WarpInsightCenterAdminInterface {
@@ -244,7 +208,7 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminListGatewayStatus {
     actor CustomerServiceEngineer
-    output AdminGatewayStatusListReturned
+    output List<GatewayStatusView>
     calls AdminListGatewayStatusFlow
   }
 
@@ -262,7 +226,7 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminListGatewayInstances {
     actor PlatformMaintenanceEngineer
-    output AdminGatewayInstanceListReturned
+    output List<GatewayInstance>
     calls AdminListGatewayInstancesFlow
   }
 
@@ -286,13 +250,13 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminListGatewayAgents {
     actor PlatformMaintenanceEngineer
-    output AdminGatewayAgentsReturned
+    output List<AgentRuntimeStatusView>
     calls AdminListGatewayAgentsFlow
   }
 
   entry AdminGetGatewayLifecycle {
     actor PlatformMaintenanceEngineer
-    output AdminGatewayLifecycleReturned
+    output List<GatewayLifecycleEvent>
     calls AdminGetGatewayLifecycleFlow
   }
 
@@ -322,7 +286,7 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminListUpgradePlans {
     actor PlatformMaintenanceEngineer
-    output AdminUpgradePlansReturned
+    output List<UpgradePlan>
     calls AdminListUpgradePlansFlow
   }
 
