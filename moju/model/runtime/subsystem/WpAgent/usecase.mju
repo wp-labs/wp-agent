@@ -5,7 +5,6 @@ usecase RegisterWithManagementCenter {
   meta {
     label zh "注册管理中心"
     label en "Register With Management Center"
-    summary zh "WpAgent 通过安装代码拉取安装脚本，并使用脚本中的注册 token 和宿主机画像向 WarpInsight 管理节点发起 enrollment，获取注册结果、agent identity、初始配置和策略绑定。"
     tags "agent-register", "wp-agent"
   }
 
@@ -21,7 +20,6 @@ usecase PeriodicallyReportSelfStatus {
   meta {
     label zh "定期上报自己状态"
     label en "Periodically Report Self Status"
-    summary zh "WpAgent 定期向管理节点上报 agent id、版本、运行时状态和健康信息，用于在线状态展示与后续控制。"
     tags "agent-health", "wp-agent"
   }
 
@@ -37,7 +35,6 @@ usecase CollectLogs {
   meta {
     label zh "采集日志"
     label en "Collect Logs"
-    summary zh "WpAgent 按本地配置读取业务服务器上的日志文件输入，维护 offset 和 multiline 状态，并写入本地 telemetry buffer。"
     tags "log-collection", "wp-agent"
   }
 
@@ -51,7 +48,6 @@ usecase CollectMetrics {
   meta {
     label zh "采集 Metric"
     label en "Collect Metrics"
-    summary zh "WpAgent 按采集目标读取业务服务器的运行指标，形成 metrics sample snapshot，供后续上报与健康分析使用。"
     tags "metric-collection", "wp-agent"
   }
 

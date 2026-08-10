@@ -48,7 +48,6 @@ struct AgentOverviewMetrics {
   meta {
     label zh "Agent 总览指标"
     label en "Agent Overview Metrics"
-    summary zh "WarpGateWay 首页展示所需的 Agent 聚合指标，包括总数、在线数、异常数和最近上报延迟。"
     tags "agentd", "status", "overview", "metrics"
   }
 
@@ -62,7 +61,6 @@ struct RecentOnlineRegisteredAgent {
   meta {
     label zh "最近上线注册 Agent"
     label en "Recent Online Registered Agent"
-    summary zh "WarpGateWay 首页展示的最近上线并完成注册的 Agent 摘要，包含上线时间和上线时长。"
     tags "agentd", "status", "overview", "recent-online"
   }
 
@@ -78,7 +76,6 @@ struct AgentOverview {
   meta {
     label zh "Agent 总览"
     label en "Agent Overview"
-    summary zh "WarpGateWay 首页所需的聚合视图，包含状态指标、最近上线注册 Agent 和需要管理员处理的异常 Agent 列表。"
     tags "agentd", "status", "overview", "admin-home"
   }
 
@@ -93,7 +90,6 @@ command LookupAgentRegistryEntry {
   meta {
     label zh "查询 Agent 登记记录"
     label en "Lookup Agent Registry Entry"
-    summary zh "管理员按 agent_id 查询 Agent 登记记录，获取租户、环境、节点与当前实例信息。"
     tags "agentd", "registry", "lookup"
   }
 
@@ -105,7 +101,6 @@ command QueryAgentCapabilityIndex {
   meta {
     label zh "查询 Agent 能力索引"
     label en "Query Agent Capability Index"
-    summary zh "管理员按 agent 查询其能力索引，获取最近 capability report 的索引状态。"
     tags "agentd", "registry", "capability"
   }
 

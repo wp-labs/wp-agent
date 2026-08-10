@@ -2,7 +2,6 @@ command ViewNetworkTopology {
   meta {
     label zh "查看网络拓扑"
     label en "View Network Topology"
-    summary zh "安全分析师查看 host / pod / network 拓扑：主机、pod、网络段及其挂接关系。"
     tags "center", "topology", "network"
   }
 
@@ -13,7 +12,6 @@ command ViewServiceTopology {
   meta {
     label zh "查看业务/服务拓扑"
     label en "View Service Topology"
-    summary zh "安全分析师查看业务、系统、服务及其依赖、入口与实例分布。"
     tags "center", "topology", "service"
   }
 

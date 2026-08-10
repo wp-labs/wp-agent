@@ -6,7 +6,6 @@ command ShowGatewayStatus {
   meta {
     label zh "展示 Gateway 状态"
     label en "Show Gateway Status"
-    summary zh "全局操作者查看各 WarpGateWay 实例的聚合状态视图。"
     tags "gateway", "status", "global-view"
   }
 
@@ -17,7 +16,6 @@ command CreateGatewayInstance {
   meta {
     label zh "创建 GateWay 管理实例"
     label en "Create Gateway Instance"
-    summary zh "客户服务工程师在 WarpInsightCenter 创建 GateWay 管理实例。"
     tags "gateway", "provisioning"
   }
 
@@ -30,7 +28,6 @@ command BindGatewayCustomer {
   meta {
     label zh "绑定客户 ID"
     label en "Bind Gateway Customer"
-    summary zh "客户服务工程师把 GateWay 管理实例绑定到客户 ID，建立实例与客户的归属关系。"
     tags "gateway", "provisioning", "customer"
   }
 

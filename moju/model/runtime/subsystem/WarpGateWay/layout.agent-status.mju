@@ -32,7 +32,6 @@ region AgentRuntimeStatusResult {
   meta {
     label zh "Agent 运行状态结果"
     label en "Agent Runtime Status Result"
-    summary zh "展示 Agent 实例、版本、在线状态、健康状态和最后上报时间。"
     tags "admin", "agent-status", "result"
   }
 
@@ -103,7 +102,6 @@ region RuntimeStatusAgentInput {
   meta {
     label zh "状态查询 Agent 输入"
     label en "Runtime Status Agent Input"
-    summary zh "填写需要查看运行状态的 agent_id。"
     tags "admin", "input", "agent-status"
   }
 
@@ -114,7 +112,6 @@ region RefreshRuntimeStatusAction {
   meta {
     label zh "刷新运行状态操作"
     label en "Refresh Runtime Status Action"
-    summary zh "触发 AdminShowAgentRuntimeStatus 查询并刷新 Agent 运行状态。"
     tags "admin", "action", "agent-status"
   }
 

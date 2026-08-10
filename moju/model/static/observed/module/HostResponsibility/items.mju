@@ -2,7 +2,6 @@ struct Subject {
   meta {
     label zh "责任主体"
     label en "Subject"
-    summary zh "责任归属中的"谁"：用户、团队、服务账号或厂商，优先以团队作为最终责任绑定对象。"
     tags "center", "responsibility", "subject"
   }
 
@@ -20,7 +19,6 @@ variant SubjectType {
   meta {
     label zh "主体类型"
     label en "Subject Type"
-    summary zh "责任主体的类型：用户、团队、服务账号或厂商。"
   }
 
   User
@@ -33,7 +31,6 @@ struct HostGroup {
   meta {
     label zh "主机组"
     label en "Host Group"
-    summary zh "一批主机的归属边界，作为责任归属与批量治理的中间层，按应用、业务、集群或环境继承。"
     tags "center", "responsibility", "host-group"
   }
 
@@ -52,7 +49,6 @@ variant HostGroupType {
   meta {
     label zh "主机组类型"
     label en "Host Group Type"
-    summary zh "主机组的归属语义：应用、业务、集群、环境或运维范围。"
   }
 
   Application
@@ -66,7 +62,6 @@ struct HostGroupMembership {
   meta {
     label zh "主机组成员关系"
     label en "Host Group Membership"
-    summary zh "主机属于哪些组的成员关系，一台主机可属于多个组，携带生效时间与来源。"
     tags "center", "responsibility", "host-group"
   }
 
@@ -108,7 +103,6 @@ variant AssignmentTargetType {
   meta {
     label zh "分配目标类型"
     label en "Assignment Target Type"
-    summary zh "责任分配的目标：单台主机或主机组。"
   }
 
   Host
@@ -119,7 +113,6 @@ variant AssignmentRole {
   meta {
     label zh "责任角色"
     label en "Assignment Role"
-    summary zh "责任角色：owner 最终归属、maintainer 日常维护、operator 操作、oncall 告警值班、security_owner 漏洞整改推进。"
   }
 
   Owner
@@ -133,7 +126,6 @@ variant AssignmentSource {
   meta {
     label zh "责任来源"
     label en "Assignment Source"
-    summary zh "责任分配或成员关系的来源：手工、CMDB 同步、HR 同步、Oncall 同步或规则推断。"
   }
 
   Manual
@@ -169,7 +161,6 @@ variant ExternalSystemType {
   meta {
     label zh "外部系统类型"
     label en "External System Type"
-    summary zh "外部主数据来源：CMDB、LDAP、IAM、HR 或 Oncall 值班平台。"
   }
 
   Cmdb
@@ -183,7 +174,6 @@ variant ExternalLinkInternalKind {
   meta {
     label zh "外部映射内部对象类型"
     label en "External Link Internal Kind"
-    summary zh "外部对象归一到内部的对象类型：责任主体、主机组或主机。"
   }
 
   Subject

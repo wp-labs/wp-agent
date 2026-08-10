@@ -7,7 +7,6 @@ command ViewGateWayOverview {
   meta {
     label zh "查看网关总览"
     label en "View GateWay Overview"
-    summary zh "管理员打开 WarpGateWay 控制台时获取网关自身状态与所辖 Agent 的聚合总览。"
     tags "gateway", "overview"
   }
 
@@ -18,7 +17,6 @@ command DispatchAgentFleetCommand {
   meta {
     label zh "下发 Agent 列表指令"
     label en "Dispatch Agent Fleet Command"
-    summary zh "管理员向选定的一组 Agent 下发统一控制指令（如暂停、升级），生成列表派发回执。"
     tags "gateway", "agent-command"
   }
 
@@ -31,7 +29,6 @@ flow ViewGateWayOverviewFlow {
   meta {
     label zh "查看网关总览"
     label en "View GateWay Overview Flow"
-    summary zh "聚合网关自身状态与所辖 Agent 的健康摘要，生成控制台总览视图。"
     tags "gateway", "overview"
   }
 
@@ -56,7 +53,6 @@ flow DispatchAgentFleetCommandFlow {
   meta {
     label zh "下发 Agent 列表指令"
     label en "Dispatch Agent Fleet Command Flow"
-    summary zh "向选定 Agent 列表下发统一控制指令，并生成派发回执。"
     tags "gateway", "agent-command"
   }
 

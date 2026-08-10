@@ -22,7 +22,6 @@ actor OperationsEngineer {
   meta {
     label zh "运维工程师"
     label en "Operations Engineer"
-    summary zh "负责在目标服务器上获取并执行 Agent 安装代码的运维人员；该角色不等同于管理员控制操作权限。"
     tags "ops", "agent-install"
   }
 
@@ -66,7 +65,6 @@ actor GatewayOperator {
   meta {
     label zh "全局操作者"
     label en "Gateway Operator"
-    summary zh "操作 WarpInsightCenter 的全局操作者，查看各 WarpGateWay 实例的聚合状态。"
     tags "gateway", "ops"
   }
 
@@ -79,7 +77,6 @@ actor CustomerServiceEngineer {
   meta {
     label zh "客户服务工程师"
     label en "Customer Service Engineer"
-    summary zh "面向客户提供服务的工程师，可在 WarpInsightCenter 创建 GateWay 管理实例并绑定客户 ID、获取指定 WarpGateWay 实例的初始配置信息、查看各 WarpGateWay 实例的运行状态、批准升级计划，用于协助客户接入与排查。"
     tags "ops", "customer-service", "gateway"
   }
 
@@ -99,7 +96,6 @@ actor PlatformMaintenanceEngineer {
   meta {
     label zh "平台维护工程师"
     label en "Platform Maintenance Engineer"
-    summary zh "负责 WarpInsight 平台维护的工程师，可在 WarpInsightCenter 发布 WarpAgentd 与 WarpGateWay 的新版本、创建升级计划。"
     tags "ops", "platform-maintenance", "release"
   }
 
@@ -126,7 +122,6 @@ actor PublicInstallClient {
   meta {
     label zh "公开安装客户端"
     label en "Public Install Client"
-    summary zh "通过 WarpGateWay 公开安装入口进行引导接入的客户端。"
     tags "install", "client"
   }
 

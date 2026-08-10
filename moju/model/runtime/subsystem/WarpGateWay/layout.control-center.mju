@@ -17,7 +17,6 @@ region AgentControlUsecaseBoard {
   meta {
     label zh "Agent 控制用例板"
     label en "Agent Control Usecase Board"
-    summary zh "控制中心的常见任务区域，集中放置暂停 Agent 和升级 Agent 两个操作入口。"
     tags "admin", "agent-control", "usecase-layout"
   }
 
@@ -42,7 +41,6 @@ region AdminOperatorAccess {
   meta {
     label zh "操作者访问方式"
     label en "Admin Operator Access"
-    summary zh "表达 AdminOperator 通过 HTTP 访问 WarpGateWay WEB。"
     tags "admin", "access"
   }
 

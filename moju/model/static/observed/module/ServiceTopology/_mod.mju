@@ -2,7 +2,6 @@ module<entity> ServiceTopology {
   meta {
     label zh "业务/服务拓扑实体"
     label en "Service Topology"
-    summary zh "负责 business / system / service 拓扑实体：业务域、系统边界、业务子系统、逻辑服务、服务实例、服务入口与实例地址、服务依赖。"
     tags "control", "center", "topology", "service"
   }
 

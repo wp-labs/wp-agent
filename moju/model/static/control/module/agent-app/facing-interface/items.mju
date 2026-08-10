@@ -28,7 +28,6 @@ interface WpAgentOnlineRegistrationInterface {
   meta {
     label zh "WpAgent 在线注册接口"
     label en "WpAgent Online Registration Interface"
-    summary zh "WpAgent 安装后主动访问的在线注册入口，提交 enrollment token、凭据申请、宿主机画像和能力摘要，并返回注册结果、agent identity、初始配置和策略绑定。"
     tags "agentd", "registration", "enrollment", "http", "interface"
   }
 
@@ -48,13 +47,11 @@ interface WpAgentOnlineRegistrationInterface {
   entry RenewAgentCredential {
     actor Agentd
     output AgentCredentialBundle
-    calls RenewAgentCredentialFlow
   }
 
   entry PollControlCommands {
     actor Agentd
     output AgentControlCommandsReturned
-    calls PollControlCommandsFlow
   }
 
   entry ReportActionResult {
@@ -83,7 +80,6 @@ flow RenewAgentCredentialFlow {
   meta {
     label zh "续期 Agent 通讯凭据"
     label en "Renew Agent Credential Flow"
-    summary zh "Agentd 使用当前有效通讯凭据申请新的 bearer 凭据；管理端轮换凭据哈希后旧凭据立即失效。"
     tags "agentd", "credential", "renewal"
   }
 

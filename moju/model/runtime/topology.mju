@@ -40,7 +40,6 @@ module<adapter> AgentHost1ControlClient {
   meta {
     label zh "AgentHost1 控制客户端"
     label en "AgentHost1 Control Client"
-    summary zh "AgentHost1 上的 WpAgent 主动连接 WarpInsight 管理节点控制通道。"
     tags "topology-helper", "control-link"
   }
 
@@ -51,7 +50,6 @@ module<adapter> AgentHost2ControlClient {
   meta {
     label zh "AgentHost2 控制客户端"
     label en "AgentHost2 Control Client"
-    summary zh "AgentHost2 上的 WpAgent 主动连接 WarpInsight 管理节点控制通道。"
     tags "topology-helper", "control-link"
   }
 
@@ -62,7 +60,6 @@ module<adapter> ManagedServiceHostControlClient {
   meta {
     label zh "托管服务节点控制客户端"
     label en "Managed Service Host Control Client"
-    summary zh "托管服务节点上的托管服务主动连接 WarpInsight 管理节点控制通道。"
     tags "topology-helper", "control-link"
   }
 

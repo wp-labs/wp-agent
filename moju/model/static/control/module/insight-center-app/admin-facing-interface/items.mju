@@ -184,115 +184,96 @@ interface WarpInsightCenterAdminInterface {
   meta {
     label zh "WarpInsightCenter 管理接口"
     label en "WarpInsightCenter Admin Interface"
-    summary zh "面向管理员的 WarpInsightCenter 管理接口，承载网关列表/策略编排与网关实例管理。"
     tags "center", "admin-facing", "management", "http", "interface"
   }
 
   entry AdminViewGatewayList {
     actor GatewayOperator
     output GatewayListView
-    calls AdminViewGatewayListFlow
   }
 
   entry AdminDispatchGlobalPolicy {
     actor PlatformMaintenanceEngineer
     output GlobalPolicyDispatch
-    calls AdminDispatchGlobalPolicyFlow
   }
 
   entry AdminShowGatewayStatus {
     actor CustomerServiceEngineer
     output GatewayStatusView
-    calls AdminShowGatewayStatusFlow
   }
 
   entry AdminListGatewayStatus {
     actor CustomerServiceEngineer
     output List<GatewayStatusView>
-    calls AdminListGatewayStatusFlow
   }
 
   entry AdminCreateGatewayInstance {
     actor CustomerServiceEngineer
     output GatewayInstance
-    calls AdminCreateGatewayInstanceFlow
   }
 
   entry AdminBindGatewayCustomer {
     actor CustomerServiceEngineer
     output GatewayCustomerBinding
-    calls AdminBindGatewayCustomerFlow
   }
 
   entry AdminListGatewayInstances {
     actor PlatformMaintenanceEngineer
     output List<GatewayInstance>
-    calls AdminListGatewayInstancesFlow
   }
 
   entry AdminGetGatewayUptime {
     actor PlatformMaintenanceEngineer
     output AdminGatewayUptimeReturned
-    calls AdminGetGatewayUptimeFlow
   }
 
   entry AdminGetGatewayHistory {
     actor PlatformMaintenanceEngineer
     output AdminGatewayHistoryReturned
-    calls AdminGetGatewayHistoryFlow
   }
 
   entry AdminGetAgentHistory {
     actor PlatformMaintenanceEngineer
     output AdminAgentHistoryReturned
-    calls AdminGetAgentHistoryFlow
   }
 
   entry AdminListGatewayAgents {
     actor PlatformMaintenanceEngineer
     output List<AgentRuntimeStatusView>
-    calls AdminListGatewayAgentsFlow
   }
 
   entry AdminGetGatewayLifecycle {
     actor PlatformMaintenanceEngineer
     output List<GatewayLifecycleEvent>
-    calls AdminGetGatewayLifecycleFlow
   }
 
   entry AdminGetGatewayInitialConfig {
     actor PlatformMaintenanceEngineer
     output GatewayInitialConfig
-    calls AdminGetGatewayInitialConfigFlow
   }
 
   entry AdminPublishRelease {
     actor PlatformMaintenanceEngineer
     output AdminReleaseReturned
-    calls AdminPublishReleaseFlow
   }
 
   entry AdminListReleases {
     actor PlatformMaintenanceEngineer
     output AdminReleasesReturned
-    calls AdminListReleasesFlow
   }
 
   entry AdminCreateUpgradePlan {
     actor PlatformMaintenanceEngineer
     output UpgradePlan
-    calls AdminCreateUpgradePlanFlow
   }
 
   entry AdminListUpgradePlans {
     actor PlatformMaintenanceEngineer
     output List<UpgradePlan>
-    calls AdminListUpgradePlansFlow
   }
 
   entry AdminApproveUpgradePlan {
     actor PlatformMaintenanceEngineer
     output UpgradePlan
-    calls AdminApproveUpgradePlanFlow
   }
 }

@@ -41,7 +41,6 @@ interface WarpGateWayPublicInstallInterface {
   entry AdminGetAgentInstallCode {
     actor OperationsEngineer
     output AgentInstallCode
-    calls AdminGetAgentInstallCodeFlow
   }
 }
 
@@ -49,50 +48,42 @@ interface WarpGateWayManagementInterface {
   meta {
     label zh "WarpGateWay 管理接口"
     label en "WarpGateWay Management Interface"
-    summary zh "需要管理员身份权限的 Web 管理接口，覆盖 Agent 运行状态查询、暂停和远程升级操作。"
     tags "admin", "authenticated", "web", "interface"
   }
 
   entry AdminShowAgentRuntimeStatus {
     actor AdminOperator
     output AgentRuntimeStatusView
-    calls AdminShowAgentRuntimeStatusFlow
   }
 
   entry AdminGetAgentOverview {
     actor AdminOperator
     output AgentOverview
-    calls AdminGetAgentOverviewFlow
   }
 
   entry AdminPauseAgent {
     actor AdminOperator
     output DispatchReceipt
-    calls AdminPauseAgentFlow
   }
 
   entry AdminUpgradeAgent {
     actor AdminOperator
     output DispatchReceipt
-    calls AdminUpgradeAgentFlow
   }
 
   entry AdminViewGateWayManagementState {
     actor AdminOperator
     output GateWayManagementStateView
-    calls AdminViewGateWayManagementStateFlow
   }
 
   entry AdminLookupAgentRegistryEntry {
     actor AdminOperator
     output AgentRegistryEntry
-    calls AdminLookupAgentRegistryEntryFlow
   }
 
   entry AdminQueryAgentCapabilityIndex {
     actor AdminOperator
     output AgentCapabilityIndex
-    calls AdminQueryAgentCapabilityIndexFlow
   }
 }
 

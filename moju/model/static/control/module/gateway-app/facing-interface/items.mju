@@ -26,19 +26,16 @@ interface WarpInsightCenterGatewayInterface {
   entry GetGatewayInitialConfig {
     actor WarpGateway
     output GatewayInitialConfig
-    calls GetGatewayInitialConfigFlow
   }
 
   entry ReportGatewayStatus {
     actor WarpGateway
     output GatewayStatusAccepted
-    calls ReportGatewayStatusFlow
   }
 
   entry ReportAgentStatus {
     actor WarpGateway
     output AgentStatusAcceptedReturned
-    calls ReportAgentStatusFlow
   }
 }
 
@@ -46,7 +43,6 @@ flow GetGatewayInitialConfigFlow {
   meta {
     label zh "获取 Gateway 初始配置"
     label en "Get Gateway Initial Config Flow"
-    summary zh "WarpGateWay 实例启动后向 WarpInsightCenter 请求初始配置，管理端返回控制中心地址、策略版本与遥测输出。"
     tags "gateway", "bootstrap", "config"
   }
 
@@ -68,7 +64,6 @@ flow ReportGatewayStatusFlow {
   meta {
     label zh "上报 Gateway 状态"
     label en "Report Gateway Status Flow"
-    summary zh "WarpGateWay 实例定期向 WarpInsightCenter 上报在线状态、版本与健康信息，管理端返回接收回执。"
     tags "gateway", "status"
   }
 

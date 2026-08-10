@@ -7,7 +7,6 @@ struct WarpGateWayInstance {
   meta {
     label zh "WarpGateWay 实例"
     label en "WarpGateWay Instance"
-    summary zh "WarpGateWay 控制平台自身的一次运行实例状态，包含 boot id、版本、启动时间与最后在线时间。"
     tags "gateway", "instance"
   }
 
@@ -23,7 +22,6 @@ struct GateWayControlConfig {
   meta {
     label zh "网关控制面配置"
     label en "GateWay Control Config"
-    summary zh "WarpGateWay 控制平台的对外访问与控制面配置，包括 advertise、enrollment、gateway 与 telemetry 地址。"
     tags "gateway", "config"
   }
 
@@ -40,7 +38,6 @@ struct GateWayHealth {
   meta {
     label zh "网关健康状态"
     label en "GateWay Health"
-    summary zh "WarpGateWay 控制平台自身的健康状态与最近上报时间。"
     tags "gateway", "health"
   }
 
@@ -53,7 +50,6 @@ struct GateWayManagementStateView {
   meta {
     label zh "网关管理状态视图"
     label en "GateWay Management State View"
-    summary zh "网关自管视角：WarpGateWay 管理员查看本机实例、控制面配置与健康状态，供本机管理控制台使用。"
     tags "gateway", "management", "self-management"
   }
 
@@ -70,7 +66,6 @@ struct GateWayOverviewView {
   meta {
     label zh "网关总览视图"
     label en "GateWay Overview View"
-    summary zh "控制台总览视角：网关控制台 dashboard 聚合网关自身状态与所辖 Agent 列表汇总。"
     tags "gateway", "overview", "console"
   }
 
@@ -86,7 +81,6 @@ command ViewGateWayManagementState {
   meta {
     label zh "查看网关管理状态"
     label en "View GateWay Management State"
-    summary zh "管理员查看 WarpGateWay 控制平台自身的实例、控制面配置与健康状态聚合视图。"
     tags "gateway", "management"
   }
 

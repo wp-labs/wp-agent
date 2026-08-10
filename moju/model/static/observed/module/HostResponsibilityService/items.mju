@@ -47,7 +47,6 @@ struct ExternalSyncCursor {
   meta {
     label zh "外部同步游标"
     label en "External Sync Cursor"
-    summary zh "各同步源的增量进度与同步状态，支持增量刷新与全量校准。"
     tags "center", "responsibility", "external-sync"
   }
 

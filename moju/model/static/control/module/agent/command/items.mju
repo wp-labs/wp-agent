@@ -4,7 +4,6 @@ command PauseAgent {
   meta {
     label zh "暂停 Agent"
     label en "Pause Agent"
-    summary zh "管理员发起的 Agent 暂停控制意图，进入控制指令编排后转换为可轮询的下行消息。"
     tags "agentd", "control-command", "pause"
   }
 
@@ -17,7 +16,6 @@ command UpgradeAgent {
   meta {
     label zh "远程升级 Agent"
     label en "Upgrade Agent"
-    summary zh "管理员发起的 Agent 远程升级控制意图，指定目标版本并进入控制指令编排。"
     tags "agentd", "control-command", "upgrade"
   }
 
@@ -31,7 +29,6 @@ command RefreshPolicyHint {
   meta {
     label zh "刷新策略提示"
     label en "Refresh Policy Hint"
-    summary zh "管理节点下发给 Agentd 的策略刷新提示，指示 Agentd 拉取或应用新的策略版本。"
     tags "agentd", "control-command", "policy"
   }
 
@@ -55,7 +52,6 @@ struct AgentControlCommand {
   meta {
     label zh "Agent 控制指令"
     label en "Agent Control Command"
-    summary zh "管理端把管理员控制意图转换为可下发给指定 Agent 的控制指令，覆盖暂停、升级、策略刷新和身份轮换等控制动作。"
     tags "agentd", "control-command"
   }
 
@@ -74,7 +70,6 @@ struct DispatchReceipt {
   meta {
     label zh "控制指令派发回执"
     label en "Dispatch Receipt"
-    summary zh "控制指令进入派发队列后的受理回执，记录目标 Agent、command id、dispatch id 和创建时间。"
     tags "agentd", "dispatch", "control-command"
   }
 
@@ -89,7 +84,6 @@ struct AgentFleetDispatchReceipt {
   meta {
     label zh "Agent 列表派发回执"
     label en "Agent Fleet Dispatch Receipt"
-    summary zh "WarpGateWay 向选定 Agent 列表下发统一指令后的派发回执，记录指令类型、目标数与状态。"
     tags "gateway", "agent-command"
   }
 
@@ -104,7 +98,6 @@ event ControlCommandsReturned {
   meta {
     label zh "控制指令已返回"
     label en "Control Commands Returned"
-    summary zh "管理节点向 Agentd 返回本次轮询可获取的控制指令消息。"
     tags "agentd", "control-command", "polling"
   }
 
@@ -119,7 +112,6 @@ event ControlLongPollTimedOut {
   meta {
     label zh "控制指令长轮询超时"
     label en "Control Long Poll Timed Out"
-    summary zh "Agentd 轮询控制指令时没有可返回的新消息，长轮询等待超时。"
     tags "agentd", "control-command", "polling"
   }
 

@@ -61,7 +61,6 @@ struct HostRuntimeState {
   meta {
     label zh "主机运行态快照"
     label en "Host Runtime State"
-    summary zh "主机的快变化运行态：当前负载、资源水位、agent 健康与保护状态。时间点快照，允许频繁刷新，可做保留窗口与 TTL 清理。"
     tags "center", "asset", "runtime-state", "host"
   }
 
@@ -88,7 +87,6 @@ variant AgentHealth {
   meta {
     label zh "Agent 健康状态"
     label en "Agent Health"
-    summary zh "边缘 agent 的当前健康档位：健康、降级、保护模式、不可用。"
   }
 
   Healthy
@@ -101,7 +99,6 @@ variant ProtectionState {
   meta {
     label zh "保护状态"
     label en "Protection State"
-    summary zh "主机当前保护/退化状态：正常、降级、保护。"
   }
 
   Normal

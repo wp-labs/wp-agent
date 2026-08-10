@@ -7,7 +7,6 @@ command ViewGatewayList {
   meta {
     label zh "查看网关列表"
     label en "View Gateway List"
-    summary zh "全局操作者查看接入 WarpInsightCenter 的 WarpGateWay 实例列表聚合视图。"
     tags "center", "gateway", "list"
   }
 
@@ -18,7 +17,6 @@ command DispatchGlobalPolicy {
   meta {
     label zh "下发全局策略"
     label en "Dispatch Global Policy"
-    summary zh "平台维护工程师在 WarpInsightCenter 向指定 WarpGateWay 实例列表下发全局策略版本。"
     tags "center", "policy"
   }
 
@@ -31,7 +29,6 @@ flow ViewGatewayListFlow {
   meta {
     label zh "查看网关列表"
     label en "View Gateway List Flow"
-    summary zh "聚合各 WarpGateWay 实例的在线、降级与离线状态，生成列表总览视图。"
     tags "center", "gateway", "list"
   }
 
@@ -55,7 +52,6 @@ flow DispatchGlobalPolicyFlow {
   meta {
     label zh "下发全局策略"
     label en "Dispatch Global Policy Flow"
-    summary zh "向目标 WarpGateWay 列表下发指定策略版本，并生成派发回执。"
     tags "center", "policy"
   }
 

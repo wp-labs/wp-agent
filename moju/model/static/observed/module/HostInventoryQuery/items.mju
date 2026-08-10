@@ -16,7 +16,6 @@ command ViewHostRuntimeState {
   meta {
     label zh "查看主机运行状态"
     label en "View Host Runtime State"
-    summary zh "安全分析师查看指定主机的当前运行态快照。"
     tags "center", "asset", "runtime-state"
   }
 

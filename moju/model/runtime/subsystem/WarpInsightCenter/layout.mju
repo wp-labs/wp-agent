@@ -52,7 +52,6 @@ region<section> GatewayStatusCard {
   meta {
     label zh "网关状态卡片"
     label en "Gateway Status Card"
-    summary zh "单个 WarpGateWay 实例的状态摘要卡片。"
     tags "center", "gateway", "status", "card"
   }
 

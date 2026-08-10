@@ -29,7 +29,6 @@ struct AgentInitialConfig {
   meta {
     label zh "初始 Agent 配置"
     label en "Agent Initial Config"
-    summary zh "Agentd 注册成功后管理端返回的初始运行配置，包括控制面地址、策略版本和遥测输出。"
     tags "agentd", "config"
   }
 

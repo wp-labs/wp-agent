@@ -6,7 +6,6 @@ struct GateWayIdentity {
   meta {
     label zh "GateWay 身份"
     label en "GateWay Identity"
-    summary zh "WarpGateWay 实例接入 WarpInsightCenter 后的稳定身份，绑定租户、环境、节点与身份状态。"
     tags "gateway", "identity"
   }
 
@@ -24,7 +23,6 @@ variant GateWayIdentityStatus {
   meta {
     label zh "GateWay 身份状态"
     label en "GateWay Identity Status"
-    summary zh "描述 WarpGateWay 身份是否有效、吊销、过期或待续期。"
     tags "gateway", "identity"
   }
 

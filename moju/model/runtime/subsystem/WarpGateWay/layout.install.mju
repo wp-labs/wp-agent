@@ -4,7 +4,6 @@ region AgentInstallCodeList {
   meta {
     label zh "Agent 安装代码列表"
     label en "Agent Install Code List"
-    summary zh "安装页主体区域，只展示两个固定安装代码：X86-Linux 和 Arm-Linux。页面不需要输入项、生成操作、token、过期时间或安装说明。"
     tags "admin", "agent-install", "install-code-list"
   }
 

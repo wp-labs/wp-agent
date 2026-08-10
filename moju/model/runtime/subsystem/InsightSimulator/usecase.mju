@@ -10,7 +10,6 @@ usecase SimulateGatewayStatusReport {
   meta {
     label zh "模拟 Gateway 状态上报"
     label en "Simulate Gateway Status Report"
-    summary zh "仿真器扮演 WarpGateWay 实例，向 WarpInsightCenter 上报在线状态、版本、健康与上报时间，用于联调中心接收链路与状态展示。"
     tags "simulator", "gateway", "status"
   }
 
@@ -24,7 +23,6 @@ usecase SimulateGetGatewayInitialConfig {
   meta {
     label zh "模拟拉取 Gateway 初始配置"
     label en "Simulate Get Gateway Initial Config"
-    summary zh "仿真器扮演 WarpGateWay 实例，向 WarpInsightCenter 拉取初始配置（控制中心地址、策略版本、遥测输出）。"
     tags "simulator", "gateway", "bootstrap"
   }
 

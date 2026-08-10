@@ -37,7 +37,6 @@ struct AgentHostProfile {
   meta {
     label zh "Agent 宿主机画像"
     label en "Agent Host Profile"
-    summary zh "Agentd 注册时上报的业务服务器宿主机信息，包括主机名、系统、架构、机器 ID、云实例和 IP 信息。"
     tags "agentd", "host"
   }
 
@@ -55,7 +54,6 @@ struct AgentCredentialBundle {
   meta {
     label zh "Agent 凭据包"
     label en "Agent Credential Bundle"
-    summary zh "Agent 注册成功后由管理端签发或返回的长期通讯凭据集合，可用于后续 HTTPS 凭据认证或 mTLS 客户端认证。"
     tags "agentd", "credential"
   }
 
@@ -76,7 +74,6 @@ struct AgentControlAuthProfile {
   meta {
     label zh "Agent 控制通道认证配置"
     label en "Agent Control Auth Profile"
-    summary zh "Agent 注册成功后调用管理端 Agent API 时使用的认证策略；后续通讯依赖 AgentIdentity 和通讯凭据，不再接受 enrollment token。"
     tags "control", "auth"
   }
 
@@ -91,7 +88,6 @@ struct AgentCredentialVerificationResult {
   meta {
     label zh "Agent 凭据校验结果"
     label en "Agent Credential Verification Result"
-    summary zh "管理端对 Agent 后续 API 调用携带的通讯凭据进行校验后的结果。"
     tags "agentd", "credential", "verification"
   }
 

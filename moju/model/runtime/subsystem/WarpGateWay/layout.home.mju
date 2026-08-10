@@ -4,7 +4,6 @@ region AgentStatusOverviewMetrics {
   meta {
     label zh "Agent 状态总览指标"
     label en "Agent Status Overview Metrics"
-    summary zh "首页顶部的 Agent 状态概览，展示总 Agent 数、在线 Agent 数、异常 Agent 数和最近上报延迟；正常 Agent 只在指标中体现，不进入首页主体列表。"
     tags "admin", "agent-status", "overview", "normal-agent-summary-only"
   }
 
@@ -19,7 +18,6 @@ region AbnormalAgentPanel {
   meta {
     label zh "异常 Agent 面板"
     label en "Abnormal Agent Panel"
-    summary zh "首页主体区域，只承载存在异常的 Agent 卡片。客户 Agent 数通常为 20 到 50 个、上限 200 个，因此首页不需要展示正常 Agent 的全量列表。"
     tags "admin", "agent-status", "abnormal-agent", "homepage-primary"
   }
 
@@ -57,7 +55,6 @@ region RecentOnlineRegisteredAgentCard {
   meta {
     label zh "最近上线注册 Agent 卡片"
     label en "Recent Online Registered Agent Card"
-    summary zh "展示单个最近上线注册 Agent 的实例、版本、注册时间、上线时间和上线时长。"
     tags "admin", "agent-status", "recent-online", "card"
   }
 
@@ -142,7 +139,6 @@ region AbnormalAgentCard {
   meta {
     label zh "异常 Agent 卡片"
     label en "Abnormal Agent Card"
-    summary zh "首页中单个异常 Agent 的摘要卡片，展示实例、版本、在线状态、健康状态和最后上报时间，用于快速定位需要处理的业务服务器。"
     tags "admin", "agent-status", "abnormal-agent", "card"
   }
 
@@ -158,7 +154,6 @@ region NoAbnormalAgentPlaceholder {
   meta {
     label zh "无异常 Agent 提示"
     label en "No Abnormal Agent Placeholder"
-    summary zh "当没有异常 Agent 时展示空状态提示；仍不展示正常 Agent 列表，正常 Agent 只通过首页指标反映。"
     tags "admin", "agent-status", "empty-state", "normal-agent-hidden"
   }
 
@@ -169,7 +164,6 @@ region TotalAgentMetric {
   meta {
     label zh "Agent 总数"
     label en "Total Agent Metric"
-    summary zh "展示已接入管理平台的 Agent 总数。"
     tags "admin", "metric", "agent-status"
   }
 
@@ -180,7 +174,6 @@ region OnlineAgentMetric {
   meta {
     label zh "在线 Agent 数"
     label en "Online Agent Metric"
-    summary zh "展示当前在线 Agent 数量。"
     tags "admin", "metric", "agent-status"
   }
 
@@ -191,7 +184,6 @@ region UnhealthyAgentMetric {
   meta {
     label zh "异常 Agent 数"
     label en "Unhealthy Agent Metric"
-    summary zh "展示健康状态异常的 Agent 数量。"
     tags "admin", "metric", "agent-status"
   }
 
@@ -202,7 +194,6 @@ region LastSeenLagMetric {
   meta {
     label zh "上报延迟"
     label en "Last Seen Lag Metric"
-    summary zh "展示 Agent 最近上报时间的延迟情况。"
     tags "admin", "metric", "agent-status"
   }
 

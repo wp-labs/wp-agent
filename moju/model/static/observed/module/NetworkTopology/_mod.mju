@@ -2,7 +2,6 @@ module<entity> NetworkTopology {
   meta {
     label zh "网络拓扑实体"
     label en "Network Topology"
-    summary zh "负责 host / pod / network 拓扑实体：pod 目录、网络域/网络段、pod 调度与网络附件、主机网络附件。"
     tags "control", "center", "topology", "network"
   }
 
