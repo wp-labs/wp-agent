@@ -6,9 +6,7 @@ module<package> Agent {
     label zh "Agent 控制面"
     label en "Agent"
     summary zh "WpAgent 边缘 agent 控制面的职责边界：注册、身份、凭据、登记簿、状态、控制指令与面向接口。"
-    tag "control"
-    tag "agentd"
-    tag "package"
+    tags "control", "agentd", "package"
   }
 
   layer Domain

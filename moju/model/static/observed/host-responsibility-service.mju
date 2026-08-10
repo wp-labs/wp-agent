@@ -8,9 +8,7 @@ struct EffectiveHostResponsibility {
     label zh "有效责任视图"
     label en "Effective Host HostResponsibility"
     summary zh "主机当前有效责任主体与来源的派生视图，由分配与继承规则计算，非 source of truth。"
-    tag "center"
-    tag "responsibility"
-    tag "effective-view"
+    tags "center", "responsibility", "effective-view"
   }
 
   unique host_id: String
@@ -30,9 +28,7 @@ struct ExternalSyncCursor {
     label zh "外部同步游标"
     label en "External Sync Cursor"
     summary zh "各同步源的增量进度与同步状态，支持增量刷新与全量校准。"
-    tag "center"
-    tag "responsibility"
-    tag "external-sync"
+    tags "center", "responsibility", "external-sync"
   }
 
   unique cursor_id: String
@@ -52,9 +48,7 @@ command ViewEffectiveHostResponsibility {
     label zh "查看主机有效责任"
     label en "View Effective Host HostResponsibility"
     summary zh "安全分析师查看指定主机的有效责任主体（owner/maintainer/oncall/security_owner）及其来源。"
-    tag "center"
-    tag "responsibility"
-    tag "effective-view"
+    tags "center", "responsibility", "effective-view"
   }
 
   host_id: String
@@ -66,9 +60,7 @@ command SyncExternalResponsibility {
     label zh "同步外部责任关系"
     label en "Sync External HostResponsibility"
     summary zh "外部系统（CMDB/LDAP/HR/Oncall）向中心同步责任主体、主机组与责任分配关系。"
-    tag "center"
-    tag "responsibility"
-    tag "external-sync"
+    tags "center", "responsibility", "external-sync"
   }
 
   system_type: ExternalSystemType

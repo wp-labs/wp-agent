@@ -3,8 +3,7 @@ module<adapter> Protocol {
     label zh "控制消息协议"
     label en "Control Protocol"
     summary zh "负责管理节点与 Agentd 之间的上行/下行控制消息 envelope、消息类型和接收结果。"
-    tag "control"
-    tag "protocol"
+    tags "control", "protocol"
   }
 
   layer Infra
@@ -44,8 +43,7 @@ variant AgentUpstreamMessageType {
     label zh "Agent 上行消息类型"
     label en "Agent Upstream Message Type"
     summary zh "Agentd 发送给管理节点的控制消息类型集合。"
-    tag "control"
-    tag "protocol"
+    tags "control", "protocol"
   }
 
   EnrollmentRequest
@@ -59,8 +57,7 @@ variant AgentDownstreamMessageType {
     label zh "Agent 下行消息类型"
     label en "Agent Downstream Message Type"
     summary zh "管理节点下发给 Agentd 的控制消息类型集合。"
-    tag "control"
-    tag "protocol"
+    tags "control", "protocol"
   }
 
   EnrollmentResult

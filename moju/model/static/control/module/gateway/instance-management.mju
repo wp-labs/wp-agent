@@ -3,9 +3,7 @@ module<logic> Gateway.InstanceManagement {
     label zh "网关实例管理"
     label en "Gateway Instance Management"
     summary zh "负责 WarpGateWay 实例的北向管理命令：状态视图、实例创建与客户绑定。"
-    tag "control"
-    tag "gateway"
-    tag "instance"
+    tags "control", "gateway", "instance"
   }
 
   layer Domain
@@ -26,9 +24,7 @@ command ShowGatewayStatus {
     label zh "展示 Gateway 状态"
     label en "Show Gateway Status"
     summary zh "全局操作者查看各 WarpGateWay 实例的聚合状态视图。"
-    tag "gateway"
-    tag "status"
-    tag "global-view"
+    tags "gateway", "status", "global-view"
   }
 
   requested_by: String
@@ -39,8 +35,7 @@ command CreateGatewayInstance {
     label zh "创建 GateWay 管理实例"
     label en "Create Gateway Instance"
     summary zh "客户服务工程师在 WarpInsightCenter 创建 GateWay 管理实例。"
-    tag "gateway"
-    tag "provisioning"
+    tags "gateway", "provisioning"
   }
 
   gateway_name: String
@@ -53,9 +48,7 @@ command BindGatewayCustomer {
     label zh "绑定客户 ID"
     label en "Bind Gateway Customer"
     summary zh "客户服务工程师把 GateWay 管理实例绑定到客户 ID，建立实例与客户的归属关系。"
-    tag "gateway"
-    tag "provisioning"
-    tag "customer"
+    tags "gateway", "provisioning", "customer"
   }
 
   gateway_id: String

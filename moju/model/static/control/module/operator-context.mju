@@ -3,9 +3,7 @@ module<entity> OperatorContext {
     label zh "操作请求上下文"
     label en "Operator Request Context"
     summary zh "跨控制面接口命令共享的操作请求来源，记录发起操作的管理员/运维人员身份。"
-    tag "control"
-    tag "request"
-    tag "audit"
+    tags "control", "request", "audit"
   }
 
   layer Domain

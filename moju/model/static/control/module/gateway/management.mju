@@ -3,9 +3,7 @@ module<logic> Gateway.Management {
     label zh "网关自身管理"
     label en "GateWay Management"
     summary zh "负责 WarpGateWay 控制平台自身的管理逻辑：网关实例、控制面配置与健康状态、管理状态与总览视图；查询命令由 GateWayManagement 承载。"
-    tag "control"
-    tag "gateway"
-    tag "management"
+    tags "control", "gateway", "management"
   }
 
   layer Domain
@@ -28,8 +26,7 @@ struct WarpGateWayInstance {
     label zh "WarpGateWay 实例"
     label en "WarpGateWay Instance"
     summary zh "WarpGateWay 控制平台自身的一次运行实例状态，包含 boot id、版本、启动时间与最后在线时间。"
-    tag "gateway"
-    tag "instance"
+    tags "gateway", "instance"
   }
 
   unique gateway_id: String
@@ -45,8 +42,7 @@ struct GateWayControlConfig {
     label zh "网关控制面配置"
     label en "GateWay Control Config"
     summary zh "WarpGateWay 控制平台的对外访问与控制面配置，包括 advertise、enrollment、gateway 与 telemetry 地址。"
-    tag "gateway"
-    tag "config"
+    tags "gateway", "config"
   }
 
   unique config_id: String
@@ -63,8 +59,7 @@ struct GateWayHealth {
     label zh "网关健康状态"
     label en "GateWay Health"
     summary zh "WarpGateWay 控制平台自身的健康状态与最近上报时间。"
-    tag "gateway"
-    tag "health"
+    tags "gateway", "health"
   }
 
   gateway_id: String
@@ -77,9 +72,7 @@ struct GateWayManagementStateView {
     label zh "网关管理状态视图"
     label en "GateWay Management State View"
     summary zh "网关自管视角：WarpGateWay 管理员查看本机实例、控制面配置与健康状态，供本机管理控制台使用。"
-    tag "gateway"
-    tag "management"
-    tag "self-management"
+    tags "gateway", "management", "self-management"
   }
 
   gateway_id: String
@@ -96,9 +89,7 @@ struct GateWayOverviewView {
     label zh "网关总览视图"
     label en "GateWay Overview View"
     summary zh "控制台总览视角：网关控制台 dashboard 聚合网关自身状态与所辖 Agent 列表汇总。"
-    tag "gateway"
-    tag "overview"
-    tag "console"
+    tags "gateway", "overview", "console"
   }
 
   gateway_id: String
@@ -114,8 +105,7 @@ command ViewGateWayManagementState {
     label zh "查看网关管理状态"
     label en "View GateWay Management State"
     summary zh "管理员查看 WarpGateWay 控制平台自身的实例、控制面配置与健康状态聚合视图。"
-    tag "gateway"
-    tag "management"
+    tags "gateway", "management"
   }
 
   requested_by: String

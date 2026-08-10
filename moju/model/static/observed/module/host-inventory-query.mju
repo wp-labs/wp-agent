@@ -3,9 +3,7 @@ module<logic> HostInventoryQuery {
     label zh "主机资产目录查询"
     label en "Host HostInventory Query"
     summary zh "负责主机资产目录与运行态的查询逻辑。"
-    tag "control"
-    tag "center"
-    tag "asset"
+    tags "control", "center", "asset"
   }
 
   layer Domain

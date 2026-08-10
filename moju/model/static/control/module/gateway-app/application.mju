@@ -3,9 +3,7 @@ module<service> GatewayApp.Application {
     label zh "网关应用编排"
     label en "GateWay Application Orchestration"
     summary zh "负责 WarpGateWay 应用层的用例级编排：网关总览、Agent 列表指令下发等命令与流程，组合控制面与网关管理 Domain 模块完成编排。"
-    tag "control"
-    tag "gateway"
-    tag "application"
+    tags "control", "gateway", "application"
   }
 
   layer Application
@@ -30,8 +28,7 @@ command ViewGateWayOverview {
     label zh "查看网关总览"
     label en "View GateWay Overview"
     summary zh "管理员打开 WarpGateWay 控制台时获取网关自身状态与所辖 Agent 的聚合总览。"
-    tag "gateway"
-    tag "overview"
+    tags "gateway", "overview"
   }
 
   requested_by: String
@@ -42,8 +39,7 @@ command DispatchAgentFleetCommand {
     label zh "下发 Agent 列表指令"
     label en "Dispatch Agent Fleet Command"
     summary zh "管理员向选定的一组 Agent 下发统一控制指令（如暂停、升级），生成列表派发回执。"
-    tag "gateway"
-    tag "agent-command"
+    tags "gateway", "agent-command"
   }
 
   command_kind: String
@@ -56,8 +52,7 @@ flow ViewGateWayOverviewFlow {
     label zh "查看网关总览"
     label en "View GateWay Overview Flow"
     summary zh "聚合网关自身状态与所辖 Agent 的健康摘要，生成控制台总览视图。"
-    tag "gateway"
-    tag "overview"
+    tags "gateway", "overview"
   }
 
   actor AdminOperator
@@ -82,8 +77,7 @@ flow DispatchAgentFleetCommandFlow {
     label zh "下发 Agent 列表指令"
     label en "Dispatch Agent Fleet Command Flow"
     summary zh "向选定 Agent 列表下发统一控制指令，并生成派发回执。"
-    tag "gateway"
-    tag "agent-command"
+    tags "gateway", "agent-command"
   }
 
   actor AdminOperator

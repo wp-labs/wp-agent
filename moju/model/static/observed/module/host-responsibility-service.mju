@@ -3,9 +3,7 @@ module<logic> HostResponsibilityService {
     label zh "责任归属逻辑"
     label en "HostResponsibility Service"
     summary zh "负责主机有效责任查询与外部责任同步逻辑。"
-    tag "control"
-    tag "center"
-    tag "responsibility"
+    tags "control", "center", "responsibility"
   }
 
   layer Domain

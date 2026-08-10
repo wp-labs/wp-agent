@@ -3,12 +3,7 @@ module<interface> GatewayApp.UserFacingInterface {
     label zh "用户侧服务接口"
     label en "User Facing Service Interface"
     summary zh "WarpGateWay 面向运维用户和管理员的 HTTP 接口，统一承载已认证安装代码获取、Agent 状态查询、暂停和远程升级能力。"
-    tag "user-facing"
-    tag "admin"
-    tag "web"
-    tag "backend"
-    tag "http"
-    tag "interface"
+    tags "user-facing", "admin", "web", "backend", "http", "interface"
   }
 
   layer Application
@@ -19,19 +14,11 @@ module<interface> GatewayApp.UserFacingInterface {
   owns AdminGetAgentOverview
   owns AdminPauseAgent
   owns AdminUpgradeAgent
-  owns AdminAgentInstallCodeReturned
-  owns AdminAgentRuntimeStatusReturned
-  owns AdminAgentOverviewReturned
-  owns AdminPauseAgentDispatchReturned
-  owns AdminUpgradeAgentDispatchReturned
   owns AdminViewGateWayManagementState
-  owns AdminGateWayManagementStateReturned
   owns AdminViewGateWayManagementStateFlow
   owns AdminLookupAgentRegistryEntry
-  owns AdminAgentRegistryEntryReturned
   owns AdminLookupAgentRegistryEntryFlow
   owns AdminQueryAgentCapabilityIndex
-  owns AdminAgentCapabilityIndexReturned
   owns AdminQueryAgentCapabilityIndexFlow
   provides WarpGateWayPublicInstallInterface by protocol<http>
   provides WarpGateWayManagementInterface by protocol<http>
@@ -76,53 +63,17 @@ message<command> AdminQueryAgentCapabilityIndex = OperatorRequest {
   agent_id: String
 }
 
-message<response> AdminAgentInstallCodeReturned {
-  install_code: AgentInstallCode
-}
-
-message<response> AdminAgentRuntimeStatusReturned {
-  status: AgentRuntimeStatusView
-}
-
-message<response> AdminAgentOverviewReturned {
-  overview: AgentOverview
-}
-
-message<response> AdminPauseAgentDispatchReturned {
-  result: DispatchReceipt
-}
-
-message<response> AdminUpgradeAgentDispatchReturned {
-  result: DispatchReceipt
-}
-
-message<response> AdminGateWayManagementStateReturned {
-  state: GateWayManagementStateView
-}
-
-message<response> AdminAgentRegistryEntryReturned {
-  entry: AgentRegistryEntry
-}
-
-message<response> AdminAgentCapabilityIndexReturned {
-  index: AgentCapabilityIndex
-}
-
 interface WarpGateWayPublicInstallInterface {
   meta {
     label zh "WarpGateWay 运维安装接口"
     label en "WarpGateWay Operations Install Interface"
     summary zh "运维工程师通过管理员 bearer 身份获取 Agent 安装代码；接口只负责安装脚本复制和 bootstrap 引导，不面向未认证访问者开放。"
-    tag "authenticated"
-    tag "bootstrap"
-    tag "agent-install"
-    tag "web"
-    tag "interface"
+    tags "authenticated", "bootstrap", "agent-install", "web", "interface"
   }
 
   entry AdminGetAgentInstallCode {
     actor OperationsEngineer
-    output AdminAgentInstallCodeReturned
+    output AgentInstallCode
     calls AdminGetAgentInstallCodeFlow
   }
 }
@@ -132,51 +83,48 @@ interface WarpGateWayManagementInterface {
     label zh "WarpGateWay 管理接口"
     label en "WarpGateWay Management Interface"
     summary zh "需要管理员身份权限的 Web 管理接口，覆盖 Agent 运行状态查询、暂停和远程升级操作。"
-    tag "admin"
-    tag "authenticated"
-    tag "web"
-    tag "interface"
+    tags "admin", "authenticated", "web", "interface"
   }
 
   entry AdminShowAgentRuntimeStatus {
     actor AdminOperator
-    output AdminAgentRuntimeStatusReturned
+    output AgentRuntimeStatusView
     calls AdminShowAgentRuntimeStatusFlow
   }
 
   entry AdminGetAgentOverview {
     actor AdminOperator
-    output AdminAgentOverviewReturned
+    output AgentOverview
     calls AdminGetAgentOverviewFlow
   }
 
   entry AdminPauseAgent {
     actor AdminOperator
-    output AdminPauseAgentDispatchReturned
+    output DispatchReceipt
     calls AdminPauseAgentFlow
   }
 
   entry AdminUpgradeAgent {
     actor AdminOperator
-    output AdminUpgradeAgentDispatchReturned
+    output DispatchReceipt
     calls AdminUpgradeAgentFlow
   }
 
   entry AdminViewGateWayManagementState {
     actor AdminOperator
-    output AdminGateWayManagementStateReturned
+    output GateWayManagementStateView
     calls AdminViewGateWayManagementStateFlow
   }
 
   entry AdminLookupAgentRegistryEntry {
     actor AdminOperator
-    output AdminAgentRegistryEntryReturned
+    output AgentRegistryEntry
     calls AdminLookupAgentRegistryEntryFlow
   }
 
   entry AdminQueryAgentCapabilityIndex {
     actor AdminOperator
-    output AdminAgentCapabilityIndexReturned
+    output AgentCapabilityIndex
     calls AdminQueryAgentCapabilityIndexFlow
   }
 }
@@ -186,9 +134,7 @@ flow AdminGetAgentInstallCodeFlow {
     label zh "获取 Agent 安装代码"
     label en "Get Agent Install Code Flow"
     summary zh "已认证的运维工程师获取可复制执行的 Agent 安装代码；管理端同时生成短期一次性 enrollment token，并在安装脚本中绑定包摘要和初始配置获取资格。"
-    tag "admin"
-    tag "agent-install"
-    tag "authenticated"
+    tags "admin", "agent-install", "authenticated"
   }
 
   actor OperationsEngineer
@@ -239,9 +185,7 @@ flow AdminShowAgentRuntimeStatusFlow {
     label zh "展示 Agent 运行状态"
     label en "Show Agent Runtime Status Flow"
     summary zh "管理员查询指定 Agent 的运行状态，并聚合生成管理端展示所需的运行状态视图。"
-    tag "admin"
-    tag "agent-status"
-    tag "runtime-view"
+    tags "admin", "agent-status", "runtime-view"
   }
 
   actor AdminOperator
@@ -262,10 +206,7 @@ flow AdminGetAgentOverviewFlow {
     label zh "获取 Agent 总览"
     label en "Get Agent Overview Flow"
     summary zh "管理员打开 WarpGateWay 首页时，聚合 Agent 状态指标、最近上线注册 Agent 和异常 Agent 列表。"
-    tag "admin"
-    tag "agent-status"
-    tag "overview"
-    tag "homepage"
+    tags "admin", "agent-status", "overview", "homepage"
   }
 
   actor AdminOperator
@@ -307,9 +248,7 @@ flow AdminPauseAgentFlow {
     label zh "提交暂停 Agent 指令"
     label en "Submit Pause Agent Command Flow"
     summary zh "管理员提交暂停 Agent 请求，控制指令编排生成暂停派发回执。"
-    tag "admin"
-    tag "agent-command"
-    tag "pause"
+    tags "admin", "agent-command", "pause"
   }
 
   actor AdminOperator
@@ -344,9 +283,7 @@ flow AdminUpgradeAgentFlow {
     label zh "提交升级 Agent 指令"
     label en "Submit Upgrade Agent Command Flow"
     summary zh "管理员提交远程升级 Agent 请求，控制指令编排生成升级派发回执。"
-    tag "admin"
-    tag "agent-command"
-    tag "upgrade"
+    tags "admin", "agent-command", "upgrade"
   }
 
   actor AdminOperator
@@ -382,9 +319,7 @@ flow AdminViewGateWayManagementStateFlow {
     label zh "查看网关管理状态"
     label en "View GateWay Management State Flow"
     summary zh "管理员查看 WarpGateWay 控制平台自身的实例、控制面配置与健康状态聚合视图。"
-    tag "admin"
-    tag "gateway"
-    tag "management"
+    tags "admin", "gateway", "management"
   }
 
   actor AdminOperator
@@ -412,9 +347,7 @@ flow AdminLookupAgentRegistryEntryFlow {
     label zh "查询 Agent 登记记录"
     label en "Lookup Agent AgentRegistry Entry Flow"
     summary zh "管理员按 agent_id 查询 Agent 登记记录。"
-    tag "admin"
-    tag "agentd"
-    tag "registry"
+    tags "admin", "agentd", "registry"
   }
 
   actor AdminOperator
@@ -440,9 +373,7 @@ flow AdminQueryAgentCapabilityIndexFlow {
     label zh "查询 Agent 能力索引"
     label en "Query Agent Capability Index Flow"
     summary zh "管理员按 agent 查询能力索引。"
-    tag "admin"
-    tag "agentd"
-    tag "registry"
+    tags "admin", "agentd", "registry"
   }
 
   actor AdminOperator

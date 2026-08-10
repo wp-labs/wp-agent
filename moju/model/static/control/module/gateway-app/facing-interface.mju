@@ -3,19 +3,11 @@ module<interface> GatewayApp.FacingInterface {
     label zh "GateWay 侧服务接口"
     label en "GateWay Facing Service Interface"
     summary zh "WarpInsightCenter 面向各 WarpGateWay 实例暴露的 HTTP 接口，承载初始配置获取与状态上报。"
-    tag "gateway-facing"
-    tag "gateway"
-    tag "bootstrap"
-    tag "status"
-    tag "backend"
-    tag "http"
-    tag "interface"
+    tags "gateway-facing", "gateway", "bootstrap", "status", "backend", "http", "interface"
   }
 
   layer Application
   owns WarpInsightCenterGatewayInterface
-  owns GatewayInitialConfigReturned
-  owns GatewayStatusAcceptedReturned
   owns GetGatewayInitialConfigFlow
   owns ReportGatewayStatusFlow
   owns ReportAgentStatus
@@ -34,14 +26,6 @@ module<interface> GatewayApp.FacingInterface {
 // （GatewayInitialConfig / GatewayStatusAccepted）由 GatewaySupervision 建模，
 // 本接口引用它们作为 wire 契约，并定义响应消息与接入流程。
 
-message<response> GatewayInitialConfigReturned {
-  config: GatewayInitialConfig
-}
-
-message<response> GatewayStatusAcceptedReturned {
-  receipt: GatewayStatusAccepted
-}
-
 message<command> ReportAgentStatus {
   gateway_id: String
   agents: List<AgentRuntimeStatusView>
@@ -57,23 +41,18 @@ interface WarpInsightCenterGatewayInterface {
     label zh "WarpInsightCenter 网关接入接口"
     label en "WarpInsightCenter Gateway Access Interface"
     summary zh "WarpGateWay 实例安装后主动访问的接入入口，获取初始配置并定期上报状态，供 WarpInsightCenter 全局聚合与控制。"
-    tag "gateway"
-    tag "gateway-facing"
-    tag "bootstrap"
-    tag "status"
-    tag "http"
-    tag "interface"
+    tags "gateway", "gateway-facing", "bootstrap", "status", "http", "interface"
   }
 
   entry GetGatewayInitialConfig {
     actor WarpGateway
-    output GatewayInitialConfigReturned
+    output GatewayInitialConfig
     calls GetGatewayInitialConfigFlow
   }
 
   entry ReportGatewayStatus {
     actor WarpGateway
-    output GatewayStatusAcceptedReturned
+    output GatewayStatusAccepted
     calls ReportGatewayStatusFlow
   }
 
@@ -89,9 +68,7 @@ flow GetGatewayInitialConfigFlow {
     label zh "获取 Gateway 初始配置"
     label en "Get Gateway Initial Config Flow"
     summary zh "WarpGateWay 实例启动后向 WarpInsightCenter 请求初始配置，管理端返回控制中心地址、策略版本与遥测输出。"
-    tag "gateway"
-    tag "bootstrap"
-    tag "config"
+    tags "gateway", "bootstrap", "config"
   }
 
   actor WarpGateway
@@ -113,8 +90,7 @@ flow ReportGatewayStatusFlow {
     label zh "上报 Gateway 状态"
     label en "Report Gateway Status Flow"
     summary zh "WarpGateWay 实例定期向 WarpInsightCenter 上报在线状态、版本与健康信息，管理端返回接收回执。"
-    tag "gateway"
-    tag "status"
+    tags "gateway", "status"
   }
 
   actor WarpGateway

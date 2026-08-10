@@ -3,8 +3,7 @@ module<entity> Agent.Enrollment {
     label zh "注册与引导实体"
     label en "AgentEnrollment"
     summary zh "负责 Agent 注册领域实体：安装引导包、注册 token 与校验、注册结果、认证配置与安装代码；注册流程由 AgentRegistration 承载。"
-    tag "control"
-    tag "enrollment"
+    tags "control", "enrollment"
   }
 
   layer Domain
@@ -36,8 +35,7 @@ struct AgentBootstrapBundle {
     label zh "Agent 引导包"
     label en "Agent Bootstrap Bundle"
     summary zh "Agentd 安装和首次连接管理端时使用的引导信息，只表达安装入口、管理端 HTTPS 地址、内部 CA 信任根和租户环境信息；注册资格由 AgentEnrollmentToken 单独表达。"
-    tag "enrollment"
-    tag "bootstrap"
+    tags "enrollment", "bootstrap"
   }
 
   unique bundle_id: String
@@ -56,9 +54,7 @@ struct ManagementEndpointTrustBundle {
     label zh "管理端信任包"
     label en "Management Endpoint Trust Bundle"
     summary zh "Agent 安装和注册阶段用于校验 WarpGateWay HTTPS 服务端证书的内部 CA 信任材料和端点约束。"
-    tag "enrollment"
-    tag "tls"
-    tag "trust-bundle"
+    tags "enrollment", "tls", "trust-bundle"
   }
 
   unique trust_bundle_id: String
@@ -75,8 +71,7 @@ struct AgentEnrollmentToken {
     label zh "Agent 注册 Token"
     label en "Agent AgentEnrollment Token"
     summary zh "管理端生成的 Agentd 注册资格凭证，服务端保存 token hash，并通过环境绑定、宿主机选择器、使用次数、有效期和状态控制合法性。"
-    tag "enrollment"
-    tag "token"
+    tags "enrollment", "token"
   }
 
   unique token_id: String
@@ -98,8 +93,7 @@ variant AgentEnrollmentTokenStatus {
     label zh "Agent 注册 Token 状态"
     label en "Agent AgentEnrollment Token Status"
     summary zh "描述注册 token 的可用、过期、耗尽或禁用等状态。"
-    tag "enrollment"
-    tag "status"
+    tags "enrollment", "status"
   }
 
   Active
@@ -114,9 +108,7 @@ struct AgentEnrollmentTokenValidation {
     label zh "Agent 注册 Token 校验结果"
     label en "Agent AgentEnrollment Token Validation"
     summary zh "管理端对注册 token 的校验结果，覆盖 hash 匹配、状态、有效期、使用次数、租户环境绑定和宿主机选择器。"
-    tag "enrollment"
-    tag "token"
-    tag "validation"
+    tags "enrollment", "token", "validation"
   }
 
   token_id: String
@@ -143,8 +135,7 @@ struct AgentEnrollmentResult {
     label zh "Agent 注册结果"
     label en "Agent AgentEnrollment Result"
     summary zh "管理端返回给 Agentd 的注册结果，包含是否成功、拒绝原因、签发身份、通讯凭据、初始配置和策略绑定。"
-    tag "enrollment"
-    tag "result"
+    tags "enrollment", "result"
   }
 
   status: AgentEnrollmentResultStatus
@@ -162,8 +153,7 @@ variant AgentEnrollmentResultStatus {
     label zh "Agent 注册结果状态"
     label en "Agent AgentEnrollment Result Status"
     summary zh "描述 Agentd 注册请求成功、拒绝或需要额外处理的结果状态。"
-    tag "enrollment"
-    tag "status"
+    tags "enrollment", "status"
   }
 
   Accepted
@@ -215,8 +205,7 @@ struct AgentEnrollmentAuthProfile {
     label zh "Agent 注册认证配置"
     label en "Agent AgentEnrollment Auth Profile"
     summary zh "定义 Agentd 注册阶段所需的 HTTPS 服务端证书校验、内部 CA 信任根、注册 token 和凭据申请要求。"
-    tag "enrollment"
-    tag "auth"
+    tags "enrollment", "auth"
   }
 
   server_tls_required: Bool
@@ -230,9 +219,7 @@ struct AgentInstallCode {
     label zh "Agent 安装代码"
     label en "Agent Install Code"
     summary zh "WarpGateWay 返回给管理员的 Agent 安装入口代码，按架构提供可复制执行的安装命令，并关联 bootstrap bundle。"
-    tag "admin"
-    tag "agent-install"
-    tag "install-code"
+    tags "admin", "agent-install", "install-code"
   }
 
   x86_linux_install_code: String

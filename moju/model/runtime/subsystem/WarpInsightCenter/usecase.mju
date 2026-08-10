@@ -9,8 +9,7 @@ usecase CreateGatewayInstance {
     label zh "创建 GateWay 管理实例"
     label en "Create Gateway Instance"
     summary zh "客户服务工程师在 WarpInsightCenter 创建 GateWay 管理实例，作为后续接入与状态聚合的管理对象。"
-    tag "gateway"
-    tag "provisioning"
+    tags "gateway", "provisioning"
   }
 
   actor Control.CustomerServiceEngineer
@@ -24,9 +23,7 @@ usecase BindGatewayCustomer {
     label zh "绑定客户 ID"
     label en "Bind Gateway Customer"
     summary zh "客户服务工程师把 GateWay 管理实例绑定到客户 ID，建立实例与客户的归属关系。"
-    tag "gateway"
-    tag "provisioning"
-    tag "customer"
+    tags "gateway", "provisioning", "customer"
   }
 
   actor Control.CustomerServiceEngineer
@@ -40,8 +37,7 @@ usecase PublishWarpAgentd {
     label zh "发布 WarpAgentd"
     label en "Publish WarpAgentd"
     summary zh "平台维护工程师在 WarpInsightCenter 发布 WarpAgentd 新版本，供各 WarpGateWay 实例拉取升级。"
-    tag "release"
-    tag "warp-agentd"
+    tags "release", "warp-agentd"
   }
 
   actor Control.PlatformMaintenanceEngineer
@@ -55,8 +51,7 @@ usecase PublishWarpGateWay {
     label zh "发布 WarpGateWay"
     label en "Publish WarpGateWay"
     summary zh "平台维护工程师在 WarpInsightCenter 发布 WarpGateWay 新版本，供各 WarpGateWay 管理实例升级。"
-    tag "release"
-    tag "warp-gateway"
+    tags "release", "warp-gateway"
   }
 
   actor Control.PlatformMaintenanceEngineer
@@ -70,8 +65,7 @@ usecase CreateUpgradePlan {
     label zh "创建升级计划"
     label en "Create Upgrade Plan"
     summary zh "平台维护工程师在 WarpInsightCenter 创建升级计划，指定目标组件、目标版本与升级范围，用于分批升级 WarpAgentd / WarpGateWay。"
-    tag "release"
-    tag "upgrade"
+    tags "release", "upgrade"
   }
 
   actor Control.PlatformMaintenanceEngineer
@@ -85,8 +79,7 @@ usecase ApproveUpgradePlan {
     label zh "批准升级计划"
     label en "Approve Upgrade Plan"
     summary zh "客户服务工程师批准升级计划，同意对指定范围内的 WarpAgentd / WarpGateWay 执行升级。"
-    tag "release"
-    tag "upgrade"
+    tags "release", "upgrade"
   }
 
   actor Control.CustomerServiceEngineer
@@ -100,9 +93,7 @@ usecase GetInitialConfig {
     label zh "获取初始配置信息"
     label en "Get Initial Config"
     summary zh "客户服务工程师在 WarpInsightCenter 获取指定 WarpGateWay 实例的初始配置信息，包括控制中心地址、策略版本与遥测输出，用于协助排查与配置核对。"
-    tag "gateway"
-    tag "bootstrap"
-    tag "config"
+    tags "gateway", "bootstrap", "config"
   }
 
   actor Control.CustomerServiceEngineer
@@ -116,9 +107,7 @@ usecase ReceiveGatewayStatusReport {
     label zh "接收 Gateway 状态上报"
     label en "Receive Gateway Status Report"
     summary zh "WarpInsightCenter 接收各 WarpGateWay 实例定期上报的状态、健康与总览信息，用于全局聚合展示与后续全局控制。"
-    tag "gateway"
-    tag "status"
-    tag "aggregation"
+    tags "gateway", "status", "aggregation"
   }
 
   actor Control.WarpGateway
@@ -132,9 +121,7 @@ usecase ViewGatewayStatus {
     label zh "查看GateWay状态"
     label en "View Gateway Status"
     summary zh "客户服务工程师在 WarpInsightCenter 查看各 WarpGateWay 实例的在线状态、版本、健康状态和最后上报时间，形成全局网关视图。"
-    tag "gateway"
-    tag "status"
-    tag "global-view"
+    tags "gateway", "status", "global-view"
   }
 
   actor Control.CustomerServiceEngineer

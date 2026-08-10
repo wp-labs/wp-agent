@@ -11,9 +11,7 @@ usecase SimulateGatewayStatusReport {
     label zh "模拟 Gateway 状态上报"
     label en "Simulate Gateway Status Report"
     summary zh "仿真器扮演 WarpGateWay 实例，向 WarpInsightCenter 上报在线状态、版本、健康与上报时间，用于联调中心接收链路与状态展示。"
-    tag "simulator"
-    tag "gateway"
-    tag "status"
+    tags "simulator", "gateway", "status"
   }
 
   actor Control.WarpGateway
@@ -27,9 +25,7 @@ usecase SimulateGetGatewayInitialConfig {
     label zh "模拟拉取 Gateway 初始配置"
     label en "Simulate Get Gateway Initial Config"
     summary zh "仿真器扮演 WarpGateWay 实例，向 WarpInsightCenter 拉取初始配置（控制中心地址、策略版本、遥测输出）。"
-    tag "simulator"
-    tag "gateway"
-    tag "bootstrap"
+    tags "simulator", "gateway", "bootstrap"
   }
 
   actor Control.WarpGateway
@@ -45,9 +41,7 @@ usecase SimulateAgentStatusReport {
     label zh "模拟 Agentd 状态上报"
     label en "Simulate Agentd Status Report"
     summary zh "仿真器扮演 WpAgent，向 WarpGateWay 上报 Agent 运行状态（AgentHello）。"
-    tag "simulator"
-    tag "agentd"
-    tag "status"
+    tags "simulator", "agentd", "status"
   }
 
   actor Control.Agentd
@@ -61,9 +55,7 @@ usecase SimulateActionResultReport {
     label zh "模拟 Agentd 动作结果上报"
     label en "Simulate Agentd Action Result Report"
     summary zh "仿真器扮演 WpAgent，向 WarpGateWay 上报动作执行结果（ReportActionResult）。"
-    tag "simulator"
-    tag "agentd"
-    tag "action-result"
+    tags "simulator", "agentd", "action-result"
   }
 
   actor Control.Agentd

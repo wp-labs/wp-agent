@@ -3,8 +3,7 @@ module<logic> Agent.Registration {
     label zh "注册与引导逻辑"
     label en "AgentEnrollment Service"
     summary zh "负责 Agent 安装代码命令与 Agentd 注册流程。"
-    tag "control"
-    tag "enrollment"
+    tags "control", "enrollment"
   }
 
   layer Domain
@@ -29,9 +28,7 @@ flow AgentdRegistrationFlow {
     label zh "Agentd 注册管理中心"
     label en "Agentd Registration Flow"
     summary zh "Agentd 使用安装代码拉取安装脚本，并通过脚本中的 enrollment token 向 WarpInsight 管理节点提交注册请求；管理侧在同一次持久化更新中校验并消费 token，拒绝重复 agent identity 后才签发通讯凭据。"
-    tag "agentd"
-    tag "registration"
-    tag "enrollment"
+    tags "agentd", "registration", "enrollment"
   }
 
   actor Agentd

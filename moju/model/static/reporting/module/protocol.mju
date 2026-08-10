@@ -3,9 +3,7 @@ module<interface> Protocol {
     label zh "上报协议"
     label en "Reporting Protocol"
     summary zh "负责 Agent hello、action 派发 ACK、执行结果上报、发现快照上报和 ingest ACK。"
-    tag "reporting"
-    tag "protocol"
-    tag "interface"
+    tags "reporting", "protocol", "interface"
   }
 
   layer Application

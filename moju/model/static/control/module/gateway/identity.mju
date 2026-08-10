@@ -3,9 +3,7 @@ module<entity> Gateway.Identity {
     label zh "GateWay 身份"
     label en "GateWay Identity"
     summary zh "负责 WarpGateWay 实例接入 WarpInsightCenter 后的稳定身份与身份状态实体。"
-    tag "control"
-    tag "gateway"
-    tag "identity"
+    tags "control", "gateway", "identity"
   }
 
   layer Domain
@@ -23,8 +21,7 @@ struct GateWayIdentity {
     label zh "GateWay 身份"
     label en "GateWay Identity"
     summary zh "WarpGateWay 实例接入 WarpInsightCenter 后的稳定身份，绑定租户、环境、节点与身份状态。"
-    tag "gateway"
-    tag "identity"
+    tags "gateway", "identity"
   }
 
   unique gateway_id: String
@@ -42,8 +39,7 @@ variant GateWayIdentityStatus {
     label zh "GateWay 身份状态"
     label en "GateWay Identity Status"
     summary zh "描述 WarpGateWay 身份是否有效、吊销、过期或待续期。"
-    tag "gateway"
-    tag "identity"
+    tags "gateway", "identity"
   }
 
   Active

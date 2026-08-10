@@ -3,9 +3,7 @@ module<entity> HostInventory {
     label zh "主机资产目录"
     label en "Host HostInventory"
     summary zh "负责主机资产目录（HostInventory）与主机运行态快照（HostRuntimeState）等中心侧资产目录实体。"
-    tag "control"
-    tag "center"
-    tag "asset"
+    tags "control", "center", "asset"
   }
 
   layer Domain

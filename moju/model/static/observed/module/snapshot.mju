@@ -3,8 +3,7 @@ module Snapshot {
     label zh "发现快照"
     label en "Discovery Snapshot"
     summary zh "负责被观测资源、目标、来源、采集候选和快照元数据的完整契约。"
-    tag "observed"
-    tag "snapshot"
+    tags "observed", "snapshot"
   }
 
   layer Domain

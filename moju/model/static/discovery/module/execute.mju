@@ -3,8 +3,7 @@ module<worker> Execute {
     label zh "受控执行"
     label en "Controlled Execution"
     summary zh "负责远程 action 的本地队列、调度、执行、隔离、运行状态和进度记录。"
-    tag "agent"
-    tag "execution"
+    tags "agent", "execution"
   }
 
   layer Domain

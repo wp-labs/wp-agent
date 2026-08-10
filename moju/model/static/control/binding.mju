@@ -5,8 +5,7 @@ bind WarpGateWayPublicInstallInterface {
     route GET "/api/v1/agent/install-code"
     auth bearer
     actor_identity OperationsEngineer.id from token.sub
-    status AdminAgentInstallCodeReturned 200
-    outcome AdminAgentInstallCodeReturned on AgentInstallCode
+    status AgentInstallCode 200
   }
 }
 
@@ -15,56 +14,49 @@ bind WarpGateWayManagementInterface {
     route GET "/api/v1/admin/agents/{agent_id}/runtime-status"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status AdminAgentRuntimeStatusReturned 200
-    outcome AdminAgentRuntimeStatusReturned on AgentRuntimeStatusView
+    status AgentRuntimeStatusView 200
   }
 
   entry AdminGetAgentOverview {
     route GET "/api/v1/admin/agents/overview"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status AdminAgentOverviewReturned 200
-    outcome AdminAgentOverviewReturned on AgentOverview
+    status AgentOverview 200
   }
 
   entry AdminPauseAgent {
     route POST "/api/v1/admin/agents/{agent_id}/pause"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status AdminPauseAgentDispatchReturned 202
-    outcome AdminPauseAgentDispatchReturned on DispatchReceipt
+    status DispatchReceipt 202
   }
 
   entry AdminUpgradeAgent {
     route POST "/api/v1/admin/agents/{agent_id}/upgrade"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status AdminUpgradeAgentDispatchReturned 202
-    outcome AdminUpgradeAgentDispatchReturned on DispatchReceipt
+    status DispatchReceipt 202
   }
 
   entry AdminViewGateWayManagementState {
     route GET "/api/v1/admin/gateway/management-state"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status AdminGateWayManagementStateReturned 200
-    outcome AdminGateWayManagementStateReturned on GateWayManagementStateView
+    status GateWayManagementStateView 200
   }
 
   entry AdminLookupAgentRegistryEntry {
     route GET "/api/v1/admin/agents/{agent_id}/registry-entry"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status AdminAgentRegistryEntryReturned 200
-    outcome AdminAgentRegistryEntryReturned on AgentRegistryEntry
+    status AgentRegistryEntry 200
   }
 
   entry AdminQueryAgentCapabilityIndex {
     route GET "/api/v1/admin/agents/{agent_id}/capability-index"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status AdminAgentCapabilityIndexReturned 200
-    outcome AdminAgentCapabilityIndexReturned on AgentCapabilityIndex
+    status AgentCapabilityIndex 200
   }
 }
 
@@ -72,8 +64,7 @@ bind WpAgentOnlineRegistrationInterface {
   entry SubmitEnrollmentRequest {
     route POST "/api/v1/agent/enroll"
     auth none
-    status AgentEnrollmentResultReturned 201
-    outcome AgentEnrollmentResultReturned on AgentEnrollmentResult
+    status AgentEnrollmentResult 201
   }
 
   entry SubmitAgentStatus {
@@ -88,8 +79,7 @@ bind WpAgentOnlineRegistrationInterface {
     route POST "/api/v1/agent/credentials:renew"
     auth bearer
     actor_identity Agentd.id from credential.agent_id
-    status AgentCredentialRenewed 200
-    outcome AgentCredentialRenewed on AgentCredentialBundle
+    status AgentCredentialBundle 200
   }
 
   entry PollControlCommands {
@@ -114,16 +104,14 @@ bind WarpInsightCenterGatewayInterface {
     route GET "/api/v1/gateway/initial-config"
     auth bearer
     actor_identity WarpGateway.id from credential.gateway_id
-    status GatewayInitialConfigReturned 200
-    outcome GatewayInitialConfigReturned on GatewayInitialConfig
+    status GatewayInitialConfig 200
   }
 
   entry ReportGatewayStatus {
     route POST "/api/v1/gateway/status"
     auth bearer
     actor_identity WarpGateway.id from credential.gateway_id
-    status GatewayStatusAcceptedReturned 200
-    outcome GatewayStatusAcceptedReturned on GatewayStatusAccepted
+    status GatewayStatusAccepted 200
   }
 }
 
@@ -132,24 +120,21 @@ bind WarpInsightCenterAdminInterface {
     route GET "/api/v1/admin/gateways"
     auth bearer
     actor_identity GatewayOperator.id from jwt.sub
-    status AdminGatewayListReturned 200
-    outcome AdminGatewayListReturned on GatewayListView
+    status GatewayListView 200
   }
 
   entry AdminDispatchGlobalPolicy {
     route POST "/api/v1/admin/policies/global"
     auth bearer
     actor_identity PlatformMaintenanceEngineer.id from jwt.sub
-    status AdminGlobalPolicyDispatchReturned 200
-    outcome AdminGlobalPolicyDispatchReturned on GlobalPolicyDispatch
+    status GlobalPolicyDispatch 200
   }
 
   entry AdminShowGatewayStatus {
     route GET "/api/v1/admin/gateways/{gateway_id}/status"
     auth bearer
     actor_identity CustomerServiceEngineer.id from jwt.sub
-    status AdminGatewayStatusReturned 200
-    outcome AdminGatewayStatusReturned on GatewayStatusView
+    status GatewayStatusView 200
   }
 
   entry AdminListGatewayStatus {
@@ -164,15 +149,13 @@ bind WarpInsightCenterAdminInterface {
     route POST "/api/v1/admin/gateways"
     auth bearer
     actor_identity CustomerServiceEngineer.id from jwt.sub
-    status AdminGatewayInstanceReturned 201
-    outcome AdminGatewayInstanceReturned on GatewayInstance
+    status GatewayInstance 201
   }
 
   entry AdminBindGatewayCustomer {
     route POST "/api/v1/admin/gateways/{gateway_id}/customer"
     auth bearer
     actor_identity CustomerServiceEngineer.id from jwt.sub
-    status AdminGatewayCustomerBindingReturned 200
-    outcome AdminGatewayCustomerBindingReturned on GatewayCustomerBinding
+    status GatewayCustomerBinding 200
   }
 }

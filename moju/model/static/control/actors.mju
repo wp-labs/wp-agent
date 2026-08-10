@@ -5,9 +5,7 @@ actor<system> Agentd {
     label zh "WpAgent 守护进程"
     label en "WpAgent Daemon"
     summary zh "运行在业务服务器上的 warp-agentd 守护进程，作为系统 actor 发起注册、凭据轮换、状态上报与控制指令轮询。"
-    tag "edge"
-    tag "agentd"
-    tag "daemon"
+    tags "edge", "agentd", "daemon"
   }
 
   access protocol<http>
@@ -25,8 +23,7 @@ actor OperationsEngineer {
     label zh "运维工程师"
     label en "Operations Engineer"
     summary zh "负责在目标服务器上获取并执行 Agent 安装代码的运维人员；该角色不等同于管理员控制操作权限。"
-    tag "ops"
-    tag "agent-install"
+    tags "ops", "agent-install"
   }
 
   access protocol<http>
@@ -70,8 +67,7 @@ actor GatewayOperator {
     label zh "全局操作者"
     label en "Gateway Operator"
     summary zh "操作 WarpInsightCenter 的全局操作者，查看各 WarpGateWay 实例的聚合状态。"
-    tag "gateway"
-    tag "ops"
+    tags "gateway", "ops"
   }
 
   access protocol<http>
@@ -84,9 +80,7 @@ actor CustomerServiceEngineer {
     label zh "客户服务工程师"
     label en "Customer Service Engineer"
     summary zh "面向客户提供服务的工程师，可在 WarpInsightCenter 创建 GateWay 管理实例并绑定客户 ID、获取指定 WarpGateWay 实例的初始配置信息、查看各 WarpGateWay 实例的运行状态、批准升级计划，用于协助客户接入与排查。"
-    tag "ops"
-    tag "customer-service"
-    tag "gateway"
+    tags "ops", "customer-service", "gateway"
   }
 
   access protocol<http>
@@ -106,9 +100,7 @@ actor PlatformMaintenanceEngineer {
     label zh "平台维护工程师"
     label en "Platform Maintenance Engineer"
     summary zh "负责 WarpInsight 平台维护的工程师，可在 WarpInsightCenter 发布 WarpAgentd 与 WarpGateWay 的新版本、创建升级计划。"
-    tag "ops"
-    tag "platform-maintenance"
-    tag "release"
+    tags "ops", "platform-maintenance", "release"
   }
 
   access protocol<http>
@@ -135,8 +127,7 @@ actor PublicInstallClient {
     label zh "公开安装客户端"
     label en "Public Install Client"
     summary zh "通过 WarpGateWay 公开安装入口进行引导接入的客户端。"
-    tag "install"
-    tag "client"
+    tags "install", "client"
   }
 
   access protocol<http>

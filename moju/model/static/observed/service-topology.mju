@@ -11,9 +11,7 @@ struct BusinessDomain {
     label zh "业务域"
     label en "Business Domain"
     summary zh "业务域对象，作为业务拓扑的根目录层。"
-    tag "center"
-    tag "topology"
-    tag "business"
+    tags "center", "topology", "business"
   }
 
   unique business_id: String
@@ -29,9 +27,7 @@ struct SystemBoundary {
     label zh "系统边界"
     label en "System Boundary"
     summary zh "业务下的系统边界，一个业务可包含多个系统，支持父系统表达更粗/更细的边界。"
-    tag "center"
-    tag "topology"
-    tag "business"
+    tags "center", "topology", "business"
   }
 
   unique system_id: String
@@ -48,9 +44,7 @@ struct BusinessSubsystem {
     label zh "业务子系统"
     label en "Business Subsystem"
     summary zh "系统内部的业务子系统，作为服务归属的目录层（与 MoJu 运行时 subsystem 概念区分）。"
-    tag "center"
-    tag "topology"
-    tag "business"
+    tags "center", "topology", "business"
   }
 
   unique subsystem_id: String
@@ -66,9 +60,7 @@ struct ServiceEntity {
     label zh "逻辑服务"
     label en "Service Entity"
     summary zh "逻辑服务定义，不是运行实例；一个服务可被部署为多个实例。"
-    tag "center"
-    tag "topology"
-    tag "service"
+    tags "center", "topology", "service"
   }
 
   unique service_id: String
@@ -102,9 +94,7 @@ struct ServiceInstance {
     label zh "服务实例"
     label en "Service Instance"
     summary zh "服务的运行副本，桥接业务服务与底层运行对象，最终落到 PodInventory / ProcessRuntimeState / HostInventory。"
-    tag "center"
-    tag "topology"
-    tag "service"
+    tags "center", "topology", "service"
   }
 
   unique service_instance_id: String
@@ -150,9 +140,7 @@ struct ServiceEndpoint {
     label zh "服务入口地址"
     label en "Service Endpoint"
     summary zh "服务的稳定入口地址（DNS、VIP、Ingress、LB 等），一个服务可有多个入口，不等同具体实例地址。"
-    tag "center"
-    tag "topology"
-    tag "service"
+    tags "center", "topology", "service"
   }
 
   unique endpoint_id: String
@@ -198,9 +186,7 @@ struct ServiceInstanceEndpoint {
     label zh "服务实例地址"
     label en "Service Instance Endpoint"
     summary zh "服务实例的当前动态运行地址（pod/host/container IP:Port）。"
-    tag "center"
-    tag "topology"
-    tag "service"
+    tags "center", "topology", "service"
   }
 
   unique instance_endpoint_id: String
@@ -218,9 +204,7 @@ struct ServiceDependency {
     label zh "服务依赖"
     label en "Service Dependency"
     summary zh "服务之间的逻辑依赖关系，区分声明依赖与运行时观测依赖，与网络附件分离。"
-    tag "center"
-    tag "topology"
-    tag "service"
+    tags "center", "topology", "service"
   }
 
   unique dependency_id: String

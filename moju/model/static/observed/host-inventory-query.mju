@@ -7,9 +7,7 @@ command QueryHostInventory {
     label zh "查询主机资产目录"
     label en "Query Host HostInventory"
     summary zh "安全分析师按租户、环境或主机名查询主机资产目录。"
-    tag "center"
-    tag "asset"
-    tag "inventory"
+    tags "center", "asset", "inventory"
   }
 
   tenant_id: String?
@@ -23,9 +21,7 @@ command ViewHostRuntimeState {
     label zh "查看主机运行状态"
     label en "View Host Runtime State"
     summary zh "安全分析师查看指定主机的当前运行态快照。"
-    tag "center"
-    tag "asset"
-    tag "runtime-state"
+    tags "center", "asset", "runtime-state"
   }
 
   host_id: String

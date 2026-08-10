@@ -3,8 +3,7 @@ module<logic> InsightCenter.PlatformRelease {
     label zh "平台版本发布"
     label en "Platform Release"
     summary zh "负责 WarpAgentd 与 WarpGateWay 新版本的发布。"
-    tag "control"
-    tag "release"
+    tags "control", "release"
   }
 
   layer Domain
@@ -31,8 +30,7 @@ command PublishWarpAgentd {
     label zh "发布 WarpAgentd"
     label en "Publish WarpAgentd"
     summary zh "平台维护工程师在 WarpInsightCenter 发布 WarpAgentd 新版本，供各 WarpGateWay 实例拉取升级。"
-    tag "release"
-    tag "warp-agentd"
+    tags "release", "warp-agentd"
   }
 
   version: String
@@ -46,8 +44,7 @@ struct WarpAgentdRelease {
     label zh "WarpAgentd 发布记录"
     label en "WarpAgentd Release"
     summary zh "WarpAgentd 新版本的发布记录，包含版本号、产物地址与发布状态。"
-    tag "release"
-    tag "warp-agentd"
+    tags "release", "warp-agentd"
   }
 
   version: String
@@ -61,8 +58,7 @@ command PublishWarpGateWay {
     label zh "发布 WarpGateWay"
     label en "Publish WarpGateWay"
     summary zh "平台维护工程师在 WarpInsightCenter 发布 WarpGateWay 新版本，供各 WarpGateWay 管理实例升级。"
-    tag "release"
-    tag "warp-gateway"
+    tags "release", "warp-gateway"
   }
 
   version: String
@@ -76,8 +72,7 @@ struct WarpGateWayRelease {
     label zh "WarpGateWay 发布记录"
     label en "WarpGateWay Release"
     summary zh "WarpGateWay 新版本的发布记录，包含版本号、产物地址与发布状态。"
-    tag "release"
-    tag "warp-gateway"
+    tags "release", "warp-gateway"
   }
 
   version: String
@@ -92,9 +87,7 @@ variant ArtifactStorageKind {
     label zh "制品存储类型"
     label en "Artifact Storage Kind"
     summary zh "制品镜像的存储后端：本地文件目录，或云对象存储（S3 兼容 / MinIO）。"
-    tag "release"
-    tag "artifact"
-    tag "storage"
+    tags "release", "artifact", "storage"
   }
 
   LocalFile
@@ -108,9 +101,7 @@ struct ArtifactMirror {
     label zh "制品镜像记录"
     label en "Artifact Mirror"
     summary zh "版本发布时将外部制品镜像到本地文件或云对象存储，记录原始地址、镜像后地址与存储后端。"
-    tag "release"
-    tag "artifact"
-    tag "mirror"
+    tags "release", "artifact", "mirror"
   }
 
   component: String
@@ -127,8 +118,7 @@ struct UpgradeTarget {
     label zh "升级目标"
     label en "Upgrade Target"
     summary zh "升级计划中的单个目标：目标组件与目标版本，可多选。"
-    tag "release"
-    tag "upgrade"
+    tags "release", "upgrade"
   }
 
   component: String
@@ -141,9 +131,7 @@ struct UpgradeStep {
     label zh "升级执行步骤"
     label en "Upgrade Step"
     summary zh "升级计划中的执行步骤，指定本批升级的网关集合与步骤状态。"
-    tag "release"
-    tag "upgrade"
-    tag "rollout"
+    tags "release", "upgrade", "rollout"
   }
 
   step_index: Int
@@ -156,8 +144,7 @@ command CreateUpgradePlan {
     label zh "创建升级计划"
     label en "Create Upgrade Plan"
     summary zh "平台维护工程师在 WarpInsightCenter 创建升级计划，指定多组件目标版本、网关范围与分批执行步骤。"
-    tag "release"
-    tag "upgrade"
+    tags "release", "upgrade"
   }
 
   targets: List<UpgradeTarget>
@@ -172,8 +159,7 @@ struct UpgradePlan {
     label zh "升级计划"
     label en "Upgrade Plan"
     summary zh "WarpAgentd / WarpGateWay 的升级计划，包含多组件目标版本、升级范围、分批执行步骤与状态。"
-    tag "release"
-    tag "upgrade"
+    tags "release", "upgrade"
   }
 
   plan_id: String
@@ -189,8 +175,7 @@ command ApproveUpgradePlan {
     label zh "批准升级计划"
     label en "Approve Upgrade Plan"
     summary zh "客户服务工程师批准升级计划，同意对指定范围内的 WarpAgentd / WarpGateWay 执行升级。"
-    tag "release"
-    tag "upgrade"
+    tags "release", "upgrade"
   }
 
   plan_id: String
@@ -203,8 +188,7 @@ struct UpgradePlanApproval {
     label zh "升级计划批准"
     label en "Upgrade Plan Approval"
     summary zh "升级计划的批准记录，包含计划、批准人、批准时间与状态。"
-    tag "release"
-    tag "upgrade"
+    tags "release", "upgrade"
   }
 
   plan_id: String

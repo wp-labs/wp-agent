@@ -3,8 +3,7 @@ module Entity {
     label zh "被观测实体"
     label en "Observed Entity"
     summary zh "负责进程、网络接口、IP、服务端点、容器、文件身份、socket owner 和运行时根等原始实体模型。"
-    tag "observed"
-    tag "entity"
+    tags "observed", "entity"
   }
 
   layer Domain

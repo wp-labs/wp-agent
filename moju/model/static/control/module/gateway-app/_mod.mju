@@ -2,9 +2,7 @@ module<package> GatewayApp {
   meta {
     label zh "GatewayApp"
     summary zh "WarpGateWay 控制平台的应用层边界：应用编排、用户侧接口与前端 WEB。"
-    tag "control"
-    tag "application"
-    tag "package"
+    tags "control", "application", "package"
   }
 
   layer Application

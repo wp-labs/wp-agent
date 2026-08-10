@@ -3,8 +3,7 @@ module<entity> Agent.Identity {
     label zh "Agent 身份"
     label en "Agent AgentIdentity"
     summary zh "负责 Agent 身份、宿主机画像、证书凭据与身份生命周期实体。"
-    tag "control"
-    tag "identity"
+    tags "control", "identity"
   }
 
   layer Domain
@@ -30,8 +29,7 @@ struct AgentIdentity {
     label zh "Agent 身份"
     label en "Agent AgentIdentity"
     summary zh "Agentd 注册后由管理端签发的稳定身份，绑定租户、环境、节点和凭据状态。"
-    tag "agentd"
-    tag "identity"
+    tags "agentd", "identity"
   }
 
   unique agent_id: String
@@ -49,8 +47,7 @@ variant AgentIdentityStatus {
     label zh "Agent 身份状态"
     label en "Agent AgentIdentity Status"
     summary zh "描述 Agentd 身份是否有效、吊销、过期或待续期。"
-    tag "agentd"
-    tag "identity"
+    tags "agentd", "identity"
   }
 
   Active
@@ -64,8 +61,7 @@ struct AgentHostProfile {
     label zh "Agent 宿主机画像"
     label en "Agent Host Profile"
     summary zh "Agentd 注册时上报的业务服务器宿主机信息，包括主机名、系统、架构、机器 ID、云实例和 IP 信息。"
-    tag "agentd"
-    tag "host"
+    tags "agentd", "host"
   }
 
   unique node_id: String
@@ -83,8 +79,7 @@ struct AgentCredentialBundle {
     label zh "Agent 凭据包"
     label en "Agent Credential Bundle"
     summary zh "Agent 注册成功后由管理端签发或返回的长期通讯凭据集合，可用于后续 HTTPS 凭据认证或 mTLS 客户端认证。"
-    tag "agentd"
-    tag "credential"
+    tags "agentd", "credential"
   }
 
   unique credential_id: String
@@ -105,8 +100,7 @@ struct AgentControlAuthProfile {
     label zh "Agent 控制通道认证配置"
     label en "Agent Control Auth Profile"
     summary zh "Agent 注册成功后调用管理端 Agent API 时使用的认证策略；后续通讯依赖 AgentIdentity 和通讯凭据，不再接受 enrollment token。"
-    tag "control"
-    tag "auth"
+    tags "control", "auth"
   }
 
   server_tls_required: Bool
@@ -121,9 +115,7 @@ struct AgentCredentialVerificationResult {
     label zh "Agent 凭据校验结果"
     label en "Agent Credential Verification Result"
     summary zh "管理端对 Agent 后续 API 调用携带的通讯凭据进行校验后的结果。"
-    tag "agentd"
-    tag "credential"
-    tag "verification"
+    tags "agentd", "credential", "verification"
   }
 
   agent_id: String

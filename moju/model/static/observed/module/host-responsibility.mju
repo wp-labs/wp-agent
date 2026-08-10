@@ -3,9 +3,7 @@ module<entity> HostResponsibility {
     label zh "主机责任归属"
     label en "Host HostResponsibility"
     summary zh "负责责任主体、主机组、成员关系、责任分配、有效责任视图与外部系统（CMDB/LDAP/HR/Oncall）责任同步等治理关系事实。"
-    tag "control"
-    tag "center"
-    tag "responsibility"
+    tags "control", "center", "responsibility"
   }
 
   layer Domain

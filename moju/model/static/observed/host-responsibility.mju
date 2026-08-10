@@ -12,9 +12,7 @@ struct Subject {
     label zh "责任主体"
     label en "Subject"
     summary zh "责任归属中的"谁"：用户、团队、服务账号或厂商，优先以团队作为最终责任绑定对象。"
-    tag "center"
-    tag "responsibility"
-    tag "subject"
+    tags "center", "responsibility", "subject"
   }
 
   unique subject_id: String
@@ -45,9 +43,7 @@ struct HostGroup {
     label zh "主机组"
     label en "Host Group"
     summary zh "一批主机的归属边界，作为责任归属与批量治理的中间层，按应用、业务、集群或环境继承。"
-    tag "center"
-    tag "responsibility"
-    tag "host-group"
+    tags "center", "responsibility", "host-group"
   }
 
   unique host_group_id: String
@@ -80,9 +76,7 @@ struct HostGroupMembership {
     label zh "主机组成员关系"
     label en "Host Group Membership"
     summary zh "主机属于哪些组的成员关系，一台主机可属于多个组，携带生效时间与来源。"
-    tag "center"
-    tag "responsibility"
-    tag "host-group"
+    tags "center", "responsibility", "host-group"
   }
 
   host_id: String
@@ -100,9 +94,7 @@ struct ResponsibilityAssignment {
     label zh "责任分配"
     label en "HostResponsibility Assignment"
     summary zh "主机或主机组到责任主体的角色分配，记录角色、主责任标记、优先级、来源与生效时间。"
-    tag "center"
-    tag "responsibility"
-    tag "assignment"
+    tags "center", "responsibility", "assignment"
   }
 
   unique assignment_id: String
@@ -165,9 +157,7 @@ struct ExternalIdentityLink {
     label zh "外部身份映射"
     label en "External AgentIdentity Link"
     summary zh "内部对象与外部系统对象的稳定映射，外部 ID 与内部主键解耦，同一内部对象可持有多个来源映射。"
-    tag "center"
-    tag "responsibility"
-    tag "external-sync"
+    tags "center", "responsibility", "external-sync"
   }
 
   unique link_id: String

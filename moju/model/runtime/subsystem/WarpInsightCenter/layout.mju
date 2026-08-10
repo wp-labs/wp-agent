@@ -13,10 +13,7 @@ region GlobalTopNavigation {
     label zh "顶部导航"
     label en "Top Navigation"
     summary zh "WarpInsightCenter 的顶部导航区，作为各页面共享的页面级导航，提供网关列表、网关实例、配置、发布与升级计划入口。"
-    tag "center"
-    tag "navigation"
-    tag "top-navigation"
-    tag "layout-index"
+    tags "center", "navigation", "top-navigation", "layout-index"
   }
 
   orientation horizontal
@@ -29,10 +26,7 @@ region<page> GatewayListPage {
     label zh "网关列表"
     label en "Gateway List"
     summary zh "查看各 WarpGateWay 实例的在线状态、版本、健康状态与最后上报时间。"
-    tag "center"
-    tag "gateway"
-    tag "list"
-    tag "page"
+    tags "center", "gateway", "list", "page"
   }
 
   orientation vertical
@@ -46,10 +40,7 @@ region<section> GatewayStatusList {
     label zh "网关列表状态列表"
     label en "Gateway List Status List"
     summary zh "按卡片展示各 WarpGateWay 实例的状态摘要。"
-    tag "center"
-    tag "gateway"
-    tag "status"
-    tag "list"
+    tags "center", "gateway", "status", "list"
   }
 
   orientation vertical
@@ -62,10 +53,7 @@ region<section> GatewayStatusCard {
     label zh "网关状态卡片"
     label en "Gateway Status Card"
     summary zh "单个 WarpGateWay 实例的状态摘要卡片。"
-    tag "center"
-    tag "gateway"
-    tag "status"
-    tag "card"
+    tags "center", "gateway", "status", "card"
   }
 
   orientation grid
@@ -83,11 +71,7 @@ region<page> GatewayInstancePage {
     label zh "网关实例管理"
     label en "Gateway Instance Management"
     summary zh "创建 GateWay 管理实例并为实例绑定客户 ID。"
-    tag "center"
-    tag "gateway"
-    tag "instance"
-    tag "provisioning"
-    tag "page"
+    tags "center", "gateway", "instance", "provisioning", "page"
   }
 
   orientation vertical
@@ -102,9 +86,7 @@ region<section> GatewayInstanceCreatePanel {
     label zh "创建网关实例"
     label en "Create Gateway Instance"
     summary zh "客户服务工程师创建 GateWay 管理实例的入口。"
-    tag "center"
-    tag "gateway"
-    tag "provisioning"
+    tags "center", "gateway", "provisioning"
   }
 
   orientation vertical
@@ -115,9 +97,7 @@ region<section> GatewayCustomerBindPanel {
     label zh "绑定客户"
     label en "Bind Gateway Customer"
     summary zh "客户服务工程师为 GateWay 管理实例绑定客户 ID 的入口。"
-    tag "center"
-    tag "gateway"
-    tag "customer"
+    tags "center", "gateway", "customer"
   }
 
   orientation vertical
@@ -130,10 +110,7 @@ region<page> GatewayConfigPage {
     label zh "网关初始配置"
     label en "Gateway Initial Config"
     summary zh "查看指定 WarpGateWay 实例的初始配置信息（控制中心地址、策略版本、遥测输出）。"
-    tag "center"
-    tag "gateway"
-    tag "config"
-    tag "page"
+    tags "center", "gateway", "config", "page"
   }
 
   orientation vertical
@@ -147,9 +124,7 @@ region<section> GatewayInitialConfigPanel {
     label zh "初始配置详情"
     label en "Gateway Initial Config Detail"
     summary zh "展示网关初始配置：控制中心地址、策略版本与遥测输出。"
-    tag "center"
-    tag "gateway"
-    tag "config"
+    tags "center", "gateway", "config"
   }
 
   orientation vertical
@@ -162,9 +137,7 @@ region<page> ReleasePage {
     label zh "版本发布"
     label en "Release"
     summary zh "发布 WarpAgentd / WarpGateWay 新版本，供各 WarpGateWay 实例或管理实例升级。"
-    tag "center"
-    tag "release"
-    tag "page"
+    tags "center", "release", "page"
   }
 
   orientation vertical
@@ -179,9 +152,7 @@ region<section> WarpAgentdReleasePanel {
     label zh "WarpAgentd 发布"
     label en "Publish WarpAgentd"
     summary zh "平台维护工程师发布 WarpAgentd 新版本。"
-    tag "center"
-    tag "release"
-    tag "warp-agentd"
+    tags "center", "release", "warp-agentd"
   }
 
   orientation vertical
@@ -192,9 +163,7 @@ region<section> WarpGateWayReleasePanel {
     label zh "WarpGateWay 发布"
     label en "Publish WarpGateWay"
     summary zh "平台维护工程师发布 WarpGateWay 新版本。"
-    tag "center"
-    tag "release"
-    tag "warp-gateway"
+    tags "center", "release", "warp-gateway"
   }
 
   orientation vertical
@@ -207,10 +176,7 @@ region<page> UpgradePlanPage {
     label zh "升级计划"
     label en "Upgrade Plan"
     summary zh "创建与批准 WarpAgentd / WarpGateWay 升级计划。"
-    tag "center"
-    tag "release"
-    tag "upgrade"
-    tag "page"
+    tags "center", "release", "upgrade", "page"
   }
 
   orientation vertical
@@ -225,9 +191,7 @@ region<section> UpgradePlanCreatePanel {
     label zh "创建升级计划"
     label en "Create Upgrade Plan"
     summary zh "平台维护工程师创建升级计划，指定目标组件、目标版本与升级范围。"
-    tag "center"
-    tag "release"
-    tag "upgrade"
+    tags "center", "release", "upgrade"
   }
 
   orientation vertical
@@ -238,9 +202,7 @@ region<section> UpgradePlanApprovePanel {
     label zh "批准升级计划"
     label en "Approve Upgrade Plan"
     summary zh "客户服务工程师批准升级计划。"
-    tag "center"
-    tag "release"
-    tag "upgrade"
+    tags "center", "release", "upgrade"
   }
 
   orientation vertical
@@ -253,8 +215,7 @@ region GatewayInstanceText {
     label zh "网关实例"
     label en "Gateway Instance"
     summary zh "展示网关实例 ID。"
-    tag "center"
-    tag "output"
+    tags "center", "output"
   }
 
   orientation vertical
@@ -265,8 +226,7 @@ region GatewayVersionText {
     label zh "网关版本"
     label en "Gateway Version"
     summary zh "展示网关运行版本。"
-    tag "center"
-    tag "output"
+    tags "center", "output"
   }
 
   orientation vertical
@@ -277,8 +237,7 @@ region GatewayOnlineStatusBadge {
     label zh "在线状态"
     label en "Gateway Online Status"
     summary zh "展示网关在线状态徽标。"
-    tag "center"
-    tag "output"
+    tags "center", "output"
   }
 
   orientation vertical
@@ -289,8 +248,7 @@ region GatewayHealthBadge {
     label zh "健康状态"
     label en "Gateway Health"
     summary zh "展示网关健康状态徽标。"
-    tag "center"
-    tag "output"
+    tags "center", "output"
   }
 
   orientation vertical
@@ -301,8 +259,7 @@ region GatewayLastSeenAtText {
     label zh "最后上报时间"
     label en "Last Seen At"
     summary zh "展示网关最后上报时间。"
-    tag "center"
-    tag "output"
+    tags "center", "output"
   }
 
   orientation vertical

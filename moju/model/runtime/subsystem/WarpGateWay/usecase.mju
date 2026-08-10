@@ -6,9 +6,7 @@ usecase GetAgentInstallCode {
     label zh "获取 Agent 安装代码"
     label en "Get Agent Install Code"
     summary zh "运维工程师在 WarpGateWay 安装页直接获取 X86-Linux 或 Arm-Linux 的 Agent 安装代码；页面不需要输入参数和管理员身份权限，代码可直接复制到服务器终端执行。"
-    tag "agent-install"
-    tag "install-code"
-    tag "public"
+    tags "agent-install", "install-code", "public"
   }
 
   actor Control.OperationsEngineer
@@ -22,10 +20,7 @@ usecase GetAgentOverview {
     label zh "获取 Agent 总览"
     label en "Get Agent Overview"
     summary zh "管理员打开 WarpGateWay 首页时获取 Agent 状态指标和异常 Agent 列表，用于首页总览展示。"
-    tag "agent-status"
-    tag "overview"
-    tag "admin"
-    tag "home"
+    tags "agent-status", "overview", "admin", "home"
   }
 
   actor Control.AdminOperator
@@ -39,8 +34,7 @@ usecase ShowAgentRuntimeStatus {
     label zh "展示 Agent 的运行状态"
     label en "Show Agent Runtime Status"
     summary zh "管理员在 WarpGateWay 中查看已接入 Agent 的在线状态、版本、最后上报时间和健康状态。"
-    tag "agent-status"
-    tag "admin"
+    tags "agent-status", "admin"
   }
 
   actor Control.AdminOperator
@@ -54,8 +48,7 @@ usecase PauseAgent {
     label zh "暂停 Agent"
     label en "Pause Agent"
     summary zh "管理员在 WarpGateWay 控制中心选择目标 Agent，向业务服务器上的 WpAgent 下发暂停请求。"
-    tag "agent-pause"
-    tag "admin"
+    tags "agent-pause", "admin"
   }
 
   actor Control.AdminOperator
@@ -69,8 +62,7 @@ usecase UpgradeAgentRemotely {
     label zh "远程升级 Agent"
     label en "Upgrade Agent Remotely"
     summary zh "管理员在 WarpGateWay 中选择目标 Agent 和目标版本，向业务服务器上的 WpAgent 下发远程升级请求。"
-    tag "agent-upgrade"
-    tag "admin"
+    tags "agent-upgrade", "admin"
   }
 
   actor Control.AdminOperator

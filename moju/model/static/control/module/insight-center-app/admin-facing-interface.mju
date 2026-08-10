@@ -3,33 +3,23 @@ module<interface> InsightCenterApp.AdminFacingInterface {
     label zh "全局控制中心管理接口"
     label en "WarpInsightCenter Admin Facing Interface"
     summary zh "WarpInsightCenter 面向管理员暴露的 HTTP 管理接口，承载网关列表/策略编排与网关实例管理。"
-    tag "center"
-    tag "admin-facing"
-    tag "management"
-    tag "backend"
-    tag "http"
-    tag "interface"
+    tags "center", "admin-facing", "management", "backend", "http", "interface"
   }
 
   layer Application
   owns WarpInsightCenterAdminInterface
   owns AdminViewGatewayList
-  owns AdminGatewayListReturned
   owns AdminViewGatewayListFlow
   owns AdminDispatchGlobalPolicy
-  owns AdminGlobalPolicyDispatchReturned
   owns AdminDispatchGlobalPolicyFlow
   owns AdminShowGatewayStatus
-  owns AdminGatewayStatusReturned
   owns AdminShowGatewayStatusFlow
   owns AdminListGatewayStatus
   owns AdminGatewayStatusListReturned
   owns AdminListGatewayStatusFlow
   owns AdminCreateGatewayInstance
-  owns AdminGatewayInstanceReturned
   owns AdminCreateGatewayInstanceFlow
   owns AdminBindGatewayCustomer
-  owns AdminGatewayCustomerBindingReturned
   owns AdminBindGatewayCustomerFlow
   owns AdminQueryHostInventory
   owns AdminHostInventoryReturned
@@ -66,7 +56,6 @@ module<interface> InsightCenterApp.AdminFacingInterface {
   owns AdminCreateUpgradePlan
   owns AdminListUpgradePlans
   owns AdminApproveUpgradePlan
-  owns AdminUpgradePlanReturned
   owns AdminUpgradePlansReturned
   provides WarpInsightCenterAdminInterface by protocol<http>
   depends Control.InsightCenterApp.WarpInsightCenter
@@ -89,27 +78,15 @@ module<interface> InsightCenterApp.AdminFacingInterface {
 message<command> AdminViewGatewayList = OperatorRequest {
 }
 
-message<response> AdminGatewayListReturned {
-  list: GatewayListView
-}
-
 message<command> AdminDispatchGlobalPolicy = OperatorRequest {
   policy_version: String
   gateway_ids: List<String>
-}
-
-message<response> AdminGlobalPolicyDispatchReturned {
-  dispatch: GlobalPolicyDispatch
 }
 
 // ── 网关实例管理 ──
 
 message<command> AdminShowGatewayStatus = OperatorRequest {
   gateway_id: String
-}
-
-message<response> AdminGatewayStatusReturned {
-  status: GatewayStatusView
 }
 
 // 状态卡片列表（喂前端网关列表页卡片栅格，代码实现对应 GET /api/v1/admin/gateways/status）
@@ -125,17 +102,9 @@ message<command> AdminCreateGatewayInstance = OperatorRequest {
   gateway_name: String
 }
 
-message<response> AdminGatewayInstanceReturned {
-  instance: GatewayInstance
-}
-
 message<command> AdminBindGatewayCustomer = OperatorRequest {
   gateway_id: String
   customer_id: String
-}
-
-message<response> AdminGatewayCustomerBindingReturned {
-  binding: GatewayCustomerBinding
 }
 
 message<command> AdminQueryHostInventory = OperatorRequest {
@@ -310,10 +279,6 @@ message<command> AdminApproveUpgradePlan {
   approved_by: String
 }
 
-message<response> AdminUpgradePlanReturned {
-  plan: UpgradePlan
-}
-
 message<response> AdminUpgradePlansReturned {
   plans: List<UpgradePlan>
 }
@@ -325,28 +290,24 @@ interface WarpInsightCenterAdminInterface {
     label zh "WarpInsightCenter 管理接口"
     label en "WarpInsightCenter Admin Interface"
     summary zh "面向管理员的 WarpInsightCenter 管理接口，承载网关列表/策略编排与网关实例管理。"
-    tag "center"
-    tag "admin-facing"
-    tag "management"
-    tag "http"
-    tag "interface"
+    tags "center", "admin-facing", "management", "http", "interface"
   }
 
   entry AdminViewGatewayList {
     actor GatewayOperator
-    output AdminGatewayListReturned
+    output GatewayListView
     calls AdminViewGatewayListFlow
   }
 
   entry AdminDispatchGlobalPolicy {
     actor PlatformMaintenanceEngineer
-    output AdminGlobalPolicyDispatchReturned
+    output GlobalPolicyDispatch
     calls AdminDispatchGlobalPolicyFlow
   }
 
   entry AdminShowGatewayStatus {
     actor CustomerServiceEngineer
-    output AdminGatewayStatusReturned
+    output GatewayStatusView
     calls AdminShowGatewayStatusFlow
   }
 
@@ -358,13 +319,13 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminCreateGatewayInstance {
     actor CustomerServiceEngineer
-    output AdminGatewayInstanceReturned
+    output GatewayInstance
     calls AdminCreateGatewayInstanceFlow
   }
 
   entry AdminBindGatewayCustomer {
     actor CustomerServiceEngineer
-    output AdminGatewayCustomerBindingReturned
+    output GatewayCustomerBinding
     calls AdminBindGatewayCustomerFlow
   }
 
@@ -406,7 +367,7 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminGetGatewayInitialConfig {
     actor PlatformMaintenanceEngineer
-    output GatewayInitialConfigReturned
+    output GatewayInitialConfig
     calls AdminGetGatewayInitialConfigFlow
   }
 
@@ -424,7 +385,7 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminCreateUpgradePlan {
     actor PlatformMaintenanceEngineer
-    output AdminUpgradePlanReturned
+    output UpgradePlan
     calls AdminCreateUpgradePlanFlow
   }
 
@@ -436,7 +397,7 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminApproveUpgradePlan {
     actor PlatformMaintenanceEngineer
-    output AdminUpgradePlanReturned
+    output UpgradePlan
     calls AdminApproveUpgradePlanFlow
   }
 }

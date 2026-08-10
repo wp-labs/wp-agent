@@ -5,9 +5,7 @@ region PauseAgentUsecaseCard {
     label zh "暂停 Agent 卡片"
     label en "Pause Agent Card"
     summary zh "控制中心的暂停任务卡片，承载暂停 Agent 用例的目标选择、提交操作和受理结果。"
-    tag "admin"
-    tag "agent-pause"
-    tag "usecase-card"
+    tags "admin", "agent-pause", "usecase-card"
   }
 
   orientation vertical
@@ -21,9 +19,7 @@ region PauseAgentForm {
     label zh "暂停 Agent 表单"
     label en "Pause Agent Form"
     summary zh "输入 Agent ID，并触发 AdminPauseAgent 下发暂停请求。"
-    tag "admin"
-    tag "agent-pause"
-    tag "form"
+    tags "admin", "agent-pause", "form"
   }
 
   orientation vertical
@@ -37,9 +33,7 @@ region PauseDispatchReceiptResult {
     label zh "暂停派发回执"
     label en "Pause Agent Dispatch Receipt"
     summary zh "展示暂停控制指令的派发 ID 和回执创建时间。"
-    tag "admin"
-    tag "agent-pause"
-    tag "result"
+    tags "admin", "agent-pause", "result"
   }
 
   orientation vertical
@@ -52,9 +46,7 @@ region UpgradeAgentRemotelyUsecaseCard {
     label zh "远程升级 Agent 卡片"
     label en "Upgrade Agent Remotely Card"
     summary zh "控制中心的远程升级卡片，承载远程升级 Agent 用例的升级表单和受理结果。"
-    tag "admin"
-    tag "agent-upgrade"
-    tag "usecase-card"
+    tags "admin", "agent-upgrade", "usecase-card"
   }
 
   orientation vertical
@@ -68,9 +60,7 @@ region UpgradeAgentRemotelyForm {
     label zh "远程升级表单"
     label en "Remote Upgrade Form"
     summary zh "输入 Agent ID 和目标版本，并触发 AdminUpgradeAgent 下发升级请求。"
-    tag "admin"
-    tag "agent-upgrade"
-    tag "form"
+    tags "admin", "agent-upgrade", "form"
   }
 
   orientation vertical
@@ -85,9 +75,7 @@ region UpgradeDispatchReceiptResult {
     label zh "升级派发回执"
     label en "Upgrade Agent Dispatch Receipt"
     summary zh "展示升级控制指令的派发 ID 和回执创建时间。"
-    tag "admin"
-    tag "agent-upgrade"
-    tag "result"
+    tags "admin", "agent-upgrade", "result"
   }
 
   orientation vertical
@@ -100,9 +88,7 @@ region PauseAgentUsecaseMeta {
     label zh "暂停用例说明"
     label en "Pause Agent Usecase Meta"
     summary zh "表达暂停 Agent 用例的触发命令和输出结果。"
-    tag "admin"
-    tag "agent-pause"
-    tag "usecase-meta"
+    tags "admin", "agent-pause", "usecase-meta"
   }
 
   orientation vertical
@@ -113,9 +99,7 @@ region PauseAgentInput {
     label zh "暂停 Agent 输入"
     label en "Pause Agent Input"
     summary zh "填写需要暂停的 agent_id。"
-    tag "admin"
-    tag "input"
-    tag "agent-pause"
+    tags "admin", "input", "agent-pause"
   }
 
   orientation vertical
@@ -126,9 +110,7 @@ region SubmitPauseAction {
     label zh "提交暂停操作"
     label en "Submit Pause Action"
     summary zh "触发 AdminPauseAgent 命令下发暂停请求。"
-    tag "admin"
-    tag "action"
-    tag "agent-pause"
+    tags "admin", "action", "agent-pause"
   }
 
   orientation horizontal
@@ -139,9 +121,7 @@ region PauseDispatchIdText {
     label zh "暂停派发 ID"
     label en "Pause Dispatch ID"
     summary zh "展示暂停请求被受理后的派发 ID。"
-    tag "admin"
-    tag "output"
-    tag "agent-pause"
+    tags "admin", "output", "agent-pause"
   }
 
   orientation vertical
@@ -152,9 +132,7 @@ region PauseDispatchCreatedAtText {
     label zh "暂停派发创建时间"
     label en "Pause Dispatch Created Time"
     summary zh "展示暂停派发回执创建的时间。"
-    tag "admin"
-    tag "output"
-    tag "agent-pause"
+    tags "admin", "output", "agent-pause"
   }
 
   orientation vertical
@@ -165,9 +143,7 @@ region UpgradeAgentRemotelyUsecaseMeta {
     label zh "远程升级用例说明"
     label en "Remote Upgrade Usecase Meta"
     summary zh "表达远程升级 Agent 用例的触发命令和输出结果。"
-    tag "admin"
-    tag "agent-upgrade"
-    tag "usecase-meta"
+    tags "admin", "agent-upgrade", "usecase-meta"
   }
 
   orientation vertical
@@ -178,9 +154,7 @@ region UpgradeAgentInput {
     label zh "升级 Agent 输入"
     label en "Upgrade Agent Input"
     summary zh "填写需要远程升级的 agent_id。"
-    tag "admin"
-    tag "input"
-    tag "agent-upgrade"
+    tags "admin", "input", "agent-upgrade"
   }
 
   orientation vertical
@@ -191,9 +165,7 @@ region TargetVersionInput {
     label zh "目标版本输入"
     label en "Target Version Input"
     summary zh "填写 Agent 远程升级的目标版本。"
-    tag "admin"
-    tag "input"
-    tag "agent-upgrade"
+    tags "admin", "input", "agent-upgrade"
   }
 
   orientation vertical
@@ -204,9 +176,7 @@ region SubmitUpgradeAction {
     label zh "提交远程升级操作"
     label en "Submit Upgrade Action"
     summary zh "触发 AdminUpgradeAgent 命令下发远程升级请求。"
-    tag "admin"
-    tag "action"
-    tag "agent-upgrade"
+    tags "admin", "action", "agent-upgrade"
   }
 
   orientation horizontal
@@ -217,9 +187,7 @@ region UpgradeDispatchIdText {
     label zh "升级派发 ID"
     label en "Upgrade Dispatch ID"
     summary zh "展示升级控制指令的派发 ID。"
-    tag "admin"
-    tag "output"
-    tag "agent-upgrade"
+    tags "admin", "output", "agent-upgrade"
   }
 
   orientation vertical
@@ -230,9 +198,7 @@ region UpgradeDispatchCreatedAtText {
     label zh "升级派发创建时间"
     label en "Upgrade Dispatch Created Time"
     summary zh "展示升级派发回执创建的时间。"
-    tag "admin"
-    tag "output"
-    tag "agent-upgrade"
+    tags "admin", "output", "agent-upgrade"
   }
 
   orientation vertical
@@ -243,9 +209,7 @@ event AdminPauseAgentRequested {
     label zh "请求暂停 Agent"
     label en "Agent Pause Requested"
     summary zh "AdminOperator 在暂停表单中触发 Agent 暂停请求。"
-    tag "admin"
-    tag "agent-pause"
-    tag "ui-event"
+    tags "admin", "agent-pause", "ui-event"
   }
 
   agent_id
@@ -257,9 +221,7 @@ event AdminUpgradeAgentRequested {
     label zh "请求远程升级 Agent"
     label en "Agent Upgrade Requested"
     summary zh "AdminOperator 在远程升级表单中触发 Agent 远程升级请求。"
-    tag "admin"
-    tag "agent-upgrade"
-    tag "ui-event"
+    tags "admin", "agent-upgrade", "ui-event"
   }
 
   agent_id

@@ -10,10 +10,7 @@ struct HostInventory {
     label zh "主机资产目录"
     label en "Host HostInventory"
     summary zh "主机的慢变化资产事实：身份、硬件与平台信息、OS 与版本、稳定网络与资产属性、首次发现与最近 inventory 刷新时间。"
-    tag "center"
-    tag "asset"
-    tag "inventory"
-    tag "host"
+    tags "center", "asset", "inventory", "host"
   }
 
   unique host_id: String
@@ -44,9 +41,7 @@ struct HostDiskInventoryItem {
     label zh "主机磁盘项"
     label en "Host Disk Item"
     summary zh "主机磁盘 inventory 的子项，包含设备、挂载点与容量信息。"
-    tag "host"
-    tag "inventory"
-    tag "disk"
+    tags "host", "inventory", "disk"
   }
 
   device: String?
@@ -60,9 +55,7 @@ struct HostNetworkInterfaceInventoryItem {
     label zh "主机网卡项"
     label en "Host Network Interface Item"
     summary zh "主机网络接口 inventory 的子项，包含网卡名、MAC 与 IP 地址集合。"
-    tag "host"
-    tag "inventory"
-    tag "network"
+    tags "host", "inventory", "network"
   }
 
   name: String
@@ -76,10 +69,7 @@ struct HostRuntimeState {
     label zh "主机运行态快照"
     label en "Host Runtime State"
     summary zh "主机的快变化运行态：当前负载、资源水位、agent 健康与保护状态。时间点快照，允许频繁刷新，可做保留窗口与 TTL 清理。"
-    tag "center"
-    tag "asset"
-    tag "runtime-state"
-    tag "host"
+    tags "center", "asset", "runtime-state", "host"
   }
 
   host_id: String

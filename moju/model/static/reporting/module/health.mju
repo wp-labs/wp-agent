@@ -3,8 +3,7 @@ module<service> Health {
     label zh "Agent 健康"
     label en "Agent Health"
     summary zh "负责 Agent 自观测健康、发现健康、Metric 健康、运行时快照和故障计数。"
-    tag "reporting"
-    tag "health"
+    tags "reporting", "health"
   }
 
   layer Domain
