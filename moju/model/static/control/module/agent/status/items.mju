@@ -16,13 +16,11 @@ struct AgentInstance {
   last_seen_at: DateTime
 }
 
-command ShowAgentRuntimeStatus {
+command ShowAgentRuntimeStatus = OperatorRequest {
   agent_id: String
-  requested_by: String
 }
 
-command GetAgentOverview {
-  requested_by: String
+command GetAgentOverview = OperatorRequest {
 }
 
 struct AgentRuntimeStatusView {
@@ -86,7 +84,7 @@ struct AgentOverview {
 
 // ── Agent 登记查询（AgentRegistryQuery 并入） ──
 
-command LookupAgentRegistryEntry {
+command LookupAgentRegistryEntry = OperatorRequest {
   meta {
     label zh "查询 Agent 登记记录"
     label en "Lookup Agent Registry Entry"
@@ -94,10 +92,9 @@ command LookupAgentRegistryEntry {
   }
 
   agent_id: String
-  requested_by: String
 }
 
-command QueryAgentCapabilityIndex {
+command QueryAgentCapabilityIndex = OperatorRequest {
   meta {
     label zh "查询 Agent 能力索引"
     label en "Query Agent Capability Index"
@@ -105,5 +102,4 @@ command QueryAgentCapabilityIndex {
   }
 
   agent_id: String
-  requested_by: String
 }

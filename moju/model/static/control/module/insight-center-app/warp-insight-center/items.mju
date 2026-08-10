@@ -3,17 +3,16 @@
 // WarpInsightCenter 的 Application 层编排：网关列表聚合、全局策略下发等
 // 用例级命令与流程，组合各 Domain 模块的事实完成编排。
 
-command ViewGatewayList {
+command ViewGatewayList = OperatorRequest {
   meta {
     label zh "查看网关列表"
     label en "View Gateway List"
     tags "center", "gateway", "list"
   }
 
-  requested_by: String
 }
 
-command DispatchGlobalPolicy {
+command DispatchGlobalPolicy = OperatorRequest {
   meta {
     label zh "下发全局策略"
     label en "Dispatch Global Policy"
@@ -22,7 +21,6 @@ command DispatchGlobalPolicy {
 
   policy_version: String
   gateway_ids: List<String>
-  requested_by: String
 }
 
 flow ViewGatewayListFlow {

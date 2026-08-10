@@ -1,4 +1,4 @@
-command QueryHostInventory {
+command QueryHostInventory = Control.OperatorRequest {
   meta {
     label zh "查询主机资产目录"
     label en "Query Host HostInventory"
@@ -9,10 +9,9 @@ command QueryHostInventory {
   tenant_id: String?
   environment_id: String?
   host_name: String?
-  requested_by: String
 }
 
-command ViewHostRuntimeState {
+command ViewHostRuntimeState = Control.OperatorRequest {
   meta {
     label zh "查看主机运行状态"
     label en "View Host Runtime State"
@@ -20,5 +19,4 @@ command ViewHostRuntimeState {
   }
 
   host_id: String
-  requested_by: String
 }

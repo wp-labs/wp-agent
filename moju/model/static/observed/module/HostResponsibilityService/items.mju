@@ -1,4 +1,4 @@
-command ViewEffectiveHostResponsibility {
+command ViewEffectiveHostResponsibility = Control.OperatorRequest {
   meta {
     label zh "查看主机有效责任"
     label en "View Effective Host HostResponsibility"
@@ -7,10 +7,9 @@ command ViewEffectiveHostResponsibility {
   }
 
   host_id: String
-  requested_by: String
 }
 
-command SyncExternalResponsibility {
+command SyncExternalResponsibility = Control.OperatorRequest {
   meta {
     label zh "同步外部责任关系"
     label en "Sync External HostResponsibility"
@@ -20,7 +19,6 @@ command SyncExternalResponsibility {
 
   system_type: ExternalSystemType
   scope_key: String
-  requested_by: String
 }
 
 struct EffectiveHostResponsibility {

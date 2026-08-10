@@ -77,12 +77,11 @@ struct GateWayOverviewView {
   updated_at: DateTime
 }
 
-command ViewGateWayManagementState {
+command ViewGateWayManagementState = OperatorRequest {
   meta {
     label zh "查看网关管理状态"
     label en "View GateWay Management State"
     tags "gateway", "management"
   }
 
-  requested_by: String
 }

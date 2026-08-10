@@ -2,17 +2,16 @@
 //
 // WarpGateWay 实例的北向管理命令（管理员视角），实体事实由 GatewaySupervision 承载。
 
-command ShowGatewayStatus {
+command ShowGatewayStatus = OperatorRequest {
   meta {
     label zh "展示 Gateway 状态"
     label en "Show Gateway Status"
     tags "gateway", "status", "global-view"
   }
 
-  requested_by: String
 }
 
-command CreateGatewayInstance {
+command CreateGatewayInstance = OperatorRequest {
   meta {
     label zh "创建 GateWay 管理实例"
     label en "Create Gateway Instance"
@@ -20,11 +19,10 @@ command CreateGatewayInstance {
   }
 
   gateway_name: String
-  requested_by: String
   requested_at: DateTime
 }
 
-command BindGatewayCustomer {
+command BindGatewayCustomer = OperatorRequest {
   meta {
     label zh "绑定客户 ID"
     label en "Bind Gateway Customer"
@@ -33,6 +31,5 @@ command BindGatewayCustomer {
 
   gateway_id: String
   customer_id: String
-  requested_by: String
   requested_at: DateTime
 }

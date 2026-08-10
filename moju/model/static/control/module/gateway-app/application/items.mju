@@ -3,17 +3,16 @@
 // WarpGateWay 控制平台的 Application 层编排：网关总览、Agent 列表指令下发等
 // 用例级命令与流程，组合控制面与网关管理 Domain 模块完成编排。
 
-command ViewGateWayOverview {
+command ViewGateWayOverview = OperatorRequest {
   meta {
     label zh "查看网关总览"
     label en "View GateWay Overview"
     tags "gateway", "overview"
   }
 
-  requested_by: String
 }
 
-command DispatchAgentFleetCommand {
+command DispatchAgentFleetCommand = OperatorRequest {
   meta {
     label zh "下发 Agent 列表指令"
     label en "Dispatch Agent Fleet Command"
@@ -22,7 +21,6 @@ command DispatchAgentFleetCommand {
 
   command_kind: String
   agent_ids: List<String>
-  requested_by: String
 }
 
 flow ViewGateWayOverviewFlow {

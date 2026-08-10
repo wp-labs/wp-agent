@@ -1,6 +1,6 @@
 // Module: AgentCommand — Agent 控制指令编排
 
-command PauseAgent {
+command PauseAgent = OperatorRequest {
   meta {
     label zh "暂停 Agent"
     label en "Pause Agent"
@@ -8,11 +8,10 @@ command PauseAgent {
   }
 
   agent_id: String
-  requested_by: String
   requested_at: DateTime
 }
 
-command UpgradeAgent {
+command UpgradeAgent = OperatorRequest {
   meta {
     label zh "远程升级 Agent"
     label en "Upgrade Agent"
@@ -21,7 +20,6 @@ command UpgradeAgent {
 
   agent_id: String
   target_version: String
-  requested_by: String
   requested_at: DateTime
 }
 

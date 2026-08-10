@@ -1,7 +1,7 @@
 // Module: PlatformRelease — 平台版本发布
 // 覆盖 WarpAgentd / WarpGateWay 新版本的发布。
 
-command PublishWarpAgentd {
+command PublishWarpAgentd = OperatorRequest {
   meta {
     label zh "发布 WarpAgentd"
     label en "Publish WarpAgentd"
@@ -10,7 +10,6 @@ command PublishWarpAgentd {
 
   version: String
   artifact_url: String
-  requested_by: String
   requested_at: DateTime
 }
 
@@ -27,7 +26,7 @@ struct WarpAgentdRelease {
   published_at: DateTime
 }
 
-command PublishWarpGateWay {
+command PublishWarpGateWay = OperatorRequest {
   meta {
     label zh "发布 WarpGateWay"
     label en "Publish WarpGateWay"
@@ -36,7 +35,6 @@ command PublishWarpGateWay {
 
   version: String
   artifact_url: String
-  requested_by: String
   requested_at: DateTime
 }
 
@@ -107,7 +105,7 @@ struct UpgradeStep {
   status: String
 }
 
-command CreateUpgradePlan {
+command CreateUpgradePlan = OperatorRequest {
   meta {
     label zh "创建升级计划"
     label en "Create Upgrade Plan"
@@ -117,7 +115,6 @@ command CreateUpgradePlan {
   targets: List<UpgradeTarget>
   gateway_ids: List<String>
   steps: List<UpgradeStep>
-  requested_by: String
   requested_at: DateTime
 }
 
