@@ -1,0 +1,11 @@
+module<pipeline> Collect {
+  meta {
+    label zh "采集管线"
+    label en "Collection Pipeline"
+    summary zh "负责日志采集、Metric 采集、多行折叠、遥测缓冲、WarpParse 摄入头和采集位点管理。"
+    tags "agent", "collection"
+  }
+
+  layer Domain
+  responsible_for "数据采集管线：日志文件输入、多行折叠、缓冲输出、Metrics 采集、WarpParse 摄入、位点管理"
+}

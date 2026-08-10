@@ -1,0 +1,106 @@
+// Module: AgentRegistration — 自动注册与身份引导逻辑
+//
+// AgentEnrollment 的逻辑（逻辑型 module<service>）：安装代码命令与注册流程，
+// 注册实体事实由 AgentEnrollment 承载。
+
+command GetAgentInstallCode {
+}
+
+flow AgentdRegistrationFlow {
+  meta {
+    label zh "Agentd 注册管理中心"
+    label en "Agentd Registration Flow"
+    summary zh "Agentd 使用安装代码拉取安装脚本，并通过脚本中的 enrollment token 向 WarpInsight 管理节点提交注册请求；管理侧在同一次持久化更新中校验并消费 token，拒绝重复 agent identity 后才签发通讯凭据。"
+    tags "agentd", "registration", "enrollment"
+  }
+
+  actor Agentd
+  trigger SubmitEnrollmentRequest
+
+  creates AgentIdentity
+  creates AgentCredentialBundle
+  creates AgentEnrollmentTokenValidation
+  creates AgentInitialConfig
+  creates AgentPolicyBinding
+  creates AgentEnrollmentResult
+
+  step ValidateEnrollmentToken {
+    create AgentEnrollmentTokenValidation {
+      token_id = "install-token-001"
+      tenant_id = "tenant-default"
+      environment_id = "env-default"
+      host_profile = SubmitEnrollmentRequest.host_profile
+      status = "valid"
+      validated_at = SubmitEnrollmentRequest.requested_at
+    }
+
+  }
+
+  step CheckDuplicateRegistration {
+  }
+
+  step IssueAgentIdentity {
+    create AgentIdentity {
+      agent_id = "agent-issued"
+      instance_id = "instance-issued"
+      status = "active"
+    }
+  }
+
+  step IssueAgentCredential {
+    create AgentCredentialBundle {
+      credential_id = "credential-issued"
+      agent_id = "agent-issued"
+      instance_id = "instance-issued"
+      auth_scheme = "bearer"
+      bearer_token = "credential-secret"
+      issued_at = SubmitEnrollmentRequest.requested_at
+    }
+
+  }
+
+  step BuildInitialConfig {
+    create AgentInitialConfig {
+      schema_version = "v1"
+      mode = "managed"
+      gateway_endpoint = "https://warp-insight.local"
+      policy_version = "v1"
+    }
+  }
+
+  step BindInitialPolicy {
+    create AgentPolicyBinding {
+      agent_id = "agent-issued"
+      policy_id = "default-agent-policy"
+      policy_version = "v1"
+      bound_at = SubmitEnrollmentRequest.requested_at
+    }
+  }
+
+  step AcceptRegistration {
+    create AgentEnrollmentResult {
+      status = "accepted"
+      agent_id = "agent-issued"
+      instance_id = "instance-issued"
+      credential_bundle = "credential-issued"
+      initial_config = "v1"
+      policy_binding = "default-agent-policy"
+    }
+  }
+}
+
+verify AgentdRegistrationVerified for flow AgentdRegistrationFlow {
+  given {
+    SubmitEnrollmentRequest.token = "install-token-001"
+    SubmitEnrollmentRequest.host_profile = "host-profile-default"
+    SubmitEnrollmentRequest.requested_at = "2026-07-04T00:00:00Z"
+  }
+
+  when SubmitEnrollmentRequest
+
+  expect {
+    AgentIdentity.agent_id == "agent-issued"
+    AgentCredentialBundle.credential_id == "credential-issued"
+    AgentEnrollmentResult.status == "accepted"
+  }
+}

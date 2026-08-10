@@ -1,0 +1,18 @@
+module<interface> InsightCenterApp.AdminFacingInterface {
+  meta {
+    label zh "全局控制中心管理接口"
+    label en "WarpInsightCenter Admin Facing Interface"
+    summary zh "WarpInsightCenter 面向管理员暴露的 HTTP 管理接口，承载网关列表/策略编排与网关实例管理。"
+    tags "center", "admin-facing", "management", "backend", "http", "interface"
+  }
+
+  layer Application
+  provides WarpInsightCenterAdminInterface by protocol<http>
+  depends Control.InsightCenterApp.WarpInsightCenter
+  depends Control.Gateway.Supervision, Control.Gateway.InstanceManagement
+  depends Control.InsightCenter.PlatformRelease
+  depends Observed.HostInventory, Observed.HostResponsibility
+  depends Observed.NetworkTopology, Observed.ServiceTopology
+  depends Security.SoftwareVulnerability
+  responsible_for "WarpInsightCenter 管理接口：作为管理员与自动化系统的 Application 层入口，承载网关列表/策略编排与网关实例管理。"
+}

@@ -1,0 +1,110 @@
+struct HostInventory {
+  meta {
+    label zh "主机资产目录"
+    label en "Host HostInventory"
+    summary zh "主机的慢变化资产事实：身份、硬件与平台信息、OS 与版本、稳定网络与资产属性、首次发现与最近 inventory 刷新时间。"
+    tags "center", "asset", "inventory", "host"
+  }
+
+  unique host_id: String
+  tenant_id: String
+  environment_id: String
+  host_name: String
+  machine_id: String?
+  serial_number: String?
+  cloud_instance_id: String?
+  vendor: String?
+  model: String?
+  arch: String
+  os_name: String
+  os_version: String?
+  kernel_version: String?
+  cpu_model: String?
+  cpu_core_count: Int?
+  memory_total_bytes: Int?
+  disk_inventory: List<HostDiskInventoryItem>?
+  network_interface_inventory: List<HostNetworkInterfaceInventoryItem>?
+  first_seen_at: DateTime
+  last_inventory_at: DateTime
+  inventory_revision: String
+}
+
+struct HostDiskInventoryItem {
+  meta {
+    label zh "主机磁盘项"
+    label en "Host Disk Item"
+    summary zh "主机磁盘 inventory 的子项，包含设备、挂载点与容量信息。"
+    tags "host", "inventory", "disk"
+  }
+
+  device: String?
+  mount_point: String?
+  total_bytes: Int?
+  filesystem: String?
+}
+
+struct HostNetworkInterfaceInventoryItem {
+  meta {
+    label zh "主机网卡项"
+    label en "Host Network Interface Item"
+    summary zh "主机网络接口 inventory 的子项，包含网卡名、MAC 与 IP 地址集合。"
+    tags "host", "inventory", "network"
+  }
+
+  name: String
+  mac_addr: String?
+  ip_addresses: List<String>
+  mtu: Int?
+}
+
+struct HostRuntimeState {
+  meta {
+    label zh "主机运行态快照"
+    label en "Host Runtime State"
+    summary zh "主机的快变化运行态：当前负载、资源水位、agent 健康与保护状态。时间点快照，允许频繁刷新，可做保留窗口与 TTL 清理。"
+    tags "center", "asset", "runtime-state", "host"
+  }
+
+  host_id: String
+  observed_at: DateTime
+  boot_id: String?
+  uptime_seconds: Int?
+  loadavg_1m: Float?
+  loadavg_5m: Float?
+  loadavg_15m: Float?
+  cpu_usage_pct: Float?
+  memory_used_bytes: Int?
+  memory_available_bytes: Int?
+  disk_used_bytes: Int?
+  disk_available_bytes: Int?
+  process_count: Int?
+  container_count: Int?
+  agent_health: AgentHealth
+  protection_state: ProtectionState?
+  last_error: String?
+}
+
+variant AgentHealth {
+  meta {
+    label zh "Agent 健康状态"
+    label en "Agent Health"
+    summary zh "边缘 agent 的当前健康档位：健康、降级、保护模式、不可用。"
+  }
+
+  Healthy
+  Degraded
+  Protect
+  Unavailable
+}
+
+variant ProtectionState {
+  meta {
+    label zh "保护状态"
+    label en "Protection State"
+    summary zh "主机当前保护/退化状态：正常、降级、保护。"
+  }
+
+  Normal
+  Degraded
+  Protect
+}

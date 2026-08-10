@@ -1,0 +1,11 @@
+module<logic> Gateway.Management {
+  meta {
+    label zh "网关自身管理"
+    label en "GateWay Management"
+    summary zh "负责 WarpGateWay 控制平台自身的管理逻辑：网关实例、控制面配置与健康状态、管理状态与总览视图；查询命令由 GateWayManagement 承载。"
+    tags "control", "gateway", "management"
+  }
+
+  layer Domain
+  responsible_for "网关自身管理：WarpGateWay 实例状态、控制面配置与健康状态、管理状态聚合视图、网关总览视图与管理状态查询；网关对中心的上报由 GatewaySupervision 表达。"
+}

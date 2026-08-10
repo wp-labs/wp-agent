@@ -1,0 +1,11 @@
+module<service> Probe {
+  meta {
+    label zh "发现探针"
+    label en "Discovery Probe"
+    summary zh "负责主机、网络、端点、进程、容器和 K8s 资源发现，以及发现快照刷新和缓存。"
+    tags "agent", "discovery"
+  }
+
+  layer Domain
+  responsible_for "发现探针与运行时：探测、刷新、缓存、持久化"
+}

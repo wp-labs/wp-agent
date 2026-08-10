@@ -1,29 +1,3 @@
 // Module: HostInventoryQuery — 主机资产目录查询
 //
 // HostInventory 的查询逻辑（逻辑型 module<service>），实体事实由 HostInventory 承载。
-
-command QueryHostInventory {
-  meta {
-    label zh "查询主机资产目录"
-    label en "Query Host HostInventory"
-    summary zh "安全分析师按租户、环境或主机名查询主机资产目录。"
-    tags "center", "asset", "inventory"
-  }
-
-  tenant_id: String?
-  environment_id: String?
-  host_name: String?
-  requested_by: String
-}
-
-command ViewHostRuntimeState {
-  meta {
-    label zh "查看主机运行状态"
-    label en "View Host Runtime State"
-    summary zh "安全分析师查看指定主机的当前运行态快照。"
-    tags "center", "asset", "runtime-state"
-  }
-
-  host_id: String
-  requested_by: String
-}

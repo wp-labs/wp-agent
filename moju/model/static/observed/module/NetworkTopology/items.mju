@@ -1,0 +1,148 @@
+struct PodInventory {
+  meta {
+    label zh "Pod 资产目录"
+    label en "Pod HostInventory"
+    summary zh "稳定 pod 目录对象：pod 身份、命名空间、负载归属与最近已知调度节点。"
+    tags "center", "topology", "pod"
+  }
+
+  unique pod_id: String
+  tenant_id: String
+  environment_id: String
+  cluster_id: String?
+  namespace: String
+  workload_id: String?
+  pod_uid: String
+  pod_name: String
+  node_id: String?
+  phase: String?
+  first_seen_at: DateTime
+  last_seen_at: DateTime
+}
+
+struct NetworkDomain {
+  meta {
+    label zh "网络域"
+    label en "Network Domain"
+    summary zh "更高层的网络边界，如 VPC、VLAN 织物或 K8s 集群网络。"
+    tags "center", "topology", "network"
+  }
+
+  unique network_domain_id: String
+  tenant_id: String
+  environment_id: String
+  kind: NetworkDomainKind
+  name: String
+  external_ref: String?
+}
+
+variant NetworkDomainKind {
+  meta {
+    label zh "网络域类型"
+    label en "Network Domain Kind"
+    summary zh "网络域的边界类型：VPC、VLAN 织物、K8s 集群网络或 CNI 织物。"
+  }
+
+  Vpc
+  VlanFabric
+  K8sClusterNetwork
+  CniFabric
+}
+
+struct NetworkSegment {
+  meta {
+    label zh "网络段"
+    label en "Network Segment"
+    summary zh "具体可连接的网络段，属于某个网络域，携带 CIDR 与网关。"
+    tags "center", "topology", "network"
+  }
+
+  unique network_segment_id: String
+  network_domain_id: String
+  segment_type: NetworkSegmentType
+  name: String
+  cidr: String?
+  gateway_ip: String?
+}
+
+variant NetworkSegmentType {
+  meta {
+    label zh "网络段类型"
+    label en "Network Segment Type"
+    summary zh "网络段的类型：子网、overlay、pod 网络、服务网络或命名空间网络。"
+  }
+
+  Subnet
+  Overlay
+  PodNetwork
+  ServiceNetwork
+  NamespaceNetwork
+}
+
+struct PodPlacement {
+  meta {
+    label zh "Pod 调度归属"
+    label en "Pod Placement"
+    summary zh "pod 与 host/node 的调度关系，一个 pod 同一时刻只有一个有效 placement，迁移通过多段生效时间保存。"
+    tags "center", "topology", "pod"
+  }
+
+  unique placement_id: String
+  pod_id: String
+  host_id: String
+  source: String
+  valid_from: DateTime
+  valid_to: DateTime?
+}
+
+struct PodNetworkAttachment {
+  meta {
+    label zh "Pod 网络附件"
+    label en "Pod Network Attachment"
+    summary zh "pod 连接到某个网络段的关系，一个 pod 可有多个 attachment，一个网络段可被多个 pod 共享。"
+    tags "center", "topology", "network"
+  }
+
+  unique attachment_id: String
+  pod_id: String
+  network_segment_id: String
+  interface_name: String?
+  ip_addr: String?
+  mac_addr: String?
+  is_primary: Bool
+  source: AttachmentSource
+  valid_from: DateTime
+  valid_to: DateTime?
+}
+
+struct HostNetworkAttachment {
+  meta {
+    label zh "主机网络附件"
+    label en "Host Network Attachment"
+    summary zh "主机自身连接到某个网络段的关系，表达 host 与网络的关系，不以 PodPlacement 替代。"
+    tags "center", "topology", "network"
+  }
+
+  unique attachment_id: String
+  host_id: String
+  network_segment_id: String
+  interface_name: String?
+  ip_addr: String?
+  mac_addr: String?
+  is_primary: Bool
+  source: AttachmentSource
+  valid_from: DateTime
+  valid_to: DateTime?
+}
+
+variant AttachmentSource {
+  meta {
+    label zh "附件来源"
+    label en "Attachment Source"
+    summary zh "网络附件关系的来源：K8s API、CNI 同步或运行时提示。"
+  }
+
+  K8sApi
+  CniSync
+  RuntimeHint
+}

@@ -1,0 +1,334 @@
+// Module: AdminFacingInterface — 全局控制中心管理接口（forAdmin）
+//
+// WarpInsightCenter 面向管理员的 HTTP 管理接口，与面向 WarpGateWay 实例的
+// GateWayFacingInterface（forGateway）拆分。承载网关列表/策略编排与网关实例管理。
+// 请求/响应为 wire 契约（Admin 前缀），组合中心各 Domain/Application 模块事实。
+
+// ── 列表/策略编排 ──
+
+message<command> AdminViewGatewayList = OperatorRequest {
+}
+
+message<command> AdminDispatchGlobalPolicy = OperatorRequest {
+  policy_version: String
+  gateway_ids: List<String>
+}
+
+// ── 网关实例管理 ──
+
+message<command> AdminShowGatewayStatus = OperatorRequest {
+  gateway_id: String
+}
+
+// 状态卡片列表（喂前端网关列表页卡片栅格，代码实现对应 GET /api/v1/admin/gateways/status）
+
+message<command> AdminListGatewayStatus = OperatorRequest {
+}
+
+message<response> AdminGatewayStatusListReturned {
+  statuses: List<GatewayStatusView>
+}
+
+message<command> AdminCreateGatewayInstance = OperatorRequest {
+  gateway_name: String
+}
+
+message<command> AdminBindGatewayCustomer = OperatorRequest {
+  gateway_id: String
+  customer_id: String
+}
+
+message<command> AdminQueryHostInventory = OperatorRequest {
+  tenant_id: String?
+  environment_id: String?
+  host_name: String?
+}
+
+message<response> AdminHostInventoryReturned {
+  hosts: HostInventory[]
+}
+
+message<command> AdminViewHostRuntimeState = OperatorRequest {
+  host_id: String
+}
+
+message<response> AdminHostRuntimeStateReturned {
+  runtime: HostRuntimeState
+}
+
+message<command> AdminViewNetworkTopology = OperatorRequest {
+}
+
+message<response> AdminNetworkTopologyReturned {
+  segments: NetworkSegment[]
+}
+
+message<command> AdminViewServiceTopology = OperatorRequest {
+  business_id: String?
+  service_id: String?
+}
+
+message<response> AdminServiceTopologyReturned {
+  services: ServiceEntity[]
+}
+
+message<command> AdminViewSoftwareVulnerabilities = OperatorRequest {
+  software_id: String?
+  host_id: String?
+}
+
+message<response> AdminSoftwareVulnerabilitiesReturned {
+  findings: SoftwareVulnerabilityFinding[]
+}
+
+message<command> AdminViewEffectiveResponsibility = OperatorRequest {
+  host_id: String
+}
+
+message<response> AdminEffectiveResponsibilityReturned {
+  responsibility: EffectiveHostResponsibility
+}
+
+// ── 实例 / 运行视图 ──
+
+message<command> AdminListGatewayInstances = OperatorRequest {
+}
+
+message<response> AdminGatewayInstanceListReturned {
+  instances: List<GatewayInstance>
+}
+
+message<command> AdminGetGatewayUptime {
+  gateway_id: String
+}
+
+message<response> AdminGatewayUptimeReturned {
+  gateway_id: String
+  window: String
+  uptime: Float?
+}
+
+message<command> AdminGetGatewayHistory {
+  gateway_id: String
+}
+
+message<response> AdminGatewayHistoryReturned {
+  gateway_id: String
+  window: String
+  step_seconds: Int
+  samples: List<GatewayHistorySample>
+}
+
+struct GatewayHistorySample {
+  at: Int
+  online: Float?
+  memory_bytes: Int?
+  cpu_percent: Float?
+}
+
+message<command> AdminGetAgentHistory {
+  gateway_id: String
+  agent_id: String
+}
+
+message<response> AdminAgentHistoryReturned {
+  agent_id: String
+  gateway_id: String
+  window: String
+  samples: List<AgentHistorySample>
+}
+
+struct AgentHistorySample {
+  at: Int
+  online: Float?
+  memory_bytes: Int?
+  cpu_percent: Float?
+  admin_latency_ms: Int?
+}
+
+message<command> AdminListGatewayAgents {
+  gateway_id: String
+}
+
+message<response> AdminGatewayAgentsReturned {
+  agents: List<AgentRuntimeStatusView>
+}
+
+message<command> AdminGetGatewayLifecycle {
+  gateway_id: String
+}
+
+message<response> AdminGatewayLifecycleReturned {
+  events: List<GatewayLifecycleEvent>
+}
+
+struct GatewayLifecycleEvent {
+  gateway_id: String
+  from_state: String?
+  to_state: String
+  at: DateTime
+}
+
+message<command> AdminGetGatewayInitialConfig {
+  instance_id: String
+}
+
+// ── 版本发布 / 升级计划 ──
+
+message<command> AdminPublishRelease = OperatorRequest {
+  component: String
+  version: String
+  artifact_url: String
+}
+
+message<response> AdminReleaseReturned {
+  version: String
+  artifact_url: String
+  status: String
+  published_at: DateTime
+}
+
+message<command> AdminListReleases {
+  component: String
+}
+
+message<response> AdminReleasesReturned {
+  releases: List<AdminReleaseReturned>
+}
+
+message<command> AdminCreateUpgradePlan = OperatorRequest {
+  targets: List<UpgradeTarget>
+  gateway_ids: List<String>
+  steps: List<UpgradeStep>
+}
+
+message<command> AdminListUpgradePlans {
+}
+
+message<command> AdminApproveUpgradePlan {
+  plan_id: String
+  approved_by: String
+}
+
+message<response> AdminUpgradePlansReturned {
+  plans: List<UpgradePlan>
+}
+
+// ── 接口 ──
+
+interface WarpInsightCenterAdminInterface {
+  meta {
+    label zh "WarpInsightCenter 管理接口"
+    label en "WarpInsightCenter Admin Interface"
+    summary zh "面向管理员的 WarpInsightCenter 管理接口，承载网关列表/策略编排与网关实例管理。"
+    tags "center", "admin-facing", "management", "http", "interface"
+  }
+
+  entry AdminViewGatewayList {
+    actor GatewayOperator
+    output GatewayListView
+    calls AdminViewGatewayListFlow
+  }
+
+  entry AdminDispatchGlobalPolicy {
+    actor PlatformMaintenanceEngineer
+    output GlobalPolicyDispatch
+    calls AdminDispatchGlobalPolicyFlow
+  }
+
+  entry AdminShowGatewayStatus {
+    actor CustomerServiceEngineer
+    output GatewayStatusView
+    calls AdminShowGatewayStatusFlow
+  }
+
+  entry AdminListGatewayStatus {
+    actor CustomerServiceEngineer
+    output AdminGatewayStatusListReturned
+    calls AdminListGatewayStatusFlow
+  }
+
+  entry AdminCreateGatewayInstance {
+    actor CustomerServiceEngineer
+    output GatewayInstance
+    calls AdminCreateGatewayInstanceFlow
+  }
+
+  entry AdminBindGatewayCustomer {
+    actor CustomerServiceEngineer
+    output GatewayCustomerBinding
+    calls AdminBindGatewayCustomerFlow
+  }
+
+  entry AdminListGatewayInstances {
+    actor PlatformMaintenanceEngineer
+    output AdminGatewayInstanceListReturned
+    calls AdminListGatewayInstancesFlow
+  }
+
+  entry AdminGetGatewayUptime {
+    actor PlatformMaintenanceEngineer
+    output AdminGatewayUptimeReturned
+    calls AdminGetGatewayUptimeFlow
+  }
+
+  entry AdminGetGatewayHistory {
+    actor PlatformMaintenanceEngineer
+    output AdminGatewayHistoryReturned
+    calls AdminGetGatewayHistoryFlow
+  }
+
+  entry AdminGetAgentHistory {
+    actor PlatformMaintenanceEngineer
+    output AdminAgentHistoryReturned
+    calls AdminGetAgentHistoryFlow
+  }
+
+  entry AdminListGatewayAgents {
+    actor PlatformMaintenanceEngineer
+    output AdminGatewayAgentsReturned
+    calls AdminListGatewayAgentsFlow
+  }
+
+  entry AdminGetGatewayLifecycle {
+    actor PlatformMaintenanceEngineer
+    output AdminGatewayLifecycleReturned
+    calls AdminGetGatewayLifecycleFlow
+  }
+
+  entry AdminGetGatewayInitialConfig {
+    actor PlatformMaintenanceEngineer
+    output GatewayInitialConfig
+    calls AdminGetGatewayInitialConfigFlow
+  }
+
+  entry AdminPublishRelease {
+    actor PlatformMaintenanceEngineer
+    output AdminReleaseReturned
+    calls AdminPublishReleaseFlow
+  }
+
+  entry AdminListReleases {
+    actor PlatformMaintenanceEngineer
+    output AdminReleasesReturned
+    calls AdminListReleasesFlow
+  }
+
+  entry AdminCreateUpgradePlan {
+    actor PlatformMaintenanceEngineer
+    output UpgradePlan
+    calls AdminCreateUpgradePlanFlow
+  }
+
+  entry AdminListUpgradePlans {
+    actor PlatformMaintenanceEngineer
+    output AdminUpgradePlansReturned
+    calls AdminListUpgradePlansFlow
+  }
+
+  entry AdminApproveUpgradePlan {
+    actor PlatformMaintenanceEngineer
+    output UpgradePlan
+    calls AdminApproveUpgradePlanFlow
+  }
+}

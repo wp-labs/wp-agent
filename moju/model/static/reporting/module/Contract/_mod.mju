@@ -1,0 +1,11 @@
+module Contract {
+  meta {
+    label zh "上报数据契约"
+    label en "Reporting Contract"
+    summary zh "负责 action 计划、执行结果、能力报告、资源使用、遥测记录等上报数据结构。"
+    tags "reporting", "contract"
+  }
+
+  layer Domain
+  responsible_for "业务数据契约：Action 计划/结果、能力上报、遥测记录"
+}

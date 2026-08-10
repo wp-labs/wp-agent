@@ -1,0 +1,84 @@
+struct ReportingRequest {
+  state_dir
+  execution_id
+  agent_id
+  instance_id
+}
+
+struct PreparedReport {
+  report
+  origin
+}
+
+struct PreparedReportOrigin {
+  state_dir
+  execution_id
+}
+
+struct LocalReportIssue {
+  kind
+  detail
+}
+
+struct LocalReportInspection {
+  execution_id
+  action_id
+  has_result
+  has_runtime
+  has_state
+  elapsed_since_finish_ms
+}
+
+state ReportingState {
+  execution_id
+  action_id
+  report_attempt
+  last_reported_at
+}
+
+struct ExporterOutput {
+  kind
+  path
+}
+
+struct ExporterSource {
+  unique source_id
+  kind
+}
+
+struct ExportResult {
+  kind
+  items
+  errors
+}
+
+struct DiscRowContext {
+  resource
+  target
+  candidate
+}
+
+struct ExecutionHistoryRecord {
+  execution_id
+  action_id
+  plan_digest
+  final_status
+  finished_at
+}
+
+struct DaemonLoop {
+  config
+  exec_bin
+}
+
+struct DiscoveryHealth {
+  snapshot
+}
+
+struct SignalRequestKind {
+  variant
+}
+
+struct RunningStateStatus {
+  variant
+}

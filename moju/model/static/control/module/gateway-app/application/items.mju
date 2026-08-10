@@ -1,0 +1,77 @@
+// Module: GateWayApplication — 网关应用编排
+//
+// WarpGateWay 控制平台的 Application 层编排：网关总览、Agent 列表指令下发等
+// 用例级命令与流程，组合控制面与网关管理 Domain 模块完成编排。
+
+command ViewGateWayOverview {
+  meta {
+    label zh "查看网关总览"
+    label en "View GateWay Overview"
+    summary zh "管理员打开 WarpGateWay 控制台时获取网关自身状态与所辖 Agent 的聚合总览。"
+    tags "gateway", "overview"
+  }
+
+  requested_by: String
+}
+
+command DispatchAgentFleetCommand {
+  meta {
+    label zh "下发 Agent 列表指令"
+    label en "Dispatch Agent Fleet Command"
+    summary zh "管理员向选定的一组 Agent 下发统一控制指令（如暂停、升级），生成列表派发回执。"
+    tags "gateway", "agent-command"
+  }
+
+  command_kind: String
+  agent_ids: List<String>
+  requested_by: String
+}
+
+flow ViewGateWayOverviewFlow {
+  meta {
+    label zh "查看网关总览"
+    label en "View GateWay Overview Flow"
+    summary zh "聚合网关自身状态与所辖 Agent 的健康摘要，生成控制台总览视图。"
+    tags "gateway", "overview"
+  }
+
+  actor AdminOperator
+  trigger ViewGateWayOverview
+
+  creates GateWayOverviewView
+
+  step BuildOverview {
+    create GateWayOverviewView {
+      gateway_id = "gateway-001"
+      agent_total = 9
+      agent_online = 7
+      agent_unhealthy = 2
+      status = "online"
+      updated_at = "now"
+    }
+  }
+}
+
+flow DispatchAgentFleetCommandFlow {
+  meta {
+    label zh "下发 Agent 列表指令"
+    label en "Dispatch Agent Fleet Command Flow"
+    summary zh "向选定 Agent 列表下发统一控制指令，并生成派发回执。"
+    tags "gateway", "agent-command"
+  }
+
+  actor AdminOperator
+  trigger DispatchAgentFleetCommand
+
+  creates AgentFleetDispatchReceipt
+
+  step AcceptFleetDispatch {
+    create AgentFleetDispatchReceipt {
+      dispatch_id = "fleet-dispatch-001"
+      command_kind = DispatchAgentFleetCommand.command_kind
+      target_count = 3
+      status = "accepted"
+      created_at = "now"
+    }
+  }
+}

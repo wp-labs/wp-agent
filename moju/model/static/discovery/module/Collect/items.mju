@@ -1,0 +1,211 @@
+command CollectLogs {
+  input_id
+  path
+  since_offset
+}
+
+command CollectMetrics {
+  target_ref
+  collection_kind
+  collected_at
+}
+
+struct FileInputConfig {
+  unique input_id
+  path
+  startup_position
+  multiline_mode
+}
+
+struct FileInputProcessor {
+  config
+  state
+}
+
+struct ProcessOutcome {
+  kind
+  batch
+  delivery
+}
+
+struct ProcessOutcomeKind {
+  variant
+}
+
+struct RawFileLine {
+  offset
+  content
+}
+
+struct ReadFromOffset {
+  offset
+  limit
+}
+
+struct StartupPosition {
+  variant
+}
+
+struct ResumeDecision {
+  start_offset
+}
+
+struct IfEmptyThen {
+  variant
+}
+
+struct MultilineMode {
+  variant
+}
+
+struct FoldedLine {
+  lines
+  start_offset
+  end_offset
+}
+
+struct FoldResult {
+  folded
+  remainder
+}
+
+struct RecordSink {
+}
+
+struct TelemetryRecordSink {
+  kind
+}
+
+struct FileRecordSink {
+  path
+}
+
+struct TcpRecordSink {
+  addr
+  port
+  framing
+}
+
+struct TcpFraming {
+  variant
+}
+
+struct StageResult {
+  staged
+  overflow
+}
+
+struct TelemetryBuffer {
+  records
+  byte_limit
+}
+
+struct MetricsRuntimeSnapshot {
+  collection_time
+  target_samples
+}
+
+struct MetricsCollectionOutcome {
+  target
+  success
+  error
+}
+
+struct MetricsCollectionTargetSample {
+  target_ref
+  resource_ref
+  collection_kind
+  collected_at
+}
+
+struct MetricsSamplesSnapshot {
+  groups
+}
+
+struct MetricsSampleGroup {
+  target_ref
+  resource_ref
+  collection_kind
+  records
+}
+
+struct MetricsSampleRecord {
+  name
+  value
+  timestamp
+}
+
+struct MetricsTargetView {
+  generated_at
+  entries
+}
+
+struct MetricsTargetViewEntry {
+  target_ref
+  resource_ref
+  collection_kind
+  last_collected_at
+}
+
+struct WarpParseIngestHead {
+  api_version
+  kind
+  encoding
+  compression
+  record_count
+  unique source_id
+  agent_id
+  instance_id
+  collected_at
+  sent_at
+}
+
+struct WarpParseIngestMessageKind {
+  variant
+}
+
+struct WarpParseIngestEncoding {
+  variant
+}
+
+struct WarpParseIngestCompression {
+  variant
+}
+
+struct LogCheckpointState {
+  file_checkpoints
+  pending_multiline
+}
+
+struct PendingMultilineState {
+  input_id
+  lines
+}
+
+struct TrackedFileCheckpoint {
+  unique input_id
+  path
+  offset
+  inode
+  updated_at
+}
+
+struct PendingCheckpoint {
+  input_id
+  offset
+}
+
+struct RuntimeState {
+  pending
+}
+
+struct CollectedReadBatch {
+  lines
+  next_offset
+  eof
+}
+
+struct DeliveryOutcome {
+  success
+  records
+}

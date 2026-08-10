@@ -1,0 +1,11 @@
+module<entity> Gateway.Identity {
+  meta {
+    label zh "GateWay 身份"
+    label en "GateWay Identity"
+    summary zh "负责 WarpGateWay 实例接入 WarpInsightCenter 后的稳定身份与身份状态实体。"
+    tags "control", "gateway", "identity"
+  }
+
+  layer Domain
+  responsible_for "GateWay 身份实体：gateway_id、实例、租户/环境/节点绑定与身份状态；对中心的接入由 GatewaySupervision 表达。"
+}

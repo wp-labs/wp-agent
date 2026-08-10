@@ -1,0 +1,8 @@
+// Module: OperatorContext — 操作请求上下文
+//
+// 面向管理员/运维人员的接口命令（Admin* 系列）统一继承 OperatorRequest，
+// 携带请求发起人 requested_by，避免在每个命令里重复声明该字段。
+
+struct OperatorRequest {
+  requested_by: String
+}
