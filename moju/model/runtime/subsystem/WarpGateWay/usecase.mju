@@ -9,10 +9,10 @@ usecase InitializeGatewayViaUrl {
     tags "gateway", "bootstrap", "initialize", "config"
   }
 
-  actor Control.WarpGateway
-  trigger Control.GetGatewayInitialConfig
+  actor Control.AdminOperator
+  trigger Control.AdminGetGatewayInitialConfig
   outcome Control.GatewayInitialConfig
-  flow Control.GetGatewayInitialConfigFlow
+  flow Control.AdminGetGatewayInitialConfigFlow
 }
 
 // 注册到 WarpInsightCenter
