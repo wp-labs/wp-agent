@@ -13,7 +13,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-OUT_DIR="${1:-ca}"
+# 默认输出到 ~/.warpinsight-center/ca（本地开发）；服务器部署可用绝对路径覆盖
+OUT_DIR="${1:-${HOME}/.warpinsight-center/ca}"
 SERVER_CN="${2:-control-center.warp-insight.local}"
 CA_CN="${CA_CN:-WarpInsight Control Center CA}"
 DAYS="${DAYS:-3650}"
