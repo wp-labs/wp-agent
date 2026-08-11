@@ -3,6 +3,8 @@
 #   ① 控制面连接  ② 注册上下文  ③ 身份与凭据  ④ 初始策略  ⑤ 遥测  ⑥ 版本/协议
 
 [control_center]
+# 信任根由 WarpInsightCenter 签发，随注册 token（GatewayEnrollmentToken.control_center_trust_bundle）下发
+# 网关安装时预置到本地，用于注册前验证控制中心 TLS
 endpoint = "https://warp-insight.example.com"
 trust_bundle = "/etc/warp-gateway/ca/control-center.pem"
 server_tls_required = true

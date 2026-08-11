@@ -135,7 +135,7 @@ struct GatewayEnrollmentToken {
   meta {
     label zh "网关注册 Token"
     label en "Gateway Enrollment Token"
-    summary zh "WarpInsightCenter 生成的 WarpGateway 注册资格凭证，服务端保存 token hash，通过环境绑定、使用次数、有效期和状态控制合法性。"
+    summary zh "WarpInsightCenter 生成的 WarpGateway 注册资格凭证，服务端保存 token hash，通过环境绑定、使用次数、有效期和状态控制合法性；随 token 携带控制中心签发的 TLS 信任根，供网关在注册前验证控制中心。"
     tags "gateway", "enrollment", "token"
   }
 
@@ -143,6 +143,7 @@ struct GatewayEnrollmentToken {
   token_hash: String
   tenant_id: String
   environment_id: String
+  control_center_trust_bundle: String
   max_uses: Int
   used_count: Int
   issued_by: String
