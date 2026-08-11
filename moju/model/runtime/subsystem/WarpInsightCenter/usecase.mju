@@ -3,17 +3,20 @@
 // 网关级事实（Control.WarpGateway、Control.GatewayOperator 及 GatewaySupervision
 // 模块下的 command/struct）在 Control 域 gateway-supervision.mju 中建模。
 
-// 创建Gateway管理实例
+// 创建 Gateway 管理实例并准备配置文件
 usecase CreateGatewayInstance {
   meta {
-    label zh "创建 Gateway 管理实例"
-    label en "Create Gateway Instance"
-    tags "gateway", "provisioning"
+    label zh "创建 Gateway 管理实例并准备配置文件"
+    label en "Create Gateway Instance and Prepare Config"
+    summary zh "创建 Gateway 管理实例并签发注册 Token（含控制中心信任根），为网关准备初始配置文件（control_center/trust_bundle/enrollment token）。"
+    tags "gateway", "provisioning", "config"
   }
 
   actor Control.CustomerServiceEngineer
   trigger Control.CreateGatewayInstance
   outcome Control.GatewayInstance
+  outcome Control.GatewayEnrollmentToken
+  flow Control.AdminCreateGatewayInstanceFlow
 }
 
 // 绑定客户ID

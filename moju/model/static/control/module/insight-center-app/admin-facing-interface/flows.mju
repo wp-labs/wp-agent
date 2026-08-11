@@ -36,10 +36,39 @@ flow AdminListGatewayStatusFlow {
 }
 
 flow AdminCreateGatewayInstanceFlow {
+  meta {
+    label zh "创建 Gateway 管理实例并准备配置"
+    label en "Create Gateway Instance and Prepare Config"
+    summary zh "创建 Gateway 管理实例并签发注册 Token（含控制中心信任根），为网关生成初始配置文件。"
+    tags "gateway", "provisioning", "config"
+  }
+
   actor CustomerServiceEngineer
   trigger AdminCreateGatewayInstance
 
-  
+  creates GatewayInstance
+  creates GatewayEnrollmentToken
+
+  step CreateInstance {
+    create GatewayInstance {
+      gateway_id = AdminCreateGatewayInstance.gateway_name
+      lifecycle_state = "Provisioned"
+      created_at = "now"
+    }
+  }
+
+  step IssueEnrollmentToken {
+    create GatewayEnrollmentToken {
+      token_id = "gw-enroll-001"
+      token_hash = "sha256:token-hash"
+      control_center_trust_bundle = "control-center.pem"
+      max_uses = 1
+      used_count = 0
+      status = "Active"
+      issued_at = "now"
+      expires_at = "2026-09-01T00:00:00Z"
+    }
+  }
 }
 
 flow AdminBindGatewayCustomerFlow {
