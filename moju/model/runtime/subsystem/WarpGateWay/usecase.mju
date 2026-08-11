@@ -1,17 +1,31 @@
 // WarpGateway 子系统用例
 
-// 通过 URL 初始化并注册到 WarpInsightCenter
+// 通过 URL 初始化
 usecase InitializeGatewayViaUrl {
   meta {
-    label zh "通过 URL 初始化并注册到控制中心"
-    label en "Initialize Gateway via URL and Register"
-    summary zh "WarpGateway 实例安装后通过控制中心初始化 URL（control_center_endpoint）获取初始配置，完成初始化并向 WarpInsightCenter 注册。"
-    tags "gateway", "bootstrap", "initialize", "register", "config"
+    label zh "通过 URL 初始化"
+    label en "Initialize Gateway via URL"
+    summary zh "WarpGateway 实例安装后通过控制中心初始化 URL（control_center_endpoint）获取初始配置，完成网关初始化。"
+    tags "gateway", "bootstrap", "initialize", "config"
   }
 
   actor Control.WarpGateway
   trigger Control.GetGatewayInitialConfig
   outcome Control.GatewayInitialConfig
+}
+
+// 注册到 WarpInsightCenter
+usecase RegisterToInsightCenter {
+  meta {
+    label zh "注册到 WarpInsightCenter"
+    label en "Register to WarpInsightCenter"
+    summary zh "WarpGateway 实例向 WarpInsightCenter 上报网关状态，完成在线注册并进入中心监管视图。"
+    tags "gateway", "register", "status", "supervision"
+  }
+
+  actor Control.WarpGateway
+  trigger Control.ReportGatewayStatus
+  outcome Control.GatewayStatusAccepted
 }
 
 // 获取 Agent 安装代码
