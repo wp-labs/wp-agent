@@ -1,6 +1,7 @@
 # WarpGateway 初始配置示例（静态预置）
 # 基于安全注册机制的网关初始化配置（对应 GatewayInitialConfig 设计）
 # 运行期产物（instance_id / gateway_id / credential_id）见 gateway_run.json
+# 策略、遥测等未定项：想清楚后再加上
 
 version = 1  # 配置文件格式版本（解析器先读它决定如何解析后续内容）
 
@@ -11,14 +12,6 @@ server_tls_required = true
 
 [enrollment]
 token_id = "gw-enroll-001"
-
-[policy]
-policy_version = "v1"
-policy_binding_id = "default-gateway-policy"
-
-[telemetry]
-output = "warp-parse"
-interval_seconds = 60
 
 [protocol]
 version = "1.0"  # 网关↔中心 wire 协议版本
