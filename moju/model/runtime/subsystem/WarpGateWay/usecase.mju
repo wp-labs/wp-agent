@@ -12,6 +12,7 @@ usecase InitializeGatewayViaUrl {
   actor Control.WarpGateway
   trigger Control.GetGatewayInitialConfig
   outcome Control.GatewayInitialConfig
+  flow Control.GetGatewayInitialConfigFlow
 }
 
 // 注册到 WarpInsightCenter
@@ -26,6 +27,7 @@ usecase RegisterToInsightCenter {
   actor Control.WarpGateway
   trigger Control.ReportGatewayStatus
   outcome Control.GatewayStatusAccepted
+  flow Control.RegisterGatewayFlow
 }
 
 // 获取 Agent 安装代码

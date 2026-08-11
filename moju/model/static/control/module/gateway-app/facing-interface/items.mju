@@ -23,6 +23,11 @@ interface WarpInsightCenterGatewayInterface {
     tags "gateway", "gateway-facing", "bootstrap", "status", "http", "interface"
   }
 
+  entry RegisterGateway {
+    actor WarpGateway
+    output GatewayEnrollmentResult
+  }
+
   entry GetGatewayInitialConfig {
     actor WarpGateway
     output GatewayInitialConfig

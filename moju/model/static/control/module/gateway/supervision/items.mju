@@ -128,3 +128,255 @@ message<command> ReportGatewayStatus {
   cpu_percent: Float?
   reported_at: DateTime
 }
+
+// ── 安全注册（forGateway：预共享 Token → 身份/凭据签发，参考 Agentd） ──
+
+struct GatewayEnrollmentToken {
+  meta {
+    label zh "网关注册 Token"
+    label en "Gateway Enrollment Token"
+    summary zh "WarpInsightCenter 生成的 WarpGateway 注册资格凭证，服务端保存 token hash，通过环境绑定、使用次数、有效期和状态控制合法性。"
+    tags "gateway", "enrollment", "token"
+  }
+
+  unique token_id: String
+  token_hash: String
+  tenant_id: String
+  environment_id: String
+  max_uses: Int
+  used_count: Int
+  issued_by: String
+  issued_at: DateTime
+  expires_at: DateTime
+  revoked_at: DateTime
+  status: GatewayEnrollmentTokenStatus
+}
+
+variant GatewayEnrollmentTokenStatus {
+  meta {
+    label zh "网关注册 Token 状态"
+    label en "Gateway Enrollment Token Status"
+    summary zh "描述网关注册 token 的可用、过期、耗尽或禁用等状态。"
+    tags "gateway", "enrollment", "status"
+  }
+
+  Active
+  Expired
+  Revoked
+  Used
+  Exhausted
+}
+
+struct GatewayEnrollmentAuthProfile {
+  meta {
+    label zh "网关注册认证配置"
+    label en "Gateway Enrollment Auth Profile"
+    summary zh "定义 WarpGateway 注册阶段所需的 HTTPS 服务端证书校验、内部 CA 信任根和注册 token 要求。"
+    tags "gateway", "enrollment", "auth"
+  }
+
+  server_tls_required: Bool
+  trust_bundle_required: Bool
+  enrollment_token_required: Bool
+}
+
+struct GatewayEnrollmentTokenValidation {
+  meta {
+    label zh "网关注册 Token 校验"
+    label en "Gateway Enrollment Token Validation"
+    summary zh "WarpGateway 注册时对预共享 token 的校验结果记录。"
+    tags "gateway", "enrollment", "validation"
+  }
+
+  token_id: String
+  gateway_id: String
+  status: String
+  validated_at: DateTime
+}
+
+struct GatewayCredentialBundle {
+  meta {
+    label zh "网关通讯凭据"
+    label en "Gateway Credential Bundle"
+    summary zh "WarpGateway 注册成功后签发的 bearer 凭据，用于后续访问 WarpInsightCenter 网关接口的认证。"
+    tags "gateway", "credential"
+  }
+
+  unique credential_id: String
+  gateway_id: String
+  instance_id: String
+  auth_scheme: String
+  bearer_token: String
+  issued_at: DateTime
+  expires_at: DateTime
+}
+
+struct GatewayCredentialVerificationResult {
+  meta {
+    label zh "网关凭据校验结果"
+    label en "Gateway Credential Verification Result"
+    summary zh "WarpGateway 后续调用时凭据校验的结果记录。"
+    tags "gateway", "credential", "verify"
+  }
+
+  gateway_id: String
+  credential_id: String
+  status: String
+  verified_at: DateTime
+}
+
+struct GatewayEnrollmentResult {
+  meta {
+    label zh "网关注册结果"
+    label en "Gateway Enrollment Result"
+    summary zh "WarpGateway 安全注册的回执：签发身份、凭据与初始配置引用。"
+    tags "gateway", "enrollment", "result"
+  }
+
+  status: String
+  gateway_id: String
+  instance_id: String
+  credential_id: String
+  initial_config: String
+}
+
+message<command> RegisterGateway {
+  enrollment_token: String
+  instance_id: String
+  requested_at: DateTime
+}
+
+message<command> VerifyGatewayCredential {
+  gateway_id: String
+  instance_id: String
+  credential_id: String
+}
+
+message<command> RenewGatewayCredential {
+  gateway_id: String
+  instance_id: String
+  current_credential_id: String
+}
+
+flow RegisterGatewayFlow {
+  meta {
+    label zh "网关注册管理中心"
+    label en "Gateway Registration Flow"
+    summary zh "WarpGateway 持预共享 Token 注册：校验 Token、防重复、签发网关身份与通讯凭据，返回注册回执。"
+    tags "gateway", "registration", "enrollment", "secure"
+  }
+
+  actor WarpGateway
+  trigger RegisterGateway
+
+  creates GatewayEnrollmentTokenValidation
+  creates GatewayIdentity
+  creates GatewayCredentialBundle
+  creates GatewayEnrollmentResult
+
+  step ValidateEnrollmentToken {
+    create GatewayEnrollmentTokenValidation {
+      token_id = RegisterGateway.enrollment_token
+      gateway_id = "gateway-issued"
+      status = "valid"
+      validated_at = RegisterGateway.requested_at
+    }
+  }
+
+  step CheckDuplicateRegistration {
+  }
+
+  step IssueGatewayIdentity {
+    create GatewayIdentity {
+      gateway_id = "gateway-issued"
+      instance_id = RegisterGateway.instance_id
+      status = "Active"
+      issued_at = RegisterGateway.requested_at
+    }
+  }
+
+  step IssueGatewayCredential {
+    create GatewayCredentialBundle {
+      credential_id = "credential-issued"
+      gateway_id = "gateway-issued"
+      instance_id = RegisterGateway.instance_id
+      auth_scheme = "bearer"
+      bearer_token = "gateway-credential-secret"
+      issued_at = RegisterGateway.requested_at
+    }
+  }
+
+  step AcceptRegistration {
+    create GatewayEnrollmentResult {
+      status = "accepted"
+      gateway_id = "gateway-issued"
+      instance_id = RegisterGateway.instance_id
+      credential_id = "credential-issued"
+      initial_config = "v1"
+    }
+  }
+}
+
+flow VerifyGatewayCredentialFlow {
+  meta {
+    label zh "校验网关通讯凭据"
+    label en "Verify Gateway Credential Flow"
+    summary zh "WarpGateway 访问网关接口前校验 bearer 凭据的有效性。"
+    tags "gateway", "credential", "verify"
+  }
+
+  actor WarpGateway
+  trigger VerifyGatewayCredential
+
+  creates GatewayCredentialVerificationResult
+
+  step VerifyCredential {
+    create GatewayCredentialVerificationResult {
+      gateway_id = VerifyGatewayCredential.gateway_id
+      credential_id = VerifyGatewayCredential.credential_id
+      status = "valid"
+      verified_at = "now"
+    }
+  }
+}
+
+flow RenewGatewayCredentialFlow {
+  meta {
+    label zh "续期网关通讯凭据"
+    label en "Renew Gateway Credential Flow"
+    summary zh "WarpGateway 用当前凭据申请新的 bearer 凭据，实现凭据定期轮换。"
+    tags "gateway", "credential", "renewal"
+  }
+
+  actor WarpGateway
+  trigger RenewGatewayCredential
+
+  creates GatewayCredentialBundle
+
+  step IssueRenewedCredential {
+    create GatewayCredentialBundle {
+      credential_id = "credential-renewed"
+      gateway_id = RenewGatewayCredential.gateway_id
+      instance_id = RenewGatewayCredential.instance_id
+      auth_scheme = "bearer"
+      bearer_token = "gateway-credential-renewed"
+      issued_at = "now"
+    }
+  }
+}
+
+verify GatewayRegistrationVerified for flow RegisterGatewayFlow {
+  given {
+    RegisterGateway.enrollment_token = "install-token-001"
+    RegisterGateway.instance_id = "gateway-issued"
+    RegisterGateway.requested_at = "2026-07-04T00:00:00Z"
+  }
+
+  when RegisterGateway
+
+  expect {
+    GatewayEnrollmentTokenValidation.status == "valid"
+    GatewayCredentialBundle.credential_id == "credential-issued"
+    GatewayEnrollmentResult.status == "accepted"
+  }
+}

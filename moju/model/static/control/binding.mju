@@ -100,6 +100,12 @@ bind WpAgentOnlineRegistrationInterface {
 }
 
 bind WarpInsightCenterGatewayInterface {
+  entry RegisterGateway {
+    route POST "/api/v1/gateway/register"
+    auth none
+    status GatewayEnrollmentResult 200
+  }
+
   entry GetGatewayInitialConfig {
     route GET "/api/v1/gateway/initial-config"
     auth bearer
