@@ -1,7 +1,8 @@
 # WarpGateway 初始配置示例（静态预置）
-# 基于安全注册机制的网关初始化配置（对应 GatewayInitialConfig 设计）：
-#   ① 控制面连接  ② 注册上下文  ④ 初始策略  ⑤ 遥测  ⑥ 版本/协议
+# 基于安全注册机制的网关初始化配置（对应 GatewayInitialConfig 设计）
 # 运行期产物（instance_id / gateway_id / credential_id）见 gateway_run.json
+
+version = 1  # 配置文件格式版本（解析器先读它决定如何解析后续内容）
 
 [control_center]
 endpoint = "https://warp-insight.example.com"
@@ -19,6 +20,5 @@ policy_binding_id = "default-gateway-policy"
 output = "warp-parse"
 interval_seconds = 60
 
-[version]
-schema_version = "v1"
-protocol_version = "1.0"
+[protocol]
+version = "1.0"  # 网关↔中心 wire 协议版本
