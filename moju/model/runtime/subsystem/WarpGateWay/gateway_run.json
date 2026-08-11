@@ -1,0 +1,16 @@
+{
+  // WarpGateway 运行信息（注册后由网关写入，非静态配置）
+  "gateway_id": "gateway-001",
+  "instance_id": "gateway-001/boot-20260811",
+  "registration": {
+    "status": "registered",
+    "enrollment_token_id": "gw-enroll-001",
+    "registered_at": "2026-08-11T00:00:00Z"
+  },
+  "credential": {
+    "credential_id": "credential-issued-001",
+    "auth_scheme": "bearer",
+    "issued_at": "2026-08-11T00:00:00Z",
+    "expires_at": "2026-09-11T00:00:00Z"
+  }
+}
