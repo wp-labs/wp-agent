@@ -46,7 +46,7 @@ struct GatewayHealth {
   reported_at: DateTime
 }
 
-struct GatewayManagementStateView {
+struct GatewayManagementState {
   meta {
     label zh "网关管理状态视图"
     label en "Gateway Management State View"
@@ -62,20 +62,6 @@ struct GatewayManagementStateView {
   last_seen_at: DateTime
 }
 
-struct GatewayOverviewView {
-  meta {
-    label zh "网关总览视图"
-    label en "Gateway Overview View"
-    tags "gateway", "overview", "console"
-  }
-
-  gateway_id: String
-  agent_total: Int
-  agent_online: Int
-  agent_unhealthy: Int
-  status: String
-  updated_at: DateTime
-}
 
 command ViewGatewayManagementState = OperatorRequest {
   meta {

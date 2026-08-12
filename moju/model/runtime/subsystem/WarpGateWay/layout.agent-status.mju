@@ -9,7 +9,7 @@ region ShowAgentRuntimeStatusUsecaseCard {
   }
 
   orientation vertical
-  contains ShowAgentRuntimeStatusUsecaseMeta { slot_trigger: ShowAgentRuntimeStatus, slot_outcome: AgentRuntimeStatusView }
+  contains ShowAgentRuntimeStatusUsecaseMeta { slot_trigger: ShowAgentRuntimeStatus, slot_outcome: AgentRuntimeStatus }
   contains ShowAgentRuntimeStatusForm
   contains AgentRuntimeStatusResult
 }

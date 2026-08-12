@@ -23,28 +23,8 @@ command DispatchGlobalPolicy = OperatorRequest {
   gateway_ids: List<String>
 }
 
-flow ViewGatewayListFlow {
-  meta {
-    label zh "查看网关列表"
-    label en "View Gateway List Flow"
-    tags "center", "gateway", "list"
-  }
-
-  actor GatewayOperator
-  trigger ViewGatewayList
-
-  creates GatewayListView
-
-  step BuildListView {
-    create GatewayListView {
-      gateway_count = 3
-      online_count = 2
-      degraded_count = 1
-      offline_count = 0
-      updated_at = "now"
-    }
-  }
-}
+// 注意：GatewayListView 是查询/聚合视图（message<response>），非领域实体，
+// 不由 flow 创建——列表视图由 handler 聚合返回。
 
 flow DispatchGlobalPolicyFlow {
   meta {

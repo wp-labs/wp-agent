@@ -130,7 +130,7 @@ region AbnormalAgentCardGrid {
   }
 
   orientation grid
-  repeat AbnormalAgentCard for agent in AgentRuntimeStatusView
+  repeat AbnormalAgentCard for agent in AgentRuntimeStatus
   layout fill_remaining
   layout scrollable
 }

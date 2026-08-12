@@ -3,7 +3,7 @@
 
 #[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
 #[moju(kind = "struct", domain = "Control", module = "Control.Agent.Status")]
-pub struct AgentRuntimeStatusView {
+pub struct AgentRuntimeStatus {
     pub version: String,
     pub health: String,
     pub instance_id: String,

@@ -135,17 +135,7 @@ struct MetricsSampleRecord {
   timestamp
 }
 
-struct MetricsTargetView {
-  generated_at
-  entries
-}
-
-struct MetricsTargetViewEntry {
-  target_ref
-  resource_ref
-  collection_kind
-  last_collected_at
-}
+// MetricsTargetView 是采集目标视图（读投影），形状由实现层派生，不建模进模型。
 
 struct WarpParseIngestHead {
   api_version

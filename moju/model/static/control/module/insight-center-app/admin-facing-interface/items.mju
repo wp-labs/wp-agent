@@ -44,10 +44,6 @@ message<command> AdminViewHostRuntimeState = OperatorRequest {
   host_id: String
 }
 
-message<response> AdminHostRuntimeStateReturned {
-  runtime: HostRuntimeState
-}
-
 message<command> AdminViewNetworkTopology = OperatorRequest {
 }
 
@@ -65,10 +61,6 @@ message<command> AdminViewEffectiveResponsibility = OperatorRequest {
   host_id: String
 }
 
-message<response> AdminEffectiveResponsibilityReturned {
-  responsibility: EffectiveHostResponsibility
-}
-
 // ── 实例 / 运行视图 ──
 
 message<command> AdminListGatewayInstances = OperatorRequest {
@@ -78,48 +70,13 @@ message<command> AdminGetGatewayUptime {
   gateway_id: String
 }
 
-message<response> AdminGatewayUptimeReturned {
-  gateway_id: String
-  window: String
-  uptime: Float?
-}
-
 message<command> AdminGetGatewayHistory {
   gateway_id: String
-}
-
-message<response> AdminGatewayHistoryReturned {
-  gateway_id: String
-  window: String
-  step_seconds: Int
-  samples: List<GatewayHistorySample>
-}
-
-struct GatewayHistorySample {
-  at: Int
-  online: Float?
-  memory_bytes: Int?
-  cpu_percent: Float?
 }
 
 message<command> AdminGetAgentHistory {
   gateway_id: String
   agent_id: String
-}
-
-message<response> AdminAgentHistoryReturned {
-  agent_id: String
-  gateway_id: String
-  window: String
-  samples: List<AgentHistorySample>
-}
-
-struct AgentHistorySample {
-  at: Int
-  online: Float?
-  memory_bytes: Int?
-  cpu_percent: Float?
-  admin_latency_ms: Int?
 }
 
 message<command> AdminListGatewayAgents {
@@ -149,19 +106,8 @@ message<command> AdminPublishRelease = OperatorRequest {
   artifact_url: String
 }
 
-message<response> AdminReleaseReturned {
-  version: String
-  artifact_url: String
-  status: String
-  published_at: DateTime
-}
-
 message<command> AdminListReleases {
   component: String
-}
-
-message<response> AdminReleasesReturned {
-  releases: List<AdminReleaseReturned>
 }
 
 message<command> AdminCreateUpgradePlan = OperatorRequest {
@@ -189,7 +135,7 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminViewGatewayList {
     actor GatewayOperator
-    output GatewayListView
+    output Projection<List<GatewayInstance>>
   }
 
   entry AdminDispatchGlobalPolicy {
@@ -199,12 +145,12 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminShowGatewayStatus {
     actor CustomerServiceEngineer
-    output GatewayStatusView
+    output GatewayRuntimeStatus
   }
 
   entry AdminListGatewayStatus {
     actor CustomerServiceEngineer
-    output List<GatewayStatusView>
+    output List<GatewayRuntimeStatus>
   }
 
   entry AdminCreateGatewayInstance {
@@ -224,22 +170,22 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminGetGatewayUptime {
     actor PlatformMaintenanceEngineer
-    output AdminGatewayUptimeReturned
+    output Projection<GatewayRuntimeStatus>
   }
 
   entry AdminGetGatewayHistory {
     actor PlatformMaintenanceEngineer
-    output AdminGatewayHistoryReturned
+    output Projection<List<GatewayRuntimeStatus>>
   }
 
   entry AdminGetAgentHistory {
     actor PlatformMaintenanceEngineer
-    output AdminAgentHistoryReturned
+    output Projection<List<AgentRuntimeStatus>>
   }
 
   entry AdminListGatewayAgents {
     actor PlatformMaintenanceEngineer
-    output List<AgentRuntimeStatusView>
+    output List<AgentRuntimeStatus>
   }
 
   entry AdminGetGatewayLifecycle {
@@ -254,12 +200,12 @@ interface WarpInsightCenterAdminInterface {
 
   entry AdminPublishRelease {
     actor PlatformMaintenanceEngineer
-    output AdminReleaseReturned
+    output Projection<WarpGatewayRelease>
   }
 
   entry AdminListReleases {
     actor PlatformMaintenanceEngineer
-    output AdminReleasesReturned
+    output List<WarpGatewayRelease>
   }
 
   entry AdminCreateUpgradePlan {

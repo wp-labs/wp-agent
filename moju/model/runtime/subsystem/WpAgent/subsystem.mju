@@ -9,4 +9,5 @@ subsystem WpAgent {
 
   uses module Discovery.Config, Discovery.Probe, Discovery.Collect, Discovery.Execute
   uses module Observed.Snapshot, Observed.Entity
+  uses flow Control.AgentdRegistrationFlow, Reporting.AgentHelloFlow
 }

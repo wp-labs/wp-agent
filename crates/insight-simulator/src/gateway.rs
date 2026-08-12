@@ -132,10 +132,22 @@ pub async fn fetch_initial_config(
         .await
         .map_err(|err| format!("failed to decode initial config response: {err}"))?;
     println!(
-        "event=InitialConfigFetched endpoint={} policy={} telemetry={}",
+        "event=InitialConfigFetched endpoint={} tls_required={} protocol={} trust_bundle_id={} ca_bundle_len={}",
         returned.config.control_center_endpoint,
-        returned.config.policy_version,
-        returned.config.telemetry_output
+        returned.config.server_tls_required,
+        returned.config.protocol_version,
+        returned
+            .config
+            .trust_bundle
+            .as_ref()
+            .map(|bundle| bundle.trust_bundle_id.as_str())
+            .unwrap_or("<none>"),
+        returned
+            .config
+            .trust_bundle
+            .as_ref()
+            .map(|bundle| bundle.ca_bundle.len())
+            .unwrap_or(0),
     );
     Ok(())
 }

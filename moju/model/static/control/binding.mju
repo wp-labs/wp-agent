@@ -14,7 +14,7 @@ bind WarpGatewayManagementInterface {
     route GET "/api/v1/admin/agents/{agent_id}/runtime-status"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status AgentRuntimeStatusView 200
+    status AgentRuntimeStatus 200
   }
 
   entry AdminGetAgentOverview {
@@ -42,7 +42,7 @@ bind WarpGatewayManagementInterface {
     route GET "/api/v1/admin/gateway/management-state"
     auth bearer
     actor_identity AdminOperator.id from jwt.sub
-    status GatewayManagementStateView 200
+    status GatewayManagementState 200
   }
 
   entry AdminLookupAgentRegistryEntry {
@@ -126,7 +126,7 @@ bind WarpInsightCenterAdminInterface {
     route GET "/api/v1/admin/gateways"
     auth bearer
     actor_identity GatewayOperator.id from jwt.sub
-    status GatewayListView 200
+    status Projection<List<GatewayInstance>> 200
   }
 
   entry AdminDispatchGlobalPolicy {
@@ -140,14 +140,14 @@ bind WarpInsightCenterAdminInterface {
     route GET "/api/v1/admin/gateways/{gateway_id}/status"
     auth bearer
     actor_identity CustomerServiceEngineer.id from jwt.sub
-    status GatewayStatusView 200
+    status GatewayRuntimeStatus 200
   }
 
   entry AdminListGatewayStatus {
     route GET "/api/v1/admin/gateways/status"
     auth bearer
     actor_identity CustomerServiceEngineer.id from jwt.sub
-    status List<GatewayStatusView> 200
+    status List<GatewayRuntimeStatus> 200
   }
 
   entry AdminCreateGatewayInstance {

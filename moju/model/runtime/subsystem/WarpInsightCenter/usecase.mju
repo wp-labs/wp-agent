@@ -8,7 +8,7 @@ usecase CreateGatewayInstance {
   meta {
     label zh "创建 Gateway 管理实例并准备配置文件"
     label en "Create Gateway Instance and Prepare Config"
-    summary zh "创建 Gateway 管理实例并签发注册 Token（含控制中心信任根），为网关准备初始配置文件（control_center/trust_bundle/enrollment token）。"
+    summary zh "创建 Gateway 管理实例并签发注册 Token（含控制中心信任根）；初始配置内容由网关初始化时从中心获取（GetInitialConfig）。"
     tags "gateway", "provisioning", "config"
   }
 
@@ -92,9 +92,10 @@ usecase GetInitialConfig {
     tags "gateway", "bootstrap", "config"
   }
 
-  actor Control.CustomerServiceEngineer
+  actor Control.WarpGateway
   trigger Control.GetGatewayInitialConfig
   outcome Control.GatewayInitialConfig
+  flow Control.GetGatewayInitialConfigFlow
 }
 
 // 接收Gateway状态上报
@@ -120,5 +121,5 @@ usecase ViewGatewayStatus {
 
   actor Control.CustomerServiceEngineer
   trigger Control.ShowGatewayStatus
-  outcome Control.GatewayStatusView
+  outcome Control.GatewayRuntimeStatus
 }

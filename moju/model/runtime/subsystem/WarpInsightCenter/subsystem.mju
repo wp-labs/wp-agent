@@ -23,4 +23,5 @@ subsystem WarpInsightCenter {
   uses module Control.GatewayApp.FacingInterface
   uses module Control.InsightCenterApp.AdminFacingInterface
   uses module Control.InsightCenterApp.WarpInsightCenter
+  uses flow Control.AdminCreateGatewayInstanceFlow, Control.GetGatewayInitialConfigFlow
 }

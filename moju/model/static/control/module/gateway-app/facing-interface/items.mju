@@ -7,7 +7,7 @@
 
 message<command> ReportAgentStatus {
   gateway_id: String
-  agents: List<AgentRuntimeStatusView>
+  agents: List<AgentRuntimeStatus>
 }
 
 message<response> AgentStatusAcceptedReturned {
@@ -56,11 +56,15 @@ flow GetGatewayInitialConfigFlow {
 
   creates GatewayInitialConfig
 
+  // 网关初始化拉取配置：config 携带控制中心信任包（公钥），
+  // 由创建时 PrepareTrustBundle 准备的 ControlCenterTrustBundle 引用而来。
   step BuildInitialConfig {
     create GatewayInitialConfig {
-      control_center_endpoint = GetGatewayInitialConfig.instance_id
-      policy_version = "v1"
-      telemetry_output = "warp-parse"
+      control_center_endpoint = "https://center.warpinsight.example"
+      trust_bundle = ControlCenterTrustBundle
+      server_tls_required = true
+      protocol_version = "1.0"
+      enrollment_token_id = "gw-enroll-001"
     }
   }
 }

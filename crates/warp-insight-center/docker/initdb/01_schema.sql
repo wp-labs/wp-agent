@@ -17,6 +17,24 @@ CREATE TABLE IF NOT EXISTS gateways (
   last_seen_at TIMESTAMPTZ
 );
 
+-- 网关注册 Token（映射模型 GatewayEnrollmentToken）：只存 hash，限量/状态/有效期，
+-- 携带环境绑定与控制中心信任根。
+CREATE TABLE IF NOT EXISTS enrollment_tokens (
+  token_id TEXT PRIMARY KEY,
+  token_hash TEXT NOT NULL,
+  gateway_id TEXT NOT NULL,
+  tenant_id TEXT NOT NULL DEFAULT 'tenant-default',
+  environment_id TEXT NOT NULL DEFAULT 'env-default',
+  issued_by TEXT NOT NULL DEFAULT '',
+  control_center_trust_bundle TEXT,
+  max_uses BIGINT NOT NULL DEFAULT 1,
+  used_count BIGINT NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'Active',
+  issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  revoked_at TIMESTAMPTZ
+);
+
 -- Gateway 上报的其下 Agent 状态（快照，agent_id 幂等 upsert）。
 CREATE TABLE IF NOT EXISTS agent_status (
   agent_id TEXT PRIMARY KEY,

@@ -1,12 +1,16 @@
 // @moju generated
 // Model module: Control.Gateway.Supervision
 
+pub mod control_center_trust_bundle;
+pub use control_center_trust_bundle::*;
+pub mod gateway_enrollment_result;
+pub use gateway_enrollment_result::*;
 pub mod gateway_initial_config;
 pub use gateway_initial_config::*;
 pub mod gateway_status_accepted;
 pub use gateway_status_accepted::*;
-pub mod gateway_status_view;
-pub use gateway_status_view::*;
+pub mod gateway_runtime_status;
+pub use gateway_runtime_status::*;
 pub mod gateway_instance;
 pub use gateway_instance::*;
 pub mod gateway_instance_lifecycle_state;
@@ -19,5 +23,7 @@ pub mod global_policy_dispatch;
 pub use global_policy_dispatch::*;
 pub mod get_gateway_initial_config;
 pub use get_gateway_initial_config::*;
+pub mod register_gateway;
+pub use register_gateway::*;
 pub mod report_gateway_status;
 pub use report_gateway_status::*;

@@ -53,7 +53,7 @@ interface WarpGatewayManagementInterface {
 
   entry AdminShowAgentRuntimeStatus {
     actor AdminOperator
-    output AgentRuntimeStatusView
+    output AgentRuntimeStatus
   }
 
   entry AdminGetAgentOverview {
@@ -73,7 +73,7 @@ interface WarpGatewayManagementInterface {
 
   entry AdminViewGatewayManagementState {
     actor AdminOperator
-    output GatewayManagementStateView
+    output GatewayManagementState
   }
 
   entry AdminLookupAgentRegistryEntry {
@@ -149,10 +149,10 @@ flow AdminShowAgentRuntimeStatusFlow {
   actor AdminOperator
   trigger AdminShowAgentRuntimeStatus
 
-  depends AgentInstance, AgentRuntimeStatusView
+  depends AgentInstance, AgentRuntimeStatus
 
   step BuildRuntimeStatusView {
-    create AgentRuntimeStatusView {
+    create AgentRuntimeStatus {
       agent_id = AdminShowAgentRuntimeStatus.agent_id
       status = "online"
     }
@@ -170,7 +170,7 @@ flow AdminGetAgentOverviewFlow {
   actor AdminOperator
   trigger AdminGetAgentOverview
 
-  depends AgentInstance, AgentRuntimeStatusView
+  depends AgentInstance, AgentRuntimeStatus
 
   creates AgentOverviewMetrics
   creates RecentOnlineRegisteredAgent
@@ -196,7 +196,7 @@ flow AdminGetAgentOverviewFlow {
     create AgentOverview {
       metrics = AgentOverviewMetrics
       recent_online_agents = RecentOnlineRegisteredAgent
-      abnormal_agents = AgentRuntimeStatusView
+      abnormal_agents = AgentRuntimeStatus
     }
   }
 }
@@ -285,10 +285,10 @@ flow AdminViewGatewayManagementStateFlow {
 
   depends WarpGatewayInstance, GatewayControlConfig, GatewayHealth
 
-  creates GatewayManagementStateView
+  creates GatewayManagementState
 
   step BuildManagementState {
-    create GatewayManagementStateView {
+    create GatewayManagementState {
       gateway_id = "gateway-001"
       instance_id = "gateway-001/boot-20260801"
       version = "0.1.0"
@@ -376,7 +376,7 @@ verify AdminGetAgentOverviewVerified for flow AdminGetAgentOverviewFlow {
     AgentOverviewMetrics.unhealthy_agents == 2
     RecentOnlineRegisteredAgent.online_duration_seconds == 5400
     AgentOverview.recent_online_agents == RecentOnlineRegisteredAgent
-    AgentOverview.abnormal_agents == AgentRuntimeStatusView
+    AgentOverview.abnormal_agents == AgentRuntimeStatus
   }
 }
 

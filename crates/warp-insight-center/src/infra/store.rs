@@ -2,7 +2,7 @@
 // - FileStore：JSON 文件快照（镜像 warp-gateway AdminStore），测试/无 PG 回退路径。
 // - PgStore：PostgreSQL（开发期，见 pg_store.rs）。
 // 持有每网关的凭证（sha256 hash）与最新上报状态（version/status/health/last_seen_at），
-// 后续 GatewayStatusView / GatewayListView 从快照聚合读取。
+// 后续 GatewayRuntimeStatus / GatewayListView 从快照聚合读取。
 
 use std::{
     collections::HashMap,
@@ -36,6 +36,8 @@ pub enum StoreError {
     Sql(sqlx::Error),
     /// 网关已存在（create_gateway 幂等冲突）。
     Conflict(String),
+    /// 注册 Token 校验失败：无效/过期/已耗尽/被吊销。
+    Enrollment(String),
 }
 
 impl fmt::Display for StoreError {
@@ -45,6 +47,7 @@ impl fmt::Display for StoreError {
             Self::Json(err) => write!(f, "center store json error: {err}"),
             Self::Sql(err) => write!(f, "center store sql error: {err}"),
             Self::Conflict(gateway_id) => write!(f, "gateway {gateway_id} already exists"),
+            Self::Enrollment(reason) => write!(f, "enrollment token rejected: {reason}"),
         }
     }
 }
@@ -84,6 +87,51 @@ pub struct CenterStoreSnapshot {
     pub upgrade_plans: Vec<UpgradePlanRecord>,
     /// 网关-客户绑定记录。
     pub customer_bindings: Vec<GatewayCustomerBindingRecord>,
+    /// 网关注册 Token（key = token_id；映射模型 GatewayEnrollmentToken）。
+    #[serde(default)]
+    pub enrollment_tokens: HashMap<String, StoredEnrollmentToken>,
+}
+
+/// 签发注册 Token 的入参（映射模型 GatewayEnrollmentToken 的签发侧可变字段）。
+#[derive(Debug, Clone)]
+pub struct EnrollmentTokenIssue {
+    /// 明文 token（仅用于计算 hash 落库，不持久化明文）。
+    pub token: String,
+    /// 签发人（管理面 requested_by）。
+    pub issued_by: String,
+    /// 控制中心信任根（control-center.pem 内容），随注册 token 下发；
+    /// 未配置 CA → None。
+    pub control_center_trust_bundle: Option<String>,
+}
+
+/// 网关注册 Token 记录（映射模型 GatewayEnrollmentToken）：服务端只存 hash，
+/// 用 max_uses/used_count/status/expiry 控制"限量、防重放、可吊销"。
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StoredEnrollmentToken {
+    pub token_id: String,
+    pub token_hash: String,
+    pub gateway_id: String,
+    /// 环境绑定（模型字段；默认 "tenant-default"）。
+    #[serde(default)]
+    pub tenant_id: String,
+    /// 环境绑定（模型字段；默认 "env-default"）。
+    #[serde(default)]
+    pub environment_id: String,
+    /// 签发人（模型字段，admin 面的 requested_by）。
+    #[serde(default)]
+    pub issued_by: String,
+    /// 随注册 token 下发的控制中心信任根（control-center.pem 内容）。
+    #[serde(default)]
+    pub control_center_trust_bundle: Option<String>,
+    pub max_uses: i64,
+    pub used_count: i64,
+    pub status: String, // Active / Used / Exhausted / Revoked / Expired
+    pub issued_at: DateTime,
+    #[serde(default)]
+    pub expires_at: Option<DateTime>,
+    /// 吊销时间（status = Revoked 时记录）。
+    #[serde(default)]
+    pub revoked_at: Option<DateTime>,
 }
 
 /// 网关-客户绑定记录（映射模型 GatewayCustomerBinding）。
@@ -134,7 +182,7 @@ pub struct StoredGateway {
     pub credential_status: StoredGatewayCredentialStatus,
     #[serde(default)]
     pub credential_expires_at: Option<String>,
-    /// 最新上报状态（喂 GatewayStatusView，last_seen_at = reported_at）。
+    /// 最新上报状态（喂 GatewayRuntimeStatus，last_seen_at = reported_at）。
     #[serde(default)]
     pub version: Option<String>,
     #[serde(default)]
@@ -237,6 +285,31 @@ pub trait Store: Send + Sync + std::fmt::Debug {
         gateway_id: &str,
         token: &str,
     ) -> Result<StoredGateway, StoreError>;
+    /// 为网关签发注册 Token（映射模型 GatewayEnrollmentToken）：持久化 hash、
+    /// 限量（默认 max_uses=1）、状态 Active、有效期。注册/初始化时消费。
+    async fn create_enrollment_token(
+        &self,
+        gateway_id: &str,
+        issue: &EnrollmentTokenIssue,
+    ) -> Result<StoredEnrollmentToken, StoreError>;
+    /// 校验并消费一个注册 Token：按 hash 查找；状态/有效期/用量不合法 → Err；
+    /// 合法则递增 used_count，达 max_uses → Exhausted；返回 token（含 gateway_id）。
+    async fn consume_enrollment_token(
+        &self,
+        token: &str,
+    ) -> Result<StoredEnrollmentToken, StoreError>;
+    /// 吊销注册 Token（映射模型 GatewayEnrollmentTokenStatus.Revoked）：
+    /// 校验归属 gateway_id 后置 status=Revoked + revoked_at；未知 token / 归属不符 → Err。
+    async fn revoke_enrollment_token(
+        &self,
+        gateway_id: &str,
+        token_id: &str,
+    ) -> Result<StoredEnrollmentToken, StoreError>;
+    /// 查询某网关最近签发的一个注册 Token（初始配置的 enrollment_token_id 引用用）。
+    async fn get_enrollment_token_for_gateway(
+        &self,
+        gateway_id: &str,
+    ) -> Result<Option<StoredEnrollmentToken>, StoreError>;
     /// 落库 Gateway 上报的其下 Agent 状态（按 agent_id 幂等 upsert，记录归属 gateway_id）。
     async fn upsert_agent_status(
         &self,
@@ -386,6 +459,128 @@ impl FileStore {
             GatewayInstanceLifecycleState::Provisioned,
         )?;
         Ok(stored)
+    }
+
+    /// 签发注册 Token（同步，供测试与 trait 委托）：默认 max_uses=1、30 天有效、
+    /// 环境绑定 tenant-default/env-default，携带控制中心信任根。
+    pub fn create_enrollment_token(
+        &self,
+        gateway_id: &str,
+        issue: &EnrollmentTokenIssue,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        let token_hash = if issue.token.is_empty() {
+            String::new()
+        } else {
+            sha256_hex(&issue.token)
+        };
+        self.update(|snapshot| {
+            let now = DateTime::now();
+            let serial = snapshot
+                .enrollment_tokens
+                .values()
+                .filter(|t| t.gateway_id == gateway_id)
+                .count() as i64
+                + 1;
+            let token = StoredEnrollmentToken {
+                token_id: format!("enroll-{gateway_id}-{serial}"),
+                token_hash,
+                gateway_id: gateway_id.to_string(),
+                tenant_id: "tenant-default".to_string(),
+                environment_id: "env-default".to_string(),
+                issued_by: issue.issued_by.clone(),
+                control_center_trust_bundle: issue.control_center_trust_bundle.clone(),
+                max_uses: 1,
+                used_count: 0,
+                status: "Active".to_string(),
+                issued_at: now.clone(),
+                expires_at: Some(DateTime::in_days(30)),
+                revoked_at: None,
+            };
+            snapshot
+                .enrollment_tokens
+                .insert(token.token_id.clone(), token.clone());
+            Ok(token)
+        })?
+    }
+
+    /// 吊销注册 Token（同步，供测试与 trait 委托）：校验归属 gateway_id 后
+    /// status → Revoked + revoked_at。已吊销再吊销视为幂等成功；未知 token / 归属不符 → Err。
+    pub fn revoke_enrollment_token(
+        &self,
+        gateway_id: &str,
+        token_id: &str,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        self.update(|snapshot| {
+            let Some(token) = snapshot.enrollment_tokens.get_mut(token_id) else {
+                return Err(StoreError::Enrollment("token not found".to_string()));
+            };
+            if token.gateway_id != gateway_id {
+                return Err(StoreError::Enrollment(
+                    "token gateway mismatch".to_string(),
+                ));
+            }
+            token.status = "Revoked".to_string();
+            token.revoked_at = Some(DateTime::now());
+            Ok(token.clone())
+        })?
+    }
+
+    /// 查询某网关最近签发的一个注册 Token（同步，供测试与 trait 委托）：
+    /// 按 issued_at 取最新，供初始配置的 enrollment_token_id 引用。
+    pub fn get_enrollment_token_for_gateway(
+        &self,
+        gateway_id: &str,
+    ) -> Result<Option<StoredEnrollmentToken>, StoreError> {
+        let snapshot = self.load()?;
+        Ok(snapshot
+            .enrollment_tokens
+            .values()
+            .filter(|token| token.gateway_id == gateway_id)
+            .max_by(|left, right| {
+                left.issued_at.to_chrono().cmp(&right.issued_at.to_chrono())
+            })
+            .cloned())
+    }
+
+    /// 校验并消费注册 Token（同步）：按 hash 查找，校验状态/有效期/用量，
+    /// 递增 used_count，达 max_uses → Exhausted；返回 token（含 gateway_id）。
+    pub fn consume_enrollment_token(
+        &self,
+        token: &str,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        let token_hash = sha256_hex(token);
+        self.update(|snapshot| {
+            let found = snapshot
+                .enrollment_tokens
+                .values_mut()
+                .find(|t| !t.token_hash.is_empty() && t.token_hash == token_hash)
+                .ok_or_else(|| StoreError::Enrollment("token not found".to_string()))?;
+            if found.status != "Active" && found.status != "Used" {
+                return Err(StoreError::Enrollment(format!(
+                    "token status {}",
+                    found.status
+                )));
+            }
+            if found
+                .expires_at
+                .as_ref()
+                .is_some_and(|exp| exp.to_chrono() < chrono::Utc::now())
+            {
+                found.status = "Expired".to_string();
+                return Err(StoreError::Enrollment("token expired".to_string()));
+            }
+            if found.used_count >= found.max_uses {
+                found.status = "Exhausted".to_string();
+                return Err(StoreError::Enrollment("token exhausted".to_string()));
+            }
+            found.used_count += 1;
+            found.status = if found.used_count >= found.max_uses {
+                "Exhausted".to_string()
+            } else {
+                "Used".to_string()
+            };
+            Ok(found.clone())
+        })?
     }
 
     /// 落库 Agent 状态（同步，供测试与 trait 委托）：按 agent_id upsert，归属以 gateway_id 参数为准。
@@ -711,6 +906,36 @@ impl Store for FileStore {
         FileStore::create_gateway(self, gateway_id, token)
     }
 
+    async fn create_enrollment_token(
+        &self,
+        gateway_id: &str,
+        issue: &EnrollmentTokenIssue,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        FileStore::create_enrollment_token(self, gateway_id, issue)
+    }
+
+    async fn consume_enrollment_token(
+        &self,
+        token: &str,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        FileStore::consume_enrollment_token(self, token)
+    }
+
+    async fn revoke_enrollment_token(
+        &self,
+        gateway_id: &str,
+        token_id: &str,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        FileStore::revoke_enrollment_token(self, gateway_id, token_id)
+    }
+
+    async fn get_enrollment_token_for_gateway(
+        &self,
+        gateway_id: &str,
+    ) -> Result<Option<StoredEnrollmentToken>, StoreError> {
+        FileStore::get_enrollment_token_for_gateway(self, gateway_id)
+    }
+
     async fn upsert_agent_status(
         &self,
         gateway_id: &str,
@@ -997,6 +1222,112 @@ mod tests {
         // 空 token → 空 hash（无凭证网关无法上报）。
         let stored = store.create_gateway("gw-nocred", "").expect("create no credential");
         assert_eq!(stored.credential_token_hash, "");
+
+        let _ = fs::remove_file(path);
+    }
+
+    #[test]
+    fn enrollment_token_single_use_anti_replay_and_revoke() {
+        let path = test_store_path();
+        let store = FileStore::new(&path);
+
+        // 签发：携带环境绑定 + 签发人 + 信任根。
+        let issue = EnrollmentTokenIssue {
+            token: "enroll-tok-1".to_string(),
+            issued_by: "admin-test".to_string(),
+            control_center_trust_bundle: Some(
+                "-----BEGIN CERTIFICATE-----\nca\n-----END CERTIFICATE-----".to_string(),
+            ),
+        };
+        let token = store
+            .create_enrollment_token("gw-001", &issue)
+            .expect("create");
+        assert_eq!(token.status, "Active");
+        assert_eq!(token.max_uses, 1);
+        assert_eq!(token.used_count, 0);
+        assert_eq!(token.tenant_id, "tenant-default");
+        assert_eq!(token.environment_id, "env-default");
+        assert_eq!(token.issued_by, "admin-test");
+        assert!(token.control_center_trust_bundle.is_some());
+        assert!(token.expires_at.is_some());
+        assert!(token.revoked_at.is_none());
+
+        // 首次消费成功 → Exhausted（max_uses=1）。
+        let consumed = store
+            .consume_enrollment_token("enroll-tok-1")
+            .expect("consume");
+        assert_eq!(consumed.status, "Exhausted");
+        assert_eq!(consumed.used_count, 1);
+
+        // 防重放：第二次消费被拒（Exhausted 状态在状态检查处被拒收）。
+        let err = store
+            .consume_enrollment_token("enroll-tok-1")
+            .expect_err("anti-replay");
+        assert!(
+            matches!(err, StoreError::Enrollment(_)),
+            "expected enrollment rejection, got {err}"
+        );
+
+        // 吊销：Revoked 后消费被拒；归属不符拒绝吊销。
+        let token2 = store
+            .create_enrollment_token(
+                "gw-001",
+                &EnrollmentTokenIssue {
+                    token: "enroll-tok-2".to_string(),
+                    issued_by: "admin-test".to_string(),
+                    control_center_trust_bundle: None,
+                },
+            )
+            .expect("create2");
+        let revoked = store
+            .revoke_enrollment_token("gw-001", &token2.token_id)
+            .expect("revoke");
+        assert_eq!(revoked.status, "Revoked");
+        assert!(revoked.revoked_at.is_some());
+        let err = store
+            .consume_enrollment_token("enroll-tok-2")
+            .expect_err("revoked reject");
+        assert!(
+            matches!(err, StoreError::Enrollment(ref reason) if reason.starts_with("token status")),
+            "expected revoked rejection, got {err}"
+        );
+        let err = store
+            .revoke_enrollment_token("gw-999", &token2.token_id)
+            .expect_err("gateway mismatch");
+        assert!(matches!(err, StoreError::Enrollment(_)));
+
+        let _ = fs::remove_file(path);
+    }
+
+    #[test]
+    fn get_enrollment_token_for_gateway_returns_latest_for_gateway() {
+        let path = test_store_path();
+        let store = FileStore::new(&path);
+        let issue = |token: &str| EnrollmentTokenIssue {
+            token: token.to_string(),
+            issued_by: "test".to_string(),
+            control_center_trust_bundle: None,
+        };
+        store
+            .create_enrollment_token("gw-001", &issue("tok-1"))
+            .expect("t1");
+        store
+            .create_enrollment_token("gw-001", &issue("tok-2"))
+            .expect("t2");
+        store
+            .create_enrollment_token("gw-002", &issue("tok-3"))
+            .expect("t3");
+
+        // 同网关取最新签发；跨网关互不可见。
+        let latest = store
+            .get_enrollment_token_for_gateway("gw-001")
+            .expect("lookup")
+            .expect("some");
+        assert_eq!(latest.token_id, "enroll-gw-001-2");
+        assert!(store
+            .get_enrollment_token_for_gateway("gw-999")
+            .expect("lookup")
+            .is_none());
 
         let _ = fs::remove_file(path);
     }

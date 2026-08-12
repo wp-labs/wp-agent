@@ -14,4 +14,5 @@ subsystem WarpGateway {
   uses module Control.Protocol, Control.Agent.Registry, Control.Agent.Status
   uses module Control.Gateway.Management, Control.Gateway.Management
   uses module Control.GatewayApp.Application
+  uses flow Control.RegisterGatewayFlow
 }

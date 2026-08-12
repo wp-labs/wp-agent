@@ -9,6 +9,14 @@ pub struct DateTime(chrono::DateTime<chrono::Utc>);
 
 impl DateTime {
     pub fn now() -> Self { Self(chrono::Utc::now()) }
+    /// `days` 天后的时刻（如注册 Token 有效期）。
+    pub fn in_days(days: i64) -> Self {
+        Self(
+            chrono::Utc::now()
+                .checked_add_signed(chrono::Duration::days(days))
+                .unwrap_or_else(chrono::Utc::now),
+        )
+    }
     pub fn from_rfc3339(value: &str) -> Option<Self> {
         chrono::DateTime::parse_from_rfc3339(value).ok().map(|v| Self(v.with_timezone(&chrono::Utc)))
     }

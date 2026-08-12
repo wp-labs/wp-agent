@@ -12,7 +12,7 @@ use insight_control::{
     AdminAgentRuntimeStatusReturned, AdminPauseAgentDispatchReturned,
     AdminUpgradeAgentDispatchReturned,
 };
-use insight_control::types::{AgentRuntimeStatusView, DateTime, DispatchReceipt};
+use insight_control::types::{AgentRuntimeStatus, DateTime, DispatchReceipt};
 
 use super::{admin_auth::require_admin_bearer, rate_limit, ApiState};
 
@@ -155,8 +155,8 @@ fn runtime_status(
     memory_bytes: Option<u64>,
     cpu_percent: Option<f64>,
     admin_latency_ms: Option<u64>,
-) -> AgentRuntimeStatusView {
-    AgentRuntimeStatusView {
+) -> AgentRuntimeStatus {
+    AgentRuntimeStatus {
         agent_id: agent_id.to_string(),
         instance_id: instance_id.to_string(),
         version: version.to_string(),

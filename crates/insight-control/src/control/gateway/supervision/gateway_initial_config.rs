@@ -3,6 +3,8 @@
 #[moju(kind = "struct", domain = "Control", module = "Control.Gateway.Supervision")]
 pub struct GatewayInitialConfig {
     pub control_center_endpoint: String,
-    pub policy_version: String,
-    pub telemetry_output: String,
+    pub trust_bundle: Option<crate::ControlCenterTrustBundle>,
+    pub server_tls_required: bool,
+    pub protocol_version: String,
+    pub enrollment_token_id: String,
 }

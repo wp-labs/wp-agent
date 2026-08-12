@@ -13,14 +13,16 @@ use axum::{
 use insight_control::types::DateTime;
 use insight_control::{
     AdminGatewayCustomerBindingReturned, AdminGatewayListReturned, AdminGatewayStatusListReturned,
-    AdminGatewayStatusReturned, AgentRuntimeStatusView, GatewayCustomerBinding, GatewayInitialConfig,
+    AdminGatewayStatusReturned, AgentRuntimeStatus, GatewayCustomerBinding, GatewayInitialConfig,
     GatewayInitialConfigReturned, GatewayInstance, GatewayInstanceLifecycleState, GatewayListView,
-    GatewayStatusView, UpgradeStep, UpgradeTarget,
+    GatewayRuntimeStatus, UpgradeStep, UpgradeTarget,
 };
 
-use crate::infra::{StoreError, StoredGateway, UpgradePlanRecord};
+use crate::infra::{
+    EnrollmentTokenIssue, StoreError, StoredEnrollmentToken, StoredGateway, UpgradePlanRecord,
+};
 
-use super::{admin_auth::require_admin_bearer, rate_limit, ApiState};
+use super::{admin_auth::require_admin_bearer, build_control_center_trust_bundle, rate_limit, ApiState};
 
 /// 创建网关实例请求体：对齐模型 `AdminCreateGatewayInstance`（gateway_name/requested_by），
 /// 额外扩展可选 `token`（脚本传入；前端表单不传则创建无凭证网关，无法上报状态）。
@@ -38,6 +40,11 @@ pub struct GatewayInstallInfo {
     pub install_command: String,
     pub cloud_image: String,
     pub init_url: String,
+    /// 生成的网关初始配置（config.toml：version/control_center/enrollment/protocol）。
+    /// [enrollment] 内嵌原始 token——网关对 /register 与 init_url 的 Bearer 鉴权所需。
+    pub config_toml: String,
+    /// 控制中心 CA 证书内容（control-center.pem 信任根），供安装时写入 trust_bundle 路径。
+    pub trust_bundle_pem: Option<String>,
 }
 
 /// 创建网关实例返回：实例视图 + 安装指引（Gateway 启动后基于 init_url 初始化）。
@@ -56,6 +63,38 @@ pub struct AdminGatewayInstanceView {
     pub created_at: DateTime,
     pub initialized_at: Option<DateTime>,
     pub init_url: String,
+}
+
+/// 注册 Token 管理视图：只公开状态/限量/有效期，不暴露 token_hash。
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct AdminEnrollmentTokenView {
+    pub token_id: String,
+    pub gateway_id: String,
+    pub tenant_id: String,
+    pub environment_id: String,
+    pub max_uses: i64,
+    pub used_count: i64,
+    pub status: String,
+    pub issued_at: DateTime,
+    pub expires_at: Option<DateTime>,
+    pub revoked_at: Option<DateTime>,
+}
+
+impl From<&StoredEnrollmentToken> for AdminEnrollmentTokenView {
+    fn from(token: &StoredEnrollmentToken) -> Self {
+        Self {
+            token_id: token.token_id.clone(),
+            gateway_id: token.gateway_id.clone(),
+            tenant_id: token.tenant_id.clone(),
+            environment_id: token.environment_id.clone(),
+            max_uses: token.max_uses,
+            used_count: token.used_count,
+            status: token.status.clone(),
+            issued_at: token.issued_at.clone(),
+            expires_at: token.expires_at.clone(),
+            revoked_at: token.revoked_at.clone(),
+        }
+    }
 }
 
 /// 创建网关实例：POST /api/v1/admin/gateways/instances。
@@ -81,18 +120,84 @@ pub async fn admin_create_gateway_instance(
     let token = request.token.as_deref().unwrap_or_default();
     match state.store.create_gateway(gateway_id, token).await {
         Ok(stored) => {
+            // 签发注册 Token：携带控制中心信任根（随 token 下发，网关注册前校验中心）。
+            let enrollment = state
+                .store
+                .create_enrollment_token(
+                    gateway_id,
+                    &EnrollmentTokenIssue {
+                        token: token.to_string(),
+                        issued_by: request.requested_by.clone(),
+                        control_center_trust_bundle: state.config.ca_cert.clone(),
+                    },
+                )
+                .await
+                .unwrap_or_else(|err| {
+                    eprintln!("warn create enrollment token failed: {err}");
+                    StoredEnrollmentToken {
+                        token_id: format!("enroll-{gateway_id}-0"),
+                        token_hash: String::new(),
+                        gateway_id: gateway_id.to_string(),
+                        tenant_id: "tenant-default".to_string(),
+                        environment_id: "env-default".to_string(),
+                        issued_by: request.requested_by.clone(),
+                        control_center_trust_bundle: state.config.ca_cert.clone(),
+                        max_uses: 1,
+                        used_count: 0,
+                        status: "Active".to_string(),
+                        issued_at: DateTime::now(),
+                        expires_at: None,
+                        revoked_at: None,
+                    }
+                });
             let init_url = format!(
                 "{}/api/v1/gateway/initial-config?instance_id={}",
                 state.config.public_url.trim_end_matches('/'),
                 stored.gateway_id
             );
+            // 生成网关初始配置文件（对应 config.toml 设计）。
+            // [enrollment] 内嵌原始 token：网关对 /register（body enrollment_token）
+            // 与 /initial-config（Bearer）鉴权都需要它，config.toml 自包含交付。
+            let config_toml = format!(
+                "version = 1\n\
+                 \n\
+                 [control_center]\n\
+                 endpoint = \"{}\"\n\
+                 trust_bundle = \"/etc/warp-gateway/ca/control-center.pem\"\n\
+                 server_tls_required = true\n\
+                 \n\
+                 [enrollment]\n\
+                 token_id = \"{}\"\n\
+                 token = \"{}\"\n\
+                 \n\
+                 [protocol]\n\
+                 version = \"{}\"\n",
+                state.config.public_url.trim_end_matches('/'),
+                enrollment.token_id,
+                toml_basic_string_escape(token),
+                state.config.protocol_version,
+            );
+            // 配置文件随实例分发（config.toml 是主表达：control_center/trust_bundle/enrollment/protocol），
+            // 安装命令将 config.toml 挂载进网关容器，而非 env 注入。
+            // 信任根：config.toml 引用 /etc/warp-gateway/ca/control-center.pem，需把
+            // control-center.pem（trust_bundle_pem 内容落盘为 ./control-center.pem）挂载到该路径，
+            // 网关访问 HTTPS init_url 时才能校验中心 TLS 服务器证书。未配置 CA → 不挂载（无 TLS 回退）。
+            let trust_bundle_mount = if state.config.ca_cert.is_some() {
+                " -v ./control-center.pem:/etc/warp-gateway/ca/control-center.pem:ro".to_string()
+            } else {
+                String::new()
+            };
             let install = GatewayInstallInfo {
                 install_command: format!(
-                    "docker run -d --name warp-gateway-{} -e WARP_GATEWAY_INIT_URL=\"{}\" -e WARP_GATEWAY_TOKEN=\"{}\" {}",
-                    stored.gateway_id, init_url, token, state.config.gateway_image
+                    "docker run -d --name warp-gateway-{gw} -v ./warp-gateway-{gw}.toml:/etc/warp-gateway/config.toml:ro{trust_mount} {image}",
+                    gw = stored.gateway_id,
+                    trust_mount = trust_bundle_mount,
+                    image = state.config.gateway_image
                 ),
                 cloud_image: state.config.gateway_image.clone(),
                 init_url,
+                config_toml,
+                trust_bundle_pem: state.config.ca_cert.clone(),
             };
             (
                 StatusCode::CREATED,
@@ -317,6 +422,24 @@ fn history_window_config(window: &str) -> Option<(i64, i64)> {
         "24h" => Some((24 * 60 * 60, 15 * 60)),
         _ => None,
     }
+}
+
+/// TOML 基础字符串转义（镜像 warp-gateway 的 toml_escape）：
+/// 保证任意 token / 端点字符串嵌入 config.toml 双引号字符串后仍是合法 TOML。
+fn toml_basic_string_escape(value: &str) -> String {
+    let mut escaped = String::with_capacity(value.len());
+    for ch in value.chars() {
+        match ch {
+            '\\' => escaped.push_str("\\\\"),
+            '"' => escaped.push_str("\\\""),
+            '\n' => escaped.push_str("\\n"),
+            '\r' => escaped.push_str("\\r"),
+            '\t' => escaped.push_str("\\t"),
+            ch if ch.is_control() => escaped.push_str(&format!("\\u{:04X}", ch as u32)),
+            ch => escaped.push(ch),
+        }
+    }
+    escaped
 }
 
 /// 实例列表：GET /api/v1/admin/gateways/instances（含生命周期状态）。
@@ -553,23 +676,56 @@ pub async fn admin_get_gateway_initial_config(
     if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
         return response;
     }
-    let host = state
-        .config
-        .public_url
-        .trim_start_matches("http://")
-        .trim_start_matches("https://")
-        .split(':')
-        .next()
-        .unwrap_or("127.0.0.1");
-    let _ = instance_id;
+    // 配置引用该网关最近签发的一个注册 Token（config.toml [enrollment] token_id）。
+    let enrollment_token_id = state
+        .store
+        .get_enrollment_token_for_gateway(&instance_id)
+        .await
+        .ok()
+        .flatten()
+        .map(|token| token.token_id)
+        .unwrap_or_default();
     Json(GatewayInitialConfigReturned {
         config: GatewayInitialConfig {
             control_center_endpoint: state.config.public_url.clone(),
-            policy_version: "policy-v1".to_string(),
-            telemetry_output: format!("otlp://{host}:4317"),
+            trust_bundle: build_control_center_trust_bundle(&state.config, &instance_id),
+            server_tls_required: true,
+            protocol_version: state.config.protocol_version.clone(),
+            enrollment_token_id,
         },
     })
     .into_response()
+}
+
+/// 吊销注册 Token：POST /api/v1/admin/gateways/:gateway_id/enrollment-tokens/:token_id/revoke。
+/// status → Revoked，此后该 token 的注册请求被拒收（吊销语义）；已吊销再吊销幂等成功。
+pub async fn admin_revoke_gateway_enrollment_token(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Path((gateway_id, token_id)): Path<(String, String)>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    match state
+        .store
+        .revoke_enrollment_token(&gateway_id, &token_id)
+        .await
+    {
+        Ok(token) => Json(AdminEnrollmentTokenView::from(&token)).into_response(),
+        Err(StoreError::Enrollment(reason)) => (
+            StatusCode::NOT_FOUND,
+            format!("failed to revoke enrollment token: {reason}"),
+        )
+            .into_response(),
+        Err(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("failed to revoke enrollment token: {err}"),
+        )
+            .into_response(),
+    }
 }
 
 /// 创建升级计划请求体：多组件目标版本 + 网关范围 + 多步执行。
@@ -729,9 +885,9 @@ pub async fn admin_list_gateway_agents(
                 .into_response();
         }
     };
-    let views: Vec<AgentRuntimeStatusView> = agents
+    let views: Vec<AgentRuntimeStatus> = agents
         .into_iter()
-        .map(|agent| AgentRuntimeStatusView {
+        .map(|agent| AgentRuntimeStatus {
             agent_id: agent.agent_id,
             instance_id: agent.instance_id,
             version: agent.version,
@@ -807,10 +963,10 @@ pub async fn admin_list_gateway_status(
         }
     };
     // 状态视图只展示「已上报过」的网关；从未上报的网关无状态可展示（聚合 gateway_count 仍计入）。
-    let mut views: Vec<GatewayStatusView> = gateways
+    let mut views: Vec<GatewayRuntimeStatus> = gateways
         .iter()
         .filter(|stored| stored.last_seen_at.is_some())
-        .map(gateway_status_view)
+        .map(gateway_runtime_status)
         .collect();
     views.sort_by(|left, right| left.gateway_id.cmp(&right.gateway_id));
     Json(AdminGatewayStatusListReturned { statuses: views }).into_response()
@@ -852,15 +1008,15 @@ pub async fn admin_show_gateway_status(
             .into_response();
     }
     Json(AdminGatewayStatusReturned {
-        status: gateway_status_view(&stored),
+        status: gateway_runtime_status(&stored),
     })
     .into_response()
 }
 
-/// StoredGateway → GatewayStatusView。仅对已上报网关调用（列表/单查已过滤）；
+/// StoredGateway → GatewayRuntimeStatus。仅对已上报网关调用（列表/单查已过滤）；
 /// Option 缺省值保留为防御性兜底。
-fn gateway_status_view(stored: &StoredGateway) -> GatewayStatusView {
-    GatewayStatusView {
+fn gateway_runtime_status(stored: &StoredGateway) -> GatewayRuntimeStatus {
+    GatewayRuntimeStatus {
         gateway_id: stored.gateway_id.clone(),
         instance_id: stored.instance_id.clone(),
         version: stored.version.clone().unwrap_or_default(),
@@ -941,6 +1097,8 @@ mod tests {
                 gateway_image: "warp-gateway:latest".to_string(),
                 artifact_dir: std::env::temp_dir().join("wic-artifacts"),
                 object_storage: None,
+                ca_cert: None,
+                protocol_version: "1.0".to_string(),
             },
             store: std::sync::Arc::new(test_store()),
             artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
@@ -959,6 +1117,17 @@ mod tests {
         assert_eq!(history_window_config("6h"), Some((21_600, 300)));
         assert_eq!(history_window_config("24h"), Some((86_400, 900)));
         assert_eq!(history_window_config("7d"), None);
+    }
+
+    #[test]
+    fn toml_basic_string_escape_handles_special_chars() {
+        // 普通 token（base64url/hex）无需转义。
+        assert_eq!(toml_basic_string_escape("g7Q3abc_-XYZ"), "g7Q3abc_-XYZ");
+        // 引号 / 反斜杠 / 换行 / 控制字符需转义，保证仍是合法 TOML 基础字符串。
+        assert_eq!(
+            toml_basic_string_escape("a\"b\\c\nd\te\u{0001}f"),
+            "a\\\"b\\\\c\\nd\\te\\u0001f"
+        );
     }
 
     #[tokio::test]
@@ -1070,6 +1239,8 @@ mod tests {
                 gateway_image: "warp-gateway:latest".to_string(),
                 artifact_dir: std::env::temp_dir().join("wic-artifacts"),
                 object_storage: None,
+                ca_cert: None,
+                protocol_version: "1.0".to_string(),
             },
             store: std::sync::Arc::new(store),
             artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
@@ -1241,6 +1412,8 @@ mod tests {
                 gateway_image: "warp-gateway:latest".to_string(),
                 artifact_dir: std::env::temp_dir().join("wic-artifacts"),
                 object_storage: None,
+                ca_cert: None,
+                protocol_version: "1.0".to_string(),
             },
             store: std::sync::Arc::new(store),
             artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
@@ -1414,6 +1587,85 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn create_gateway_instance_mounts_trust_bundle_when_ca_configured() {
+        use axum::{body::Body, http::Request};
+        use http_body_util::BodyExt;
+        use tower::ServiceExt;
+
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("wic-create-tb-{nanos}.json"));
+        let store = FileStore::new(&path);
+        let state = ApiState {
+            config: CenterConfig {
+                listen_addr: "127.0.0.1:3100".to_string(),
+                store_path: std::env::temp_dir().join(format!("wic-create-tb-{nanos}.json")),
+                gateway_credentials: Vec::new(),
+                admin_token_hash: Some(super::super::super::infra::sha256_hex("admin-tok")),
+                database_url: None,
+                victoriametrics_url: None,
+                public_url: "http://127.0.0.1:3100".to_string(),
+                gateway_image: "warp-gateway:latest".to_string(),
+                artifact_dir: std::env::temp_dir().join("wic-artifacts"),
+                object_storage: None,
+                ca_cert: Some(
+                    "-----BEGIN CERTIFICATE-----\nca\n-----END CERTIFICATE-----".to_string(),
+                ),
+                protocol_version: "1.0".to_string(),
+            },
+            store: std::sync::Arc::new(store),
+            artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
+                std::env::temp_dir().join("wic-artifacts"),
+                "http://127.0.0.1:3100",
+            )),
+            rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
+                super::super::rate_limit::RateLimitState::default(),
+            )),
+        };
+        let app = super::super::router_for(state);
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/admin/gateways/instances")
+                    .header("content-type", "application/json")
+                    .header("authorization", "Bearer admin-tok")
+                    .body(Body::from(create_payload("gw-tb")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::CREATED);
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
+        let returned: AdminCreateGatewayInstanceReturned =
+            serde_json::from_slice(&body).expect("json");
+        // 证书内容随响应交付 + 安装命令挂载到 config.toml 引用的 trust_bundle 路径。
+        assert!(returned.install.trust_bundle_pem.is_some());
+        assert!(returned
+            .install
+            .install_command
+            .contains("-v ./control-center.pem:/etc/warp-gateway/ca/control-center.pem:ro"));
+        assert!(returned
+            .install
+            .config_toml
+            .contains("trust_bundle = \"/etc/warp-gateway/ca/control-center.pem\""));
+        // config.toml 自包含原始 token：网关对 /register 与 init_url Bearer 鉴权所需。
+        assert!(returned
+            .install
+            .config_toml
+            .contains("token = \"tok-create\""));
+
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[tokio::test]
     async fn read_endpoints_require_admin_token() {
         use axum::{body::Body, http::Request};
         use tower::ServiceExt;
@@ -1441,5 +1693,74 @@ mod tests {
                 "uri {uri} should require admin token"
             );
         }
+    }
+
+    #[tokio::test]
+    async fn revoke_enrollment_token_endpoint_revokes_and_404s_unknown() {
+        use axum::{body::Body, http::Request};
+        use http_body_util::BodyExt;
+        use tower::ServiceExt;
+
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("wic-revoke-{nanos}.json"));
+        let store = FileStore::new(&path);
+        let token = store
+            .create_enrollment_token(
+                "gw-001",
+                &EnrollmentTokenIssue {
+                    token: "enroll-tok-1".to_string(),
+                    issued_by: "test".to_string(),
+                    control_center_trust_bundle: None,
+                },
+            )
+            .expect("enroll");
+        let state = create_state_with_store(store);
+        let app = super::super::router_for(state);
+
+        // 吊销 → 200 + Revoked。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri(format!(
+                        "/api/v1/admin/gateways/gw-001/enrollment-tokens/{}/revoke",
+                        token.token_id
+                    ))
+                    .header("authorization", "Bearer admin-tok")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
+        let view: AdminEnrollmentTokenView = serde_json::from_slice(&body).expect("json");
+        assert_eq!(view.status, "Revoked");
+        assert!(view.revoked_at.is_some());
+
+        // 未知 token → 404。
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/admin/gateways/gw-001/enrollment-tokens/enroll-nope/revoke")
+                    .header("authorization", "Bearer admin-tok")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+        let _ = std::fs::remove_file(path);
     }
 }

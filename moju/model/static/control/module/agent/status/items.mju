@@ -23,7 +23,7 @@ command ShowAgentRuntimeStatus = OperatorRequest {
 command GetAgentOverview = OperatorRequest {
 }
 
-struct AgentRuntimeStatusView {
+struct AgentRuntimeStatus {
   meta {
     label zh "Agentd 运行状态视图"
     label en "Agentd Runtime Status View"
@@ -79,7 +79,7 @@ struct AgentOverview {
 
   metrics: AgentOverviewMetrics
   recent_online_agents: List<RecentOnlineRegisteredAgent>
-  abnormal_agents: List<AgentRuntimeStatusView>
+  abnormal_agents: List<AgentRuntimeStatus>
 }
 
 // ── Agent 登记查询（AgentRegistryQuery 并入） ──

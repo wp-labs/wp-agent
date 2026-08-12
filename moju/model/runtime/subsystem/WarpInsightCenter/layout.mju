@@ -44,7 +44,7 @@ region<section> GatewayStatusList {
   }
 
   orientation vertical
-  repeat GatewayStatusCard for gateway in GatewayStatusView
+  repeat GatewayStatusCard for gateway in GatewayRuntimeStatus
   layout scrollable
 }
 

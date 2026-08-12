@@ -12,17 +12,21 @@ use axum::{
 };
 
 use insight_control::{
-    GatewayInitialConfig, GatewayInitialConfigReturned, GatewayStatusAccepted,
-    GatewayStatusAcceptedReturned, ReportGatewayStatus,
+    GatewayEnrollmentResult, GatewayEnrollmentResultReturned, GatewayInitialConfig,
+    GatewayInitialConfigReturned, GatewayStatusAccepted, GatewayStatusAcceptedReturned,
+    RegisterGateway, ReportGatewayStatus,
 };
 
 use crate::infra::{
     sha256_hex, GatewayStatusUpdate, StoredAgent, StoredGateway, StoredGatewayCredentialStatus,
+    StoreError,
 };
 
-use super::{rate_limit, ApiState};
+use super::{build_control_center_trust_bundle, rate_limit, ApiState};
 
 const GATEWAY_AUTH_SCOPE: &str = "gateway";
+/// 注册自携带 token 鉴权，无网关身份可查，独立限流桶防 token 暴力枚举。
+const GATEWAY_REGISTER_SCOPE: &str = "gateway-register";
 
 /// Gateway 上报其下 Agent 状态（POST /api/v1/gateway/agents/status）。
 #[derive(serde::Deserialize)]
@@ -135,6 +139,85 @@ pub async fn download_release_artifact(
     }
 }
 
+/// 网关注册：POST /api/v1/gateway/register。
+/// 对应模型 `RegisterGateway` + `RegisterGatewayFlow`：WarpGateway 持预共享
+/// enrollment token 提交注册。消费 token（防重放/限量/吊销/过期）后签发注册回执；
+/// 本迭代沿用"注册 token 即网关初始凭据"的简化，注册后同 token 作为 bearer
+/// 访问 initial-config / status（后续按流程签发独立 GatewayCredentialBundle）。
+pub async fn register_gateway(
+    State(state): State<ApiState>,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(input): Json<RegisterGateway>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    // 注册自携带 token 鉴权（无网关身份可查），独立限流桶防 token 暴力枚举。
+    if let Some(response) = rate_limit::check_rate_limit(&state, &client_key, GATEWAY_REGISTER_SCOPE)
+    {
+        return response;
+    }
+    let consumed = match state
+        .store
+        .consume_enrollment_token(&input.enrollment_token)
+        .await
+    {
+        Ok(token) => token,
+        Err(StoreError::Enrollment(reason)) => {
+            rate_limit::record_auth_failure(&state, &client_key, GATEWAY_REGISTER_SCOPE);
+            return (
+                StatusCode::UNAUTHORIZED,
+                format!("enrollment token rejected: {reason}"),
+            )
+                .into_response();
+        }
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to consume enrollment token: {err}"),
+            )
+                .into_response();
+        }
+    };
+    // token 绑定的网关必须已创建。
+    let gateway_exists = match state.store.get_gateway(&consumed.gateway_id).await {
+        Ok(Some(_)) => true,
+        Ok(None) => false,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to load gateway store: {err}"),
+            )
+                .into_response();
+        }
+    };
+    if !gateway_exists {
+        rate_limit::record_auth_failure(&state, &client_key, GATEWAY_REGISTER_SCOPE);
+        return (
+            StatusCode::UNAUTHORIZED,
+            "enrollment token bound to unknown gateway".to_string(),
+        )
+            .into_response();
+    }
+    // 生命周期：Provisioned → Initializing（注册成功即进入初始化）。
+    if let Err(err) = state
+        .store
+        .mark_gateway_initializing(&consumed.gateway_id)
+        .await
+    {
+        eprintln!("warn mark gateway initializing failed: {err}");
+    }
+    rate_limit::clear_auth_failures(&state, &client_key, GATEWAY_REGISTER_SCOPE);
+    Json(GatewayEnrollmentResultReturned {
+        result: GatewayEnrollmentResult {
+            status: "accepted".to_string(),
+            gateway_id: consumed.gateway_id.clone(),
+            instance_id: input.instance_id,
+            credential_id: format!("cred-{}", consumed.gateway_id),
+            initial_config: "v1".to_string(),
+        },
+    })
+    .into_response()
+}
+
 #[derive(serde::Deserialize)]
 pub struct InitialConfigQueryParams {
     pub instance_id: Option<String>,
@@ -159,19 +242,22 @@ pub async fn get_gateway_initial_config(
             if let Err(err) = state.store.mark_gateway_initializing(instance_id).await {
                 eprintln!("warn mark gateway initializing failed: {err}");
             }
-            let host = state
-                .config
-                .public_url
-                .trim_start_matches("http://")
-                .trim_start_matches("https://")
-                .split(':')
-                .next()
-                .unwrap_or("127.0.0.1");
+            // 配置引用该网关最近签发的一个注册 Token（config.toml [enrollment] token_id）。
+            let enrollment_token_id = state
+                .store
+                .get_enrollment_token_for_gateway(instance_id)
+                .await
+                .ok()
+                .flatten()
+                .map(|token| token.token_id)
+                .unwrap_or_default();
             Json(GatewayInitialConfigReturned {
                 config: GatewayInitialConfig {
                     control_center_endpoint: state.config.public_url.clone(),
-                    policy_version: "policy-v1".to_string(),
-                    telemetry_output: format!("otlp://{host}:4317"),
+                    trust_bundle: build_control_center_trust_bundle(&state.config, instance_id),
+                    server_tls_required: true,
+                    protocol_version: state.config.protocol_version.clone(),
+                    enrollment_token_id,
                 },
             })
             .into_response()
@@ -349,6 +435,8 @@ mod tests {
                 gateway_image: "warp-gateway:latest".to_string(),
                 artifact_dir: std::env::temp_dir().join("wic-artifacts"),
                 object_storage: None,
+                ca_cert: None,
+                protocol_version: "1.0".to_string(),
             },
             store: std::sync::Arc::new(store),
             artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
@@ -366,6 +454,57 @@ mod tests {
         Router::new()
             .route("/api/v1/gateway/status", post(submit_gateway_status))
             .with_state(state)
+    }
+
+    /// 构造带 seed 网关 + 注册 Token 的完整路由（register 端点走 router_for）。
+    fn register_state(enrollment_token: &str) -> ApiState {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("wic-register-{nanos}.json"));
+        let store = FileStore::new(&path);
+        store
+            .seed(&[GatewayCredentialSeed {
+                gateway_id: "gw-001".to_string(),
+                token: "cred-tok".to_string(),
+                expires_at: None,
+            }])
+            .expect("seed");
+        store
+            .create_enrollment_token(
+                "gw-001",
+                &crate::infra::EnrollmentTokenIssue {
+                    token: enrollment_token.to_string(),
+                    issued_by: "test".to_string(),
+                    control_center_trust_bundle: None,
+                },
+            )
+            .expect("enroll");
+        ApiState {
+            config: crate::config::CenterConfig {
+                listen_addr: "127.0.0.1:3100".to_string(),
+                store_path: std::env::temp_dir().join(format!("wic-register-{nanos}.json")),
+                gateway_credentials: Vec::new(),
+                admin_token_hash: None,
+                database_url: None,
+                victoriametrics_url: None,
+                public_url: "http://127.0.0.1:3100".to_string(),
+                gateway_image: "warp-gateway:latest".to_string(),
+                artifact_dir: std::env::temp_dir().join("wic-artifacts"),
+                object_storage: None,
+                ca_cert: None,
+                protocol_version: "1.0".to_string(),
+            },
+            store: std::sync::Arc::new(store),
+            artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
+                std::env::temp_dir().join("wic-artifacts"),
+                "http://127.0.0.1:3100",
+            )),
+            rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
+                super::super::rate_limit::RateLimitState::default(),
+            )),
+        }
     }
 
     fn status_payload(gateway_id: &str) -> String {
@@ -429,6 +568,143 @@ mod tests {
             .await
             .expect("response");
 
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    fn register_payload(token: &str) -> String {
+        format!(
+            r#"{{"enrollment_token":"{token}","instance_id":"inst-1","requested_at":"2026-08-11T00:00:00Z"}}"#
+        )
+    }
+
+    #[tokio::test]
+    async fn register_consumes_token_once_then_rejects_replay() {
+        let app = super::super::router_for(register_state("enroll-tok-a"));
+
+        // 首次注册 → 200 accepted + 注册回执。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/register")
+                    .header("content-type", "application/json")
+                    .body(Body::from(register_payload("enroll-tok-a")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let response_body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
+        let returned: GatewayEnrollmentResultReturned =
+            serde_json::from_slice(&response_body).expect("json");
+        assert_eq!(returned.result.status, "accepted");
+        assert_eq!(returned.result.gateway_id, "gw-001");
+        assert_eq!(returned.result.instance_id, "inst-1");
+        assert_eq!(returned.result.credential_id, "cred-gw-001");
+
+        // 防重放：同一 token 二次注册 → 401（Exhausted）。
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/register")
+                    .header("content-type", "application/json")
+                    .body(Body::from(register_payload("enroll-tok-a")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn register_rejects_unknown_token() {
+        let app = super::super::router_for(register_state("enroll-tok-a"));
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/register")
+                    .header("content-type", "application/json")
+                    .body(Body::from(register_payload("enroll-tok-unknown")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn register_rejects_revoked_token() {
+        // 构造 FileStore → seed 网关 + 签发 token → 吊销 → 再注册 → 401。
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("wic-register-revoked-{nanos}.json"));
+        let file_store = FileStore::new(&path);
+        file_store
+            .seed(&[GatewayCredentialSeed {
+                gateway_id: "gw-001".to_string(),
+                token: "cred-tok".to_string(),
+                expires_at: None,
+            }])
+            .expect("seed");
+        let token = file_store
+            .create_enrollment_token(
+                "gw-001",
+                &crate::infra::EnrollmentTokenIssue {
+                    token: "enroll-tok-b".to_string(),
+                    issued_by: "test".to_string(),
+                    control_center_trust_bundle: None,
+                },
+            )
+            .expect("enroll");
+        file_store
+            .revoke_enrollment_token("gw-001", &token.token_id)
+            .expect("revoke");
+        let state = ApiState {
+            config: crate::config::CenterConfig {
+                listen_addr: "127.0.0.1:3100".to_string(),
+                store_path: std::env::temp_dir().join(format!("wic-register-revoked-{nanos}.json")),
+                gateway_credentials: Vec::new(),
+                admin_token_hash: None,
+                database_url: None,
+                victoriametrics_url: None,
+                public_url: "http://127.0.0.1:3100".to_string(),
+                gateway_image: "warp-gateway:latest".to_string(),
+                artifact_dir: std::env::temp_dir().join("wic-artifacts"),
+                object_storage: None,
+                ca_cert: None,
+                protocol_version: "1.0".to_string(),
+            },
+            store: std::sync::Arc::new(file_store),
+            artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
+                std::env::temp_dir().join("wic-artifacts"),
+                "http://127.0.0.1:3100",
+            )),
+            rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
+                super::super::rate_limit::RateLimitState::default(),
+            )),
+        };
+        let app = super::super::router_for(state);
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/register")
+                    .header("content-type", "application/json")
+                    .body(Body::from(register_payload("enroll-tok-b")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 }

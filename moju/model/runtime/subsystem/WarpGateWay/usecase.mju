@@ -12,7 +12,6 @@ usecase InitializeGatewayViaUrl {
   actor Control.AdminOperator
   trigger Control.AdminGetGatewayInitialConfig
   outcome Control.GatewayInitialConfig
-  flow Control.AdminGetGatewayInitialConfigFlow
 }
 
 // 注册到 WarpInsightCenter
@@ -66,7 +65,7 @@ usecase ShowAgentRuntimeStatus {
 
   actor Control.AdminOperator
   trigger Control.ShowAgentRuntimeStatus
-  outcome Control.AgentRuntimeStatusView
+  outcome Control.AgentRuntimeStatus
 }
 
 // 暂停 Agent

@@ -8,7 +8,7 @@ use axum::{
 };
 use serde::Serialize;
 
-use insight_control::types::{AgentRuntimeStatusView, DateTime};
+use insight_control::types::{AgentRuntimeStatus, DateTime};
 use crate::infra::{AgentMetricSample, StoredAgentRegistration};
 
 use super::admin_auth::require_admin_bearer;
@@ -54,7 +54,7 @@ pub enum RecentOnlineRegisteredAgentSource {
 pub struct AgentOverview {
     pub metrics: AgentOverviewMetrics,
     pub recent_online_agents: Vec<RecentOnlineRegisteredAgent>,
-    pub abnormal_agents: Vec<AgentRuntimeStatusView>,
+    pub abnormal_agents: Vec<AgentRuntimeStatus>,
 }
 
 pub async fn get_agent_overview(

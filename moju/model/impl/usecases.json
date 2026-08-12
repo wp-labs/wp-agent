@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "usecases": [
+    {
+      "name": "System.WarpInsightCenter.CreateGatewayInstance",
+      "status": "Partial",
+      "progress": 85,
+      "flow": "Control.AdminCreateGatewayInstanceFlow",
+      "entries": [
+        {
+          "name": "AdminCreateGatewayInstance",
+          "route": "POST /api/v1/admin/gateways/instances",
+          "handler": "admin_ops.rs:admin_create_gateway_instance",
+          "covers": ["CreateInstance", "IssueEnrollmentToken"]
+        },
+        {
+          "name": "AdminListGatewayInstances",
+          "route": "GET /api/v1/admin/gateways/instances",
+          "handler": "admin_ops.rs:admin_list_gateway_instances"
+        },
+        {
+          "name": "RegisterGateway",
+          "route": "POST /api/v1/gateway/register",
+          "handler": "gateway_ops.rs:register_gateway"
+        },
+        {
+          "name": "GetInitialConfig",
+          "route": "GET /api/v1/gateway/initial-config",
+          "handler": "gateway_ops.rs:get_gateway_initial_config"
+        },
+        {
+          "name": "AdminGetInitialConfig",
+          "route": "GET /api/v1/admin/gateways/instances/:instance_id/config",
+          "handler": "admin_ops.rs:admin_get_gateway_initial_config"
+        },
+        {
+          "name": "RevokeEnrollmentToken",
+          "route": "POST /api/v1/admin/gateways/:gateway_id/enrollment-tokens/:token_id/revoke",
+          "handler": "admin_ops.rs:admin_revoke_gateway_enrollment_token"
+        }
+      ],
+      "gaps": [
+        "独立 GatewayCredentialBundle 签发未拆分（沿用 token 即凭据简化）",
+        "无显式供应完成信号（Running 由首次 status 上报隐式触发）"
+      ]
+    },
+    {
+      "name": "System.WarpInsightCenter.GetInitialConfig",
+      "status": "Complete",
+      "progress": 100,
+      "entries": [
+        {
+          "name": "GetInitialConfig",
+          "route": "GET /api/v1/gateway/initial-config",
+          "handler": "gateway_ops.rs:get_gateway_initial_config"
+        },
+        {
+          "name": "AdminGetInitialConfig",
+          "route": "GET /api/v1/admin/gateways/instances/:instance_id/config",
+          "handler": "admin_ops.rs:admin_get_gateway_initial_config"
+        }
+      ]
+    },
+    {
+      "name": "System.WarpInsightCenter.ReceiveGatewayStatusReport",
+      "status": "Complete",
+      "progress": 100,
+      "entries": [
+        {
+          "name": "SubmitGatewayStatus",
+          "route": "POST /api/v1/gateway/status",
+          "handler": "gateway_ops.rs:submit_gateway_status"
+        },
+        {
+          "name": "SubmitAgentStatus",
+          "route": "POST /api/v1/gateway/agents/status",
+          "handler": "gateway_ops.rs:submit_agent_status"
+        }
+      ]
+    },
+    {
+      "name": "System.WarpInsightCenter.ViewGatewayStatus",
+      "status": "Complete",
+      "progress": 100,
+      "entries": [
+        {
+          "name": "AdminViewGatewayList",
+          "route": "GET /api/v1/admin/gateways",
+          "handler": "admin_ops.rs:admin_view_gateway_list"
+        },
+        {
+          "name": "AdminListGatewayStatus",
+          "route": "GET /api/v1/admin/gateways/status",
+          "handler": "admin_ops.rs:admin_list_gateway_status"
+        },
+        {
+          "name": "AdminShowGatewayStatus",
+          "route": "GET /api/v1/admin/gateways/:gateway_id/status",
+          "handler": "admin_ops.rs:admin_show_gateway_status"
+        }
+      ]
+    },
+    {
+      "name": "System.WarpInsightCenter.BindGatewayCustomer",
+      "status": "Complete",
+      "progress": 100,
+      "entries": [
+        {
+          "name": "AdminBindGatewayCustomer",
+          "route": "POST /api/v1/admin/gateways/bind",
+          "handler": "admin_ops.rs:admin_bind_gateway_customer"
+        }
+      ]
+    }
+  ]
+}

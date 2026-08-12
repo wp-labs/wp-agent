@@ -23,29 +23,8 @@ command DispatchAgentFleetCommand = OperatorRequest {
   agent_ids: List<String>
 }
 
-flow ViewGatewayOverviewFlow {
-  meta {
-    label zh "查看网关总览"
-    label en "View Gateway Overview Flow"
-    tags "gateway", "overview"
-  }
-
-  actor AdminOperator
-  trigger ViewGatewayOverview
-
-  creates GatewayOverviewView
-
-  step BuildOverview {
-    create GatewayOverviewView {
-      gateway_id = "gateway-001"
-      agent_total = 9
-      agent_online = 7
-      agent_unhealthy = 2
-      status = "online"
-      updated_at = "now"
-    }
-  }
-}
+// 网关总览是 agent 运行态（AgentRuntimeStatus）的读投影，形状由实现层派生，
+// 不建模为 flow 创建的 View。
 
 flow DispatchAgentFleetCommandFlow {
   meta {

@@ -19,6 +19,8 @@ const ENV_OBJECT_STORAGE_ENDPOINT: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_EN
 const ENV_OBJECT_STORAGE_BUCKET: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_BUCKET";
 const ENV_OBJECT_STORAGE_ACCESS_KEY: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_ACCESS_KEY";
 const ENV_OBJECT_STORAGE_SECRET_KEY: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_SECRET_KEY";
+const ENV_CA_CERT_PATH: &str = "WARP_INSIGHT_CENTER_CA_CERT_PATH";
+const ENV_PROTOCOL_VERSION: &str = "WARP_INSIGHT_CENTER_PROTOCOL_VERSION";
 
 /// 默认对外地址使用域名（初始化 URL / 控制中心端点需要可被 Gateway 从外网访问）。
 const DEFAULT_PUBLIC_URL: &str = "https://center.warpinsight.example";
@@ -40,7 +42,10 @@ pub struct CenterConfig {
     /// 有值 → 每次状态上报额外推送指标；未设置/为空 → 不启用（仅存快照）。
     pub victoriametrics_url: Option<String>,
     /// center 对外地址（生成网关初始化 URL），默认 `https://center.warpinsight.example`，
-    /// 部署时通过 `WARP_INSIGHT_CENTER_PUBLIC_URL` 配置真实域名。
+    /// 部署时通过 `WARP_INSIGHT_CENTER_PUBLIC_URL` 配置真实域名或 IP。
+    /// 注意：该主机名/IP 必须落在控制中心服务器证书的 SAN 内（见
+    /// `scripts/generate-control-center-cert.sh`），否则 server_tls_required=true 时
+    /// 网关对 init_url 的 TLS 主机名校验会失败。
     pub public_url: String,
     /// gateway 镜像名（docker 安装命令 / 云镜像地址），默认 `warp-gateway:latest`。
     pub gateway_image: String,
@@ -48,6 +53,12 @@ pub struct CenterConfig {
     pub artifact_dir: PathBuf,
     /// 云对象存储（可选，S3 兼容 / MinIO）；配置了 endpoint 则发布制品存对象存储，否则本地。
     pub object_storage: Option<ObjectStorageConfig>,
+    /// 控制中心 CA 证书内容（control-center.pem，信任根）——分发给 Gateway 作为
+    /// control_center.trust_bundle。从 `WARP_INSIGHT_CENTER_CA_CERT_PATH` 读取，
+    /// 默认 `~/.warpinsight-center/ca/control-center.pem`；文件不存在 → None。
+    pub ca_cert: Option<String>,
+    /// 网关↔中心 wire 协议版本（config.toml [protocol] version）。
+    pub protocol_version: String,
 }
 
 /// S3 兼容对象存储配置（MinIO 等）。
@@ -109,6 +120,21 @@ impl CenterConfig {
             }
             _ => None,
         };
+        // 信任根：从 WARP_INSIGHT_CENTER_CA_CERT_PATH 读取 control-center.pem；
+        // 默认 ~/.warpinsight-center/ca/control-center.pem；文件不存在 → None。
+        let ca_cert = {
+            let default_path =
+                std::path::PathBuf::from(std::env::var("HOME").unwrap_or_default())
+                    .join(".warpinsight-center")
+                    .join("ca")
+                    .join("control-center.pem");
+            let path = env::var(ENV_CA_CERT_PATH)
+                .map(PathBuf::from)
+                .unwrap_or(default_path);
+            std::fs::read_to_string(&path).ok()
+        };
+        let protocol_version =
+            env::var(ENV_PROTOCOL_VERSION).unwrap_or_else(|_| "1.0".to_string());
         if listen_addr.trim().is_empty() {
             return Err(ConfigError::new("listen addr must not be empty"));
         }
@@ -123,6 +149,8 @@ impl CenterConfig {
             gateway_image,
             artifact_dir,
             object_storage,
+            ca_cert,
+            protocol_version,
         })
     }
 }

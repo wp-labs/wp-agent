@@ -4,5 +4,5 @@
 #[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
 #[moju(kind = "message", role = "response", domain = "Control", module = "Control.GatewayApp.UserFacingInterface")]
 pub struct AdminAgentRuntimeStatusReturned {
-    pub status: crate::control::types::AgentRuntimeStatusView,
+    pub status: crate::control::types::AgentRuntimeStatus,
 }

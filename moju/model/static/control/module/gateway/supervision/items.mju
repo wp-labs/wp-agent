@@ -2,16 +2,37 @@
 // 覆盖 WarpGateway 实例接入 WarpInsightCenter 的初始配置获取、状态上报与状态/实例/客户/列表视图实体。
 // 实例管理命令由 GatewayInstanceManagement 承载。
 
+struct ControlCenterTrustBundle {
+  meta {
+    label zh "控制中心信任包"
+    label en "Control Center Trust Bundle"
+    summary zh "WarpGateway 校验 WarpInsightCenter HTTPS 服务端证书的 CA 信任材料（control-center.pem 公钥）与端点约束。"
+    tags "gateway", "tls", "trust-bundle"
+  }
+
+  unique trust_bundle_id: String
+  control_endpoint: String
+  /// control-center.pem 公钥内容——最终交给 gateway 用于校验中心 TLS。
+  ca_bundle: String
+  server_name: String
+  expected_san: String
+  issued_at: DateTime?
+  expires_at: DateTime?
+}
+
 struct GatewayInitialConfig {
   meta {
     label zh "Gateway 初始配置"
     label en "Gateway Initial Config"
+    summary zh "WarpGateway 初始化所需的安全连接配置：控制中心端点、TLS 信任包、协议版本与注册 Token 引用（策略/遥测待定）。config.toml 即其序列化。"
     tags "gateway", "config"
   }
 
   control_center_endpoint: String
-  policy_version: String
-  telemetry_output: String
+  trust_bundle: ControlCenterTrustBundle?
+  server_tls_required: Bool
+  protocol_version: String
+  enrollment_token_id: String
 }
 
 struct GatewayStatusAccepted {
@@ -26,18 +47,19 @@ struct GatewayStatusAccepted {
   accepted_at: DateTime
 }
 
-struct GatewayStatusView {
+// Gateway 运行态领域事实（注册后的版本/状态/健康/最近上报），非 View DTO。
+struct GatewayRuntimeStatus {
   meta {
-    label zh "Gateway 状态视图"
-    label en "Gateway Status View"
-    tags "gateway", "status", "global-view"
+    label zh "Gateway 运行状态"
+    label en "Gateway Runtime Status"
+    tags "gateway", "status", "runtime"
   }
 
-  gateway_id: String
+  unique gateway_id: String
   instance_id: String
-  version: String
-  status: String
-  health: String
+  version: String?
+  status: String?
+  health: String?
   memory_bytes: Int?
   cpu_percent: Float?
   last_seen_at: DateTime
@@ -81,20 +103,6 @@ struct GatewayCustomerBinding {
   customer_id: String
   status: String
   bound_at: DateTime
-}
-
-struct GatewayListView {
-  meta {
-    label zh "网关列表视图"
-    label en "Gateway List View"
-    tags "center", "gateway", "list"
-  }
-
-  gateway_count: Int
-  online_count: Int
-  degraded_count: Int
-  offline_count: Int
-  updated_at: DateTime
 }
 
 struct GlobalPolicyDispatch {
@@ -143,7 +151,7 @@ struct GatewayEnrollmentToken {
   token_hash: String
   tenant_id: String
   environment_id: String
-  control_center_trust_bundle: String
+  control_center_trust_bundle: ControlCenterTrustBundle
   max_uses: Int
   used_count: Int
   issued_by: String

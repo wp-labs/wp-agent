@@ -9,9 +9,9 @@ use sqlx::{postgres::PgPoolOptions, FromRow, PgPool, Row};
 use crate::config::GatewayCredentialSeed;
 
 use super::{
-    sha256_hex, GatewayCustomerBindingRecord, GatewayStatusUpdate, LifecycleEvent, ReleaseRecord,
-    StoredAgent, Store, StoreError, StoredGateway, StoredGatewayCredentialStatus,
-    UpgradePlanRecord,
+    sha256_hex, EnrollmentTokenIssue, GatewayCustomerBindingRecord, GatewayStatusUpdate,
+    LifecycleEvent, ReleaseRecord, StoredAgent, StoredEnrollmentToken, Store, StoreError,
+    StoredGateway, StoredGatewayCredentialStatus, UpgradePlanRecord,
 };
 
 #[derive(Debug, Clone)]
@@ -162,6 +162,33 @@ fn parse_credential_status(value: &str) -> StoredGatewayCredentialStatus {
     }
 }
 
+/// chrono TIMESTAMPTZ → 共享 DateTime。
+fn to_shared_dt(value: chrono::DateTime<chrono::Utc>) -> DateTime {
+    DateTime::from_rfc3339(&value.to_rfc3339()).unwrap_or_else(DateTime::now)
+}
+
+/// enrollment_tokens 行 → StoredEnrollmentToken（create/consume/revoke 共用）。
+fn enrollment_token_from_row(row: &sqlx::postgres::PgRow) -> StoredEnrollmentToken {
+    let issued_at: chrono::DateTime<chrono::Utc> = row.get("issued_at");
+    let expires_at: Option<chrono::DateTime<chrono::Utc>> = row.get("expires_at");
+    let revoked_at: Option<chrono::DateTime<chrono::Utc>> = row.get("revoked_at");
+    StoredEnrollmentToken {
+        token_id: row.get("token_id"),
+        token_hash: row.get("token_hash"),
+        gateway_id: row.get("gateway_id"),
+        tenant_id: row.get("tenant_id"),
+        environment_id: row.get("environment_id"),
+        issued_by: row.get("issued_by"),
+        control_center_trust_bundle: row.get("control_center_trust_bundle"),
+        max_uses: row.get("max_uses"),
+        used_count: row.get("used_count"),
+        status: row.get("status"),
+        issued_at: to_shared_dt(issued_at),
+        expires_at: expires_at.map(to_shared_dt),
+        revoked_at: revoked_at.map(to_shared_dt),
+    }
+}
+
 fn parse_optional_timestamptz(value: &Option<String>) -> Option<chrono::DateTime<chrono::Utc>> {
     value
         .as_deref()
@@ -285,6 +312,119 @@ impl Store for PgStore {
             token_hash,
             None,
         ))
+    }
+
+    async fn create_enrollment_token(
+        &self,
+        gateway_id: &str,
+        issue: &EnrollmentTokenIssue,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        let token_hash = sha256_hex(&issue.token);
+        let token_id = format!("enroll-{gateway_id}-{}", DateTime::now().to_chrono().timestamp());
+        let row = sqlx::query(
+            "INSERT INTO enrollment_tokens \
+               (token_id, token_hash, gateway_id, tenant_id, environment_id, issued_by, \
+                control_center_trust_bundle, max_uses, used_count, status, issued_at, expires_at) \
+             VALUES ($1, $2, $3, 'tenant-default', 'env-default', $4, $5, 1, 0, 'Active', \
+                     NOW(), NOW() + INTERVAL '30 days') \
+             RETURNING token_id, token_hash, gateway_id, tenant_id, environment_id, issued_by, \
+                       control_center_trust_bundle, max_uses, used_count, status, issued_at, \
+                       expires_at, revoked_at",
+        )
+        .bind(&token_id)
+        .bind(&token_hash)
+        .bind(gateway_id)
+        .bind(&issue.issued_by)
+        .bind(&issue.control_center_trust_bundle)
+        .fetch_one(&self.pool)
+        .await?;
+        Ok(enrollment_token_from_row(&row))
+    }
+
+    async fn consume_enrollment_token(
+        &self,
+        token: &str,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        let token_hash = sha256_hex(token);
+        let now = chrono::Utc::now();
+        let row = sqlx::query(
+            "SELECT token_id, token_hash, gateway_id, tenant_id, environment_id, issued_by, \
+                    control_center_trust_bundle, max_uses, used_count, status, issued_at, \
+                    expires_at, revoked_at \
+             FROM enrollment_tokens WHERE token_hash = $1 FOR UPDATE",
+        )
+        .bind(&token_hash)
+        .fetch_optional(&self.pool)
+        .await?
+        .ok_or_else(|| StoreError::Enrollment("token not found".to_string()))?;
+        let status: String = row.get("status");
+        let used_count: i64 = row.get("used_count");
+        let max_uses: i64 = row.get("max_uses");
+        let expires_at: Option<chrono::DateTime<chrono::Utc>> = row.get("expires_at");
+        if status != "Active" && status != "Used" {
+            return Err(StoreError::Enrollment(format!("token status {status}")));
+        }
+        if expires_at.as_ref().is_some_and(|exp| *exp < now) {
+            return Err(StoreError::Enrollment("token expired".to_string()));
+        }
+        if used_count >= max_uses {
+            return Err(StoreError::Enrollment("token exhausted".to_string()));
+        }
+        let new_used = used_count + 1;
+        let new_status = if new_used >= max_uses {
+            "Exhausted"
+        } else {
+            "Used"
+        };
+        sqlx::query(
+            "UPDATE enrollment_tokens SET used_count = $1, status = $2 WHERE token_id = $3",
+        )
+        .bind(new_used)
+        .bind(new_status)
+        .bind(row.get::<String, _>("token_id"))
+        .execute(&self.pool)
+        .await?;
+        let mut token = enrollment_token_from_row(&row);
+        token.used_count = new_used;
+        token.status = new_status.to_string();
+        Ok(token)
+    }
+
+    async fn revoke_enrollment_token(
+        &self,
+        gateway_id: &str,
+        token_id: &str,
+    ) -> Result<StoredEnrollmentToken, StoreError> {
+        let row = sqlx::query(
+            "UPDATE enrollment_tokens SET status = 'Revoked', revoked_at = NOW() \
+             WHERE token_id = $1 AND gateway_id = $2 \
+             RETURNING token_id, token_hash, gateway_id, tenant_id, environment_id, issued_by, \
+                       control_center_trust_bundle, max_uses, used_count, status, issued_at, \
+                       expires_at, revoked_at",
+        )
+        .bind(token_id)
+        .bind(gateway_id)
+        .fetch_optional(&self.pool)
+        .await?
+        .ok_or_else(|| StoreError::Enrollment("token not found".to_string()))?;
+        Ok(enrollment_token_from_row(&row))
+    }
+
+    async fn get_enrollment_token_for_gateway(
+        &self,
+        gateway_id: &str,
+    ) -> Result<Option<StoredEnrollmentToken>, StoreError> {
+        let row = sqlx::query(
+            "SELECT token_id, token_hash, gateway_id, tenant_id, environment_id, issued_by, \
+                    control_center_trust_bundle, max_uses, used_count, status, issued_at, \
+                    expires_at, revoked_at \
+             FROM enrollment_tokens WHERE gateway_id = $1 \
+             ORDER BY issued_at DESC LIMIT 1",
+        )
+        .bind(gateway_id)
+        .fetch_optional(&self.pool)
+        .await?;
+        Ok(row.map(|row| enrollment_token_from_row(&row)))
     }
 
     async fn upsert_agent_status(
