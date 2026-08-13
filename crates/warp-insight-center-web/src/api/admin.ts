@@ -93,6 +93,12 @@ export interface GatewayInstallInfo {
   installCommand: string;
   cloudImage: string;
   initUrl: string;
+  /** 服务端生成的 curl 验证命令（Bearer 用注册凭证调用 initUrl）。 */
+  initCurl: string;
+  /** 服务端生成的完整 Gateway 配置文件，可直接保存为 config.toml。 */
+  configToml: string;
+  /** 控制中心 CA 信任证书；未启用 TLS 时为空。 */
+  trustBundlePem: string | null;
 }
 
 /** 创建网关实例返回：实例视图 + 安装指引（Gateway 启动后基于 initUrl 初始化）。 */
@@ -176,6 +182,8 @@ export interface GlobalPolicyDispatch {
 export interface CreateGatewayInstanceCommand {
   gatewayName: string;
   requestedBy: string;
+  /** 注册凭证（可选）：非空则网关可持它 Bearer 调用 init_url / register。 */
+  token?: string;
 }
 
 export interface BindGatewayCustomerCommand {
@@ -218,6 +226,7 @@ export interface ExampleResult<T> {
 
 export const ADMIN_AUTH_CHANGED_EVENT = "warpInsightCenterAuthChanged";
 const ADMIN_API_TOKEN_STORAGE_KEY = "warpInsightCenterApiToken";
+const GATEWAY_INIT_CURL_STORAGE_KEY = "warpInsightGatewayInitCurls";
 
 let adminApiToken: string | null =
   typeof window !== "undefined"
@@ -269,6 +278,40 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function getAdminApiToken(): string | null {
   return adminApiToken;
+}
+
+/** 将创建回执中的 init curl 临时保存在当前浏览器会话，供实例详情页复用。 */
+export function storeGatewayInitCurl(
+  gatewayId: string,
+  initCurl: string,
+): void {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = window.sessionStorage.getItem(GATEWAY_INIT_CURL_STORAGE_KEY);
+    const values: Record<string, string> = raw ? JSON.parse(raw) : {};
+    values[gatewayId] = initCurl;
+    window.sessionStorage.setItem(
+      GATEWAY_INIT_CURL_STORAGE_KEY,
+      JSON.stringify(values),
+    );
+  } catch {
+    // 会话存储不可用时，创建回执仍会在当前页面直接展示命令。
+  }
+}
+
+/** 读取当前会话中保存的 init curl；历史实例没有回执时返回 null。 */
+export function readGatewayInitCurl(gatewayId: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(GATEWAY_INIT_CURL_STORAGE_KEY);
+    if (!raw) return null;
+    const values: unknown = JSON.parse(raw);
+    if (!values || typeof values !== "object") return null;
+    const value = (values as Record<string, unknown>)[gatewayId];
+    return typeof value === "string" && value.length > 0 ? value : null;
+  } catch {
+    return null;
+  }
 }
 
 export function setAdminApiToken(token: string): void {
@@ -403,6 +446,18 @@ function normalizeGatewayInstallInfo(payload: any): GatewayInstallInfo {
       pick(payload, "init_url", "initUrl"),
       "install.initUrl",
     ),
+    initCurl: requiredString(
+      pick(payload, "init_curl", "initCurl"),
+      "install.initCurl",
+    ),
+    configToml: requiredString(
+      pick(payload, "config_toml", "configToml"),
+      "install.configToml",
+    ),
+    trustBundlePem:
+      pick(payload, "trust_bundle_pem", "trustBundlePem") == null
+        ? null
+        : String(pick(payload, "trust_bundle_pem", "trustBundlePem")),
   };
 }
 
@@ -504,9 +559,7 @@ function normalizeUpgradeStep(payload: any): UpgradeStep {
       pick(payload, "step_index", "stepIndex"),
       "step.stepIndex",
     ),
-    gatewayIds: Array.isArray(
-      pick(payload, "gateway_ids", "gatewayIds"),
-    )
+    gatewayIds: Array.isArray(pick(payload, "gateway_ids", "gatewayIds"))
       ? (pick(payload, "gateway_ids", "gatewayIds") as string[])
       : [],
     status: requiredString(payload.status, "step.status"),
@@ -514,9 +567,7 @@ function normalizeUpgradeStep(payload: any): UpgradeStep {
 }
 
 function normalizeUpgradePlan(payload: any): UpgradePlan {
-  const rawTargets = Array.isArray(
-    pick(payload, "targets"),
-  )
+  const rawTargets = Array.isArray(pick(payload, "targets"))
     ? (pick(payload, "targets") as any[])
     : [];
   const rawSteps = Array.isArray(pick(payload, "steps"))
@@ -919,9 +970,12 @@ function exampleGatewayInstance(
       initializedAt: null,
     },
     install: {
-      installCommand: `docker run -d --name warp-gateway-${gatewayId} -e WARP_GATEWAY_INIT_URL="${initUrl}" -e WARP_GATEWAY_TOKEN="<token>" warp-gateway:latest`,
+      installCommand: `docker run -d --name warp-gateway-${gatewayId} -e WARP_GATEWAY_INIT_URL="${initUrl}" -e WARP_GATEWAY_TOKEN="${command.token ?? "<token>"}" warp-gateway:latest`,
       cloudImage: "warp-gateway:latest",
       initUrl,
+      initCurl: `curl -H "Authorization: Bearer ${command.token ?? "<token>"}" "${initUrl}"`,
+      configToml: `version = 1\n\n[control_center]\nendpoint = "http://127.0.0.1:3100"\n\n[enrollment]\ntoken = "${command.token ?? "<token>"}"\n`,
+      trustBundlePem: null,
     },
   };
 }
@@ -1187,6 +1241,7 @@ export async function createGatewayInstance(
       body: JSON.stringify({
         gateway_name: command.gatewayName,
         requested_by: command.requestedBy,
+        token: command.token,
       }),
     },
   ).then(async (result) => {
@@ -1309,7 +1364,9 @@ export async function publishWarpGateWay(
   });
 }
 
-export async function fetchUpgradePlans(): Promise<ExampleResult<UpgradePlan[]>> {
+export async function fetchUpgradePlans(): Promise<
+  ExampleResult<UpgradePlan[]>
+> {
   return fetchOrFallback(
     "/api/v1/admin/upgrade-plans",
     exampleUpgradePlans,

@@ -18,15 +18,22 @@ use insight_control::{
 };
 
 use crate::infra::{
-    sha256_hex, GatewayStatusUpdate, StoredAgent, StoredGateway, StoredGatewayCredentialStatus,
-    StoreError,
+    sha256_hex, GatewayStatusUpdate, StoreError, StoredAgent, StoredGateway,
+    StoredGatewayCredentialStatus,
 };
 
-use super::{build_control_center_trust_bundle, rate_limit, ApiState};
+use super::{build_control_center_trust_bundle, control_center_tls_required, rate_limit, ApiState};
 
 const GATEWAY_AUTH_SCOPE: &str = "gateway";
 /// 注册自携带 token 鉴权，无网关身份可查，独立限流桶防 token 暴力枚举。
 const GATEWAY_REGISTER_SCOPE: &str = "gateway-register";
+
+/// 允许 Gateway Web 以 Authorization Header 直接调用初始化端点。
+/// 该端点不使用 Cookie，因此使用通配来源不会扩大用户会话权限；Token 仍只在 Header 中传输。
+/// 处理浏览器对 Gateway 初始化请求的 Authorization 预检。
+pub async fn options_gateway_initial_config() -> Response {
+    StatusCode::NO_CONTENT.into_response()
+}
 
 /// Gateway 上报其下 Agent 状态（POST /api/v1/gateway/agents/status）。
 #[derive(serde::Deserialize)]
@@ -151,7 +158,8 @@ pub async fn register_gateway(
 ) -> Response {
     let client_key = rate_limit::client_key(client);
     // 注册自携带 token 鉴权（无网关身份可查），独立限流桶防 token 暴力枚举。
-    if let Some(response) = rate_limit::check_rate_limit(&state, &client_key, GATEWAY_REGISTER_SCOPE)
+    if let Some(response) =
+        rate_limit::check_rate_limit(&state, &client_key, GATEWAY_REGISTER_SCOPE)
     {
         return response;
     }
@@ -255,7 +263,7 @@ pub async fn get_gateway_initial_config(
                 config: GatewayInitialConfig {
                     control_center_endpoint: state.config.public_url.clone(),
                     trust_bundle: build_control_center_trust_bundle(&state.config, instance_id),
-                    server_tls_required: true,
+                    server_tls_required: control_center_tls_required(&state.config),
                     protocol_version: state.config.protocol_version.clone(),
                     enrollment_token_id,
                 },
@@ -351,7 +359,10 @@ async fn authenticate_gateway(
     };
     // 网关身份由 `actor_identity WarpGateway.id from credential.gateway_id` 表达：
     // 这里按上报 gateway_id 查到的凭证做常数时间 token 比较，即身份一致性校验。
-    if !constant_time_eq(gateway.credential_token_hash.as_bytes(), token_hash.as_bytes()) {
+    if !constant_time_eq(
+        gateway.credential_token_hash.as_bytes(),
+        token_hash.as_bytes(),
+    ) {
         rate_limit::record_auth_failure(state, client_key, GATEWAY_AUTH_SCOPE);
         return Err((StatusCode::UNAUTHORIZED, "invalid gateway credential").into_response());
     }
@@ -403,11 +414,7 @@ mod tests {
     use std::time::{SystemTime, UNIX_EPOCH};
     use tower::ServiceExt;
 
-    use crate::{
-        api::ApiState,
-        config::GatewayCredentialSeed,
-        infra::FileStore,
-    };
+    use crate::{api::ApiState, config::GatewayCredentialSeed, infra::FileStore};
 
     fn test_state() -> ApiState {
         let nanos = SystemTime::now()
@@ -529,7 +536,12 @@ mod tests {
             .expect("response");
 
         assert_eq!(response.status(), StatusCode::OK);
-        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
         let returned: GatewayStatusAcceptedReturned = serde_json::from_slice(&body).expect("json");
         assert_eq!(returned.receipt.gateway_id, "gw-001");
         assert_eq!(returned.receipt.instance_id, "inst-1");
@@ -621,6 +633,39 @@ mod tests {
             .await
             .expect("response");
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn initial_config_preflight_allows_gateway_web_authorization_header() {
+        let response = super::super::router_for(register_state("enroll-tok-c"))
+            .oneshot(
+                Request::builder()
+                    .method("OPTIONS")
+                    .uri("/api/v1/gateway/initial-config?instance_id=gw-001")
+                    .header("origin", "http://127.0.0.1:5174")
+                    .header("access-control-request-method", "GET")
+                    .header("access-control-request-headers", "authorization")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
+        assert_eq!(
+            response
+                .headers()
+                .get("access-control-allow-origin")
+                .and_then(|value| value.to_str().ok()),
+            Some("*")
+        );
+        assert!(response
+            .headers()
+            .get("access-control-allow-headers")
+            .expect("allow headers")
+            .to_str()
+            .expect("header value")
+            .contains("authorization"));
     }
 
     #[tokio::test]

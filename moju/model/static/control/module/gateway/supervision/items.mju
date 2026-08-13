@@ -126,6 +126,11 @@ message<command> GetGatewayInitialConfig {
   requested_at: DateTime
 }
 
+message<command> InitializeGatewayViaUrl {
+  init_url: String
+  requested_at: DateTime
+}
+
 message<command> ReportGatewayStatus {
   gateway_id: String
   instance_id: String

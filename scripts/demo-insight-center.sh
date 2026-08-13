@@ -122,6 +122,7 @@ ensure_center() {
     cd "${REPO_ROOT}"
     exec nohup env \
       WARP_INSIGHT_CENTER_LISTEN="${host}:${port}" \
+      WARP_INSIGHT_CENTER_PUBLIC_URL="${CENTER_URL}" \
       WARP_INSIGHT_CENTER_DATABASE_URL="${PG_URL}" \
       WARP_INSIGHT_CENTER_VICTORIAMETRICS_URL="${VM_URL}" \
       "${CENTER_BIN}" \
@@ -133,7 +134,7 @@ ensure_center() {
 }
 
 create_gateways() {
-  echo "== 3. 通过接口创建网关 =="
+  echo "== 3. 通过接口创建网关并获取 init_url =="
   IFS=',' read -r -a pairs <<< "${GATEWAYS}"
   for entry in "${pairs[@]}"; do
     entry="$(printf '%s' "${entry}" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
@@ -145,7 +146,32 @@ create_gateways() {
       -H 'content-type: application/json' \
       -d "{\"gateway_name\":\"${gateway_name}\",\"requested_by\":\"demo\",\"token\":\"${token}\"}")"
     if [[ "${status}" == "201" ]]; then
+      # 创建成功：解析响应取 install.init_url（网关初始化入口）。
+      local init_url
+      init_url="$(python3 - /tmp/demo-create-response.json <<'PY'
+import json, sys
+try:
+    install = json.load(open(sys.argv[1]))["install"]
+except Exception:
+    install = {}
+print(install.get("init_url", ""))
+PY
+)"
       echo "  创建网关 ${gateway_name} (201)"
+      if [[ -n "${init_url}" ]]; then
+        echo "    init_url = ${init_url}"
+        if [[ "${init_url}" == "${CENTER_URL%/}/api/v1/gateway/initial-config?instance_id=${gateway_name}" ]]; then
+          echo "    ✓ init_url 指向当前 center 的 initial-config 端点"
+        else
+          echo "    ✗ init_url 与 CENTER_URL 不一致（检查 WARP_INSIGHT_CENTER_PUBLIC_URL）" >&2
+        fi
+        # 用 curl 实际调用 init_url（Bearer 用注册 token），验证网关可拿到初始配置。
+        echo "    curl init_url（Bearer ${token}）:"
+        curl -s -w "\n    HTTP %{http_code}\n" \
+          -H "Authorization: Bearer ${token}" "${init_url}" | sed 's/^/      /'
+      else
+        echo "    ✗ 响应无 install.init_url" >&2
+      fi
     elif [[ "${status}" == "409" ]]; then
       echo "  网关 ${gateway_name} 已存在 (409，复用)"
     else
@@ -183,7 +209,8 @@ ensure_center_web() {
   port="$(python3 -c "from urllib.parse import urlparse; print(urlparse('${CENTER_WEB_URL}').port or 80)")"
   (
     cd "${web_dir}"
-    exec nohup npm run dev -- --host "${host}" --port "${port}" --strictPort \
+    exec nohup env WARP_INSIGHT_WEB_PROXY_TARGET="${CENTER_URL}" \
+      npm run dev -- --host "${host}" --port "${port}" --strictPort \
       >/tmp/warp-insight-center-web-demo.log 2>&1
   ) &
   CENTER_WEB_PID=$!

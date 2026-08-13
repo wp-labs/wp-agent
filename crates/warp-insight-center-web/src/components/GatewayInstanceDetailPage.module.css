@@ -130,10 +130,23 @@
   line-height: 1.55;
 }
 
-.infoGrid {
+.accessGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: minmax(0, 1.55fr) minmax(180px, 0.45fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.endpointColumn,
+.metadataColumn {
+  min-width: 0;
+}
+
+.metadataColumn {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding-top: 1px;
 }
 
 .infoItem {
@@ -203,6 +216,65 @@
   line-height: 1.55;
 }
 
+.curlBlock {
+  margin-top: 16px;
+  padding: 13px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-md);
+  background: var(--wi-bg-muted);
+}
+
+.curlHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+}
+
+.curlHint,
+.curlPlaceholder {
+  margin-top: 4px;
+  color: var(--wi-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.curlCopyButton {
+  flex-shrink: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--wi-border-strong);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-bg-panel);
+  color: var(--wi-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.curlCopyButton:hover {
+  border-color: var(--wi-primary-border);
+  background: var(--wi-primary-soft);
+}
+
+.curlCopyButton:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--wi-focus-ring);
+}
+
+.curlCode {
+  margin: 0;
+  padding: 11px 12px;
+  overflow-x: auto;
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-code-bg);
+  color: var(--wi-code-text);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .timeline {
   display: flex;
   flex-wrap: wrap;
@@ -262,7 +334,27 @@
     padding: 17px;
   }
 
-  .infoGrid {
+  .accessGrid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .metadataColumn {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding-top: 0;
+  }
+
+  .curlHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .curlCopyButton {
+    align-self: flex-start;
+  }
+
+  .metadataColumn {
     grid-template-columns: 1fr;
   }
 

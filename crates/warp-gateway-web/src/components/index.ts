@@ -77,3 +77,4 @@ export { SubsystemTargetVersion } from "./SubsystemTargetVersion";
 export { SubsystemAdminUpgradeAgent } from "./SubsystemAdminUpgradeAgent";
 export { SubsystemX86LinuxInstallCode } from "./SubsystemX86LinuxInstallCode";
 export { SubsystemArmLinuxInstallCode } from "./SubsystemArmLinuxInstallCode";
+export { SubsystemGatewayInitializePage } from "./SubsystemGatewayInitializePage";

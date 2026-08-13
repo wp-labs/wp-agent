@@ -47,6 +47,37 @@ export interface AgentInstallCode {
   bootstrapEnrollmentToken: string;
 }
 
+/** 控制中心返回给 Gateway 的初始连接材料，字段与 Gateway 面接口契约一致。 */
+export interface ControlCenterTrustBundle {
+  trust_bundle_id: string;
+  control_endpoint: string;
+  ca_bundle: string;
+  server_name: string;
+  expected_san: string;
+  issued_at: string | null;
+  expires_at: string | null;
+}
+
+/** GET /api/v1/gateway/initial-config 的 config 载荷。 */
+export interface GatewayInitialConfig {
+  control_center_endpoint: string;
+  trust_bundle: ControlCenterTrustBundle | null;
+  server_tls_required: boolean;
+  protocol_version: string;
+  enrollment_token_id: string;
+}
+
+/** 生成 Gateway 初始化接口的安全调用命令；凭证始终位于 Header 而非 URL。 */
+export function buildGatewayInitialConfigCurl(
+  initUrl: string,
+  gatewayToken: string,
+): string {
+  const quote = (value: string) => `'${value.split("'").join(`'\"'\"'`)}'`;
+  const url = initUrl.trim() || "<center-init-url>";
+  const token = gatewayToken.trim() || "<gateway-token>";
+  return `curl -H ${quote(`Authorization: Bearer ${token}`)} ${quote(url)}`;
+}
+
 export interface DispatchReceipt {
   dispatchId: string;
   commandId: string;
@@ -146,6 +177,85 @@ function requiredString(value: unknown, fieldName: string): string {
 function requiredNumber(value: unknown, fieldName: string): number {
   if (typeof value === "number") return value;
   throw new Error(`Invalid API response: missing ${fieldName}`);
+}
+
+function requiredBoolean(value: unknown, fieldName: string): boolean {
+  if (typeof value === "boolean") return value;
+  throw new Error(`Invalid API response: missing ${fieldName}`);
+}
+
+function requiredRecord(
+  value: unknown,
+  fieldName: string,
+): Record<string, unknown> {
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  throw new Error(`Invalid API response: missing ${fieldName}`);
+}
+
+function nullableString(value: unknown, fieldName: string): string | null {
+  if (value === null) return null;
+  return requiredString(value, fieldName);
+}
+
+function normalizeTrustBundle(value: unknown): ControlCenterTrustBundle | null {
+  if (value === null) return null;
+  const bundle = requiredRecord(value, "config.trust_bundle");
+  return {
+    trust_bundle_id: requiredString(
+      bundle.trust_bundle_id,
+      "config.trust_bundle.trust_bundle_id",
+    ),
+    control_endpoint: requiredString(
+      bundle.control_endpoint,
+      "config.trust_bundle.control_endpoint",
+    ),
+    ca_bundle: requiredString(bundle.ca_bundle, "config.trust_bundle.ca_bundle"),
+    server_name: requiredString(
+      bundle.server_name,
+      "config.trust_bundle.server_name",
+    ),
+    expected_san: requiredString(
+      bundle.expected_san,
+      "config.trust_bundle.expected_san",
+    ),
+    issued_at: nullableString(
+      bundle.issued_at,
+      "config.trust_bundle.issued_at",
+    ),
+    expires_at: nullableString(
+      bundle.expires_at,
+      "config.trust_bundle.expires_at",
+    ),
+  };
+}
+
+/** 按当前 JSON 契约收敛初始配置，避免把服务端错误静默成空字段。 */
+export function normalizeGatewayInitialConfig(
+  payload: unknown,
+): GatewayInitialConfig {
+  const root = requiredRecord(payload, "response");
+  const config = requiredRecord(root.config, "config");
+  return {
+    control_center_endpoint: requiredString(
+      config.control_center_endpoint,
+      "config.control_center_endpoint",
+    ),
+    trust_bundle: normalizeTrustBundle(config.trust_bundle),
+    server_tls_required: requiredBoolean(
+      config.server_tls_required,
+      "config.server_tls_required",
+    ),
+    protocol_version: requiredString(
+      config.protocol_version,
+      "config.protocol_version",
+    ),
+    enrollment_token_id: requiredString(
+      config.enrollment_token_id,
+      "config.enrollment_token_id",
+    ),
+  };
 }
 
 function requiredArray(value: unknown, fieldName: string): any[] {
@@ -320,6 +430,29 @@ export async function fetchAgentOverview(): Promise<AgentOverview> {
 export async function fetchAgentInstallCode(): Promise<AgentInstallCode> {
   const payload = await requestJson<unknown>("/api/v1/agent/install-code");
   return normalizeInstallCode(payload);
+}
+
+/**
+ * 从 Gateway 页面调用控制中心的网关面初始化接口。
+ * initUrl 由 Center 创建实例时下发，凭证只放在 Authorization Header，
+ * 不拼接到 URL，避免浏览器历史和代理日志泄露注册 Token。
+ */
+export async function fetchGatewayInitialConfig(
+  initUrl: string,
+  gatewayToken: string,
+): Promise<GatewayInitialConfig> {
+  const path = initUrl.trim();
+  const token = gatewayToken.trim();
+  const response = await fetch(path, {
+    headers: {
+      authorization: `Bearer ${token}`,
+      accept: "application/json",
+    },
+  });
+  if (!response.ok) {
+    throw new ApiError(response.status, path);
+  }
+  return normalizeGatewayInitialConfig(await response.json());
 }
 
 export async function pauseAgent(

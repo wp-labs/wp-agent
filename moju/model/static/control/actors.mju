@@ -61,6 +61,7 @@ actor<system> WarpGateway {
   can VerifyGatewayCredential
   can RenewGatewayCredential
   can GetGatewayInitialConfig
+  can InitializeGatewayViaUrl
   can ReportGatewayStatus
   can ReportAgentStatus
 }

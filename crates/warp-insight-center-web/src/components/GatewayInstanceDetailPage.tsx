@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import type { GatewayInstanceLifecycleState } from "../api";
+import {
+  readGatewayInitCurl,
+  type GatewayInstanceLifecycleState,
+} from "../api";
 import { useGatewayInstances, useGatewayLifecycle } from "../hooks";
 import { GatewayCustomerBindPanel } from "./GatewayCustomerBindPanel";
 import {
@@ -27,7 +30,7 @@ function lifecycleTone(state: GatewayInstanceLifecycleState): BadgeTone {
   }
 }
 
-/** 展示未上线网关实例的初始化入口、生命周期和下一步部署动作。 */
+/** 展示未上线网关实例的接入材料、生命周期和下一步部署动作。 */
 export function GatewayInstanceDetailPage() {
   const { gatewayId = "" } = useParams();
   const {
@@ -36,6 +39,8 @@ export function GatewayInstanceDetailPage() {
     isLoading,
   } = useGatewayInstances();
   const [copied, setCopied] = useState(false);
+  const [curlCopied, setCurlCopied] = useState(false);
+  const [initCurl, setInitCurl] = useState<string | null>(null);
   const instance = instancesData?.data.find(
     (item) => item.gatewayId === gatewayId,
   );
@@ -47,6 +52,12 @@ export function GatewayInstanceDetailPage() {
   const initUrl =
     instance?.initUrl ??
     `/api/v1/gateway/initial-config?instance_id=${encodeURIComponent(gatewayId)}`;
+  const displayInitCurl =
+    initCurl ?? `curl -H "Authorization: Bearer <token>" "${initUrl}"`;
+
+  useEffect(() => {
+    setInitCurl(readGatewayInitCurl(gatewayId));
+  }, [gatewayId]);
 
   async function copyInitUrl() {
     try {
@@ -54,14 +65,24 @@ export function GatewayInstanceDetailPage() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      // 浏览器禁用剪贴板时保留可选中的 URL，不阻断初始化流程。
+      // 浏览器禁用剪贴板时保留可选中的 URL，不阻断部署接入流程。
+    }
+  }
+
+  async function copyInitCurl() {
+    try {
+      await navigator.clipboard.writeText(displayInitCurl);
+      setCurlCopied(true);
+      window.setTimeout(() => setCurlCopied(false), 1500);
+    } catch {
+      // 剪贴板不可用时保留可选中的命令文本。
     }
   }
 
   return (
     <PageShell
       title={instance ? `实例 ${instance.gatewayId}` : "实例详情"}
-      summary="查看未上线实例的初始化入口与生命周期，完成 Gateway 部署后将自动进入运行态。"
+      summary="查看未上线实例的部署接入材料与生命周期；Gateway 初始化页面位于网关自身管理台。"
     >
       <Link to="/instance" className={styles.backLink}>
         ← 返回网关管理
@@ -102,46 +123,72 @@ export function GatewayInstanceDetailPage() {
 
           <section className={styles.card}>
             <header className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>初始化接入</h2>
+              <h2 className={styles.cardTitle}>Gateway 接入材料</h2>
               <p className={styles.cardSubtitle}>
-                将下面的 URL 配置到
-                Gateway，启动后即可拉取控制中心地址、策略版本与遥测配置。
+                这些材料由 Center 生成，供 Gateway 部署后访问控制中心并完成首次接入。
               </p>
             </header>
-            <div className={styles.infoGrid}>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>初始化 URL</span>
-                <div className={styles.urlRow}>
-                  <code className={styles.url}>{initUrl}</code>
-                  <button
-                    type="button"
-                    className={styles.copyButton}
-                    onClick={copyInitUrl}
-                  >
-                    {copied ? "已复制" : "复制"}
-                  </button>
+            <div className={styles.accessGrid}>
+              <div className={styles.endpointColumn}>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Center 接入 URL</span>
+                  <div className={styles.urlRow}>
+                    <code className={styles.url}>{initUrl}</code>
+                    <button
+                      type="button"
+                      className={styles.copyButton}
+                      onClick={copyInitUrl}
+                    >
+                      {copied ? "已复制" : "复制"}
+                    </button>
+                  </div>
+                </div>
+                <div className={styles.curlBlock}>
+                  <div className={styles.curlHeader}>
+                    <div>
+                        <span className={styles.infoLabel}>Center 接入 curl</span>
+                      <p className={styles.curlHint}>
+                        使用网关注册凭证验证 Center 接入接口，命令可直接复制到终端执行。
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.curlCopyButton}
+                      onClick={copyInitCurl}
+                    >
+                      {curlCopied ? "已复制" : "复制命令"}
+                    </button>
+                  </div>
+                  <pre className={styles.curlCode}>{displayInitCurl}</pre>
+                  {!initCurl ? (
+                    <p className={styles.curlPlaceholder}>
+                      当前会话没有保存创建回执，命令中的 &lt;token&gt;
+                      需要替换为实际注册凭证。
+                    </p>
+                  ) : null}
                 </div>
               </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>实例 ID</span>
-                <strong>{instance.instanceId || "待首次上报生成"}</strong>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>创建时间</span>
-                <strong>{formatDateTime(instance.createdAt)}</strong>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>初始化完成</span>
-                <strong>
-                  {instance.initializedAt
-                    ? formatDateTime(instance.initializedAt)
-                    : "尚未完成"}
-                </strong>
+              <div className={styles.metadataColumn}>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>实例 ID</span>
+                  <strong>{instance.instanceId || "待首次上报生成"}</strong>
+                </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>创建时间</span>
+                  <strong>{formatDateTime(instance.createdAt)}</strong>
+                </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>初始化完成</span>
+                  <strong>
+                    {instance.initializedAt
+                      ? formatDateTime(instance.initializedAt)
+                      : "尚未完成"}
+                  </strong>
+                </div>
               </div>
             </div>
             <p className={styles.hint}>
-              创建时生成的 Docker
-              安装命令包含网关凭证，请回到创建回执或部署流水线获取；控制中心不会在实例列表中重复展示凭证。
+              Gateway 初始化页面属于网关自身管理台；本页只保存 Center 侧实例接入材料，不承载 Gateway 初始化流程。
             </p>
           </section>
 

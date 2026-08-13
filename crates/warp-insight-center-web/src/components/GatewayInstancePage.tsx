@@ -8,7 +8,7 @@ export function GatewayInstancePage() {
   return (
     <PageShell
       title="网关管理"
-      summary="创建并管理 Gateway 实例；未上线实例进入初始化流程，已运行实例进入运行监控。"
+      summary="创建并管理 Gateway 实例；未上线实例查看 Center 接入材料，Gateway 初始化在网关管理台完成。"
     >
       <div className={styles.content}>
         <GatewayInstanceCreatePanel />

@@ -55,7 +55,7 @@ export function SubsystemAdminTopNavigation({
       {children ?? (
         <>
           <div className={styles.primary}>
-            <div className={styles.brand}>WarpInsight 管理台</div>
+            <div className={styles.brand}>WarpGateway 管理台</div>
             <nav className={styles.links} aria-label="主导航">
               <NavLink
                 className={({ isActive }) =>
@@ -78,9 +78,17 @@ export function SubsystemAdminTopNavigation({
                 className={({ isActive }) =>
                   isActive ? `${styles.link} ${styles.active}` : styles.link
                 }
+                to="/init"
+              >
+                初始化 Gateway
+              </NavLink>
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? `${styles.link} ${styles.active}` : styles.link
+                }
                 to="/install"
               >
-                安装
+                安装 Agent
               </NavLink>
             </nav>
           </div>

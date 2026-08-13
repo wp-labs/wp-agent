@@ -10,7 +10,7 @@ import {
 } from "./ui";
 import styles from "./GatewayInstanceList.module.css";
 
-/** 按接入阶段展示实例，避免初始化流程与运行监控入口混在同一序列中。 */
+/** 按接入阶段展示实例，避免 Center 接入材料与运行监控入口混在同一序列中。 */
 function InstanceGroup({
   id,
   title,
@@ -63,7 +63,7 @@ function InstanceGroup({
                 <span className={styles.actionLabel}>
                   {instance.lifecycleState === "Running"
                     ? "运行详情 →"
-                    : "初始化详情 →"}
+                    : "接入材料 →"}
                 </span>
               </div>
             </Link>
@@ -120,7 +120,7 @@ export function GatewayInstanceList() {
           <InstanceGroup
             id="gateway-onboarding-title"
             title="待接入实例"
-            description="尚未完成首次上线，需要继续部署、初始化或排查失败原因。"
+            description="尚未完成首次上线，需要继续部署并在 Gateway 管理台完成初始化。"
             instances={onboardingInstances}
             emptyText="当前没有待接入实例。"
           />

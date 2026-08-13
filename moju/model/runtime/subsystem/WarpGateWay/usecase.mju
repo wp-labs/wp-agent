@@ -9,8 +9,8 @@ usecase InitializeGatewayViaUrl {
     tags "gateway", "bootstrap", "initialize", "config"
   }
 
-  actor Control.AdminOperator
-  trigger Control.AdminGetGatewayInitialConfig
+  actor Control.WarpGateway
+  trigger Control.InitializeGatewayViaUrl
   outcome Control.GatewayInitialConfig
 }
 

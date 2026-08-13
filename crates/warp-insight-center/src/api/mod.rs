@@ -2,7 +2,14 @@
 
 use std::sync::{Arc, Mutex};
 
-use axum::{routing::get, routing::post, Router};
+use axum::{
+    extract::Request,
+    http::{header, HeaderValue},
+    middleware::{from_fn, Next},
+    response::Response,
+    routing::{get, post},
+    Router,
+};
 
 use insight_control::ControlCenterTrustBundle;
 
@@ -14,16 +21,16 @@ mod gateway_ops;
 mod rate_limit;
 
 use admin_ops::{
-    admin_create_gateway_instance, admin_get_agent_history, admin_get_gateway_history,
-    admin_get_gateway_uptime, admin_list_gateway_agents, admin_list_gateway_instances,
-    admin_approve_upgrade_plan, admin_bind_gateway_customer, admin_create_upgrade_plan,
-    admin_get_gateway_initial_config, admin_list_gateway_lifecycle, admin_list_gateway_status,
+    admin_approve_upgrade_plan, admin_bind_gateway_customer, admin_create_gateway_instance,
+    admin_create_upgrade_plan, admin_get_agent_history, admin_get_gateway_history,
+    admin_get_gateway_initial_config, admin_get_gateway_uptime, admin_list_gateway_agents,
+    admin_list_gateway_instances, admin_list_gateway_lifecycle, admin_list_gateway_status,
     admin_list_releases, admin_list_upgrade_plans, admin_publish_release,
     admin_revoke_gateway_enrollment_token, admin_show_gateway_status, admin_view_gateway_list,
 };
 use gateway_ops::{
-    download_release_artifact, get_gateway_initial_config, register_gateway, submit_agent_status,
-    submit_gateway_status,
+    download_release_artifact, get_gateway_initial_config, options_gateway_initial_config,
+    register_gateway, submit_agent_status, submit_gateway_status,
 };
 
 #[derive(Debug, Clone)]
@@ -32,6 +39,12 @@ pub struct ApiState {
     pub store: Arc<dyn Store>,
     pub artifact_store: Arc<dyn ArtifactStore>,
     pub rate_limits: Arc<Mutex<rate_limit::RateLimitState>>,
+}
+
+/// 控制中心是否要求 TLS：按 `public_url` scheme 推导（https → true，http → false）。
+/// 避免 HTTP 演示端点被网关按"必须 TLS"连接而失败。
+pub(crate) fn control_center_tls_required(config: &CenterConfig) -> bool {
+    config.public_url.trim_start().starts_with("https://")
 }
 
 /// 从 center 配置构造控制中心信任包：`ca_cert`（PEM）→ `ca_bundle`（公钥），
@@ -60,6 +73,25 @@ pub(crate) fn build_control_center_trust_bundle(
     })
 }
 
+/// 为 Gateway 初始化端点统一补 CORS 响应头，确保浏览器能读取认证失败状态。
+async fn gateway_initial_config_cors(request: Request, next: Next) -> Response {
+    let mut response = next.run(request).await;
+    let headers = response.headers_mut();
+    headers.insert(
+        header::ACCESS_CONTROL_ALLOW_ORIGIN,
+        HeaderValue::from_static("*"),
+    );
+    headers.insert(
+        header::ACCESS_CONTROL_ALLOW_HEADERS,
+        HeaderValue::from_static("authorization, accept"),
+    );
+    headers.insert(
+        header::ACCESS_CONTROL_EXPOSE_HEADERS,
+        HeaderValue::from_static("cache-control"),
+    );
+    response
+}
+
 pub fn router(config: CenterConfig, store: Arc<dyn Store>) -> Router {
     let artifact_store = crate::infra::build_artifact_store(&config);
     router_for(ApiState {
@@ -82,7 +114,9 @@ pub fn router_for(state: ApiState) -> Router {
         // 网关面：Gateway 拉取初始配置（初始化 URL 指向此端点）
         .route(
             "/api/v1/gateway/initial-config",
-            get(get_gateway_initial_config),
+            get(get_gateway_initial_config)
+                .options(options_gateway_initial_config)
+                .layer(from_fn(gateway_initial_config_cors)),
         )
         // 管理面：创建网关实例（AdminCreateGatewayInstance，POST /api/v1/admin/gateways/instances）
         .route(

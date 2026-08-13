@@ -58,3 +58,17 @@ region<page> AgentControlCenterPage {
   contains AgentControlUsecaseBoard
   layout fill_remaining
 }
+
+region<page> GatewayInitializePage {
+  meta {
+    label zh "网关初始化"
+    label en "Gateway Initialize"
+    summary zh "WarpGateway 的独立初始化页：输入控制中心初始化 URL（init_url），获取网关初始配置完成初始化。"
+    tags "admin", "gateway", "initialize", "page"
+  }
+
+  orientation vertical
+  contains AdminTopNavigation
+  contains GatewayInitializeUsecaseCard { slot_usecase: InitializeGatewayViaUrl }
+  layout fill_remaining
+}

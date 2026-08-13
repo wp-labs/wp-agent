@@ -22,7 +22,10 @@ use crate::infra::{
     EnrollmentTokenIssue, StoreError, StoredEnrollmentToken, StoredGateway, UpgradePlanRecord,
 };
 
-use super::{admin_auth::require_admin_bearer, build_control_center_trust_bundle, rate_limit, ApiState};
+use super::{
+    admin_auth::require_admin_bearer, build_control_center_trust_bundle,
+    control_center_tls_required, rate_limit, ApiState,
+};
 
 /// 创建网关实例请求体：对齐模型 `AdminCreateGatewayInstance`（gateway_name/requested_by），
 /// 额外扩展可选 `token`（脚本传入；前端表单不传则创建无凭证网关，无法上报状态）。
@@ -45,6 +48,8 @@ pub struct GatewayInstallInfo {
     pub config_toml: String,
     /// 控制中心 CA 证书内容（control-center.pem 信任根），供安装时写入 trust_bundle 路径。
     pub trust_bundle_pem: Option<String>,
+    /// 服务端生成的 curl 验证命令：Bearer 用注册凭证调用 init_url，便于快速验证。
+    pub init_curl: String,
 }
 
 /// 创建网关实例返回：实例视图 + 安装指引（Gateway 启动后基于 init_url 初始化）。
@@ -164,7 +169,7 @@ pub async fn admin_create_gateway_instance(
                  [control_center]\n\
                  endpoint = \"{}\"\n\
                  trust_bundle = \"/etc/warp-gateway/ca/control-center.pem\"\n\
-                 server_tls_required = true\n\
+                 server_tls_required = {}\n\
                  \n\
                  [enrollment]\n\
                  token_id = \"{}\"\n\
@@ -173,6 +178,7 @@ pub async fn admin_create_gateway_instance(
                  [protocol]\n\
                  version = \"{}\"\n",
                 state.config.public_url.trim_end_matches('/'),
+                control_center_tls_required(&state.config),
                 enrollment.token_id,
                 toml_basic_string_escape(token),
                 state.config.protocol_version,
@@ -187,6 +193,14 @@ pub async fn admin_create_gateway_instance(
             } else {
                 String::new()
             };
+            // 服务端生成 curl 验证命令：Bearer 用注册凭证调 init_url。空凭证 → 占位 <token>。
+            let curl_token = if token.is_empty() {
+                "<token>".to_string()
+            } else {
+                token.to_string()
+            };
+            let init_curl =
+                format!("curl -H \"Authorization: Bearer {curl_token}\" \"{init_url}\"");
             let install = GatewayInstallInfo {
                 install_command: format!(
                     "docker run -d --name warp-gateway-{gw} -v ./warp-gateway-{gw}.toml:/etc/warp-gateway/config.toml:ro{trust_mount} {image}",
@@ -198,6 +212,7 @@ pub async fn admin_create_gateway_instance(
                 init_url,
                 config_toml,
                 trust_bundle_pem: state.config.ca_cert.clone(),
+                init_curl,
             };
             (
                 StatusCode::CREATED,
@@ -689,7 +704,7 @@ pub async fn admin_get_gateway_initial_config(
         config: GatewayInitialConfig {
             control_center_endpoint: state.config.public_url.clone(),
             trust_bundle: build_control_center_trust_bundle(&state.config, &instance_id),
-            server_tls_required: true,
+            server_tls_required: control_center_tls_required(&state.config),
             protocol_version: state.config.protocol_version.clone(),
             enrollment_token_id,
         },
@@ -766,9 +781,7 @@ pub async fn admin_create_upgrade_plan(
     }
     let plan_id = format!(
         "plan-{}",
-        chrono::Utc::now()
-            .timestamp_nanos_opt()
-            .unwrap_or_default()
+        chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default()
     );
     let record = UpgradePlanRecord {
         plan_id,
@@ -1474,6 +1487,10 @@ mod tests {
         );
         assert!(returned.install.init_url.contains("initial-config"));
         assert!(returned.install.install_command.starts_with("docker run"));
+        assert_eq!(
+            returned.install.init_curl,
+            "curl -H \"Authorization: Bearer tok-create\" \"http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=gw-create\""
+        );
 
         // 实例列表公开可重复获取的初始化 URL，但不重复返回安装命令或凭证。
         let response = app
