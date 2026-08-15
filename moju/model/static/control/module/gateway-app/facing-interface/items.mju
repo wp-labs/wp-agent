@@ -69,7 +69,6 @@ flow GetGatewayInitialConfigFlow {
 
   actor WarpGateway
 
-  lane WarpGateway for Control.GatewayApp.Application
   lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
 
   depends GatewayIdentity, GatewayBootstrapToken
@@ -187,7 +186,6 @@ flow ReportGatewayStatusFlow {
 
   actor WarpGateway
 
-  lane WarpGateway for Control.GatewayApp.Application
   lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
 
   creates GatewayStatusAccepted

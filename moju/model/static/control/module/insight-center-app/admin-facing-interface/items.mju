@@ -127,31 +127,12 @@ message<command> AdminApproveUpgradePlan {
 
 // ── 接口 ──
 
-interface WarpInsightCenterAdminInterface {
+interface GatewayProvisioningInterface {
   meta {
-    label zh "WarpInsightCenter 管理接口"
-    label en "WarpInsightCenter Admin Interface"
-    tags "center", "admin-facing", "management", "http", "interface"
-  }
-
-  entry AdminViewGatewayList {
-    actor GatewayOperator
-    output Projection<List<GatewayInstance>>
-  }
-
-  entry AdminDispatchGlobalPolicy {
-    actor PlatformMaintenanceEngineer
-    output GlobalPolicyDispatch
-  }
-
-  entry AdminShowGatewayStatus {
-    actor CustomerServiceEngineer
-    output GatewayRuntimeStatus
-  }
-
-  entry AdminListGatewayStatus {
-    actor CustomerServiceEngineer
-    output List<GatewayRuntimeStatus>
+    label zh "Gateway 置备管理接口"
+    label en "Gateway Provisioning Interface"
+    summary zh "业务管理员开通网关：创建管理实例、绑定客户。仅 BusinessAdministrator 可下达。"
+    tags "center", "admin-facing", "provisioning", "http", "interface"
   }
 
   entry AdminCreateGatewayInstance {
@@ -162,6 +143,30 @@ interface WarpInsightCenterAdminInterface {
   entry AdminBindGatewayCustomer {
     actor BusinessAdministrator
     output GatewayCustomerBinding
+  }
+}
+
+interface GatewayOpsInterface {
+  meta {
+    label zh "网关与 Agent 运维观测接口"
+    label en "Gateway Ops Interface"
+    summary zh "网关与 Agent 舰队的只读运维观测：实例列表、运行状态、生命周期、历史与初始配置。"
+    tags "center", "admin-facing", "observability", "http", "interface"
+  }
+
+  entry AdminViewGatewayList {
+    actor GatewayOperator
+    output Projection<List<GatewayInstance>>
+  }
+
+  entry AdminShowGatewayStatus {
+    actor CustomerServiceEngineer
+    output GatewayRuntimeStatus
+  }
+
+  entry AdminListGatewayStatus {
+    actor CustomerServiceEngineer
+    output List<GatewayRuntimeStatus>
   }
 
   entry AdminListGatewayInstances {
@@ -179,6 +184,16 @@ interface WarpInsightCenterAdminInterface {
     output Projection<List<GatewayRuntimeStatus>>
   }
 
+  entry AdminGetGatewayLifecycle {
+    actor PlatformMaintenanceEngineer
+    output List<GatewayLifecycleEvent>
+  }
+
+  entry AdminGetGatewayInitialConfig {
+    actor PlatformMaintenanceEngineer
+    output GatewayInitialConfig
+  }
+
   entry AdminGetAgentHistory {
     actor PlatformMaintenanceEngineer
     output Projection<List<AgentRuntimeStatus>>
@@ -188,15 +203,19 @@ interface WarpInsightCenterAdminInterface {
     actor PlatformMaintenanceEngineer
     output List<AgentRuntimeStatus>
   }
+}
 
-  entry AdminGetGatewayLifecycle {
-    actor PlatformMaintenanceEngineer
-    output List<GatewayLifecycleEvent>
+interface PlatformReleaseInterface {
+  meta {
+    label zh "平台发布与策略接口"
+    label en "Platform Release Interface"
+    summary zh "平台维护工程师管理网关/Agent 发布、升级计划审批与全局策略下发。"
+    tags "center", "admin-facing", "release", "policy", "http", "interface"
   }
 
-  entry AdminGetGatewayInitialConfig {
+  entry AdminDispatchGlobalPolicy {
     actor PlatformMaintenanceEngineer
-    output GatewayInitialConfig
+    output GlobalPolicyDispatch
   }
 
   entry AdminPublishRelease {
@@ -223,5 +242,4 @@ interface WarpInsightCenterAdminInterface {
     actor PlatformMaintenanceEngineer
     output UpgradePlan
   }
-
 }

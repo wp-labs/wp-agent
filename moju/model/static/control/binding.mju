@@ -163,19 +163,28 @@ bind WarpInsightCenterGatewayInterface {
   }
 }
 
-bind WarpInsightCenterAdminInterface {
+bind GatewayProvisioningInterface {
+  entry AdminCreateGatewayInstance {
+    route POST "/api/v1/admin/gateways/instances"
+    auth bearer
+    actor_identity BusinessAdministrator.id from jwt.sub
+    status GatewayInstance 201
+  }
+
+  entry AdminBindGatewayCustomer {
+    route POST "/api/v1/admin/gateways/bind"
+    auth bearer
+    actor_identity BusinessAdministrator.id from jwt.sub
+    status GatewayCustomerBinding 200
+  }
+}
+
+bind GatewayOpsInterface {
   entry AdminViewGatewayList {
     route GET "/api/v1/admin/gateways"
     auth bearer
     actor_identity GatewayOperator.id from jwt.sub
     status Projection<List<GatewayInstance>> 200
-  }
-
-  entry AdminDispatchGlobalPolicy {
-    route POST "/api/v1/admin/policies/global"
-    auth bearer
-    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
-    status GlobalPolicyDispatch 200
   }
 
   entry AdminShowGatewayStatus {
@@ -192,18 +201,96 @@ bind WarpInsightCenterAdminInterface {
     status List<GatewayRuntimeStatus> 200
   }
 
-  entry AdminCreateGatewayInstance {
-    route POST "/api/v1/admin/gateways"
+  entry AdminListGatewayInstances {
+    route GET "/api/v1/admin/gateways/instances"
     auth bearer
-    actor_identity BusinessAdministrator.id from jwt.sub
-    status GatewayInstance 201
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status List<GatewayInstance> 200
   }
 
-  entry AdminBindGatewayCustomer {
-    route POST "/api/v1/admin/gateways/{gateway_id}/customer"
+  entry AdminGetGatewayUptime {
+    route GET "/api/v1/admin/gateways/{gateway_id}/status/uptime"
     auth bearer
-    actor_identity BusinessAdministrator.id from jwt.sub
-    status GatewayCustomerBinding 200
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status Projection<GatewayRuntimeStatus> 200
   }
 
+  entry AdminGetGatewayHistory {
+    route GET "/api/v1/admin/gateways/{gateway_id}/status/history"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status Projection<List<GatewayRuntimeStatus>> 200
+  }
+
+  entry AdminGetGatewayLifecycle {
+    route GET "/api/v1/admin/gateways/{gateway_id}/lifecycle"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status List<GatewayLifecycleEvent> 200
+  }
+
+  entry AdminGetGatewayInitialConfig {
+    route GET "/api/v1/admin/gateways/instances/{instance_id}/config"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status GatewayInitialConfig 200
+  }
+
+  entry AdminGetAgentHistory {
+    route GET "/api/v1/admin/gateways/{gateway_id}/agents/{agent_id}/history"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status Projection<List<AgentRuntimeStatus>> 200
+  }
+
+  entry AdminListGatewayAgents {
+    route GET "/api/v1/admin/gateways/{gateway_id}/agents"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status List<AgentRuntimeStatus> 200
+  }
+}
+
+bind PlatformReleaseInterface {
+  entry AdminDispatchGlobalPolicy {
+    route POST "/api/v1/admin/policies/global"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status GlobalPolicyDispatch 200
+  }
+
+  entry AdminPublishRelease {
+    route POST "/api/v1/admin/releases/{component}"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status Projection<WarpGatewayRelease> 201
+  }
+
+  entry AdminListReleases {
+    route GET "/api/v1/admin/releases/{component}"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status List<WarpGatewayRelease> 200
+  }
+
+  entry AdminCreateUpgradePlan {
+    route POST "/api/v1/admin/upgrade-plans"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status UpgradePlan 201
+  }
+
+  entry AdminListUpgradePlans {
+    route GET "/api/v1/admin/upgrade-plans"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status List<UpgradePlan> 200
+  }
+
+  entry AdminApproveUpgradePlan {
+    route POST "/api/v1/admin/upgrade-plans/approve"
+    auth bearer
+    actor_identity PlatformMaintenanceEngineer.id from jwt.sub
+    status UpgradePlan 200
+  }
 }

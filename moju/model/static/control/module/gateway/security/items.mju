@@ -1,0 +1,151 @@
+// Module: GatewaySecurity — 网关安全凭据与信任材料（实体）
+// 承载 WarpGateway 接入安全机制的凭据/信任实体：置备引导 Token、注册 Token、
+// 运行期凭据、控制中心信任包与校验记录。flows 由 GatewaySupervision 等承载。
+
+struct ControlCenterTrustBundle {
+  meta {
+    label zh "控制中心信任包"
+    label en "Control Center Trust Bundle"
+    summary zh "WarpGateway 校验 WarpInsightCenter HTTPS 服务端证书的 CA 信任材料（control-center.pem 公钥）与端点约束。"
+    tags "gateway", "tls", "trust-bundle"
+  }
+
+  unique trust_bundle_id: String
+  control_endpoint: String
+  /// control-center.pem 公钥内容——最终交给 gateway 用于校验中心 TLS。
+  ca_bundle: String
+  server_name: String
+  expected_san: String
+  issued_at: DateTime?
+  expires_at: DateTime?
+}
+
+struct GatewayEnrollmentToken {
+  meta {
+    label zh "网关注册 Token（RegistToken 存储记录）"
+    label en "Gateway Enrollment Token"
+    summary zh "网关注册凭据（RegistToken）的服务端存储记录：网关 init 置备时由中心签发，仅保存 token hash；绑定签发时的 gateway_id / instance_id，注册时校验与请求方一致；通过使用次数、有效期与状态控制合法性；随 token 携带控制中心签发的 TLS 信任根，供网关在注册前验证控制中心。明文签发值写入 config.toml [enrollment] token，本实体是其落库校验记录。"
+    tags "gateway", "enrollment", "token", "storage"
+  }
+
+  unique token_id: String
+  gateway_id: String
+  instance_id: String?
+  token_hash: String
+  tenant_id: String
+  environment_id: String
+  control_center_trust_bundle: ControlCenterTrustBundle
+  max_uses: Int
+  used_count: Int
+  issued_by: String
+  issued_at: DateTime
+  expires_at: DateTime
+  revoked_at: DateTime
+  status: GatewayEnrollmentTokenStatus
+}
+
+variant GatewayEnrollmentTokenStatus {
+  meta {
+    label zh "网关注册 Token 状态"
+    label en "Gateway Enrollment Token Status"
+    summary zh "描述网关注册 token 的可用、过期、耗尽或禁用等状态。"
+    tags "gateway", "enrollment", "status"
+  }
+
+  Active
+  Expired
+  Revoked
+  Used
+  Exhausted
+}
+
+struct GatewayEnrollmentAuthProfile {
+  meta {
+    label zh "网关注册认证配置"
+    label en "Gateway Enrollment Auth Profile"
+    summary zh "定义 WarpGateway 注册阶段所需的 HTTPS 服务端证书校验、内部 CA 信任根和注册 token 要求。"
+    tags "gateway", "enrollment", "auth"
+  }
+
+  server_tls_required: Bool
+  trust_bundle_required: Bool
+  enrollment_token_required: Bool
+}
+
+struct GatewayEnrollmentTokenValidation {
+  meta {
+    label zh "网关注册 Token 校验"
+    label en "Gateway Enrollment Token Validation"
+    summary zh "WarpGateway 注册时对预共享 token 的校验结果记录。"
+    tags "gateway", "enrollment", "validation"
+  }
+
+  token_id: String
+  gateway_id: String
+  status: String
+  validated_at: DateTime
+}
+
+struct GatewayBootstrapToken {
+  meta {
+    label zh "网关置备引导 Token"
+    label en "Gateway Bootstrap Token"
+    summary zh "WarpInsightCenter 创建实例时签发的一次性置备引导凭据：网关调用 initial-config 时以 Bearer 鉴权置备；初始化完成后不可再生成。明文仅 admin 页面一次性展示，不进 create API 响应。"
+    tags "gateway", "bootstrap", "token"
+  }
+
+  unique token_id: String
+  gateway_id: String
+  instance_id: String?
+  token_hash: String
+  status: GatewayBootstrapTokenStatus
+  issued_at: DateTime
+  expires_at: DateTime
+  max_uses: Int
+  used_count: Int
+}
+
+variant GatewayBootstrapTokenStatus {
+  meta {
+    label zh "置备引导 Token 状态"
+    label en "Gateway Bootstrap Token Status"
+    summary zh "描述网关置备引导 token 的可用、已消费、过期或禁用状态。"
+    tags "gateway", "bootstrap", "status"
+  }
+
+  Active
+  Consumed
+  Expired
+  Revoked
+}
+
+struct GatewayCredentialBundle {
+  meta {
+    label zh "网关通讯凭据"
+    label en "Gateway Credential Bundle"
+    summary zh "WarpGateway 注册成功后签发的 bearer 凭据，用于后续访问 WarpInsightCenter 网关接口的认证。"
+    tags "gateway", "credential"
+  }
+
+  unique credential_id: String
+  gateway_id: String
+  instance_id: String
+  auth_scheme: String
+  bearer_token: String
+  issued_at: DateTime
+  expires_at: DateTime
+}
+
+struct GatewayCredentialVerificationResult {
+  meta {
+    label zh "网关凭据校验结果"
+    label en "Gateway Credential Verification Result"
+    summary zh "WarpGateway 后续调用时凭据校验的结果记录。"
+    tags "gateway", "credential", "verify"
+  }
+
+  gateway_id: String
+  credential_id: String
+  status: String
+  verified_at: DateTime
+}

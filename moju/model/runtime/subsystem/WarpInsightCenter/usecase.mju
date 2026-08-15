@@ -3,19 +3,19 @@
 // 网关级事实（Control.WarpGateway、Control.GatewayOperator 及 GatewaySupervision
 // 模块下的 command/struct）在 Control 域 gateway-supervision.mju 中建模。
 
-// 创建 Gateway 管理实例并准备配置文件
+// 创建 Gateway 管理实例并签发置备引导 Token
 usecase CreateGatewayInstance {
   meta {
-    label zh "创建 Gateway 管理实例并准备配置文件"
-    label en "Create Gateway Instance and Prepare Config"
-    summary zh "创建 Gateway 管理实例并签发注册 Token（含控制中心信任根）；初始配置内容由网关初始化时从中心获取（GetInitialConfig）。"
+    label zh "创建 Gateway 管理实例并签发置备引导 Token"
+    label en "Create Gateway Instance and Issue Bootstrap Token"
+    summary zh "创建 Gateway 管理实例并签发一次性置备引导 Token（含控制中心信任根）；初始配置内容由网关调 initial-config 时即时生成（GetInitialConfig）。"
     tags "gateway", "provisioning", "config"
   }
 
-  actor Control.CustomerServiceEngineer
-  trigger Control.CreateGatewayInstance
+  actor Control.BusinessAdministrator
+  trigger Control.AdminCreateGatewayInstance
   outcome Control.GatewayInstance
-  outcome Control.GatewayEnrollmentToken
+  outcome Control.GatewayBootstrapToken
   flow Control.AdminCreateGatewayInstanceFlow
 }
 
@@ -27,8 +27,8 @@ usecase BindGatewayCustomer {
     tags "gateway", "provisioning", "customer"
   }
 
-  actor Control.CustomerServiceEngineer
-  trigger Control.BindGatewayCustomer
+  actor Control.BusinessAdministrator
+  trigger Control.AdminBindGatewayCustomer
   outcome Control.GatewayCustomerBinding
 }
 
@@ -98,6 +98,21 @@ usecase GetInitialConfig {
   flow Control.GetGatewayInitialConfigFlow
 }
 
+// 续期网关运行期凭据
+usecase RenewGatewayCredential {
+  meta {
+    label zh "续期网关运行期凭据"
+    label en "Renew Gateway Credential"
+    summary zh "网关凭当前运行期凭据申请新的 RUNTIME 凭据，旧凭据立即失效，实现定期轮换。"
+    tags "gateway", "credential", "renewal"
+  }
+
+  actor Control.WarpGateway
+  trigger Control.RenewGatewayCredential
+  outcome Control.GatewayCredentialBundle
+  flow Control.RenewGatewayCredentialFlow
+}
+
 // 接收Gateway状态上报
 usecase ReceiveGatewayStatusReport {
   meta {
@@ -120,6 +135,6 @@ usecase ViewGatewayStatus {
   }
 
   actor Control.CustomerServiceEngineer
-  trigger Control.ShowGatewayStatus
+  trigger Control.AdminShowGatewayStatus
   outcome Control.GatewayRuntimeStatus
 }

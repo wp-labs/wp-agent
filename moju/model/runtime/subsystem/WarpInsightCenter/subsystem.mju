@@ -16,12 +16,11 @@ subsystem WarpInsightCenter {
 
   uses module Control.Agent.Registry, Control.Protocol
   uses module Control.Agent.Status, Control.Agent.Command
-  uses module Control.Gateway.Supervision, Control.Gateway.InstanceManagement
+  uses module Control.Gateway.Supervision
   uses module Control.Gateway.Identity
   uses module Control.InsightCenter.PlatformRelease
   uses module Control.InsightCenterApp.InsightCenterWeb
   uses module Control.GatewayApp.FacingInterface
   uses module Control.InsightCenterApp.AdminFacingInterface
   uses module Control.InsightCenterApp.WarpInsightCenter
-  uses flow Control.AdminCreateGatewayInstanceFlow, Control.GetGatewayInitialConfigFlow
 }

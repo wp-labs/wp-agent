@@ -7,9 +7,11 @@ module<interface> InsightCenterApp.AdminFacingInterface {
   }
 
   layer Application
-  provides WarpInsightCenterAdminInterface by protocol<http>
+  provides GatewayProvisioningInterface by protocol<http>
+  provides GatewayOpsInterface by protocol<http>
+  provides PlatformReleaseInterface by protocol<http>
   depends Control.InsightCenterApp.WarpInsightCenter
-  depends Control.Gateway.Supervision, Control.Gateway.InstanceManagement
+  depends Control.Gateway.Supervision
   depends Control.InsightCenter.PlatformRelease
   depends Observed.HostInventory, Observed.HostResponsibility
   depends Observed.NetworkTopology, Observed.ServiceTopology

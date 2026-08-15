@@ -74,7 +74,6 @@ actor GatewayOperator {
   }
 
   access protocol<http>
-  can ShowGatewayStatus
   can AdminViewGatewayList
 }
 
@@ -87,7 +86,6 @@ actor BusinessAdministrator {
   }
 
   access protocol<http>
-  can CreateGatewayInstance
   can AdminCreateGatewayInstance
   can GetGatewayInitialConfig
   can AdminGetGatewayInitialConfig
@@ -106,9 +104,7 @@ actor CustomerServiceEngineer {
   access protocol<http>
   can GatewayContainerInstallRequested
   can GatewayImageDownloadRequested
-  can BindGatewayCustomer
   can GetGatewayInitialConfig
-  can ShowGatewayStatus
   can ApproveUpgradePlan
   can AdminShowGatewayStatus
   can AdminListGatewayStatus
