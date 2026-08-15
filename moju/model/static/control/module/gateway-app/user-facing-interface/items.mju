@@ -95,6 +95,11 @@ interface WarpGatewayManagementInterface {
     actor AdminOperator
     output AgentCapabilityIndex
   }
+
+  entry DispatchAgentFleetCommand {
+    actor AdminOperator
+    output AgentFleetDispatchReceipt
+  }
 }
 
 flow AdminGetAgentInstallCodeFlow {

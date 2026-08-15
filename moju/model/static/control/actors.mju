@@ -89,8 +89,6 @@ actor BusinessAdministrator {
   access protocol<http>
   can CreateGatewayInstance
   can AdminCreateGatewayInstance
-  can RevealBootstrapToken
-  can RotateBootstrapToken
   can GetGatewayInitialConfig
   can AdminGetGatewayInitialConfig
   can AdminViewGatewayList

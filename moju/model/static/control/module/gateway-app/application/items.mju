@@ -12,7 +12,7 @@ command ViewGatewayOverview = OperatorRequest {
 
 }
 
-command DispatchAgentFleetCommand = OperatorRequest {
+message<command> DispatchAgentFleetCommand = OperatorRequest {
   meta {
     label zh "下发 Agent 列表指令"
     label en "Dispatch Agent Fleet Command"

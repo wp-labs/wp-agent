@@ -47,6 +47,16 @@ interface WarpInsightCenterGatewayInterface {
     actor WarpGateway
     output AgentStatusAcceptedReturned
   }
+
+  entry VerifyGatewayCredential {
+    actor WarpGateway
+    output GatewayCredentialVerificationResult
+  }
+
+  entry InitializeGatewayViaUrl {
+    actor WarpGateway
+    output GatewayInitialConfig
+  }
 }
 
 flow GetGatewayInitialConfigFlow {

@@ -12,17 +12,6 @@ command ViewGatewayList = OperatorRequest {
 
 }
 
-command DispatchGlobalPolicy = OperatorRequest {
-  meta {
-    label zh "下发全局策略"
-    label en "Dispatch Global Policy"
-    tags "center", "policy"
-  }
-
-  policy_version: String
-  gateway_ids: List<String>
-}
-
 // 注意：GatewayListView 是查询/聚合视图（message<response>），非领域实体，
 // 不由 flow 创建——列表视图由 handler 聚合返回。
 
@@ -34,15 +23,15 @@ flow DispatchGlobalPolicyFlow {
   }
 
   actor PlatformMaintenanceEngineer
-  trigger DispatchGlobalPolicy
+  trigger AdminDispatchGlobalPolicy
 
   creates GlobalPolicyDispatch
 
   step DispatchPolicy {
     create GlobalPolicyDispatch {
-      dispatch_id = DispatchGlobalPolicy.requested_by
-      policy_version = DispatchGlobalPolicy.policy_version
-      target_count = DispatchGlobalPolicy.gateway_ids
+      dispatch_id = AdminDispatchGlobalPolicy.requested_by
+      policy_version = AdminDispatchGlobalPolicy.policy_version
+      target_count = AdminDispatchGlobalPolicy.gateway_ids
       status = "accepted"
       dispatched_at = "now"
     }

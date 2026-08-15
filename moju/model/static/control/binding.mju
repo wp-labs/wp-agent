@@ -72,6 +72,13 @@ bind WarpGatewayManagementInterface {
     actor_identity AdminOperator.id from jwt.sub
     status AgentCapabilityIndex 200
   }
+
+  entry DispatchAgentFleetCommand {
+    route POST "/api/v1/gateway/agents/dispatch"
+    auth bearer
+    actor_identity AdminOperator.id from jwt.sub
+    status AgentFleetDispatchReceipt 202
+  }
 }
 
 bind WpAgentOnlineRegistrationInterface {
@@ -140,6 +147,20 @@ bind WarpInsightCenterGatewayInterface {
     actor_identity WarpGateway.id from credential.gateway_id
     status GatewayCredentialBundle 200
   }
+
+  entry VerifyGatewayCredential {
+    route POST "/api/v1/gateway/credentials:verify"
+    auth bearer
+    actor_identity WarpGateway.id from credential.gateway_id
+    status GatewayCredentialVerificationResult 200
+  }
+
+  entry InitializeGatewayViaUrl {
+    route POST "/api/v1/gateway/initialize-via-url"
+    auth bearer
+    actor_identity WarpGateway.id from credential.gateway_id
+    status GatewayInitialConfig 200
+  }
 }
 
 bind WarpInsightCenterAdminInterface {
@@ -185,17 +206,4 @@ bind WarpInsightCenterAdminInterface {
     status GatewayCustomerBinding 200
   }
 
-  entry RevealBootstrapToken {
-    route GET "/api/v1/admin/gateways/{gateway_id}/bootstrap-token"
-    auth bearer
-    actor_identity BusinessAdministrator.id from jwt.sub
-    status GatewayBootstrapToken 200
-  }
-
-  entry RotateBootstrapToken {
-    route POST "/api/v1/admin/gateways/{gateway_id}/bootstrap-tokens/rotate"
-    auth bearer
-    actor_identity BusinessAdministrator.id from jwt.sub
-    status GatewayBootstrapToken 200
-  }
 }
