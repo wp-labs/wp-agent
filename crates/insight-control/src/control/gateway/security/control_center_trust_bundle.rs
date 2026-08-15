@@ -1,6 +1,6 @@
 // @moju generated
 #[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Gateway.Supervision")]
+#[moju(kind = "struct", domain = "Control", module = "Control.Gateway.Security")]
 pub struct ControlCenterTrustBundle {
     pub trust_bundle_id: String,
     pub control_endpoint: String,

@@ -26,11 +26,11 @@ use admin_ops::{
     admin_get_gateway_initial_config, admin_get_gateway_uptime, admin_list_gateway_agents,
     admin_list_gateway_instances, admin_list_gateway_lifecycle, admin_list_gateway_status,
     admin_list_releases, admin_list_upgrade_plans, admin_publish_release,
-    admin_revoke_gateway_enrollment_token, admin_show_gateway_status, admin_view_gateway_list,
+    admin_show_gateway_status, admin_view_gateway_list,
 };
 use gateway_ops::{
     download_release_artifact, get_gateway_initial_config, options_gateway_initial_config,
-    register_gateway, submit_agent_status, submit_gateway_status,
+    register_gateway, renew_gateway_credential, submit_agent_status, submit_gateway_status,
 };
 
 #[derive(Debug, Clone)]
@@ -111,12 +111,17 @@ pub fn router_for(state: ApiState) -> Router {
         .route("/api/v1/gateway/agents/status", post(submit_agent_status))
         // 网关面：WarpGateway 持注册 Token 注册（RegisterGatewayFlow）
         .route("/api/v1/gateway/register", post(register_gateway))
-        // 网关面：Gateway 拉取初始配置（初始化 URL 指向此端点）
+        // 网关面：Gateway 拉取初始配置（初始化 URL 指向此端点；置备 + 出 config.toml）
         .route(
             "/api/v1/gateway/initial-config",
             get(get_gateway_initial_config)
                 .options(options_gateway_initial_config)
                 .layer(from_fn(gateway_initial_config_cors)),
+        )
+        // 网关面：续期运行期凭据（RenewGatewayCredential，旧 token 立即失效）
+        .route(
+            "/api/v1/gateway/credentials:renew",
+            post(renew_gateway_credential),
         )
         // 管理面：创建网关实例（AdminCreateGatewayInstance，POST /api/v1/admin/gateways/instances）
         .route(
@@ -132,11 +137,6 @@ pub fn router_for(state: ApiState) -> Router {
         .route(
             "/api/v1/admin/gateways/bind",
             post(admin_bind_gateway_customer),
-        )
-        // 管理面：吊销网关注册 Token（GatewayEnrollmentTokenStatus.Revoked）
-        .route(
-            "/api/v1/admin/gateways/:gateway_id/enrollment-tokens/:token_id/revoke",
-            post(admin_revoke_gateway_enrollment_token),
         )
         // 管理面：实例初始配置（admin 侧查询）
         .route(

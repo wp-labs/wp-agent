@@ -7,4 +7,7 @@ pub struct GatewayEnrollmentResult {
     pub instance_id: String,
     pub credential_id: String,
     pub initial_config: String,
+    /// 注册成功后签发的独立运行期凭据（RUNTIME_TOKEN）：旧注册凭据（RegistToken）只用于
+    /// 本次注册，运行期 Bearer 以本 bundle 为准。
+    pub credential_bundle: crate::GatewayCredentialBundle,
 }

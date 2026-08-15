@@ -30,7 +30,7 @@ pub use agent::identity::*;
 pub use agent::registry::*;
 pub use agent::status::*;
 pub use gateway::identity::*;
-pub use gateway::instance_management::*;
 pub use gateway::management::*;
+pub use gateway::security::*;
 pub use gateway::supervision::*;
 pub use insight_center::platform_release::*;

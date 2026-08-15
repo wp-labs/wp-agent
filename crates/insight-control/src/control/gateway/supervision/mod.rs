@@ -1,8 +1,6 @@
 // @moju generated
 // Model module: Control.Gateway.Supervision
 
-pub mod control_center_trust_bundle;
-pub use control_center_trust_bundle::*;
 pub mod gateway_enrollment_result;
 pub use gateway_enrollment_result::*;
 pub mod gateway_initial_config;

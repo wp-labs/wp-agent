@@ -182,6 +182,10 @@ pub struct StoredGateway {
     pub credential_status: StoredGatewayCredentialStatus,
     #[serde(default)]
     pub credential_expires_at: Option<String>,
+    /// 一次性置备引导 Token 的 hash（BOOTSTRAP_TOKEN）。create 时签发，
+    /// init-url 置备成功后清空（消费）；初始化后不可再生成。空串 = 无/已消费。
+    #[serde(default)]
+    pub bootstrap_token_hash: String,
     /// 最新上报状态（喂 GatewayRuntimeStatus，last_seen_at = reported_at）。
     #[serde(default)]
     pub version: Option<String>,
@@ -216,6 +220,7 @@ impl StoredGateway {
             credential_token_hash,
             credential_status: StoredGatewayCredentialStatus::Active,
             credential_expires_at: expires_at,
+            bootstrap_token_hash: String::new(),
             version: None,
             status: None,
             health: None,
@@ -298,6 +303,20 @@ pub trait Store: Send + Sync + std::fmt::Debug {
         &self,
         token: &str,
     ) -> Result<StoredEnrollmentToken, StoreError>;
+    /// 校验并消费一次性置备引导 Token（BOOTSTRAP_TOKEN）：比对 hash + 未初始化，
+    /// 成功则清空 bootstrap_token_hash。返回是否消费成功。
+    async fn consume_bootstrap_token(
+        &self,
+        gateway_id: &str,
+        bootstrap_token: &str,
+    ) -> Result<bool, StoreError>;
+    /// 落库运行期凭据（RUNTIME_TOKEN）：更新 credential_token_hash + Active + 过期时间。
+    async fn update_gateway_credential(
+        &self,
+        gateway_id: &str,
+        token_hash: &str,
+        expires_at: Option<String>,
+    ) -> Result<bool, StoreError>;
     /// 吊销注册 Token（映射模型 GatewayEnrollmentTokenStatus.Revoked）：
     /// 校验归属 gateway_id 后置 status=Revoked + revoked_at；未知 token / 归属不符 → Err。
     async fn revoke_enrollment_token(
@@ -426,6 +445,8 @@ impl FileStore {
     }
 
     /// 创建网关实例（同步，供测试与 trait 委托）：gateway_id 已存在 → Conflict。
+    /// `token` 为一次性置备引导 Token（BOOTSTRAP_TOKEN），只存 sha256；
+    /// 运行期凭据（credential_token_hash）留空，注册后签发 RUNTIME_TOKEN 时再落库。
     pub fn create_gateway(
         &self,
         gateway_id: &str,
@@ -436,7 +457,7 @@ impl FileStore {
                 if snapshot.gateways.contains_key(gateway_id) {
                     return Err(StoreError::Conflict(gateway_id.to_string()));
                 }
-                let token_hash = if token.is_empty() {
+                let bootstrap_hash = if token.is_empty() {
                     String::new()
                 } else {
                     sha256_hex(token)
@@ -444,9 +465,10 @@ impl FileStore {
                 let mut stored = StoredGateway::provisioned(
                     gateway_id.to_string(),
                     String::new(),
-                    token_hash,
+                    String::new(),
                     None,
                 );
+                stored.bootstrap_token_hash = bootstrap_hash;
                 stored.lifecycle_state = Some(GatewayInstanceLifecycleState::Provisioned);
                 stored.created_at = Some(DateTime::now());
                 snapshot.gateways.insert(gateway_id.to_string(), stored.clone());
@@ -581,6 +603,49 @@ impl FileStore {
             };
             Ok(found.clone())
         })?
+    }
+
+    /// 校验并消费一次性置备引导 Token（同步）：比对 `bootstrap_token_hash`，网关必须
+    /// 处于 Provisioned（未初始化）且 token 未消费；成功则清空 bootstrap_token_hash（消费）。
+    /// 返回是否消费成功（不匹配/已消费/已初始化 → false，由 handler 映射 401）。
+    pub fn consume_bootstrap_token(
+        &self,
+        gateway_id: &str,
+        bootstrap_token: &str,
+    ) -> Result<bool, StoreError> {
+        let bootstrap_hash = sha256_hex(bootstrap_token);
+        self.update(|snapshot| {
+            let Some(gateway) = snapshot.gateways.get_mut(gateway_id) else {
+                return false;
+            };
+            if gateway.bootstrap_token_hash.is_empty()
+                || gateway.bootstrap_token_hash != bootstrap_hash
+                || gateway.lifecycle_state != Some(GatewayInstanceLifecycleState::Provisioned)
+            {
+                return false;
+            }
+            gateway.bootstrap_token_hash.clear();
+            true
+        })
+    }
+
+    /// 落库运行期凭据（RUNTIME_TOKEN，同步）：更新 credential_token_hash + Active + 过期时间。
+    /// 网关注册/续期时调用；旧凭据 hash 被覆盖即失效。返回是否更新成功。
+    pub fn update_gateway_credential(
+        &self,
+        gateway_id: &str,
+        token_hash: &str,
+        expires_at: Option<String>,
+    ) -> Result<bool, StoreError> {
+        self.update(|snapshot| {
+            let Some(gateway) = snapshot.gateways.get_mut(gateway_id) else {
+                return false;
+            };
+            gateway.credential_token_hash = token_hash.to_string();
+            gateway.credential_status = StoredGatewayCredentialStatus::Active;
+            gateway.credential_expires_at = expires_at;
+            true
+        })
     }
 
     /// 落库 Agent 状态（同步，供测试与 trait 委托）：按 agent_id upsert，归属以 gateway_id 参数为准。
@@ -921,6 +986,23 @@ impl Store for FileStore {
         FileStore::consume_enrollment_token(self, token)
     }
 
+    async fn consume_bootstrap_token(
+        &self,
+        gateway_id: &str,
+        bootstrap_token: &str,
+    ) -> Result<bool, StoreError> {
+        FileStore::consume_bootstrap_token(self, gateway_id, bootstrap_token)
+    }
+
+    async fn update_gateway_credential(
+        &self,
+        gateway_id: &str,
+        token_hash: &str,
+        expires_at: Option<String>,
+    ) -> Result<bool, StoreError> {
+        FileStore::update_gateway_credential(self, gateway_id, token_hash, expires_at)
+    }
+
     async fn revoke_enrollment_token(
         &self,
         gateway_id: &str,
@@ -1211,7 +1293,10 @@ mod tests {
 
         let stored = store.create_gateway("gw-100", "tok-x").expect("create");
         assert_eq!(stored.gateway_id, "gw-100");
-        assert_eq!(stored.credential_token_hash, sha256_hex("tok-x"));
+        // create 的 token 是置备引导 Token（BOOTSTRAP_TOKEN）：存 bootstrap hash，
+        // 运行期凭据（credential_token_hash）留空，注册后签发 RUNTIME_TOKEN 时再落库。
+        assert_eq!(stored.bootstrap_token_hash, sha256_hex("tok-x"));
+        assert_eq!(stored.credential_token_hash, "");
         assert_eq!(stored.credential_status, StoredGatewayCredentialStatus::Active);
         assert_eq!(stored.instance_id, "");
 
@@ -1219,10 +1304,69 @@ mod tests {
         let err = store.create_gateway("gw-100", "tok-y").expect_err("conflict");
         assert!(matches!(err, StoreError::Conflict(ref gateway_id) if gateway_id == "gw-100"));
 
-        // 空 token → 空 hash（无凭证网关无法上报）。
+        // 空 token → bootstrap hash 也空（无引导凭据网关无法置备）。
         let stored = store.create_gateway("gw-nocred", "").expect("create no credential");
+        assert_eq!(stored.bootstrap_token_hash, "");
         assert_eq!(stored.credential_token_hash, "");
 
+        let _ = fs::remove_file(path);
+    }
+
+    #[test]
+    fn bootstrap_token_consume_and_rotate() {
+        // 消费：匹配 bootstrap + Provisioned → true，hash 清空。
+        let path = test_store_path();
+        let store = FileStore::new(&path);
+        store.create_gateway("gw-b", "boot-x").expect("create");
+        assert!(store
+            .consume_bootstrap_token("gw-b", "boot-x")
+            .expect("consume"));
+        assert!(store.load().expect("load").gateways["gw-b"]
+            .bootstrap_token_hash
+            .is_empty());
+        // 已消费 → false（防重放）。
+        assert!(!store
+            .consume_bootstrap_token("gw-b", "boot-x")
+            .expect("re-consume"));
+        // 错 token → false。
+        let path2 = test_store_path();
+        let store2 = FileStore::new(&path2);
+        store2.create_gateway("gw-b", "boot-x").expect("create");
+        assert!(!store2
+            .consume_bootstrap_token("gw-b", "wrong")
+            .expect("wrong"));
+        // 已初始化 → false。
+        let path3 = test_store_path();
+        let store3 = FileStore::new(&path3);
+        store3.create_gateway("gw-b", "boot-x").expect("create");
+        store3.mark_gateway_initializing("gw-b").expect("init");
+        assert!(!store3
+            .consume_bootstrap_token("gw-b", "boot-x")
+            .expect("initialized"));
+
+        for path in [path, path2, path3] {
+            let _ = fs::remove_file(path);
+        }
+    }
+
+    #[test]
+    fn update_gateway_credential_replaces_runtime_credential() {
+        let path = test_store_path();
+        let store = FileStore::new(&path);
+        store.create_gateway("gw-c", "boot-x").expect("create");
+        let expires = Some("2026-09-01T00:00:00Z".to_string());
+        assert!(store
+            .update_gateway_credential("gw-c", "sha256:runtime", expires.clone())
+            .expect("update"));
+        let snapshot = store.load().expect("load");
+        let stored = &snapshot.gateways["gw-c"];
+        assert_eq!(stored.credential_token_hash, "sha256:runtime");
+        assert_eq!(stored.credential_status, StoredGatewayCredentialStatus::Active);
+        assert_eq!(stored.credential_expires_at, expires);
+        // 未知网关 → false。
+        assert!(!store
+            .update_gateway_credential("gw-nope", "h", None)
+            .expect("unknown"));
         let _ = fs::remove_file(path);
     }
 
