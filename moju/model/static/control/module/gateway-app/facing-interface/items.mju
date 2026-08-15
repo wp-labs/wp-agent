@@ -71,8 +71,9 @@ flow GetGatewayInitialConfigFlow {
   step CallInitUrl in WarpGateway by GetGatewayInitialConfig {
   }
 
-  // ① 中心校验并一次性消费引导 Token（Bearer bootstrap）：比对 token_hash、校验 gateway_id 绑定；
-  // 消费后 status → Consumed、used_count+1；仅未初始化（Provisioned）实例可 init，防重放与重复置备。
+  // ① 中心校验并一次性消费引导 Token（Bearer bootstrap）：比对 token_hash、校验 gateway_id 与
+  // instance_id 绑定；消费后 status → Consumed、used_count+1；仅未初始化（Provisioned）实例可 init，
+  // 防重放与重复置备。
   step ValidateBootstrapToken in WarpInsightCenter {
   }
 
@@ -92,10 +93,11 @@ flow GetGatewayInitialConfigFlow {
     }
   }
 
-  // ③ 中心构建初始配置：config 绑定网关身份与注册 Token 引用，携带控制中心信任包（公钥）。
+  // ③ 中心构建初始配置：config 绑定网关身份与实例、注册 Token 引用，携带控制中心信任包（公钥）。
   step BuildInitialConfig in WarpInsightCenter {
     create GatewayInitialConfig {
       gateway_id = "gateway-issued"
+      instance_id = "gw-inst-001"
       control_center_endpoint = "https://center.warpinsight.example"
       trust_bundle = ControlCenterTrustBundle
       server_tls_required = true
@@ -140,10 +142,11 @@ flow InitializeGatewayViaUrlFlow {
     }
   }
 
-  // ② 构建初始配置：控制端点 = 提交的 URL，config 携带控制中心信任包（公钥）。
+  // ② 构建初始配置：控制端点 = 提交的 URL，config 携带控制中心信任包（公钥），绑定实例。
   step BuildInitialConfig {
     create GatewayInitialConfig {
       gateway_id = "gateway-issued"
+      instance_id = "gw-inst-001"
       control_center_endpoint = InitializeGatewayViaUrl.init_url
       trust_bundle = ControlCenterTrustBundle
       server_tls_required = true

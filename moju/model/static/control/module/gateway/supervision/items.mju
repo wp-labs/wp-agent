@@ -463,7 +463,7 @@ flow RenewGatewayCredentialFlow {
   step RequestRenewal in WarpGateway by RenewGatewayCredential {
   }
 
-  // 中心以当前凭据鉴权后签发新运行期凭据，旧凭据立即失效。
+  // 中心以当前凭据鉴权后签发新运行期凭据（短 TTL），旧凭据立即失效。
   step IssueRenewedCredential in WarpInsightCenter {
     create GatewayCredentialBundle {
       credential_id = "credential-renewed"
@@ -472,6 +472,7 @@ flow RenewGatewayCredentialFlow {
       auth_scheme = "bearer"
       bearer_token = "gateway-credential-renewed"
       issued_at = "now"
+      expires_at = "2026-08-16T00:00:00Z"
     }
   }
 }
