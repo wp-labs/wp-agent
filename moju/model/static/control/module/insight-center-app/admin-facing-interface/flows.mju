@@ -12,26 +12,27 @@
 
 flow AdminCreateGatewayInstanceFlow {
   // 泳道：责任归属——实例创建与 token 签发均由中心 Application 层编排执行；
-  // CustomerServiceEngineer 仅作为流程发起者（actor），不执行具体步骤。
+  // BusinessAdministrator 仅作为流程发起者（actor），不执行具体步骤。
   lane Center for Control.InsightCenterApp.WarpInsightCenter
 
   meta {
-    label zh "创建 Gateway 管理实例并签发注册 Token"
-    label en "Create Gateway Instance and Issue Enrollment Token"
-    summary zh "创建 Gateway 管理实例并签发注册 Token（含控制中心信任根）。初始配置内容由 GetGatewayInitialConfigFlow 在网关初始化时即时提供，config.toml 由网关派生落盘，center 不产出配置文件。"
+    label zh "创建 Gateway 管理实例并签发置备引导 Token"
+    label en "Create Gateway Instance and Issue Bootstrap Token"
+    summary zh "创建 Gateway 管理实例并签发一次性置备引导 Token（含控制中心信任根）。初始配置内容由 GetGatewayInitialConfigFlow 在网关初始化时即时提供：网关以 BootstrapToken 鉴权，center 签发 RegistToken 生成 config.toml。"
     tags "gateway", "provisioning", "config"
   }
 
-  actor CustomerServiceEngineer
-  trigger AdminCreateGatewayInstance
+  actor BusinessAdministrator
 
   creates GatewayInstance
-  creates GatewayEnrollmentToken
+  creates GatewayBootstrapToken
   creates ControlCenterTrustBundle
 
-  step CreateInstance in Center {
+  // 入口：业务管理员经中心管理台创建实例（by 声明 trigger，省略 flow-level trigger）。
+  step CreateInstance in Center by AdminCreateGatewayInstance {
     create GatewayInstance {
       gateway_id = AdminCreateGatewayInstance.gateway_name
+      instance_id = AdminCreateGatewayInstance.instance_id
       lifecycle_state = "Provisioned"
       created_at = "now"
     }
@@ -51,16 +52,149 @@ flow AdminCreateGatewayInstanceFlow {
     }
   }
 
-  step IssueEnrollmentToken in Center {
-    create GatewayEnrollmentToken {
-      token_id = "gw-enroll-001"
-      token_hash = "sha256:token-hash"
-      control_center_trust_bundle = ControlCenterTrustBundle
+  // 签发一次性置备引导 Token（短 TTL）：仅 create 时签发一次，初始化完成后不可再生成。
+  step IssueBootstrapToken in Center {
+    create GatewayBootstrapToken {
+      token_id = "gw-boot-001"
+      gateway_id = AdminCreateGatewayInstance.gateway_name
+      instance_id = AdminCreateGatewayInstance.instance_id
+      token_hash = "sha256:bootstrap-token-hash"
       max_uses = 1
       used_count = 0
       status = "Active"
       issued_at = "now"
-      expires_at = "2026-09-01T00:00:00Z"
+      expires_at = "2026-08-16T00:00:00Z"
+    }
+  }
+}
+
+// 多参与者泳道 flow：Gateway 接入 WarpInsightCenter 整体编排。
+// actor：业务管理员（BusinessAdministrator）中心侧创建实例；
+// 客户服务工程师（CustomerServiceEngineer）在客户现场下载/安装；WarpGateway 实例的动作由网关侧
+// 单入口 flow（GetGatewayInitialConfigFlow / RegisterGatewayFlow / ReportGatewayStatusFlow /
+// RenewGatewayCredentialFlow）承载，此处以 WarpGateway 泳道标注时间线。
+// 泳道：中心（WarpInsightCenter）与网关（WarpGateway）两侧。
+// 业务管理员创建实例；客户服务工程师下载安装；中心签发引导、置备派生、签发运行期凭据；
+// WarpGateway 实例安装完成后持一次性引导 Token 置备、注册、周期上报。
+flow GatewayOnboardingFlow {
+  meta {
+    label zh "Gateway 接入整体流程"
+    label en "Gateway Onboarding Flow"
+    summary zh "WarpGateway 从中心创建、客户现场下载/安装、init 置备、注册到运行期上报/续期的端到端编排；业务管理员（BusinessAdministrator）中心侧创建、客户服务工程师（CustomerServiceEngineer）现场部署；泳道：中心（WarpInsightCenter）/ 网关（WarpGateway）。"
+    tags "gateway", "onboarding", "enrollment"
+  }
+
+  actor BusinessAdministrator
+  actor CustomerServiceEngineer
+
+  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+  lane WarpGateway for Control.GatewayApp.Application
+
+  creates GatewayEnrollmentToken
+  creates GatewayInitialConfig
+  creates GatewayStatusAccepted
+
+  // ① 业务管理员经中心管理台创建实例——由 AdminCreateGatewayInstanceFlow.CreateInstance 承载，
+  // 本步骤引用其产出（时间线标记，不重复 create）。
+  step CreateGatewayInstance in WarpInsightCenter by AdminCreateGatewayInstance {
+    input GatewayInstance
+  }
+
+  // ② 中心签发一次性置备引导 Token（BOOTSTRAP_TOKEN，只存 sha256，短 TTL，绑定实例）——由
+  // AdminCreateGatewayInstanceFlow.IssueBootstrapToken 承载，本步骤引用其产出（时间线标记，不重复 create）。
+  step IssueBootstrapToken in WarpInsightCenter {
+    input GatewayBootstrapToken
+  }
+
+  // ③ 中心经 admin 页面一次性展示引导 Token 明文给工程师（只存 sha256；明文仅此一次展示，
+  // 不入 create API 响应）；工程师线下携带、安装时注入容器。分发通道保密即 B 方案安全基石。
+  step RevealBootstrapToken in WarpInsightCenter {
+    input GatewayBootstrapToken
+  }
+
+  // ④ 在网关侧拉取镜像（docker pull）；由 GatewayImageDownloadRequested 命令驱动（客户服务工程师
+  // 发起下载，区别于 ① 的管理员命令；命令的 gateway_id / instance_id 必须匹配流程实例）。镜像以
+  // digest / signature 绑定，供 ⑤ 安装前校验完整性。
+  step DownloadGatewayImage in WarpGateway by GatewayImageDownloadRequested {
+    input GatewayImage
+  }
+
+  // ⑤ 在网关侧启动容器（docker run，注入 init_url + setup_token）；由 GatewayContainerInstallRequested
+  // 命令驱动（客户服务工程师发起安装，区别于 ① 的管理员命令；命令的 gateway_id / instance_id 必须匹配
+  // 流程实例）。安装前校验镜像摘要与签名（GatewayImage.image_digest / image_signature，见 ④），防投毒镜像。
+  // bootstrap 与中心信任包（control-center.pem）随安装注入：走 env / setup_token，不走 URL query，
+  // 防日志泄露。信任包须早于 init 到达（供 ⑥ 校验中心证书）。
+  step InstallGatewayContainer in WarpGateway by GatewayContainerInstallRequested {
+    input GatewayBootstrapToken
+    input ControlCenterTrustBundle
+  }
+
+  // ⑥ 网关侧校验中心 HTTPS 证书：对照安装时注入的 ControlCenterTrustBundle（见 ⑤，server_name /
+  // expected_san）验证中心身份通过后，才上送 bootstrap，防 MITM 截获引导 Token。
+  step VerifyCenterTls in WarpGateway {
+    input ControlCenterTrustBundle
+  }
+
+  // ⑦ 中心校验并一次性消费引导 Token（Bearer bootstrap）：比对 token_hash、校验 gateway_id 与
+  // instance_id 绑定、未超期（超期 status → Expired）；消费后 status → Consumed、used_count+1，防重放。
+  // 仅 lifecycle_state = Provisioned 的实例可 init，校验通过后迁移 → Initializing，防止已初始化实例重复置备。
+  step ValidateBootstrapToken in WarpInsightCenter {
+  }
+
+  // ⑧ WarpGateway 实例调 init-url（Bearer 一次性 bootstrap）；中心由引导 Token 直接签发
+  // REGIST_TOKEN 落 enrollment、出 config.toml。REGIST_TOKEN 绑定签发时的 gateway_id / instance_id，
+  // 注册时校验与请求方一致；短 TTL，逾期未注册自动失效。config.toml 内含 REGIST_TOKEN 明文，须经强 TLS
+  // 回传（网关已校验中心证书，见 ⑥）；config 携带控制中心端点、TLS 强制开关与信任包（运行期轮换用，
+  // init 校验用信任包见 ⑤）；enrollment_token_id 即后续注册时提交的 REGIST_TOKEN 来源，注册流程校验并
+  // 一次性消费。
+  step CallInitUrl in WarpInsightCenter {
+    input GatewayBootstrapToken
+    create GatewayEnrollmentToken {
+      token_id = "enroll-regist-001"
+      gateway_id = AdminCreateGatewayInstance.gateway_name
+      instance_id = AdminCreateGatewayInstance.instance_id
+      token_hash = "sha256:regist-token-hash"
+      max_uses = 1
+      used_count = 0
+      status = "Active"
+      issued_at = "now"
+      expires_at = "2026-08-16T00:00:00Z"
+    }
+    create GatewayInitialConfig {
+      gateway_id = AdminCreateGatewayInstance.gateway_name
+      instance_id = AdminCreateGatewayInstance.instance_id
+      control_center_endpoint = "https://center.warpinsight.example"
+      trust_bundle = ControlCenterTrustBundle
+      server_tls_required = true
+      protocol_version = "1.0"
+      enrollment_token_id = "enroll-regist-001"
+    }
+  }
+
+  // ⑨ WarpGateway 实例应用返回的 config.toml（写盘、以新配置进入初始化态，完成 init）。
+  step ApplyInitialConfig in WarpGateway {
+    input GatewayInitialConfig
+  }
+
+  // ⑩ WarpGateway 实例持 REGIST_TOKEN 注册（一次性消费）：提交的 token 即 config.toml
+  // [enrollment] 的明文 REGIST_TOKEN（= enrollment_token_id）；RegisterGatewayFlow 校验并消费
+  // （used_count+1 → Used）。
+  step SubmitRegistration in WarpGateway {
+    input GatewayEnrollmentToken
+  }
+
+  // ⑪ 注册成功后中心签发独立运行期凭据（RUNTIME_TOKEN，可轮换）——签发由 RegisterGatewayFlow
+  // 承载（注册成功即签发）；本步骤为网关侧接收注册回执中的运行期凭据，不在本 flow 重复签发。
+  step ReceiveRuntimeCredential in WarpGateway {
+    input GatewayCredentialBundle
+  }
+
+  // ⑫ WarpGateway 实例周期上报运行状态（绑定具体实例）。
+  step ReportGatewayStatus in WarpGateway {
+    create GatewayStatusAccepted {
+      gateway_id = AdminCreateGatewayInstance.gateway_name
+      instance_id = AdminCreateGatewayInstance.instance_id
+      accepted_at = "now"
     }
   }
 }

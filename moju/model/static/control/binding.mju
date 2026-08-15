@@ -7,6 +7,20 @@ bind WarpGatewayPublicInstallInterface {
     actor_identity OperationsEngineer.id from token.sub
     status AgentInstallCode 200
   }
+
+  entry GatewayContainerInstallRequested {
+    route POST "/api/v1/gateway/container-install"
+    auth bearer
+    actor_identity CustomerServiceEngineer.id from token.sub
+    status GatewayInstallReceipt 202
+  }
+
+  entry GatewayImageDownloadRequested {
+    route POST "/api/v1/gateway/image-download"
+    auth bearer
+    actor_identity CustomerServiceEngineer.id from token.sub
+    status GatewayImageDownloadReceipt 202
+  }
 }
 
 bind WarpGatewayManagementInterface {
@@ -119,6 +133,13 @@ bind WarpInsightCenterGatewayInterface {
     actor_identity WarpGateway.id from credential.gateway_id
     status GatewayStatusAccepted 200
   }
+
+  entry RenewGatewayCredential {
+    route POST "/api/v1/gateway/credentials:renew"
+    auth bearer
+    actor_identity WarpGateway.id from credential.gateway_id
+    status GatewayCredentialBundle 200
+  }
 }
 
 bind WarpInsightCenterAdminInterface {
@@ -153,14 +174,28 @@ bind WarpInsightCenterAdminInterface {
   entry AdminCreateGatewayInstance {
     route POST "/api/v1/admin/gateways"
     auth bearer
-    actor_identity CustomerServiceEngineer.id from jwt.sub
+    actor_identity BusinessAdministrator.id from jwt.sub
     status GatewayInstance 201
   }
 
   entry AdminBindGatewayCustomer {
     route POST "/api/v1/admin/gateways/{gateway_id}/customer"
     auth bearer
-    actor_identity CustomerServiceEngineer.id from jwt.sub
+    actor_identity BusinessAdministrator.id from jwt.sub
     status GatewayCustomerBinding 200
+  }
+
+  entry RevealBootstrapToken {
+    route GET "/api/v1/admin/gateways/{gateway_id}/bootstrap-token"
+    auth bearer
+    actor_identity BusinessAdministrator.id from jwt.sub
+    status GatewayBootstrapToken 200
+  }
+
+  entry RotateBootstrapToken {
+    route POST "/api/v1/admin/gateways/{gateway_id}/bootstrap-tokens/rotate"
+    auth bearer
+    actor_identity BusinessAdministrator.id from jwt.sub
+    status GatewayBootstrapToken 200
   }
 }

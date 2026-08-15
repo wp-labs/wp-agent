@@ -78,6 +78,26 @@ actor GatewayOperator {
   can AdminViewGatewayList
 }
 
+actor BusinessAdministrator {
+  meta {
+    label zh "业务管理员"
+    label en "Business Administrator"
+    summary zh "负责网关开通的中心侧业务管理员：创建网关实例、获取置备引导 Token。"
+    tags "gateway", "provisioning", "business-admin"
+  }
+
+  access protocol<http>
+  can CreateGatewayInstance
+  can AdminCreateGatewayInstance
+  can RevealBootstrapToken
+  can RotateBootstrapToken
+  can GetGatewayInitialConfig
+  can AdminGetGatewayInitialConfig
+  can AdminViewGatewayList
+  can AdminListGatewayInstances
+  can AdminBindGatewayCustomer
+}
+
 actor CustomerServiceEngineer {
   meta {
     label zh "客户服务工程师"
@@ -86,15 +106,14 @@ actor CustomerServiceEngineer {
   }
 
   access protocol<http>
-  can CreateGatewayInstance
+  can GatewayContainerInstallRequested
+  can GatewayImageDownloadRequested
   can BindGatewayCustomer
   can GetGatewayInitialConfig
   can ShowGatewayStatus
   can ApproveUpgradePlan
   can AdminShowGatewayStatus
   can AdminListGatewayStatus
-  can AdminCreateGatewayInstance
-  can AdminBindGatewayCustomer
 }
 
 actor PlatformMaintenanceEngineer {

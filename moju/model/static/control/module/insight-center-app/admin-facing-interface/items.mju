@@ -27,6 +27,17 @@ message<command> AdminListGatewayStatus = OperatorRequest {
 
 message<command> AdminCreateGatewayInstance = OperatorRequest {
   gateway_name: String
+  instance_id: String
+}
+
+// 一次性展示置备引导 Token（仅初始化前）。
+message<command> RevealBootstrapToken = OperatorRequest {
+  gateway_id: String
+}
+
+// 初始化前轮换置备引导 Token（初始化后不可再生成）。
+message<command> RotateBootstrapToken = OperatorRequest {
+  gateway_id: String
 }
 
 message<command> AdminBindGatewayCustomer = OperatorRequest {
@@ -154,12 +165,12 @@ interface WarpInsightCenterAdminInterface {
   }
 
   entry AdminCreateGatewayInstance {
-    actor CustomerServiceEngineer
+    actor BusinessAdministrator
     output GatewayInstance
   }
 
   entry AdminBindGatewayCustomer {
-    actor CustomerServiceEngineer
+    actor BusinessAdministrator
     output GatewayCustomerBinding
   }
 
@@ -221,5 +232,15 @@ interface WarpInsightCenterAdminInterface {
   entry AdminApproveUpgradePlan {
     actor PlatformMaintenanceEngineer
     output UpgradePlan
+  }
+
+  entry RevealBootstrapToken {
+    actor BusinessAdministrator
+    output GatewayBootstrapToken
+  }
+
+  entry RotateBootstrapToken {
+    actor BusinessAdministrator
+    output GatewayBootstrapToken
   }
 }

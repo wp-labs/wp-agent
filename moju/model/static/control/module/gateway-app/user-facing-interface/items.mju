@@ -34,13 +34,23 @@ interface WarpGatewayPublicInstallInterface {
   meta {
     label zh "WarpGateway 运维安装接口"
     label en "WarpGateway Operations Install Interface"
-    summary zh "运维工程师通过管理员 bearer 身份获取 Agent 安装代码；接口只负责安装脚本复制和 bootstrap 引导，不面向未认证访问者开放。"
-    tags "authenticated", "bootstrap", "agent-install", "web", "interface"
+    summary zh "运维/客户服务工程师通过管理员 bearer 身份获取 Agent 安装代码、发起网关容器安装；接口只负责安装脚本复制与容器引导，不面向未认证访问者开放。"
+    tags "authenticated", "bootstrap", "agent-install", "gateway-install", "web", "interface"
   }
 
   entry AdminGetAgentInstallCode {
     actor OperationsEngineer
     output AgentInstallCode
+  }
+
+  entry GatewayContainerInstallRequested {
+    actor CustomerServiceEngineer
+    output GatewayInstallReceipt
+  }
+
+  entry GatewayImageDownloadRequested {
+    actor CustomerServiceEngineer
+    output GatewayImageDownloadReceipt
   }
 }
 
