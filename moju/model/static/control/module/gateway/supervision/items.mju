@@ -6,7 +6,7 @@ struct GatewayImage {
   meta {
     label zh "网关镜像"
     label en "Gateway Image"
-    summary zh "WarpGateway 部署用的容器镜像（docker pull / docker run 对象），下载后启动容器实例；携带摘要与签名供安装前校验完整性，防投毒镜像。"
+    summary zh "WarpGateway 部署用的容器镜像（docker pull / docker run 对象），下载后启动容器实例；携带摘要、签名与独立信任锚（发行方签名者 signer_id + 中心签发的 release manifest），安装前按信任锚校验完整性，防投毒镜像与循环信任。"
     tags "gateway", "deployment", "image"
   }
 
@@ -14,6 +14,8 @@ struct GatewayImage {
   version: String
   image_digest: String
   image_signature: String
+  signer_id: String
+  release_manifest_ref: String
 }
 
 struct ControlCenterTrustBundle {

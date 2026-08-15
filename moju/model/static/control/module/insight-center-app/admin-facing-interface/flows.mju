@@ -94,45 +94,45 @@ flow GatewayOnboardingFlow {
   creates GatewayInitialConfig
   creates GatewayStatusAccepted
 
-  // ① 业务管理员经中心管理台创建实例——由 AdminCreateGatewayInstanceFlow.CreateInstance 承载，
-  // 本步骤引用其产出（时间线标记，不重复 create）。
+  // ① 业务管理员经中心管理台创建实例——由 AdminCreateGatewayInstanceFlow.CreateInstance 承载；
+  // 本步骤是时间线标记（创建动作不在本 flow 重复），不消费实例。
   step CreateGatewayInstance in WarpInsightCenter by AdminCreateGatewayInstance {
-    input GatewayInstance
   }
 
   // ② 中心签发一次性置备引导 Token（BOOTSTRAP_TOKEN，只存 sha256，短 TTL，绑定实例）——由
-  // AdminCreateGatewayInstanceFlow.IssueBootstrapToken 承载，本步骤引用其产出（时间线标记，不重复 create）。
+  // AdminCreateGatewayInstanceFlow.IssueBootstrapToken 承载；本步骤是时间线标记，不消费 token。
   step IssueBootstrapToken in WarpInsightCenter {
-    input GatewayBootstrapToken
   }
 
-  // ③ 中心经 admin 页面一次性展示引导 Token 明文给工程师（只存 sha256；明文仅此一次展示，
-  // 不入 create API 响应）；工程师线下携带、安装时注入容器。分发通道保密即 B 方案安全基石。
+  // ③ 中心经 admin 页面一次性展示引导 Token 明文给工程师（只存 sha256；明文仅此一次展示、
+  // 不入 create API 响应）。token 已在系统内（② 签发），展示即读取系统内记录，无需外部输入；
+  // 工程师线下携带、安装时注入容器。分发通道保密即 B 方案安全基石。
   step RevealBootstrapToken in WarpInsightCenter {
-    input GatewayBootstrapToken
   }
 
   // ④ 在网关侧拉取镜像（docker pull）；由 GatewayImageDownloadRequested 命令驱动（客户服务工程师
-  // 发起下载，区别于 ① 的管理员命令；命令的 gateway_id / instance_id 必须匹配流程实例）。镜像以
-  // digest / signature 绑定，供 ⑤ 安装前校验完整性。
+  // 发起下载，区别于 ① 的管理员命令；命令的 gateway_id / instance_id 必须匹配流程实例）。镜像 spec
+  // 是部署定义（拉哪个镜像），非外部运行时输入，不加 input；镜像以 digest / signature 绑定并携带
+  // 独立信任锚（signer_id / release_manifest_ref），供 ⑤ 安装前校验完整性。
   step DownloadGatewayImage in WarpGateway by GatewayImageDownloadRequested {
-    input GatewayImage
   }
 
   // ⑤ 在网关侧启动容器（docker run，注入 init_url + setup_token）；由 GatewayContainerInstallRequested
   // 命令驱动（客户服务工程师发起安装，区别于 ① 的管理员命令；命令的 gateway_id / instance_id 必须匹配
-  // 流程实例）。安装前校验镜像摘要与签名（GatewayImage.image_digest / image_signature，见 ④），防投毒镜像。
-  // bootstrap 与中心信任包（control-center.pem）随安装注入：走 env / setup_token，不走 URL query，
-  // 防日志泄露。信任包须早于 init 到达（供 ⑥ 校验中心证书）。
+  // 流程实例）。安装前校验镜像摘要与签名（GatewayImage.image_digest / image_signature，见 ④）——预期值
+  // 取自**中心签发的 release manifest**（GatewayImage.release_manifest_ref），signer_id 用于 pin 发行方
+  // 公钥，而非随镜像返回的仓库 manifest，防循环信任（控制仓库者不能同时控制预期值）。bootstrap 与中心
+  // 信任包（control-center.pem）随安装注入：走 env / setup_token，不走 URL query，防日志泄露。
+  // 信任包须早于 init 到达（供 ⑥ 校验中心证书）。
   step InstallGatewayContainer in WarpGateway by GatewayContainerInstallRequested {
     input GatewayBootstrapToken
     input ControlCenterTrustBundle
   }
 
-  // ⑥ 网关侧校验中心 HTTPS 证书：对照安装时注入的 ControlCenterTrustBundle（见 ⑤，server_name /
-  // expected_san）验证中心身份通过后，才上送 bootstrap，防 MITM 截获引导 Token。
+  // ⑥ 网关侧校验中心 HTTPS 证书：对照 ⑤ 已注入的 ControlCenterTrustBundle（server_name /
+  // expected_san）验证中心身份通过后，才上送 bootstrap，防 MITM 截获引导 Token。信任包已在 ⑤
+  // 注入本侧，此处仅使用，不加 input。
   step VerifyCenterTls in WarpGateway {
-    input ControlCenterTrustBundle
   }
 
   // ⑦ 中心校验并一次性消费引导 Token（Bearer bootstrap）：比对 token_hash、校验 gateway_id 与
