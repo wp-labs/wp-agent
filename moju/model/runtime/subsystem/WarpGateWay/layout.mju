@@ -7,7 +7,7 @@ region AdminTopNavigation {
   meta {
     label zh "顶部导航"
     label en "Top Navigation"
-    summary zh "WarpGateway 的顶部导航区，作为三个独立页面共享的页面级导航，提供首页、安装和控制中心入口，并展示在线业务区和操作者上下文。"
+    summary zh "WarpGateway 的顶部导航区，作为四个独立页面共享的页面级导航，提供首页、初始化、安装和控制中心入口，并展示在线业务区和操作者上下文。"
     tags "admin", "navigation", "top-navigation", "layout-index"
   }
 

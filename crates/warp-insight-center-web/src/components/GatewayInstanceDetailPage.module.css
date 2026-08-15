@@ -158,6 +158,70 @@
   font-size: 13px;
 }
 
+.tokenBuilder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--wi-border);
+  border-radius: var(--wi-radius-md);
+  background: var(--wi-bg-muted);
+}
+
+.tokenHint {
+  margin-top: 4px;
+  color: var(--wi-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.tokenRow {
+  display: flex;
+  align-items: stretch;
+  gap: 7px;
+}
+
+.tokenInput {
+  min-width: 0;
+  flex: 1;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--wi-border-strong);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-bg-panel);
+  color: var(--wi-text);
+  font-size: 12px;
+}
+
+.tokenInput:focus {
+  border-color: var(--wi-primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--wi-focus-ring);
+}
+
+.generateButton {
+  flex-shrink: 0;
+  padding: 0 12px;
+  border: 1px solid var(--wi-primary-border);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-primary-soft);
+  color: var(--wi-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.generateButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.generateButton:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--wi-focus-ring);
+}
+
 .infoLabel {
   color: var(--wi-text-muted);
   font-size: 11px;

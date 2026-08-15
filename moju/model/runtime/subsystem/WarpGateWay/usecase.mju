@@ -12,21 +12,69 @@ usecase InitializeGatewayViaUrl {
   actor Control.WarpGateway
   trigger Control.InitializeGatewayViaUrl
   outcome Control.GatewayInitialConfig
+  flow Control.InitializeGatewayViaUrlFlow
 }
 
-// 注册到 WarpInsightCenter
+// 通过 init-url 置备（GetGatewayInitialConfigFlow：bootstrap 鉴权 + 身份派生 REGIST → config.toml）
+usecase InitGatewayViaInitialConfig {
+  meta {
+    label zh "通过 init-url 置备"
+    label en "Init Gateway via Initial Config"
+    summary zh "WarpGateway 持一次性 BootstrapToken 调 initial-config：消费引导、上交 IdentityToken，center 派生 RegistToken 生成 config.toml，完成置备。"
+    tags "gateway", "bootstrap", "provisioning", "config"
+  }
+
+  actor Control.WarpGateway
+  trigger Control.GetGatewayInitialConfig
+  outcome Control.GatewayInitialConfig
+  outcome Control.GatewayEnrollmentToken
+  flow Control.GetGatewayInitialConfigFlow
+}
+
+// 注册到 WarpInsightCenter（消费 RegistToken → 签发独立运行期凭据）
 usecase RegisterToInsightCenter {
   meta {
     label zh "注册到 WarpInsightCenter"
     label en "Register to WarpInsightCenter"
-    summary zh "WarpGateway 实例向 WarpInsightCenter 上报网关状态，完成在线注册并进入中心监管视图。"
-    tags "gateway", "register", "status", "supervision"
+    summary zh "WarpGateway 持 config.toml 中的 RegistToken 注册：center 消费注册凭据并签发独立运行期凭据（RUNTIME_TOKEN），网关进入中心监管视图。"
+    tags "gateway", "register", "credential", "supervision"
+  }
+
+  actor Control.WarpGateway
+  trigger Control.RegisterGateway
+  outcome Control.GatewayEnrollmentResult
+  outcome Control.GatewayCredentialBundle
+  flow Control.RegisterGatewayFlow
+}
+
+// 续期运行期凭据（旧凭据立即失效）
+usecase RenewGatewayCredential {
+  meta {
+    label zh "续期网关运行期凭据"
+    label en "Renew Gateway Credential"
+    summary zh "网关凭当前 RUNTIME_TOKEN 申请新运行期凭据，旧凭据立即失效，实现定期轮换。"
+    tags "gateway", "credential", "renewal"
+  }
+
+  actor Control.WarpGateway
+  trigger Control.RenewGatewayCredential
+  outcome Control.GatewayCredentialBundle
+  flow Control.RenewGatewayCredentialFlow
+}
+
+// 上报网关状态（运行期心跳）
+usecase ReportGatewayStatus {
+  meta {
+    label zh "上报网关状态"
+    label en "Report Gateway Status"
+    summary zh "网关周期以 RUNTIME_TOKEN 上报运行状态，center 落库并进入监控视图。"
+    tags "gateway", "status", "runtime"
   }
 
   actor Control.WarpGateway
   trigger Control.ReportGatewayStatus
   outcome Control.GatewayStatusAccepted
-  flow Control.RegisterGatewayFlow
+  flow Control.ReportGatewayStatusFlow
 }
 
 // 获取 Agent 安装代码

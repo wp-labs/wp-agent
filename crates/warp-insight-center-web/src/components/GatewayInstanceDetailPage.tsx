@@ -40,6 +40,7 @@ export function GatewayInstanceDetailPage() {
   } = useGatewayInstances();
   const [copied, setCopied] = useState(false);
   const [curlCopied, setCurlCopied] = useState(false);
+  const [gatewayToken, setGatewayToken] = useState("");
   const [initCurl, setInitCurl] = useState<string | null>(null);
   const instance = instancesData?.data.find(
     (item) => item.gatewayId === gatewayId,
@@ -49,11 +50,14 @@ export function GatewayInstanceDetailPage() {
     error: lifecycleError,
     isLoading: lifecycleLoading,
   } = useGatewayLifecycle(instance?.gatewayId ?? "");
-  const initUrl =
+  const initEndpoint =
     instance?.initUrl ??
     `/api/v1/gateway/initial-config?instance_id=${encodeURIComponent(gatewayId)}`;
+  // init_url 不携带凭证（token 不进 URL），凭证走 config.toml / Authorization Header。
+  const generatedInitUrl = initEndpoint;
+  const initUrl = generatedInitUrl;
   const displayInitCurl =
-    initCurl ?? `curl -H "Authorization: Bearer <token>" "${initUrl}"`;
+    initCurl ?? `curl -H "Authorization: Bearer <gateway-identity-token>" "${initEndpoint.split("#", 1)[0]}"`;
 
   useEffect(() => {
     setInitCurl(readGatewayInitCurl(gatewayId));
@@ -77,6 +81,13 @@ export function GatewayInstanceDetailPage() {
     } catch {
       // 剪贴板不可用时保留可选中的命令文本。
     }
+  }
+
+  function handleGenerateInitUrl() {
+    if (!gatewayToken.trim()) return;
+    setInitCurl(
+      `curl -H "Authorization: Bearer ${gatewayToken.trim()}" "${initEndpoint.split("#", 1)[0]}"`,
+    );
   }
 
   return (
@@ -130,6 +141,32 @@ export function GatewayInstanceDetailPage() {
             </header>
             <div className={styles.accessGrid}>
               <div className={styles.endpointColumn}>
+                <div className={styles.tokenBuilder}>
+                  <div>
+                    <span className={styles.infoLabel}>Gateway 身份 Token</span>
+                    <p className={styles.tokenHint}>
+                      创建 Gateway 实例时使用的身份凭证；用于生成本次 init_url 和 Center 接入 curl。
+                    </p>
+                  </div>
+                  <div className={styles.tokenRow}>
+                    <input
+                      className={styles.tokenInput}
+                      type="password"
+                      value={gatewayToken}
+                      onChange={(event) => setGatewayToken(event.target.value)}
+                      placeholder="输入 Gateway 身份 Token"
+                      autoComplete="off"
+                    />
+                    <button
+                      type="button"
+                      className={styles.generateButton}
+                      onClick={handleGenerateInitUrl}
+                      disabled={!gatewayToken.trim()}
+                    >
+                      生成接入 URL
+                    </button>
+                  </div>
+                </div>
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Center 接入 URL</span>
                   <div className={styles.urlRow}>
@@ -162,8 +199,7 @@ export function GatewayInstanceDetailPage() {
                   <pre className={styles.curlCode}>{displayInitCurl}</pre>
                   {!initCurl ? (
                     <p className={styles.curlPlaceholder}>
-                      当前会话没有保存创建回执，命令中的 &lt;token&gt;
-                      需要替换为实际注册凭证。
+                      当前页面没有保存创建回执，请输入 Gateway 身份 Token 后生成完整命令。
                     </p>
                   ) : null}
                 </div>

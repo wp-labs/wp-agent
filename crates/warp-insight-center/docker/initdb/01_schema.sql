@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS gateways (
   credential_token_hash TEXT NOT NULL,
   credential_status TEXT NOT NULL DEFAULT 'active',
   credential_expires_at TIMESTAMPTZ,
+  bootstrap_token_hash TEXT NOT NULL DEFAULT '',
   version TEXT,
   status TEXT,
   health TEXT,

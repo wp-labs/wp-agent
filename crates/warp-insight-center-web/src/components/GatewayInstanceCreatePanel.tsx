@@ -135,10 +135,14 @@ export function GatewayInstanceCreatePanel() {
               <TextInput name="requestedBy" defaultValue="admin" required />
             </FormField>
             <FormField
-              label="注册凭证（可选）"
-              hint="网关持它 Bearer 调用 init_url / register；留空则网关无凭证无法初始化"
+              label="Gateway 注册凭证"
+              hint="生成初始化材料时输入；Gateway 将使用它访问 init_url / register"
             >
-              <TextInput name="gatewayToken" placeholder="例如：tok-xxxx" />
+              <TextInput
+                name="gatewayToken"
+                placeholder="例如：tok-xxxx"
+                required
+              />
             </FormField>
             <div className={styles.formAction}>
               <span className={styles.actionHint}>

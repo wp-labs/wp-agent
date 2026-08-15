@@ -11,15 +11,15 @@ use axum::{
     Json,
 };
 
+use insight_control::types::DateTime;
 use insight_control::{
-    GatewayEnrollmentResult, GatewayEnrollmentResultReturned, GatewayInitialConfig,
-    GatewayInitialConfigReturned, GatewayStatusAccepted, GatewayStatusAcceptedReturned,
-    RegisterGateway, ReportGatewayStatus,
+    GatewayCredentialBundle, GatewayEnrollmentResult, GatewayEnrollmentResultReturned,
+    GatewayStatusAccepted, GatewayStatusAcceptedReturned, RegisterGateway, ReportGatewayStatus,
 };
 
 use crate::infra::{
-    sha256_hex, GatewayStatusUpdate, StoreError, StoredAgent, StoredGateway,
-    StoredGatewayCredentialStatus,
+    derive_regist_token, new_secret_token, sha256_hex, EnrollmentTokenIssue, GatewayStatusUpdate,
+    StoreError, StoredAgent, StoredGateway, StoredGatewayCredentialStatus,
 };
 
 use super::{build_control_center_trust_bundle, control_center_tls_required, rate_limit, ApiState};
@@ -147,10 +147,10 @@ pub async fn download_release_artifact(
 }
 
 /// 网关注册：POST /api/v1/gateway/register。
-/// 对应模型 `RegisterGateway` + `RegisterGatewayFlow`：WarpGateway 持预共享
-/// enrollment token 提交注册。消费 token（防重放/限量/吊销/过期）后签发注册回执；
-/// 本迭代沿用"注册 token 即网关初始凭据"的简化，注册后同 token 作为 bearer
-/// 访问 initial-config / status（后续按流程签发独立 GatewayCredentialBundle）。
+/// 对应模型 `RegisterGateway` + `RegisterGatewayFlow`：WarpGateway 持一次性
+/// RegistToken（enrollment token）提交注册。消费 token（防重放/限量/吊销/过期）后
+/// **签发独立运行期凭据（RUNTIME_TOKEN）**：RegistToken 只用于本次注册，
+/// 运行期 Bearer（initial-config / status）以新签发的凭据为准。
 pub async fn register_gateway(
     State(state): State<ApiState>,
     client: Option<ConnectInfo<SocketAddr>>,
@@ -205,6 +205,27 @@ pub async fn register_gateway(
         )
             .into_response();
     }
+    // 注册成功：签发独立运行期凭据（RUNTIME_TOKEN），覆盖引导后的空运行期凭据。
+    // 镜像 warp-gateway renew_agent_credential：新 token + credential_id + 过期，原子替换。
+    let (bundle, credential_hash, credential_expires_at) =
+        match issue_runtime_credential(&state.config, &consumed.gateway_id, &input.instance_id) {
+            Ok(issued) => issued,
+            Err(reason) => {
+                return (StatusCode::INTERNAL_SERVER_ERROR, reason).into_response();
+            }
+        };
+    let updated = state
+        .store
+        .update_gateway_credential(&consumed.gateway_id, &credential_hash, credential_expires_at)
+        .await
+        .unwrap_or(false);
+    if !updated {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "failed to persist gateway runtime credential".to_string(),
+        )
+            .into_response();
+    }
     // 生命周期：Provisioned → Initializing（注册成功即进入初始化）。
     if let Err(err) = state
         .store
@@ -219,11 +240,37 @@ pub async fn register_gateway(
             status: "accepted".to_string(),
             gateway_id: consumed.gateway_id.clone(),
             instance_id: input.instance_id,
-            credential_id: format!("cred-{}", consumed.gateway_id),
+            credential_id: bundle.credential_id.clone(),
             initial_config: "v1".to_string(),
+            credential_bundle: bundle,
         },
     })
     .into_response()
+}
+
+/// 签发独立运行期凭据（RUNTIME_TOKEN）：随机 bearer + credential_id + 过期时间。
+/// 返回 (credential bundle, sha256(bearer) 落库用, expires_at rfc3339)。
+fn issue_runtime_credential(
+    config: &crate::config::CenterConfig,
+    gateway_id: &str,
+    instance_id: &str,
+) -> Result<(GatewayCredentialBundle, String, Option<String>), String> {
+    let bearer_token = new_secret_token("wic")?;
+    let credential_id = new_secret_token("cred")?;
+    let issued_at_time = chrono::Utc::now();
+    let issued_at = issued_at_time.to_rfc3339();
+    let expires_at =
+        (issued_at_time + chrono::Duration::seconds(config.credential_ttl_seconds)).to_rfc3339();
+    let bundle = GatewayCredentialBundle {
+        credential_id: credential_id.clone(),
+        gateway_id: gateway_id.to_string(),
+        instance_id: instance_id.to_string(),
+        auth_scheme: "bearer".to_string(),
+        bearer_token: bearer_token.clone(),
+        issued_at: DateTime::from_rfc3339(&issued_at).unwrap_or_else(DateTime::now),
+        expires_at: DateTime::from_rfc3339(&expires_at).unwrap_or_else(DateTime::now),
+    };
+    Ok((bundle, sha256_hex(&bearer_token), Some(expires_at)))
 }
 
 #[derive(serde::Deserialize)]
@@ -232,8 +279,11 @@ pub struct InitialConfigQueryParams {
 }
 
 /// 拉取网关初始配置：GET /api/v1/gateway/initial-config。
-/// 对齐模型 `GetGatewayInitialConfig` entry；gateway 面 Bearer 鉴权
-/// （init_url 里 instance_id = gateway_id，故按 instance_id 匹配凭证）。
+/// 对齐模型 `ProvisionGatewayFlow`；gateway 面 Bearer 鉴权。两种状态：
+/// - **未初始化**（有 bootstrap、无运行期凭据）：Bearer 为一次性 BootstrapToken，
+///   携带 X-Gateway-Identity-Token → 派生 RegistToken 落 enrollment → 消费 bootstrap → 出 config.toml。
+/// - **已初始化**（有运行期凭据）：现有 authenticate_gateway（Bearer RUNTIME_TOKEN）→ 出同一 config.toml。
+/// 返回 `application/toml`（config.toml 即 GatewayInitialConfig 的序列化）。
 pub async fn get_gateway_initial_config(
     State(state): State<ApiState>,
     headers: HeaderMap,
@@ -244,13 +294,41 @@ pub async fn get_gateway_initial_config(
     let Some(instance_id) = params.instance_id.as_deref() else {
         return (StatusCode::BAD_REQUEST, "missing instance_id").into_response();
     };
+    // 安全 #1（fail-closed）：TLS 开启但未配置信任根 → 拒绝服务，
+    // 避免网关在无法校验中心证书的情况下继续初始化（可被中间人）。
+    if control_center_tls_required(&state.config)
+        && build_control_center_trust_bundle(&state.config, instance_id).is_none()
+    {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            "TLS is required but the control center trust root is not configured",
+        )
+            .into_response();
+    }
+    let gateway = match state.store.get_gateway(instance_id).await {
+        Ok(Some(gateway)) => gateway,
+        Ok(None) => {
+            rate_limit::record_auth_failure(&state, &client_key, GATEWAY_AUTH_SCOPE);
+            return (StatusCode::UNAUTHORIZED, "unknown gateway").into_response();
+        }
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to load gateway store: {err}"),
+            )
+                .into_response();
+        }
+    };
+    // 未初始化 → 置备路径。
+    if gateway.credential_token_hash.is_empty() && !gateway.bootstrap_token_hash.is_empty() {
+        return provision_gateway_initial_config(
+            &state, &headers, instance_id, &gateway, &client_key,
+        )
+        .await;
+    }
+    // 已初始化 → 现有运行期凭据鉴权。
     match authenticate_gateway(&state, &headers, instance_id, &client_key).await {
-        Ok(_) => {
-            // 生命周期：Provisioned → Initializing（Gateway 首次拉取初始配置）。
-            if let Err(err) = state.store.mark_gateway_initializing(instance_id).await {
-                eprintln!("warn mark gateway initializing failed: {err}");
-            }
-            // 配置引用该网关最近签发的一个注册 Token（config.toml [enrollment] token_id）。
+        Ok(_gateway) => {
             let enrollment_token_id = state
                 .store
                 .get_enrollment_token_for_gateway(instance_id)
@@ -259,19 +337,131 @@ pub async fn get_gateway_initial_config(
                 .flatten()
                 .map(|token| token.token_id)
                 .unwrap_or_default();
-            Json(GatewayInitialConfigReturned {
-                config: GatewayInitialConfig {
-                    control_center_endpoint: state.config.public_url.clone(),
-                    trust_bundle: build_control_center_trust_bundle(&state.config, instance_id),
-                    server_tls_required: control_center_tls_required(&state.config),
-                    protocol_version: state.config.protocol_version.clone(),
-                    enrollment_token_id,
-                },
-            })
-            .into_response()
+            let config_toml = build_config_toml(&state, &enrollment_token_id, None);
+            (
+                StatusCode::OK,
+                [(header::CONTENT_TYPE, "application/toml")],
+                config_toml,
+            )
+                .into_response()
         }
         Err(response) => response,
     }
+}
+
+/// 置备路径：Bearer 一次性 BootstrapToken 鉴权 + X-Gateway-Identity-Token 派生
+/// RegistToken → 落 enrollment token（供 /register 消费）→ 成功后消费 bootstrap → 出 config.toml。
+async fn provision_gateway_initial_config(
+    state: &ApiState,
+    headers: &HeaderMap,
+    instance_id: &str,
+    gateway: &StoredGateway,
+    client_key: &str,
+) -> Response {
+    let Some(bootstrap_token) = bearer_token(headers) else {
+        return (StatusCode::UNAUTHORIZED, "missing bearer credential").into_response();
+    };
+    if sha256_hex(bootstrap_token) != gateway.bootstrap_token_hash {
+        rate_limit::record_auth_failure(state, client_key, GATEWAY_AUTH_SCOPE);
+        return (StatusCode::UNAUTHORIZED, "invalid bootstrap token").into_response();
+    }
+    let identity_token = headers
+        .get("x-gateway-identity-token")
+        .and_then(|value| value.to_str().ok())
+        .map(str::trim)
+        .filter(|value| !value.is_empty());
+    let Some(identity_token) = identity_token else {
+        return (
+            StatusCode::BAD_REQUEST,
+            "missing X-Gateway-Identity-Token".to_string(),
+        )
+            .into_response();
+    };
+    // 派生 RegistToken：HMAC(center_secret, "gateway-reg:" + gateway_id + ":" + identity_token)。
+    let regist_token = derive_regist_token(&state.config.hmac_secret, instance_id, identity_token);
+    // 落 enrollment token（sha256(regist_token)，max_uses=1，Active），供 /register 一次性消费。
+    let enrollment = match state
+        .store
+        .create_enrollment_token(
+            instance_id,
+            &EnrollmentTokenIssue {
+                token: regist_token.clone(),
+                issued_by: "provision".to_string(),
+                control_center_trust_bundle: state.config.ca_cert.clone(),
+            },
+        )
+        .await
+    {
+        Ok(token) => token,
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to issue regist token: {err}"),
+            )
+                .into_response();
+        }
+    };
+    // 成功落库 RegistToken 后才消费 bootstrap（一次性；网络抖动可重试置备）。
+    match state.store.consume_bootstrap_token(instance_id, bootstrap_token).await {
+        Ok(true) => {}
+        Ok(false) => {
+            return (
+                StatusCode::CONFLICT,
+                "bootstrap token already consumed or gateway initialized".to_string(),
+            )
+                .into_response();
+        }
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to consume bootstrap token: {err}"),
+            )
+                .into_response();
+        }
+    }
+    // 生命周期：Provisioned → Initializing。
+    if let Err(err) = state.store.mark_gateway_initializing(instance_id).await {
+        eprintln!("warn mark gateway initializing failed: {err}");
+    }
+    rate_limit::clear_auth_failures(state, client_key, GATEWAY_AUTH_SCOPE);
+    let config_toml = build_config_toml(state, &enrollment.token_id, Some(&regist_token));
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "application/toml")],
+        config_toml,
+    )
+        .into_response()
+}
+
+/// 生成 config.toml：control_center/trust_bundle/protocol + [enrollment] token_id。
+/// 置备路径带 `regist_token`（明文派生值）写入 `[enrollment] token`；已初始化路径省略
+/// （网关已注册、使用运行期凭据，不再需要注册 token）。
+fn build_config_toml(
+    state: &ApiState,
+    enrollment_token_id: &str,
+    regist_token: Option<&str>,
+) -> String {
+    let endpoint = state.config.public_url.trim_end_matches('/');
+    let tls_required = control_center_tls_required(&state.config);
+    let token_line = match regist_token {
+        Some(token) => format!("token = \"{token}\"\n"),
+        None => String::new(),
+    };
+    format!(
+        "version = 1\n\
+         \n\
+         [control_center]\n\
+         endpoint = \"{endpoint}\"\n\
+         trust_bundle = \"/etc/warp-gateway/ca/control-center.pem\"\n\
+         server_tls_required = {tls_required}\n\
+         \n\
+         [enrollment]\n\
+         token_id = \"{enrollment_token_id}\"\n\
+         {token_line}\
+         [protocol]\n\
+         version = \"{}\"\n",
+        state.config.protocol_version,
+    )
 }
 
 pub async fn submit_gateway_status(
@@ -329,6 +519,56 @@ pub async fn submit_gateway_status(
 /// 按 binding 的 `actor_identity WarpGateway.id from credential.gateway_id`：
 /// bearer token → 匹配 store 中该 gateway 的凭证 hash（常数时间比较）→
 /// Active 且未过期 → 与上报 gateway_id 一致。
+/// 续期运行期凭据请求体：以当前 RUNTIME_TOKEN 鉴权后签发新凭据。
+#[derive(serde::Deserialize)]
+pub struct RenewGatewayCredentialRequest {
+    pub gateway_id: String,
+    pub instance_id: String,
+}
+
+/// 续期运行期凭据：POST /api/v1/gateway/credentials:renew。
+/// 以当前 RUNTIME_TOKEN 鉴权（authenticate_gateway）→ 签发新 RUNTIME_TOKEN + credential_id
+/// → 原子替换 hash → 旧 token 立即失效。镜像 warp-gateway `renew_agent_credential`。
+pub async fn renew_gateway_credential(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(input): Json<RenewGatewayCredentialRequest>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    match authenticate_gateway(&state, &headers, &input.gateway_id, &client_key).await {
+        Ok(_) => {
+            let (bundle, credential_hash, credential_expires_at) =
+                match issue_runtime_credential(&state.config, &input.gateway_id, &input.instance_id)
+                {
+                    Ok(issued) => issued,
+                    Err(reason) => {
+                        return (StatusCode::INTERNAL_SERVER_ERROR, reason).into_response();
+                    }
+                };
+            let updated = state
+                .store
+                .update_gateway_credential(
+                    &input.gateway_id,
+                    &credential_hash,
+                    credential_expires_at,
+                )
+                .await
+                .unwrap_or(false);
+            if !updated {
+                return (
+                    StatusCode::UNAUTHORIZED,
+                    "invalid gateway credential".to_string(),
+                )
+                    .into_response();
+            }
+            rate_limit::clear_auth_failures(&state, &client_key, GATEWAY_AUTH_SCOPE);
+            (StatusCode::OK, Json(bundle)).into_response()
+        }
+        Err(response) => response,
+    }
+}
+
 async fn authenticate_gateway(
     state: &ApiState,
     headers: &HeaderMap,
@@ -444,6 +684,8 @@ mod tests {
                 object_storage: None,
                 ca_cert: None,
                 protocol_version: "1.0".to_string(),
+                hmac_secret: "test-hmac-secret".to_string(),
+                credential_ttl_seconds: 3600,
             },
             store: std::sync::Arc::new(store),
             artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
@@ -502,6 +744,47 @@ mod tests {
                 object_storage: None,
                 ca_cert: None,
                 protocol_version: "1.0".to_string(),
+                hmac_secret: "test-hmac-secret".to_string(),
+                credential_ttl_seconds: 3600,
+            },
+            store: std::sync::Arc::new(store),
+            artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
+                std::env::temp_dir().join("wic-artifacts"),
+                "http://127.0.0.1:3100",
+            )),
+            rate_limits: std::sync::Arc::new(std::sync::Mutex::new(
+                super::super::rate_limit::RateLimitState::default(),
+            )),
+        }
+    }
+
+    /// 构造"已创建未置备"网关（create_gateway 存 bootstrap hash、无运行期凭据）的完整路由。
+    fn provision_state(bootstrap_token: &str) -> ApiState {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("wic-provision-{nanos}.json"));
+        let store = FileStore::new(&path);
+        store
+            .create_gateway("gw-p", bootstrap_token)
+            .expect("create");
+        ApiState {
+            config: crate::config::CenterConfig {
+                listen_addr: "127.0.0.1:3100".to_string(),
+                store_path: std::env::temp_dir().join(format!("wic-provision-{nanos}.json")),
+                gateway_credentials: Vec::new(),
+                admin_token_hash: None,
+                database_url: None,
+                victoriametrics_url: None,
+                public_url: "http://127.0.0.1:3100".to_string(),
+                gateway_image: "warp-gateway:latest".to_string(),
+                artifact_dir: std::env::temp_dir().join("wic-artifacts"),
+                object_storage: None,
+                ca_cert: None,
+                protocol_version: "1.0".to_string(),
+                hmac_secret: "test-hmac-secret".to_string(),
+                credential_ttl_seconds: 3600,
             },
             store: std::sync::Arc::new(store),
             artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(
@@ -618,10 +901,17 @@ mod tests {
         assert_eq!(returned.result.status, "accepted");
         assert_eq!(returned.result.gateway_id, "gw-001");
         assert_eq!(returned.result.instance_id, "inst-1");
-        assert_eq!(returned.result.credential_id, "cred-gw-001");
+        // 注册后签发独立运行期凭据（RUNTIME_TOKEN）：随机 bearer + 过期时间。
+        let bundle = &returned.result.credential_bundle;
+        assert!(bundle.bearer_token.starts_with("wic_"), "runtime token: {}", bundle.bearer_token);
+        assert_eq!(bundle.auth_scheme, "bearer");
+        assert_eq!(bundle.gateway_id, "gw-001");
+        assert_eq!(bundle.instance_id, "inst-1");
+        assert!(bundle.expires_at > bundle.issued_at);
 
         // 防重放：同一 token 二次注册 → 401（Exhausted）。
         let response = app
+            .clone()
             .oneshot(
                 Request::builder()
                     .method("POST")
@@ -633,6 +923,191 @@ mod tests {
             .await
             .expect("response");
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+        // 运行期分离核心断言：注册后只有新签发的 RUNTIME_TOKEN 有效。
+        let runtime_token = bundle.bearer_token.clone();
+        // RegistToken（enroll-tok-a）作 Bearer 调 status → 401（已消费，且非运行期凭据）。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/status")
+                    .header("content-type", "application/json")
+                    .header("authorization", "Bearer enroll-tok-a")
+                    .body(Body::from(status_payload("gw-001")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        // 种子运行期凭据（cred-tok）被新凭据替换 → 401。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/status")
+                    .header("content-type", "application/json")
+                    .header("authorization", "Bearer cred-tok")
+                    .body(Body::from(status_payload("gw-001")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        // 新签发的 RUNTIME_TOKEN → 200。
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/status")
+                    .header("content-type", "application/json")
+                    .header("authorization", format!("Bearer {runtime_token}"))
+                    .body(Body::from(status_payload("gw-001")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn provision_initial_config_derives_regist_and_consumes_bootstrap() {
+        use axum::{body::Body, http::Request};
+        use http_body_util::BodyExt;
+        use tower::ServiceExt;
+        let app = super::super::router_for(provision_state("boot-tok-p"));
+
+        // 未置备：Bearer 一次性 bootstrap + X-Gateway-Identity-Token → 200 + config.toml（含派生 RegistToken）。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/api/v1/gateway/initial-config?instance_id=gw-p")
+                    .header("authorization", "Bearer boot-tok-p")
+                    .header("x-gateway-identity-token", "identity-p")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let content_type = response
+            .headers()
+            .get(header::CONTENT_TYPE)
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or_default();
+        assert!(content_type.contains("application/toml"), "content-type: {content_type}");
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
+        let toml = String::from_utf8(body.to_vec()).expect("utf8");
+        // 派生 RegistToken 写入 [enrollment] token。
+        let expected_regist =
+            crate::infra::derive_regist_token("test-hmac-secret", "gw-p", "identity-p");
+        assert!(toml.contains(&format!("token = \"{expected_regist}\"")), "toml: {toml}");
+        assert!(toml.contains("server_tls_required = false"));
+        assert!(toml.contains("token_id = \"enroll-gw-p"));
+
+        // bootstrap 一次性：置备成功后复用 → 401（已消费，且无运行期凭据）。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/api/v1/gateway/initial-config?instance_id=gw-p")
+                    .header("authorization", "Bearer boot-tok-p")
+                    .header("x-gateway-identity-token", "identity-p")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+        // 错 bootstrap → 401（不落 enrollment、不消费）。
+        let app2 = super::super::router_for(provision_state("boot-2"));
+        let response = app2
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/api/v1/gateway/initial-config?instance_id=gw-p")
+                    .header("authorization", "Bearer wrong-boot")
+                    .header("x-gateway-identity-token", "identity-p")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn renew_gateway_credential_rotates_and_invalidates_old() {
+        use axum::{body::Body, http::Request};
+        use http_body_util::BodyExt;
+        use tower::ServiceExt;
+        // 以 seed 运行期凭据作为当前凭据（authenticate_gateway 可过），renew 轮换。
+        let app = super::super::router_for(register_state("enroll-r"));
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/credentials:renew")
+                    .header("content-type", "application/json")
+                    .header("authorization", "Bearer cred-tok")
+                    .body(Body::from(
+                        r#"{"gateway_id":"gw-001","instance_id":"inst-1"}"#,
+                    ))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response
+            .into_body()
+            .collect()
+            .await
+            .expect("body")
+            .to_bytes();
+        let renewed: GatewayCredentialBundle = serde_json::from_slice(&body).expect("json");
+        assert!(renewed.bearer_token.starts_with("wic_"));
+        assert_ne!(renewed.bearer_token, "cred-tok");
+
+        // 旧凭据立即失效 → 401；新凭据 → 200。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/status")
+                    .header("content-type", "application/json")
+                    .header("authorization", "Bearer cred-tok")
+                    .body(Body::from(status_payload("gw-001")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/gateway/status")
+                    .header("content-type", "application/json")
+                    .header("authorization", format!("Bearer {}", renewed.bearer_token))
+                    .body(Body::from(status_payload("gw-001")))
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[tokio::test]
@@ -728,6 +1203,8 @@ mod tests {
                 object_storage: None,
                 ca_cert: None,
                 protocol_version: "1.0".to_string(),
+                hmac_secret: "test-hmac-secret".to_string(),
+                credential_ttl_seconds: 3600,
             },
             store: std::sync::Arc::new(file_store),
             artifact_store: std::sync::Arc::new(crate::infra::LocalArtifactStore::new(

@@ -60,22 +60,12 @@ export interface ControlCenterTrustBundle {
 
 /** GET /api/v1/gateway/initial-config 的 config 载荷。 */
 export interface GatewayInitialConfig {
+  gateway_id: string;
   control_center_endpoint: string;
   trust_bundle: ControlCenterTrustBundle | null;
   server_tls_required: boolean;
   protocol_version: string;
   enrollment_token_id: string;
-}
-
-/** 生成 Gateway 初始化接口的安全调用命令；凭证始终位于 Header 而非 URL。 */
-export function buildGatewayInitialConfigCurl(
-  initUrl: string,
-  gatewayToken: string,
-): string {
-  const quote = (value: string) => `'${value.split("'").join(`'\"'\"'`)}'`;
-  const url = initUrl.trim() || "<center-init-url>";
-  const token = gatewayToken.trim() || "<gateway-token>";
-  return `curl -H ${quote(`Authorization: Bearer ${token}`)} ${quote(url)}`;
 }
 
 export interface DispatchReceipt {
@@ -238,6 +228,7 @@ export function normalizeGatewayInitialConfig(
   const root = requiredRecord(payload, "response");
   const config = requiredRecord(root.config, "config");
   return {
+    gateway_id: requiredString(config.gateway_id, "config.gateway_id"),
     control_center_endpoint: requiredString(
       config.control_center_endpoint,
       "config.control_center_endpoint",
@@ -434,25 +425,26 @@ export async function fetchAgentInstallCode(): Promise<AgentInstallCode> {
 
 /**
  * 从 Gateway 页面调用控制中心的网关面初始化接口。
- * initUrl 由 Center 创建实例时下发，凭证只放在 Authorization Header，
- * 不拼接到 URL，避免浏览器历史和代理日志泄露注册 Token。
+ * initUrl 由 Center 创建实例时下发，**不携带凭证**（token 不进 URL）；
+ * 网关凭证由操作者单独输入，只放入 Authorization Header。
+ * 返回 `application/toml` 的 config.toml 文本（置备时由 Center 生成）。
  */
 export async function fetchGatewayInitialConfig(
   initUrl: string,
-  gatewayToken: string,
-): Promise<GatewayInitialConfig> {
-  const path = initUrl.trim();
-  const token = gatewayToken.trim();
+  token?: string,
+): Promise<string> {
+  // 去掉可能残留的 fragment（如手工复制带 # 的链接）。
+  const path = initUrl.split("#", 1)[0];
   const response = await fetch(path, {
     headers: {
-      authorization: `Bearer ${token}`,
-      accept: "application/json",
+      accept: "application/toml",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
   });
   if (!response.ok) {
     throw new ApiError(response.status, path);
   }
-  return normalizeGatewayInitialConfig(await response.json());
+  return response.text();
 }
 
 export async function pauseAgent(

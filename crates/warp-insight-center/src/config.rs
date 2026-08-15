@@ -21,6 +21,8 @@ const ENV_OBJECT_STORAGE_ACCESS_KEY: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_
 const ENV_OBJECT_STORAGE_SECRET_KEY: &str = "WARP_INSIGHT_CENTER_OBJECT_STORAGE_SECRET_KEY";
 const ENV_CA_CERT_PATH: &str = "WARP_INSIGHT_CENTER_CA_CERT_PATH";
 const ENV_PROTOCOL_VERSION: &str = "WARP_INSIGHT_CENTER_PROTOCOL_VERSION";
+const ENV_HMAC_SECRET: &str = "WARP_INSIGHT_CENTER_HMAC_SECRET";
+const ENV_CREDENTIAL_TTL_SECONDS: &str = "WARP_INSIGHT_CENTER_CREDENTIAL_TTL_SECONDS";
 
 /// 默认对外地址使用域名（初始化 URL / 控制中心端点需要可被 Gateway 从外网访问）。
 const DEFAULT_PUBLIC_URL: &str = "https://center.warpinsight.example";
@@ -59,6 +61,12 @@ pub struct CenterConfig {
     pub ca_cert: Option<String>,
     /// 网关↔中心 wire 协议版本（config.toml [protocol] version）。
     pub protocol_version: String,
+    /// RegistToken 派生密钥（HMAC-SHA256）：由网关身份 Token 派生注册凭据。
+    /// 派生后中心只存结果 hash、不重算，故轮换该密钥不影响既有凭据校验；
+    /// 生产必须配置（`WARP_INSIGHT_CENTER_HMAC_SECRET`）。
+    pub hmac_secret: String,
+    /// 运行期凭据（RUNTIME_TOKEN）有效期秒数（镜像 warp-gateway 的 credential_ttl_seconds）。
+    pub credential_ttl_seconds: i64,
 }
 
 /// S3 兼容对象存储配置（MinIO 等）。
@@ -135,6 +143,15 @@ impl CenterConfig {
         };
         let protocol_version =
             env::var(ENV_PROTOCOL_VERSION).unwrap_or_else(|_| "1.0".to_string());
+        // RegistToken 派生密钥：生产必须显式配置；未配置 → dev 固定默认值。
+        let hmac_secret = env::var(ENV_HMAC_SECRET).unwrap_or_else(|_| {
+            "dev-center-hmac-secret-change-me".to_string()
+        });
+        // 运行期凭据有效期：默认 30 天。
+        let credential_ttl_seconds = env::var(ENV_CREDENTIAL_TTL_SECONDS)
+            .ok()
+            .and_then(|value| value.trim().parse::<i64>().ok())
+            .unwrap_or(30 * 24 * 3600);
         if listen_addr.trim().is_empty() {
             return Err(ConfigError::new("listen addr must not be empty"));
         }
@@ -151,6 +168,8 @@ impl CenterConfig {
             object_storage,
             ca_cert,
             protocol_version,
+            hmac_secret,
+            credential_ttl_seconds,
         })
     }
 }

@@ -42,13 +42,8 @@ export function useAgentInstallCode() {
 /** Gateway 初始化页面的显式提交动作；不自动轮询，避免重复消耗一次性凭证。 */
 export function useGatewayInitialConfig() {
   return useMutation({
-    mutationFn: ({
-      initUrl,
-      gatewayToken,
-    }: {
-      initUrl: string;
-      gatewayToken: string;
-    }) => fetchGatewayInitialConfig(initUrl, gatewayToken),
+    mutationFn: ({ initUrl, token }: { initUrl: string; token?: string }) =>
+      fetchGatewayInitialConfig(initUrl, token),
   });
 }
 

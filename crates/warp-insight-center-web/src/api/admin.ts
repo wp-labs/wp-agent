@@ -960,7 +960,10 @@ function exampleGatewayInstance(
   command: CreateGatewayInstanceCommand,
 ): AdminCreateGatewayInstanceReturned {
   const gatewayId = `gw-${Math.random().toString(36).slice(2, 8)}`;
-  const initUrl = `http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=${gatewayId}`;
+  const initEndpoint = `http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=${gatewayId}`;
+  const token = command.token ?? "<token>";
+  // init_url 不携带凭证（token 不进 URL），凭证走 config.toml / Authorization Header。
+  const initUrl = initEndpoint;
   return {
     instance: {
       gatewayId,
@@ -973,7 +976,7 @@ function exampleGatewayInstance(
       installCommand: `docker run -d --name warp-gateway-${gatewayId} -e WARP_GATEWAY_INIT_URL="${initUrl}" -e WARP_GATEWAY_TOKEN="${command.token ?? "<token>"}" warp-gateway:latest`,
       cloudImage: "warp-gateway:latest",
       initUrl,
-      initCurl: `curl -H "Authorization: Bearer ${command.token ?? "<token>"}" "${initUrl}"`,
+      initCurl: `curl -H "Authorization: Bearer ${token}" "${initEndpoint}"`,
       configToml: `version = 1\n\n[control_center]\nendpoint = "http://127.0.0.1:3100"\n\n[enrollment]\ntoken = "${command.token ?? "<token>"}"\n`,
       trustBundlePem: null,
     },
