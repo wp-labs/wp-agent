@@ -23,3 +23,7 @@ pub mod gateway_initial_config_returned;
 pub use gateway_initial_config_returned::*;
 pub mod gateway_status_accepted_returned;
 pub use gateway_status_accepted_returned::*;
+pub mod dispatch_agent_fleet_command;
+pub use dispatch_agent_fleet_command::*;
+pub mod agent_fleet_dispatch_receipt;
+pub use agent_fleet_dispatch_receipt::*;

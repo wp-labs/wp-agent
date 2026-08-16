@@ -39,6 +39,8 @@ pub struct SimConfig {
     pub report_agents: bool,
     /// Agentd 角色：每次一并上报一个动作结果。
     pub report_action: bool,
+    /// Gateway 角色 onboarding 时把 config.toml / runtime-token 落盘到 run_dir/gateways/<gw>/<instance>/。
+    pub run_dir: Option<String>,
 }
 
 impl SimConfig {
@@ -61,6 +63,7 @@ gateway options:
   --version <v>          版本（默认 v2.4.1）
   --fetch-config         启动时拉一次初始配置（GET /api/v1/gateway/initial-config）
   --report-agents        每次一并上报其下 2 个模拟 Agent 状态
+  --run-dir <dir>        onboarding 时把 config.toml / runtime-token 写盘到 <dir>/gateways/<gw>/<instance>/
   --insecure             接受无效 TLS 证书
 
 agentd options:
@@ -112,6 +115,7 @@ agentd options:
             fetch_config: false,
             report_agents: false,
             report_action: false,
+            run_dir: None,
         };
 
         let rest = &args[1..];
@@ -149,6 +153,7 @@ agentd options:
                         }
                         "--version" => cfg.version = value.clone(),
                         "--status" => cfg.status = Some(value.clone()),
+                        "--run-dir" => cfg.run_dir = Some(value.clone()),
                         "--health" => cfg.health = Some(value.clone()),
                         other => return Err(format!("unknown option {other}")),
                     }

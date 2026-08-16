@@ -290,12 +290,14 @@ impl Store for PgStore {
         } else {
             sha256_hex(token)
         };
+        let instance_id = format!("inst-{gateway_id}");
         let result = sqlx::query(
             "INSERT INTO gateways (gateway_id, instance_id, bootstrap_token_hash, lifecycle_state, created_at) \
-             VALUES ($1, '', $2, 'Provisioned', NOW()) \
+             VALUES ($1, $2, $3, 'Provisioned', NOW()) \
              ON CONFLICT (gateway_id) DO NOTHING",
         )
         .bind(gateway_id)
+        .bind(&instance_id)
         .bind(&bootstrap_hash)
         .execute(&self.pool)
         .await?;

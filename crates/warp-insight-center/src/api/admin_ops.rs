@@ -13,9 +13,10 @@ use axum::{
 use insight_control::types::DateTime;
 use insight_control::{
     AdminGatewayCustomerBindingReturned, AdminGatewayListReturned, AdminGatewayStatusListReturned,
-    AdminGatewayStatusReturned, AgentRuntimeStatus, GatewayCustomerBinding, GatewayInitialConfig,
+    AdminGatewayStatusReturned, AgentFleetDispatchReceipt, AgentRuntimeStatus,
+    DispatchAgentFleetCommand, DispatchGlobalPolicy, GatewayCustomerBinding, GatewayInitialConfig,
     GatewayInitialConfigReturned, GatewayInstance, GatewayInstanceLifecycleState, GatewayListView,
-    GatewayRuntimeStatus, UpgradeStep, UpgradeTarget,
+    GatewayRuntimeStatus, GlobalPolicyDispatch, UpgradeStep, UpgradeTarget,
 };
 
 use crate::infra::{StoreError, StoredGateway, UpgradePlanRecord};
@@ -1623,4 +1624,56 @@ mod tests {
         }
     }
 
+}
+
+/// 下发全局策略（DispatchGlobalPolicyFlow）：记录一次全局策略下发回执。
+pub async fn admin_dispatch_global_policy(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(input): Json<DispatchGlobalPolicy>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    Json(GlobalPolicyDispatch {
+        dispatch_id: format!(
+            "policy-{}",
+            chrono::Utc::now()
+                .timestamp_nanos_opt()
+                .unwrap_or_default()
+        ),
+        policy_version: input.policy_version,
+        target_count: input.gateway_ids.len() as i64,
+        status: "accepted".to_string(),
+        dispatched_at: DateTime::now(),
+    })
+    .into_response()
+}
+
+/// 下发 Agent 舰队指令（DispatchAgentFleetCommandFlow）：记录一次舰队指令下发回执。
+pub async fn admin_dispatch_agent_fleet_command(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(input): Json<DispatchAgentFleetCommand>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    if let Err(response) = require_admin_bearer(&state, &headers, &client_key) {
+        return response;
+    }
+    Json(AgentFleetDispatchReceipt {
+        dispatch_id: format!(
+            "fleet-{}",
+            chrono::Utc::now()
+                .timestamp_nanos_opt()
+                .unwrap_or_default()
+        ),
+        command_kind: input.command_kind,
+        target_count: input.agent_ids.len() as i64,
+        status: "accepted".to_string(),
+        created_at: DateTime::now(),
+    })
+    .into_response()
 }

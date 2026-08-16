@@ -26,11 +26,13 @@ use admin_ops::{
     admin_get_gateway_initial_config, admin_get_gateway_uptime, admin_list_gateway_agents,
     admin_list_gateway_instances, admin_list_gateway_lifecycle, admin_list_gateway_status,
     admin_list_releases, admin_list_upgrade_plans, admin_publish_release,
-    admin_show_gateway_status, admin_view_gateway_list,
+    admin_show_gateway_status, admin_view_gateway_list, admin_dispatch_global_policy,
+    admin_dispatch_agent_fleet_command,
 };
 use gateway_ops::{
-    download_release_artifact, get_gateway_initial_config, options_gateway_initial_config,
-    register_gateway, renew_gateway_credential, submit_agent_status, submit_gateway_status,
+    download_release_artifact, get_gateway_initial_config, initialize_gateway_via_url,
+    options_gateway_initial_config, register_gateway, renew_gateway_credential, submit_agent_status,
+    submit_gateway_status, verify_gateway_credential,
 };
 
 #[derive(Debug, Clone)]
@@ -122,6 +124,27 @@ pub fn router_for(state: ApiState) -> Router {
         .route(
             "/api/v1/gateway/credentials:renew",
             post(renew_gateway_credential),
+        )
+        // 网关面：校验通讯凭据（VerifyGatewayCredentialFlow）——axum 下 `:` 会被当路径参数，
+        // 与 credentials:renew 冲突，故 verify 用斜杠路径。
+        .route(
+            "/api/v1/gateway/credentials/verify",
+            post(verify_gateway_credential),
+        )
+        // 网关面：通过 URL 初始化（InitializeGatewayViaUrlFlow）
+        .route(
+            "/api/v1/gateway/initialize-via-url",
+            post(initialize_gateway_via_url),
+        )
+        // 管理面：下发全局策略（DispatchGlobalPolicyFlow）
+        .route(
+            "/api/v1/admin/policies/global",
+            post(admin_dispatch_global_policy),
+        )
+        // 管理面：下发 Agent 舰队指令（DispatchAgentFleetCommandFlow）
+        .route(
+            "/api/v1/gateway/agents/dispatch",
+            post(admin_dispatch_agent_fleet_command),
         )
         // 管理面：创建网关实例（AdminCreateGatewayInstance，POST /api/v1/admin/gateways/instances）
         .route(

@@ -464,7 +464,7 @@ impl FileStore {
                 };
                 let mut stored = StoredGateway::provisioned(
                     gateway_id.to_string(),
-                    String::new(),
+                    format!("inst-{gateway_id}"),
                     String::new(),
                     None,
                 );

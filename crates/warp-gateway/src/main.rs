@@ -48,7 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 fn init_config_command(
     out_arg: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let token = warp_gateway::infra::new_secret_token("admin")
+    let token = warp_gateway::infra::new_admin_token()
         .map_err(|err| format!("failed to generate admin api token: {err}"))?;
     let out_path = out_arg
         .map(PathBuf::from)

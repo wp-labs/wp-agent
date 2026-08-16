@@ -185,7 +185,7 @@ export function GatewayInstanceDetailPage() {
                     <div>
                         <span className={styles.infoLabel}>Center 接入 curl</span>
                       <p className={styles.curlHint}>
-                        使用网关注册凭证验证 Center 接入接口，命令可直接复制到终端执行。
+                        使用置备引导 Token 验证 Center 接入接口，命令可直接复制到终端执行。
                       </p>
                     </div>
                     <button

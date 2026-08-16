@@ -93,10 +93,10 @@ export interface GatewayInstallInfo {
   installCommand: string;
   cloudImage: string;
   initUrl: string;
-  /** 服务端生成的 curl 验证命令（Bearer 用注册凭证调用 initUrl）。 */
+  /** Center 创建实例时签发的一次性置备引导 Token，仅在创建回执中交付。 */
+  setupToken: string;
+  /** 服务端生成的 curl 验证命令（Bearer 使用一次性置备引导 Token）。 */
   initCurl: string;
-  /** 服务端生成的完整 Gateway 配置文件，可直接保存为 config.toml。 */
-  configToml: string;
   /** 控制中心 CA 信任证书；未启用 TLS 时为空。 */
   trustBundlePem: string | null;
 }
@@ -182,8 +182,6 @@ export interface GlobalPolicyDispatch {
 export interface CreateGatewayInstanceCommand {
   gatewayName: string;
   requestedBy: string;
-  /** 注册凭证（可选）：非空则网关可持它 Bearer 调用 init_url / register。 */
-  token?: string;
 }
 
 export interface BindGatewayCustomerCommand {
@@ -446,13 +444,13 @@ function normalizeGatewayInstallInfo(payload: any): GatewayInstallInfo {
       pick(payload, "init_url", "initUrl"),
       "install.initUrl",
     ),
+    setupToken: requiredString(
+      pick(payload, "setup_token", "setupToken"),
+      "install.setupToken",
+    ),
     initCurl: requiredString(
       pick(payload, "init_curl", "initCurl"),
       "install.initCurl",
-    ),
-    configToml: requiredString(
-      pick(payload, "config_toml", "configToml"),
-      "install.configToml",
     ),
     trustBundlePem:
       pick(payload, "trust_bundle_pem", "trustBundlePem") == null
@@ -959,9 +957,10 @@ function exampleAgentStatus(gatewayId: string): AgentStatusView[] {
 function exampleGatewayInstance(
   command: CreateGatewayInstanceCommand,
 ): AdminCreateGatewayInstanceReturned {
-  const gatewayId = `gw-${Math.random().toString(36).slice(2, 8)}`;
+  const gatewayId = command.gatewayName.trim();
   const initEndpoint = `http://127.0.0.1:3100/api/v1/gateway/initial-config?instance_id=${gatewayId}`;
-  const token = command.token ?? "<token>";
+  // 示例数据也模拟 Center 自动签发，避免前端重新承担凭据输入职责。
+  const bootstrapToken = `boot_${Math.random().toString(36).slice(2, 14)}`;
   // init_url 不携带凭证（token 不进 URL），凭证走 config.toml / Authorization Header。
   const initUrl = initEndpoint;
   return {
@@ -973,11 +972,11 @@ function exampleGatewayInstance(
       initializedAt: null,
     },
     install: {
-      installCommand: `docker run -d --name warp-gateway-${gatewayId} -e WARP_GATEWAY_INIT_URL="${initUrl}" -e WARP_GATEWAY_TOKEN="${command.token ?? "<token>"}" warp-gateway:latest`,
+      installCommand: `docker run -d --name warp-gateway-${gatewayId} -e WARP_GATEWAY_INIT_URL="${initUrl}" -e WARP_GATEWAY_BOOTSTRAP_TOKEN="${bootstrapToken}" warp-gateway:latest`,
       cloudImage: "warp-gateway:latest",
       initUrl,
-      initCurl: `curl -H "Authorization: Bearer ${token}" "${initEndpoint}"`,
-      configToml: `version = 1\n\n[control_center]\nendpoint = "http://127.0.0.1:3100"\n\n[enrollment]\ntoken = "${command.token ?? "<token>"}"\n`,
+      setupToken: bootstrapToken,
+      initCurl: `curl -H "Authorization: Bearer ${bootstrapToken}" "${initEndpoint}"`,
       trustBundlePem: null,
     },
   };
@@ -1244,7 +1243,6 @@ export async function createGatewayInstance(
       body: JSON.stringify({
         gateway_name: command.gatewayName,
         requested_by: command.requestedBy,
-        token: command.token,
       }),
     },
   ).then(async (result) => {

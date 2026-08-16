@@ -1,8 +1,6 @@
 // Gateway 角色：向 WarpInsightCenter 上报状态 / 拉取初始配置。
 
-use insight_control::{
-    GatewayInitialConfigReturned, GetGatewayInitialConfig, ReportGatewayStatus,
-};
+use insight_control::{GetGatewayInitialConfig, ReportGatewayStatus};
 use insight_control::types::DateTime;
 use reqwest::StatusCode;
 
@@ -99,11 +97,12 @@ pub async fn report_agents_status(
 }
 
 /// 拉取网关初始配置：GET {center}/api/v1/gateway/initial-config。
-/// 注意：中心暂未实现该端点，会返回 404（调用方自行处理）。
+/// 返回 (RegistToken, config.toml 全文)：RegistToken 取自 [enrollment] token 明文，
+/// config.toml 全文供 run-dir 落盘（程序运行时生成网关配置）。
 pub async fn fetch_initial_config(
     client: &reqwest::Client,
     config: &SimConfig,
-) -> Result<(), String> {
+) -> Result<(Option<String>, String), String> {
     let url = format!(
         "{}/api/v1/gateway/initial-config",
         config.upstream_url.trim_end_matches('/')
@@ -114,7 +113,17 @@ pub async fn fetch_initial_config(
         requested_at: DateTime::now(),
     };
     let response = client::send_json(
-        || client.get(&url).query(&[("instance_id", request.instance_id.as_str())]),
+        || {
+            client
+                .get(&url)
+                .query(&[("instance_id", request.instance_id.as_str())])
+                // 置备路径要求 X-Gateway-Identity-Token（网关自生成身份）：
+                // 中心用它派生 RegistToken。
+                .header(
+                    "X-Gateway-Identity-Token",
+                    format!("sim-identity-{}", config.id),
+                )
+        },
         &config.token,
     )
     .await?;
@@ -127,27 +136,78 @@ pub async fn fetch_initial_config(
             response.status()
         ));
     }
-    let returned: GatewayInitialConfigReturned = response
-        .json()
+    let body = response
+        .text()
         .await
-        .map_err(|err| format!("failed to decode initial config response: {err}"))?;
-    println!(
-        "event=InitialConfigFetched endpoint={} tls_required={} protocol={} trust_bundle_id={} ca_bundle_len={}",
-        returned.config.control_center_endpoint,
-        returned.config.server_tls_required,
-        returned.config.protocol_version,
-        returned
-            .config
-            .trust_bundle
-            .as_ref()
-            .map(|bundle| bundle.trust_bundle_id.as_str())
-            .unwrap_or("<none>"),
-        returned
-            .config
-            .trust_bundle
-            .as_ref()
-            .map(|bundle| bundle.ca_bundle.len())
-            .unwrap_or(0),
+        .map_err(|err| format!("failed to read initial config response: {err}"))?;
+    // 中心 initial-config 返回 JSON：{ config, regist_token }。
+    let parsed: serde_json::Value = serde_json::from_str(&body)
+        .map_err(|err| format!("failed to decode initial config JSON: {err}"))?;
+    let config = &parsed["config"];
+    let regist_token = parsed["regist_token"].as_str().map(str::to_string);
+    // 依据 JSON config 生成 config.toml（网关落盘的 TOML 配置文件）。
+    let config_toml = format!(
+        "version = 1\n\
+         \n\
+         [control_center]\n\
+         endpoint = \"{}\"\n\
+         trust_bundle = \"/etc/warp-gateway/ca/control-center.pem\"\n\
+         server_tls_required = {}\n\
+         \n\
+         [enrollment]\n\
+         token_id = \"{}\"\n\
+         {}\
+         [protocol]\n\
+         version = \"{}\"\n",
+        config["control_center_endpoint"].as_str().unwrap_or(""),
+        config["server_tls_required"].as_bool().unwrap_or(false),
+        config["enrollment_token_id"].as_str().unwrap_or(""),
+        match &regist_token {
+            Some(token) => format!("token = \"{token}\"\n"),
+            None => String::new(),
+        },
+        config["protocol_version"].as_str().unwrap_or("1.0"),
     );
-    Ok(())
+    println!(
+        "event=InitialConfigFetched regist_token_present={}",
+        regist_token.is_some()
+    );
+    Ok((regist_token, config_toml))
+}
+
+/// 用 RegistToken 注册：POST {center}/api/v1/gateway/register → 返回运行期 bearer。
+pub async fn register(
+    client: &reqwest::Client,
+    config: &SimConfig,
+    regist_token: &str,
+) -> Result<String, String> {
+    let url = format!(
+        "{}/api/v1/gateway/register",
+        config.upstream_url.trim_end_matches('/')
+    );
+    let request = serde_json::json!({
+        "enrollment_token": regist_token,
+        "instance_id": config.instance_id,
+        "requested_at": DateTime::now().to_chrono().to_rfc3339(),
+    });
+    let response = client::send_json(|| client.post(&url).json(&request), &config.token).await?;
+    let status = response.status();
+    if !status.is_success() {
+        return Err(format!(
+            "gateway register rejected: HTTP {status} body={}",
+            response.text().await.unwrap_or_default()
+        ));
+    }
+    let body = response
+        .text()
+        .await
+        .map_err(|err| format!("failed to read register response: {err}"))?;
+    let result: serde_json::Value = serde_json::from_str(&body)
+        .map_err(|err| format!("failed to decode register response: {err}"))?;
+    let bearer = result["result"]["credential_bundle"]["bearer_token"]
+        .as_str()
+        .ok_or_else(|| format!("register response missing bearer_token: {body}"))?
+        .to_string();
+    println!("event=GatewayRegistered bearer_len={}", bearer.len());
+    Ok(bearer)
 }

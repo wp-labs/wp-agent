@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS gateways (
   gateway_id TEXT PRIMARY KEY,
   instance_id TEXT NOT NULL DEFAULT '',
-  credential_token_hash TEXT NOT NULL,
+  credential_token_hash TEXT NOT NULL DEFAULT '',
   credential_status TEXT NOT NULL DEFAULT 'active',
   credential_expires_at TIMESTAMPTZ,
   bootstrap_token_hash TEXT NOT NULL DEFAULT '',
@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS gateways (
   cpu_percent DOUBLE PRECISION,
   lifecycle_state TEXT,
   initialized_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_seen_at TIMESTAMPTZ
 );
 

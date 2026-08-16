@@ -149,7 +149,7 @@ bind WarpInsightCenterGatewayInterface {
   }
 
   entry VerifyGatewayCredential {
-    route POST "/api/v1/gateway/credentials:verify"
+    route POST "/api/v1/gateway/credentials/verify"
     auth bearer
     actor_identity WarpGateway.id from credential.gateway_id
     status GatewayCredentialVerificationResult 200

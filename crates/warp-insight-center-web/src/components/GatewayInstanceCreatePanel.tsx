@@ -74,7 +74,10 @@ function CopyBlock({
   );
 }
 
-/** 提供可按需展开的实例创建流程，避免低频表单长期占据实例列表空间。 */
+/**
+ * 提供可按需展开的实例创建流程。
+ * 置备引导 Token 始终由 Center 签发，表单只收集实例标识和操作人信息。
+ */
 export function GatewayInstanceCreatePanel() {
   const [expanded, setExpanded] = useState(false);
   const mutation = useCreateGatewayInstance();
@@ -82,11 +85,9 @@ export function GatewayInstanceCreatePanel() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const token = String(data.get("gatewayToken") ?? "").trim();
     mutation.mutate({
       gatewayName: String(data.get("gatewayName") ?? ""),
       requestedBy: String(data.get("requestedBy") ?? ""),
-      token: token || undefined,
     });
   }
 
@@ -124,29 +125,21 @@ export function GatewayInstanceCreatePanel() {
       {expanded ? (
         <div id="gateway-instance-create-content" className={styles.body}>
           <form className={styles.form} onSubmit={handleSubmit}>
-            <FormField label="网关名称" hint="例如：gw-prod-east">
-              <TextInput
-                name="gatewayName"
-                required
-                placeholder="请输入网关名称"
-              />
-            </FormField>
-            <FormField label="申请者（requested_by）">
-              <TextInput name="requestedBy" defaultValue="admin" required />
-            </FormField>
-            <FormField
-              label="Gateway 注册凭证"
-              hint="生成初始化材料时输入；Gateway 将使用它访问 init_url / register"
-            >
-              <TextInput
-                name="gatewayToken"
-                placeholder="例如：tok-xxxx"
-                required
-              />
-            </FormField>
+            <div className={styles.formFields}>
+              <FormField label="网关名称" hint="例如：gw-prod-east">
+                <TextInput
+                  name="gatewayName"
+                  required
+                  placeholder="请输入网关名称"
+                />
+              </FormField>
+              <FormField label="申请者（requested_by）">
+                <TextInput name="requestedBy" defaultValue="admin" required />
+              </FormField>
+            </div>
             <div className={styles.formAction}>
               <span className={styles.actionHint}>
-                创建后实例默认进入“待部署”状态。
+                创建后实例进入“待部署”状态，置备引导 Token 由中心自动签发。
               </span>
               <PrimaryButton type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? "创建中…" : "创建实例"}
@@ -172,25 +165,24 @@ export function GatewayInstanceCreatePanel() {
             <div className={styles.install}>
               <div className={styles.installTitle}>安装指引</div>
               <CopyBlock
-                label="① Docker 安装命令（已注入初始化 URL 与网关凭证）"
+                label="① 一次性置备引导 Token（请立即妥善保存）"
+                code={install.setupToken}
+              />
+              <CopyBlock
+                label="② Docker 安装命令（已注入初始化 URL 与置备凭据）"
                 code={install.installCommand}
               />
               <CopyBlock
-                label="② 云镜像地址（云服务器直接拉取）"
+                label="③ 云镜像地址（云服务器直接拉取）"
                 code={install.cloudImage}
               />
               <CopyBlock
-                label="③ 初始化 HTTPS URL（Gateway 启动后基于此 URL 初始化）"
+                label="④ 初始化 HTTPS URL（Gateway 启动后基于此 URL 初始化）"
                 code={install.initUrl}
               />
               <CopyBlock
-                label="④ curl 验证初始化 URL（服务端生成，Bearer 用注册凭证）"
+                label="⑤ curl 验证初始化 URL（Bearer 使用置备引导 Token）"
                 code={install.initCurl}
-              />
-              <CopyBlock
-                label="⑤ Gateway 配置文件（保存为 config.toml）"
-                code={install.configToml}
-                filename={`warp-gateway-${created?.instance.gatewayId ?? "instance"}.toml`}
               />
               {install.trustBundlePem ? (
                 <CopyBlock
@@ -200,8 +192,8 @@ export function GatewayInstanceCreatePanel() {
                 />
               ) : null}
               <p className={styles.installHint}>
-                Gateway 启动后将携带网关凭证访问初始化
-                URL，获取控制中心地址、策略版本与遥测输出，完成接入。
+                Gateway 启动后将携带置备引导 Token 访问初始化 URL，获取
+                config.toml 和注册凭据，完成接入。
               </p>
             </div>
           ) : null}

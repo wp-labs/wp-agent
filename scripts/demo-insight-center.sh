@@ -12,6 +12,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+RUN_DIR="${REPO_ROOT}/.run"
+mkdir -p "${RUN_DIR}/center" "${RUN_DIR}/gateways"
 COMPOSE_DIR="${REPO_ROOT}/crates/warp-insight-center"
 CENTER_BIN="${REPO_ROOT}/target/debug/warp-insight-center"
 SIM_BIN="${REPO_ROOT}/target/debug/insight-simulator"
@@ -247,14 +249,42 @@ start_simulators() {
     gateway_name="${entry%%:*}"
     token="${entry#*:}"
     instance_id="inst-${gateway_name#gw-}"
+    # 生成网关自管配置（warp-gateway.toml，含 admin token）。
+    local gw_bin="${REPO_ROOT}/target/debug/warp-gateway"
+    if [[ ! -x "${gw_bin}" ]]; then
+      cargo build --manifest-path "${REPO_ROOT}/Cargo.toml" -p warp-gateway >/dev/null
+    fi
+    local gw_dir="${RUN_DIR}/gateways/${gateway_name}/${instance_id}"
+    mkdir -p "${gw_dir}"
+    "${gw_bin}" init-config "${gw_dir}/warp-gateway.toml" >/dev/null 2>&1 || true
     "${SIM_BIN}" gateway \
       --center-url "${CENTER_URL}" \
       --gateway-id "${gateway_name}" --instance-id "${instance_id}" \
       --token "${token}" --interval "${REPORT_INTERVAL}" \
-      --report-agents \
+      --fetch-config --run-dir "${RUN_DIR}" --report-agents \
       >"/tmp/insight-simulator-${gateway_name}.log" 2>&1 &
     SIM_PIDS+=($!)
     echo "  simulator[${gateway_name}] pid=$! → 每 ${REPORT_INTERVAL}s 上报（含 2 个模拟 Agent）"
+  done
+  # 把网关自管配置（warp-gateway.toml，含 admin_api_token）并入各网关 config.toml。
+  for entry in "${pairs[@]}"; do
+    entry="$(printf '%s' "${entry}" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+    [[ -z "${entry}" ]] && continue
+    local gw="${entry%%:*}"
+    local inst="inst-${gw#gw-}"
+    local dir="${RUN_DIR}/gateways/${gw}/${inst}"
+    local cfg="${dir}/config.toml"
+    local admin="${dir}/warp-gateway.toml"
+    for _ in $(seq 1 50); do
+      [[ -f "${cfg}" ]] && break
+      sleep 0.2
+    done
+    if [[ -f "${cfg}" && -f "${admin}" ]]; then
+      {
+        echo
+        cat "${admin}"
+      } >> "${cfg}"
+    fi
   done
 }
 

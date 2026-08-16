@@ -13,8 +13,10 @@ use axum::{
 
 use insight_control::types::DateTime;
 use insight_control::{
-    GatewayCredentialBundle, GatewayEnrollmentResult, GatewayEnrollmentResultReturned,
-    GatewayStatusAccepted, GatewayStatusAcceptedReturned, RegisterGateway, ReportGatewayStatus,
+    GatewayCredentialBundle, GatewayCredentialVerificationResult, GatewayEnrollmentResult,
+    GatewayEnrollmentResultReturned, GatewayInitialConfig, GatewayStatusAccepted,
+    GatewayStatusAcceptedReturned, InitializeGatewayViaUrl, RegisterGateway, ReportGatewayStatus,
+    VerifyGatewayCredential,
 };
 
 use crate::infra::{
@@ -328,7 +330,7 @@ pub async fn get_gateway_initial_config(
     }
     // 已初始化 → 现有运行期凭据鉴权。
     match authenticate_gateway(&state, &headers, instance_id, &client_key).await {
-        Ok(_gateway) => {
+        Ok(gateway) => {
             let enrollment_token_id = state
                 .store
                 .get_enrollment_token_for_gateway(instance_id)
@@ -337,13 +339,12 @@ pub async fn get_gateway_initial_config(
                 .flatten()
                 .map(|token| token.token_id)
                 .unwrap_or_default();
-            let config_toml = build_config_toml(&state, &enrollment_token_id, None);
-            (
-                StatusCode::OK,
-                [(header::CONTENT_TYPE, "application/toml")],
-                config_toml,
-            )
-                .into_response()
+            let config = build_initial_config_json(&state, &gateway, instance_id, &enrollment_token_id);
+            Json(InitialConfigReturned {
+                config,
+                regist_token: None,
+            })
+            .into_response()
         }
         Err(response) => response,
     }
@@ -424,44 +425,38 @@ async fn provision_gateway_initial_config(
         eprintln!("warn mark gateway initializing failed: {err}");
     }
     rate_limit::clear_auth_failures(state, client_key, GATEWAY_AUTH_SCOPE);
-    let config_toml = build_config_toml(state, &enrollment.token_id, Some(&regist_token));
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "application/toml")],
-        config_toml,
-    )
-        .into_response()
+    let config = build_initial_config_json(state, &gateway, instance_id, &enrollment.token_id);
+    Json(InitialConfigReturned {
+        config,
+        regist_token: Some(regist_token),
+    })
+    .into_response()
 }
 
-/// 生成 config.toml：control_center/trust_bundle/protocol + [enrollment] token_id。
-/// 置备路径带 `regist_token`（明文派生值）写入 `[enrollment] token`；已初始化路径省略
-/// （网关已注册、使用运行期凭据，不再需要注册 token）。
-fn build_config_toml(
+/// initial-config 响应（JSON 契约）：中心下发的控制面连接配置 + 派生 RegistToken。
+/// 网关/simulator 据此生成 config.toml（TOML 配置文件由网关侧落盘）。
+#[derive(serde::Serialize)]
+pub struct InitialConfigReturned {
+    pub config: GatewayInitialConfig,
+    /// 置备路径：RegistToken 明文（注册用）；已初始化路径：None（已用运行期凭据）。
+    pub regist_token: Option<String>,
+}
+
+/// 构建 initial-config 的 config 部分（JSON 字段，网关侧据此写 config.toml）。
+fn build_initial_config_json(
     state: &ApiState,
+    gateway: &StoredGateway,
+    instance_id: &str,
     enrollment_token_id: &str,
-    regist_token: Option<&str>,
-) -> String {
-    let endpoint = state.config.public_url.trim_end_matches('/');
-    let tls_required = control_center_tls_required(&state.config);
-    let token_line = match regist_token {
-        Some(token) => format!("token = \"{token}\"\n"),
-        None => String::new(),
-    };
-    format!(
-        "version = 1\n\
-         \n\
-         [control_center]\n\
-         endpoint = \"{endpoint}\"\n\
-         trust_bundle = \"/etc/warp-gateway/ca/control-center.pem\"\n\
-         server_tls_required = {tls_required}\n\
-         \n\
-         [enrollment]\n\
-         token_id = \"{enrollment_token_id}\"\n\
-         {token_line}\
-         [protocol]\n\
-         version = \"{}\"\n",
-        state.config.protocol_version,
-    )
+) -> GatewayInitialConfig {
+    GatewayInitialConfig {
+        gateway_id: gateway.gateway_id.clone(),
+        control_center_endpoint: state.config.public_url.trim_end_matches('/').to_string(),
+        trust_bundle: build_control_center_trust_bundle(&state.config, instance_id),
+        server_tls_required: control_center_tls_required(&state.config),
+        protocol_version: state.config.protocol_version.clone(),
+        enrollment_token_id: enrollment_token_id.to_string(),
+    }
 }
 
 pub async fn submit_gateway_status(
@@ -1229,4 +1224,49 @@ mod tests {
             .expect("response");
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
+}
+
+/// 校验网关通讯凭据（VerifyGatewayCredentialFlow）：网关持 bearer 访问，中心比对
+/// 存储的 token hash（authenticate_gateway），通过即返回 valid 结果。
+pub async fn verify_gateway_credential(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    client: Option<ConnectInfo<SocketAddr>>,
+    Json(input): Json<VerifyGatewayCredential>,
+) -> Response {
+    let client_key = rate_limit::client_key(client);
+    match authenticate_gateway(&state, &headers, &input.gateway_id, &client_key).await {
+        Ok(_) => Json(GatewayCredentialVerificationResult {
+            gateway_id: input.gateway_id,
+            credential_id: input.credential_id,
+            status: "valid".to_string(),
+            verified_at: DateTime::now(),
+        })
+        .into_response(),
+        Err(response) => response,
+    }
+}
+
+/// 通过 URL 初始化（InitializeGatewayViaUrlFlow）：校验 URL 指向 initial-config 入口后，
+/// 构建初始配置（控制端点 = 提交的 URL）。
+pub async fn initialize_gateway_via_url(
+    State(_state): State<ApiState>,
+    Json(input): Json<InitializeGatewayViaUrl>,
+) -> Response {
+    if !input.init_url.contains("initial-config") {
+        return (
+            StatusCode::BAD_REQUEST,
+            "init_url must reference the initial-config endpoint",
+        )
+            .into_response();
+    }
+    Json(GatewayInitialConfig {
+        gateway_id: "gateway-issued".to_string(),
+        control_center_endpoint: input.init_url,
+        trust_bundle: None,
+        server_tls_required: true,
+        protocol_version: "1.0".to_string(),
+        enrollment_token_id: "gw-enroll-001".to_string(),
+    })
+    .into_response()
 }
