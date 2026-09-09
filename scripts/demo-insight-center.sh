@@ -14,8 +14,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 RUN_DIR="${REPO_ROOT}/.run"
 mkdir -p "${RUN_DIR}/center" "${RUN_DIR}/gateways"
-COMPOSE_DIR="${REPO_ROOT}/crates/warp-insight-center"
-CENTER_BIN="${REPO_ROOT}/target/debug/warp-insight-center"
+COMPOSE_DIR="${REPO_ROOT}/crates/wist-center"
+CENTER_BIN="${REPO_ROOT}/target/debug/wist-center"
 SIM_BIN="${REPO_ROOT}/target/debug/insight-simulator"
 
 # ── 可覆盖配置 ──
@@ -108,13 +108,13 @@ ensure_infra() {
 }
 
 ensure_center() {
-  echo "== 2. 启动 warp-insight-center（PG 快照 + VM 时序推送）=="
+  echo "== 2. 启动 wist-center（PG 快照 + VM 时序推送）=="
   if center_ready; then
     echo "  center 已在运行（${CENTER_URL}），复用。"
     return
   fi
   require_cmd cargo
-  cargo build --manifest-path "${REPO_ROOT}/Cargo.toml" -p warp-insight-center >/dev/null
+  cargo build --manifest-path "${REPO_ROOT}/Cargo.toml" -p wist-center >/dev/null
   local host
   local port
   # 只绑定中心地址；CENTER_URL 用 http://host:port 形式。
@@ -128,7 +128,7 @@ ensure_center() {
       WARP_INSIGHT_CENTER_DATABASE_URL="${PG_URL}" \
       WARP_INSIGHT_CENTER_VICTORIAMETRICS_URL="${VM_URL}" \
       "${CENTER_BIN}" \
-      >/tmp/warp-insight-center-demo.log 2>&1
+      >/tmp/wist-center-demo.log 2>&1
   ) &
   CENTER_PID=$!
   CENTER_STARTED_BY_SCRIPT=1
@@ -200,7 +200,7 @@ ensure_center_web() {
     return
   fi
   require_cmd npm
-  local web_dir="${REPO_ROOT}/crates/warp-insight-center-web"
+  local web_dir="${REPO_ROOT}/crates/center-web"
   if [[ ! -d "${web_dir}/node_modules" ]]; then
     echo "  center-web 依赖缺失：${web_dir}/node_modules（先 cd 到该目录执行 npm install）" >&2
     exit 1
@@ -213,7 +213,7 @@ ensure_center_web() {
     cd "${web_dir}"
     exec nohup env WARP_INSIGHT_WEB_PROXY_TARGET="${CENTER_URL}" \
       npm run dev -- --host "${host}" --port "${port}" --strictPort \
-      >/tmp/warp-insight-center-web-demo.log 2>&1
+      >/tmp/center-web-demo.log 2>&1
   ) &
   CENTER_WEB_PID=$!
   echo "  启动 center-web：${CENTER_WEB_URL} (pid=$!)"
@@ -231,7 +231,7 @@ ensure_center_web() {
   if [[ "${ok}" == "1" ]]; then
     echo "  center-web 就绪"
   else
-    echo "  center-web 未就绪（日志 /tmp/warp-insight-center-web-demo.log），跳过，不影响演示。"
+    echo "  center-web 未就绪（日志 /tmp/center-web-demo.log），跳过，不影响演示。"
     CENTER_WEB_PID=""
   fi
 }

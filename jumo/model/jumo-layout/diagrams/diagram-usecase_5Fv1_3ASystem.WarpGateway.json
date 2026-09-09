@@ -4,21 +4,37 @@
     "y": 0.0
   },
   "nodes": {
-    "actor:Control.WarpGateway": {
-      "x": 1292.5352,
-      "y": 198.75
-    },
-    "usecase:System.WarpGateway.RegisterToInsightCenter": {
-      "x": 619.72266,
+    "usecase:System.WarpGateway.InitializeGatewayViaUrl": {
+      "x": 341.58203,
       "y": 307.96875
+    },
+    "usecase:System.WarpGateway.ShowAgentRuntimeStatus": {
+      "x": 765.7383,
+      "y": 395.22656
+    },
+    "usecase:System.WarpGateway.InitGatewayViaInitialConfig": {
+      "x": 709.3906,
+      "y": 178.23828
     },
     "usecase:System.WarpGateway.ReportGatewayStatus": {
       "x": 632.3594,
       "y": 77.95703
     },
-    "usecase:System.WarpGateway.InitializeGatewayViaUrl": {
-      "x": 341.58203,
+    "usecase:System.WarpGateway.GetAgentOverview": {
+      "x": 561.77344,
+      "y": 586.41797
+    },
+    "usecase:System.WarpGateway.RegisterToInsightCenter": {
+      "x": 619.72266,
       "y": 307.96875
+    },
+    "actor:Control.AdminOperator": {
+      "x": 90.0,
+      "y": 488.21875
+    },
+    "actor:Control.WarpGateway": {
+      "x": 1292.5352,
+      "y": 198.75
     },
     "usecase:System.WarpGateway.PauseAgent": {
       "x": 736.47656,
@@ -27,22 +43,6 @@
     "usecase:System.WarpGateway.RenewGatewayCredential": {
       "x": 1004.6172,
       "y": 570.78516
-    },
-    "usecase:System.WarpGateway.ShowAgentRuntimeStatus": {
-      "x": 765.7383,
-      "y": 395.22656
-    },
-    "usecase:System.WarpGateway.GetAgentOverview": {
-      "x": 561.77344,
-      "y": 586.41797
-    },
-    "usecase:System.WarpGateway.InitGatewayViaInitialConfig": {
-      "x": 709.3906,
-      "y": 178.23828
-    },
-    "actor:Control.AdminOperator": {
-      "x": 90.0,
-      "y": 488.21875
     }
   },
   "sizes": {

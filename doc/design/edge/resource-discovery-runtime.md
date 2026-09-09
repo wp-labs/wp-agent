@@ -15,20 +15,20 @@
 - 中心侧资源目录归并
 - 任意 shell 或远程动作式发现
 - 具体某一类 metrics collector 的字段细节
-- `warp-insight-exec` 的 opcode 设计
+- `wist-exec` 的 opcode 设计
 
 相关文档：
 
 - [`discovery-runtime-current-state.md`](discovery-runtime-current-state.md)
-- [`agentd-architecture.md`](agentd-architecture.md)
-- [`agentd-state-and-boundaries.md`](agentd-state-and-boundaries.md)
-- [`agentd-failure-handling.md`](agentd-failure-handling.md)
-- [`capability-report-schema.md`](capability-report-schema.md)
+- [`agentd-architecture.md`](../../crates/warp-agentd/docs/agentd-architecture.md)
+- [`agentd-state-and-boundaries.md`](../../crates/warp-agentd/docs/agentd-state-and-boundaries.md)
+- [`agentd-failure-handling.md`](../../crates/warp-agentd/docs/agentd-failure-handling.md)
+- [`capability-report-schema.md`](../../crates/warp-agentd/docs/capability-report-schema.md)
 - [`../center/report-discovery-snapshot-schema.md`](../center/report-discovery-snapshot-schema.md)
 - [`../foundation/architecture.md`](../foundation/architecture.md)
 - [`../foundation/roadmap.md`](../foundation/roadmap.md)
 - [`../telemetry/metrics-discovery-and-resource-mapping.md`](../telemetry/metrics-discovery-and-resource-mapping.md)
-- [`self-observability.md`](self-observability.md)
+- [`self-observability.md`](../../crates/warp-agentd/docs/self-observability.md)
 
 ---
 
@@ -36,7 +36,7 @@
 
 第一版固定以下结论：
 
-- `discovery` 是 `warp-insightd` 的常驻运行时能力，不是 `warp-insight-exec` 的任务
+- `discovery` 是 `warp-insightd` 的常驻运行时能力，不是 `wist-exec` 的任务
 - `discovery` 负责产出本地事实，不直接决定“现在要采哪些 target”
 - `discovery` 必须可持续 refresh，不是只在启动时做一次同步大扫描
 - `discovery` 结果必须可同时服务数据面和控制面
@@ -93,12 +93,12 @@
 - 用临时 shell 命令执行发现逻辑
 - 阻塞 daemon 主启动流程直到全量扫描结束
 
-### 3.3 与 `warp-insight-exec` 的关系
+### 3.3 与 `wist-exec` 的关系
 
 第一版应明确：
 
-- `warp-insight-exec` 不承载 discovery 本体
-- `warp-insight-exec` 最多只承载只读导出类 opcode
+- `wist-exec` 不承载 discovery 本体
+- `wist-exec` 最多只承载只读导出类 opcode
 - 不允许把常驻 discovery 建模成“反复执行的 action task”
 
 原因是：
@@ -1055,7 +1055,7 @@ state/telemetry/metrics_samples.json
 
 当前阶段固定以下结论：
 
-1. `discovery` 归属 `warp-insightd`，不归属 `warp-insight-exec`
+1. `discovery` 归属 `warp-insightd`，不归属 `wist-exec`
 2. `discovery` 是常驻运行时，不是一次性任务
 3. `discovery` 只产出本地事实与 target 候选，不直接做采集决策
 4. `discovery` 状态独立于 execution 状态树

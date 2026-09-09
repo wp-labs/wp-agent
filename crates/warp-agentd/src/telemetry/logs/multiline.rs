@@ -2,7 +2,7 @@
 
 use crate::state_store::log_checkpoint_state::PendingMultilineState;
 
-use super::file_reader::RawFileLine;
+use crate::telemetry::logs::files::file_reader::RawFileLine;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MultilineMode {
@@ -106,7 +106,7 @@ fn starts_with_indent(text: &str) -> bool {
 mod tests {
     use super::{MultilineMode, flush_pending, fold_lines};
     use crate::state_store::log_checkpoint_state::PendingMultilineState;
-    use crate::telemetry::logs::file_reader::RawFileLine;
+    use crate::telemetry::logs::files::file_reader::RawFileLine;
 
     #[test]
     fn indented_mode_keeps_last_group_pending_until_next_tick() {

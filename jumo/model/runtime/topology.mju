@@ -4,7 +4,7 @@ node WarpGatewayHost {
   meta {
     label zh "WarpGateway节点"
     label en "WarpGateway Host"
-    summary zh "在线业务区内的 WarpGateway 控制平台节点，运行 WarpGateway 前端 WEB、后端 WEB 服务接口和控制中心；数据平台能力由托管服务区承载。WarpGateway 实例接入上级 WarpInsightCenter 聚合控制中心，接收全局策略与控制指令。"
+    summary zh "在线业务区内的 WarpGateway 控制平台节点，运行 WarpGateway 前端 WEB、后端 WEB 服务接口和控制中心；数据平台能力由托管服务区承载。WarpGateway 实例接入上级 WistCenter 聚合控制中心，接收全局策略与控制指令。"
     tags "center", "online-business-zone", "control-plane", "warp-gateway"
   }
 }
@@ -13,7 +13,7 @@ node AgentHost1 {
   meta {
     label zh "业务节点1"
     label en "Agent Host 1"
-    summary zh "在线业务区内已经存在的业务服务器节点，安装 WpAgent 后运行 warp-agentd 和 warp-insight-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
+    summary zh "在线业务区内已经存在的业务服务器节点，安装 WarpAgentd 后运行其 warp-agentd 守护进程与 wist-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
     tags "edge", "online-business-zone", "existing-host"
   }
 }
@@ -22,7 +22,7 @@ node AgentHost2 {
   meta {
     label zh "现有业务服务器节点 2"
     label en "Agent Host 2"
-    summary zh "在线业务区内已经存在的业务服务器节点，安装 WpAgent 后运行 warp-agentd 和 warp-insight-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
+    summary zh "在线业务区内已经存在的业务服务器节点，安装 WarpAgentd 后运行其 warp-agentd 守护进程与 wist-upgrader，集成本机 OS、进程、网络、容器运行时、业务日志、本地状态与 spool 资源，负责本地发现、采集、缓冲、上送和受控升级。"
     tags "edge", "online-business-zone", "existing-host"
   }
 }
@@ -89,11 +89,11 @@ network ManagedServiceZone {
 bind AgentHost1ControlClient to AgentHost1 with topology
 bind AgentHost2ControlClient to AgentHost2 with topology
 bind ManagedServiceHostControlClient to ManagedServiceHost with topology
-// Agent 主机部署 WpAgent：先绑 agent 数据面模块，再绑管理节点，使控制面模块
+// Agent 主机部署 WarpAgentd：先绑 agent 数据面模块，再绑管理节点，使控制面模块
 // 最终归属管理节点，Agent 节点保留 Discovery/Observed/Reporting 数据面。
 bind warp-agentd-bin to AgentHost1 with topology
 bind warp-agentd-bin to AgentHost2 with topology
-bind warp-gateway-web to WarpGatewayHost with topology
+bind gateway-web to WarpGatewayHost with topology
 bind warp-gateway to WarpGatewayHost with topology
 
 // 节点间关系：Agent 主动连接管理节点控制通道。

@@ -6,12 +6,12 @@ profile HttpRust for warp-gateway.target<bin,http> {
   path "crates/warp-gateway"
 }
 
-profile WebTs for warp-gateway-web.target<site,web> {
+profile WebTs for gateway-web.target<site,web> {
   language typescript
   runtime browser
   deps react, vite
   scaffold dto, client, route
-  path "crates/warp-gateway-web"
+  path "crates/gateway-web"
 }
 
 profile HttpRust for warp-insight-center.target<bin,http> {

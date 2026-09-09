@@ -7,14 +7,14 @@ use std::path::Path;
 use std::process::Command;
 
 use serde::{Deserialize, Serialize};
-use warp_insight_contracts::discovery::StringKeyValue;
-use warp_insight_shared::fs::write_json_atomic;
+use wist_contracts::discovery::StringKeyValue;
+use wist_shared::fs::write_json_atomic;
 
 #[cfg(test)]
 use super::target_view::path_for as target_view_path_for;
 use super::target_view::{MetricsTargetView, MetricsTargetViewEntry};
 #[cfg(test)]
-use warp_insight_shared::fs::read_json;
+use wist_shared::fs::read_json;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ::jumo_derive::Jumo)]
 #[serde(deny_unknown_fields)]
@@ -632,7 +632,7 @@ mod tests {
 
     use super::{MetricsRuntimeSnapshot, build_runtime_snapshot, path_for, store};
     use crate::telemetry::metrics::target_view::{MetricsTargetView, MetricsTargetViewEntry};
-    use warp_insight_contracts::discovery::StringKeyValue;
+    use wist_contracts::discovery::StringKeyValue;
 
     fn temp_dir(name: &str) -> PathBuf {
         let suffix = SystemTime::now()
@@ -793,7 +793,7 @@ mod tests {
 
         store(&snapshot_path, &snapshot).expect("store runtime snapshot");
         let loaded: MetricsRuntimeSnapshot =
-            warp_insight_shared::fs::read_json(&snapshot_path).expect("load runtime snapshot");
+            wist_shared::fs::read_json(&snapshot_path).expect("load runtime snapshot");
 
         assert_eq!(loaded, snapshot);
     }

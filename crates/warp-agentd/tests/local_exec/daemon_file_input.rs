@@ -5,12 +5,12 @@ use std::thread;
 use std::time::Duration;
 
 use serde::Deserialize;
-use warp_insight_contracts::agent_config::{DiscoverySection, LogFileInputSection};
-use warp_insight_contracts::discovery::{
+use wist_contracts::agent_config::{DiscoverySection, LogFileInputSection};
+use wist_contracts::discovery::{
     CandidateCollectionTarget, DiscoveredResource, DiscoveredTarget, DiscoveryCacheMeta,
 };
-use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
-use warp_insight_shared::fs::read_json;
+use wist_contracts::telemetry_record::TelemetryRecordContract;
+use wist_shared::fs::read_json;
 use warp_agentd::bootstrap;
 use warp_agentd::daemon;
 use warp_agentd::self_observability::DiscoveryReadiness;
@@ -55,7 +55,7 @@ struct TestMetricsCollectionOutcome {
     succeeded_targets: usize,
     failed_targets: usize,
     last_error: Option<String>,
-    runtime_facts: Vec<warp_insight_contracts::discovery::StringKeyValue>,
+    runtime_facts: Vec<wist_contracts::discovery::StringKeyValue>,
     sample_targets: Vec<TestMetricsCollectionTargetSample>,
 }
 
@@ -85,7 +85,7 @@ fn daemon_run_once_processes_configured_file_input() {
 
     let output_path = root.join("log").join("warp-parse-records.ndjson");
     let output = fs::read_to_string(&output_path).expect("read output");
-    let records: Vec<warp_insight_contracts::telemetry_record::TelemetryRecordContract> = output
+    let records: Vec<wist_contracts::telemetry_record::TelemetryRecordContract> = output
         .lines()
         .filter(|line| !line.trim().is_empty())
         .map(|line| serde_json::from_str(line).expect("parse telemetry record"))
@@ -422,7 +422,7 @@ fn daemon_run_once_continues_when_discovery_cache_store_fails() {
 
     let output_path = root.join("log").join("warp-parse-records.ndjson");
     let output = fs::read_to_string(&output_path).expect("read output");
-    let records: Vec<warp_insight_contracts::telemetry_record::TelemetryRecordContract> = output
+    let records: Vec<wist_contracts::telemetry_record::TelemetryRecordContract> = output
         .lines()
         .filter(|line| !line.trim().is_empty())
         .map(|line| serde_json::from_str(line).expect("parse telemetry record"))
@@ -469,7 +469,7 @@ fn daemon_run_once_rebuilds_when_discovery_cache_is_corrupt() {
 
     let output_path = root.join("log").join("warp-parse-records.ndjson");
     let output = fs::read_to_string(&output_path).expect("read output");
-    let records: Vec<warp_insight_contracts::telemetry_record::TelemetryRecordContract> = output
+    let records: Vec<wist_contracts::telemetry_record::TelemetryRecordContract> = output
         .lines()
         .filter(|line| !line.trim().is_empty())
         .map(|line| serde_json::from_str(line).expect("parse telemetry record"))
@@ -537,7 +537,7 @@ fn daemon_run_once_uses_cached_metrics_snapshot_when_target_view_is_missing() {
         read_json(&runtime_snapshot_path).expect("read runtime snapshot after fallback");
     let output_path = root.join("log").join("warp-parse-records.ndjson");
     let output = fs::read_to_string(&output_path).expect("read output");
-    let records: Vec<warp_insight_contracts::telemetry_record::TelemetryRecordContract> = output
+    let records: Vec<wist_contracts::telemetry_record::TelemetryRecordContract> = output
         .lines()
         .filter(|line| !line.trim().is_empty())
         .map(|line| serde_json::from_str(line).expect("parse telemetry record"))
@@ -668,7 +668,7 @@ fn daemon_run_once_continues_when_one_file_input_fails() {
 
     let output_path = root.join("log").join("warp-parse-records.ndjson");
     let output = fs::read_to_string(&output_path).expect("read output");
-    let records: Vec<warp_insight_contracts::telemetry_record::TelemetryRecordContract> = output
+    let records: Vec<wist_contracts::telemetry_record::TelemetryRecordContract> = output
         .lines()
         .filter(|line| !line.trim().is_empty())
         .map(|line| serde_json::from_str(line).expect("parse telemetry record"))
@@ -805,7 +805,7 @@ fn daemon_run_once_replays_existing_spool_even_when_source_file_is_missing() {
 
     let output_path = root.join("log").join("warp-parse-records.ndjson");
     let output = fs::read_to_string(&output_path).expect("read output");
-    let records: Vec<warp_insight_contracts::telemetry_record::TelemetryRecordContract> = output
+    let records: Vec<wist_contracts::telemetry_record::TelemetryRecordContract> = output
         .lines()
         .filter(|line| !line.trim().is_empty())
         .map(|line| serde_json::from_str(line).expect("parse telemetry record"))

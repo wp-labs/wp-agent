@@ -4,5 +4,5 @@
 #[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
 #[jumo(kind = "message", role = "response", domain = "Reporting", module = "Reporting.Protocol")]
 pub struct ActionResultAccepted {
-    pub receipt: warp_insight_reporting::ActionResultReceipt,
+    pub receipt: wist_reporting::ActionResultReceipt,
 }

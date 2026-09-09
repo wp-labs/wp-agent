@@ -16,9 +16,9 @@
 
 - [`roadmap.md`](roadmap.md)
 - [`glossary.md`](glossary.md)
-- [`../edge/agentd-architecture.md`](../edge/agentd-architecture.md)
-- [`../edge/agentd-state-schema.md`](../edge/agentd-state-schema.md)
-- [`../edge/log-file-state-schema.md`](../edge/log-file-state-schema.md)
+- [`../../crates/warp-agentd/docs/agentd-architecture.md`](../../crates/warp-agentd/docs/agentd-architecture.md)
+- [`../../crates/warp-agentd/docs/agentd-state-schema.md`](../../crates/warp-agentd/docs/agentd-state-schema.md)
+- [`../../crates/warp-agentd/docs/log-file-state-schema.md`](../../crates/warp-agentd/docs/log-file-state-schema.md)
 - [`../execution/action-plan-schema.md`](../execution/action-plan-schema.md)
 - [`../center/agent-gateway-protocol.md`](../center/agent-gateway-protocol.md)
 
@@ -56,13 +56,13 @@
 warp-insight/
   doc/
   crates/
-    warp-insight-contracts/
-    warp-insight-validate/
-    warp-insight-shared/
+    wist-contracts/
+    wist-validate/
+    wist-shared/
     warp-insightd/
-    warp-insight-exec/
-    warp-insight-upgrader/
-    warp-insight-gateway/
+    wist-exec/
+    wist-upgrader/
+    wist-gateway/
     warp-insight-control/
   fixtures/
     contracts/
@@ -75,19 +75,19 @@ warp-insight/
 
 模块角色：
 
-- `warp-insight-contracts/`
+- `wist-contracts/`
   所有 schema 对象、枚举、serde 类型、版本字段
-- `warp-insight-validate/`
+- `wist-validate/`
   独立校验器、约束检查器、负例测试
-- `warp-insight-shared/`
+- `wist-shared/`
   错误码、通用 paths、ids、时间工具、配置加载
 - `warp-insightd/`
   边缘常驻 daemon、state store、scheduler、telemetry runtime
-- `warp-insight-exec/`
+- `wist-exec/`
   `ActionPlan` runtime、opcode dispatch、`ActionResult`
-- `warp-insight-upgrader/`
+- `wist-upgrader/`
   prepare / switch / health-check / rollback
-- `warp-insight-gateway/`
+- `wist-gateway/`
   南向 session、hello、heartbeat、dispatch、ack/result 通道
 - `warp-insight-control/`
   request / approval / compile / sign / dispatch / tracker
@@ -104,12 +104,12 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-contracts/src/action_plan.rs`
-- `crates/warp-insight-contracts/src/action_result.rs`
-- `crates/warp-insight-contracts/src/capability_report.rs`
-- `crates/warp-insight-contracts/src/gateway.rs`
-- `crates/warp-insight-contracts/src/agent_config.rs`
-- `crates/warp-insight-contracts/src/state_exec.rs`
+- `crates/wist-contracts/src/action_plan.rs`
+- `crates/wist-contracts/src/action_result.rs`
+- `crates/wist-contracts/src/capability_report.rs`
+- `crates/wist-contracts/src/gateway.rs`
+- `crates/wist-contracts/src/agent_config.rs`
+- `crates/wist-contracts/src/state_exec.rs`
 
 完成定义：
 
@@ -125,10 +125,10 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-validate/src/action_plan.rs`
-- `crates/warp-insight-validate/src/action_result.rs`
-- `crates/warp-insight-validate/src/config.rs`
-- `crates/warp-insight-validate/src/state.rs`
+- `crates/wist-validate/src/action_plan.rs`
+- `crates/wist-validate/src/action_result.rs`
+- `crates/wist-validate/src/config.rs`
+- `crates/wist-validate/src/state.rs`
 
 完成定义：
 
@@ -174,7 +174,7 @@ warp-insight/
 - 能初始化 `run/`、`state/`、`log/` 目录
 - 能加载配置并进入 `standalone` 常驻主循环
 
-### 4.5 B005 `warp-insight-exec` skeleton
+### 4.5 B005 `wist-exec` skeleton
 
 对应里程碑：
 
@@ -182,10 +182,10 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-exec/src/main.rs`
-- `crates/warp-insight-exec/src/runtime.rs`
-- `crates/warp-insight-exec/src/workdir.rs`
-- `crates/warp-insight-exec/src/result_writer.rs`
+- `crates/wist-exec/src/main.rs`
+- `crates/wist-exec/src/runtime.rs`
+- `crates/wist-exec/src/workdir.rs`
+- `crates/wist-exec/src/result_writer.rs`
 
 完成定义：
 
@@ -193,7 +193,7 @@ warp-insight/
 - 能写出 `state.json` / `result.json`
 - 暂无真实 opcode 也可完成最小空执行
 
-### 4.6 B006 `warp-insight-upgrader` skeleton
+### 4.6 B006 `wist-upgrader` skeleton
 
 对应里程碑：
 
@@ -201,10 +201,10 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-upgrader/src/main.rs`
-- `crates/warp-insight-upgrader/src/prepare.rs`
-- `crates/warp-insight-upgrader/src/switch.rs`
-- `crates/warp-insight-upgrader/src/rollback.rs`
+- `crates/wist-upgrader/src/main.rs`
+- `crates/wist-upgrader/src/prepare.rs`
+- `crates/wist-upgrader/src/switch.rs`
+- `crates/wist-upgrader/src/rollback.rs`
 
 完成定义：
 
@@ -259,8 +259,8 @@ warp-insight/
 建议模块：
 
 - `crates/warp-insightd/src/executor_protocol.rs`
-- `crates/warp-insight-exec/src/protocol.rs`
-- `crates/warp-insight-shared/src/paths.rs`
+- `crates/wist-exec/src/protocol.rs`
+- `crates/wist-shared/src/paths.rs`
 
 完成定义：
 
@@ -279,7 +279,7 @@ warp-insight/
 - `crates/warp-insightd/src/supervisor.rs`
 - `crates/warp-insightd/src/recovery.rs`
 - `crates/warp-insightd/src/self_observability.rs`
-- `crates/warp-insight-shared/src/error_codes.rs`
+- `crates/wist-shared/src/error_codes.rs`
 
 完成定义：
 
@@ -344,7 +344,7 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-shared/src/identity.rs`
+- `crates/wist-shared/src/identity.rs`
 - `crates/warp-insightd/src/identity/mod.rs`
 
 完成定义：
@@ -362,7 +362,7 @@ warp-insight/
 建议模块：
 
 - `crates/warp-insightd/src/identity/enroll.rs`
-- `crates/warp-insight-gateway/src/enroll_api.rs`
+- `crates/wist-gateway/src/enroll_api.rs`
 
 完成定义：
 
@@ -378,8 +378,8 @@ warp-insight/
 建议模块：
 
 - `crates/warp-insightd/src/gateway_client.rs`
-- `crates/warp-insight-gateway/src/session.rs`
-- `crates/warp-insight-gateway/src/lease.rs`
+- `crates/wist-gateway/src/session.rs`
+- `crates/wist-gateway/src/lease.rs`
 
 完成定义：
 
@@ -427,12 +427,12 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-exec/src/opcodes/process.rs`
-- `crates/warp-insight-exec/src/opcodes/socket.rs`
-- `crates/warp-insight-exec/src/opcodes/service.rs`
-- `crates/warp-insight-exec/src/opcodes/file.rs`
-- `crates/warp-insight-exec/src/opcodes/config.rs`
-- `crates/warp-insight-exec/src/opcodes/agent.rs`
+- `crates/wist-exec/src/opcodes/process.rs`
+- `crates/wist-exec/src/opcodes/socket.rs`
+- `crates/wist-exec/src/opcodes/service.rs`
+- `crates/wist-exec/src/opcodes/file.rs`
+- `crates/wist-exec/src/opcodes/config.rs`
+- `crates/wist-exec/src/opcodes/agent.rs`
 
 完成定义：
 
@@ -466,7 +466,7 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-contracts/src/telemetry_record.rs`
+- `crates/wist-contracts/src/telemetry_record.rs`
 - `crates/warp-insightd/src/telemetry/envelope.rs`
 - `crates/warp-insightd/src/telemetry/normalize.rs`
 
@@ -599,9 +599,9 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-upgrader/src/download.rs`
-- `crates/warp-insight-upgrader/src/verify.rs`
-- `crates/warp-insight-upgrader/src/health_check.rs`
+- `crates/wist-upgrader/src/download.rs`
+- `crates/wist-upgrader/src/verify.rs`
+- `crates/wist-upgrader/src/health_check.rs`
 
 完成定义：
 
@@ -615,9 +615,9 @@ warp-insight/
 
 建议模块：
 
-- `crates/warp-insight-validate/src/attestation.rs`
-- `crates/warp-insight-exec/src/allow.rs`
-- `crates/warp-insight-shared/src/error_codes.rs`
+- `crates/wist-validate/src/attestation.rs`
+- `crates/wist-exec/src/allow.rs`
+- `crates/wist-shared/src/error_codes.rs`
 
 完成定义：
 

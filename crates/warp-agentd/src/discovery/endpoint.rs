@@ -5,8 +5,8 @@ use std::collections::BTreeMap;
 #[cfg(target_os = "linux")]
 mod endpoint_linux;
 
-use warp_insight_contracts::discovery::{DiscoveredResource, DiscoveredTarget, DiscoveryOrigin};
-use warp_insight_shared::time::now_rfc3339;
+use wist_contracts::discovery::{DiscoveredResource, DiscoveredTarget, DiscoveryOrigin};
+use wist_shared::time::now_rfc3339;
 
 use super::host::default_host_id;
 use super::{DiscoveryProbe, DiscoveryProbeError, DiscoverySourceKind, ProbeOutput};

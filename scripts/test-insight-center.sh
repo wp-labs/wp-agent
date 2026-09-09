@@ -21,10 +21,10 @@ TEST_RUN_DIR="${REPO_ROOT}/.run/test"
 if ! mkdir -p "${TEST_RUN_DIR}" 2>/dev/null; then
   TEST_RUN_DIR="${TMPDIR:-/tmp}"
 fi
-TMP_ROOT="$(mktemp -d "${TEST_RUN_DIR}/warp-insight-center.XXXXXX")"
+TMP_ROOT="$(mktemp -d "${TEST_RUN_DIR}/wist-center.XXXXXX")"
 STORE_PATH="${TMP_ROOT}/center-store.json"
-CENTER_LOG="${TMP_ROOT}/warp-insight-center.log"
-CENTER_WEB_LOG="${TMP_ROOT}/warp-insight-center-web.log"
+CENTER_LOG="${TMP_ROOT}/wist-center.log"
+CENTER_WEB_LOG="${TMP_ROOT}/center-web.log"
 RESPONSE_JSON="${TMP_ROOT}/response.json"
 CENTER_PID=""
 CENTER_STARTED_BY_SCRIPT=0
@@ -146,7 +146,7 @@ ensure_database() {
     sleep 0.2
   done
   echo "database is not reachable: ${DATABASE_URL}" >&2
-  echo "start it with: docker compose -f ${REPO_ROOT}/crates/warp-insight-center/docker-compose.yml up -d postgres" >&2
+  echo "start it with: docker compose -f ${REPO_ROOT}/crates/wist-center/docker-compose.yml up -d postgres" >&2
   exit 1
 }
 
@@ -158,8 +158,8 @@ start_center() {
   ensure_database
 
   require_cmd cargo
-  echo "center service is not running; building and starting warp-insight-center..."
-  cargo build --manifest-path "${REPO_ROOT}/Cargo.toml" -p warp-insight-center
+  echo "center service is not running; building and starting wist-center..."
+  cargo build --manifest-path "${REPO_ROOT}/Cargo.toml" -p wist-center
 
   (
     cd "${REPO_ROOT}"
@@ -170,7 +170,7 @@ start_center() {
       WARP_INSIGHT_CENTER_STORE_PATH="${STORE_PATH}" \
       WARP_INSIGHT_CENTER_DATABASE_URL="${DATABASE_URL}" \
       WARP_INSIGHT_CENTER_ADMIN_TOKEN="${ADMIN_API_TOKEN}" \
-      "${REPO_ROOT}/target/debug/warp-insight-center" \
+      "${REPO_ROOT}/target/debug/wist-center" \
       >"${CENTER_LOG}" 2>&1
   ) &
   CENTER_PID=$!
@@ -178,20 +178,20 @@ start_center() {
   CENTER_STARTED_BY_SCRIPT=1
   for _ in {1..100}; do
     if ! kill -0 "${CENTER_PID}" 2>/dev/null; then
-      echo "warp-insight-center failed to start; log:" >&2
+      echo "wist-center failed to start; log:" >&2
       cat "${CENTER_LOG}" >&2
       exit 1
     fi
-    if center_ready; then
-      echo "started warp-insight-center pid=${CENTER_PID}"
-      return
-    fi
-    sleep 0.1
-  done
+  if center_ready; then
+    echo "started wist-center pid=${CENTER_PID}"
+    return
+  fi
+  sleep 0.2
+done
 
-  echo "warp-insight-center did not become ready; log:" >&2
-  cat "${CENTER_LOG}" >&2
-  exit 1
+echo "wist-center did not become ready; log:" >&2
+cat "${CENTER_LOG}" >&2
+exit 1
 }
 
 ensure_center() {
@@ -240,15 +240,15 @@ start_center_web_service() {
   port="$(center_web_listen_options | sed -n '2p')"
 
   require_cmd npm
-  if [[ ! -d "${REPO_ROOT}/crates/warp-insight-center-web/node_modules" ]]; then
-    echo "center-web dependencies are missing: crates/warp-insight-center-web/node_modules" >&2
-    echo "run npm install in crates/warp-insight-center-web before running this script." >&2
+  if [[ ! -d "${REPO_ROOT}/crates/center-web/node_modules" ]]; then
+    echo "center-web dependencies are missing: crates/center-web/node_modules" >&2
+    echo "run npm install in crates/center-web before running this script." >&2
     exit 1
   fi
 
-  echo "center-web is not running; starting warp-insight-center-web..."
+  echo "center-web is not running; starting center-web..."
   (
-    cd "${REPO_ROOT}/crates/warp-insight-center-web"
+    cd "${REPO_ROOT}/crates/center-web"
     exec nohup npm run dev -- --host "${host}" --port "${port}" --strictPort \
       >"${CENTER_WEB_LOG}" 2>&1
   ) &
@@ -256,19 +256,19 @@ start_center_web_service() {
 
   for _ in {1..100}; do
     if ! kill -0 "${CENTER_WEB_PID}" 2>/dev/null; then
-      echo "warp-insight-center-web failed to start; log:" >&2
+      echo "center-web failed to start; log:" >&2
       cat "${CENTER_WEB_LOG}" >&2
       exit 1
     fi
     if [[ "$(center_web_status)" == "200" ]]; then
-      echo "started warp-insight-center-web pid=${CENTER_WEB_PID}"
+      echo "started center-web pid=${CENTER_WEB_PID}"
       echo "center web url: ${CENTER_WEB_BASE_URL}"
       return
     fi
     sleep 0.1
   done
 
-  echo "warp-insight-center-web did not become ready; log:" >&2
+  echo "center-web did not become ready; log:" >&2
   cat "${CENTER_WEB_LOG}" >&2
   exit 1
 }
@@ -429,7 +429,7 @@ PY
 require_cmd curl
 require_cmd python3
 
-echo "testing warp-insight-center against ${CENTER_BASE_URL}"
+echo "testing wist-center against ${CENTER_BASE_URL}"
 echo "admin api token: ${ADMIN_API_TOKEN}"
 echo "gateway credentials: ${GATEWAY_CREDENTIALS}"
 if [[ -n "${DATABASE_URL}" ]]; then
@@ -534,7 +534,7 @@ else
   echo "reusing an externally running center; skipping store validation (unknown store path)"
 fi
 
-echo "warp-insight-center test passed"
+echo "wist-center test passed"
 echo "center api url: ${CENTER_BASE_URL}"
 if [[ "${SKIP_CENTER_WEB}" != "1" ]]; then
   echo "center web url: ${CENTER_WEB_BASE_URL}"

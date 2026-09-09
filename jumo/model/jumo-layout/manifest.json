@@ -11,15 +11,20 @@
     "runtime:System.WarpGateway::layer_diagram_v2": "diagrams/diagram-runtime_3ASystem.WarpGateway_3A_3Alayer_5Fdiagram_5Fv2.json",
     "static:Control::layer_diagram_v2": "diagrams/diagram-static_3AControl_3A_3Alayer_5Fdiagram_5Fv2.json",
     "static:Control::package_diagram_v1:Control.Agent": "diagrams/diagram-static_3AControl_3A_3Apackage_5Fdiagram_5Fv1_3AControl.Agent.json",
+    "static:Observed::layer_diagram_v2": "diagrams/diagram-static_3AObserved_3A_3Alayer_5Fdiagram_5Fv2.json",
     "structure_graph_v2::module::Control.Agent.Command": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Agent.Command.json",
     "structure_graph_v2::module::Control.Agent.Enrollment": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Agent.Enrollment.json",
     "structure_graph_v2::module::Control.Agent.Registry": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Agent.Registry.json",
     "structure_graph_v2::module::Control.Agent.Status": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Agent.Status.json",
     "structure_graph_v2::module::Control.Gateway.Supervision": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Gateway.Supervision.json",
     "structure_graph_v2::module::Control.InsightCenter.PlatformRelease": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.InsightCenter.PlatformRelease.json",
+    "structure_graph_v2::module::Observed.Entity": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AObserved.Entity.json",
+    "structure_graph_v2::module::Observed.ServiceTopology": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AObserved.ServiceTopology.json",
+    "structure_graph_v2::module::Telemetry.Signal": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3ATelemetry.Signal.json",
     "usecase_v1:System.InsightSimulator": "diagrams/diagram-usecase_5Fv1_3ASystem.InsightSimulator.json",
     "usecase_v1:System.WarpGateway": "diagrams/diagram-usecase_5Fv1_3ASystem.WarpGateway.json",
     "usecase_v1:System.WarpInsightCenter": "diagrams/diagram-usecase_5Fv1_3ASystem.WarpInsightCenter.json",
+    "usecase_v1:System.WistCenter": "diagrams/diagram-usecase_5Fv1_3ASystem.WistCenter.json",
     "usecase_v1:System.WpAgent": "diagrams/diagram-usecase_5Fv1_3ASystem.WpAgent.json"
   }
 }

@@ -4,38 +4,44 @@
     "y": 0.0
   },
   "nodes": {
-    "node:AgentHost1": {
-      "x": 511.40625,
-      "y": 168.44922
-    },
     "network:OnlineBusinessZone": {
-      "x": 387.47852,
-      "y": 351.78516
-    },
-    "node:ManagedServiceHost": {
-      "x": 916.6875,
-      "y": 530.75
-    },
-    "node:WarpGatewayHost": {
-      "x": 233.26953,
-      "y": 531.83594
+      "x": 448.11914,
+      "y": 360.8203
     },
     "node:AgentHost2": {
-      "x": 524.7383,
-      "y": 356.59375
+      "x": 273.91016,
+      "y": 511.41016
+    },
+    "node:ManagedServiceHost": {
+      "x": 1093.25,
+      "y": 351.78516
+    },
+    "node:AgentHost1": {
+      "x": 273.91016,
+      "y": 221.9961
     },
     "network:ManagedServiceZone": {
-      "x": 916.6875,
-      "y": 508.75
+      "x": 1068.9824,
+      "y": 361.30664
+    },
+    "node:WarpGatewayHost": {
+      "x": 562.3242,
+      "y": 351.78516
     }
   },
   "sizes": {
     "network:OnlineBusinessZone": {
-      "x": 628.41797,
-      "y": 633.89844
+      "x": 749.6992,
+      "y": 651.96875
+    },
+    "network:ManagedServiceZone": {
+      "x": 340.83984,
+      "y": 445.70703
     }
   },
   "scales": {},
-  "fills": {},
+  "fills": {
+    "network:ManagedServiceZone": 4
+  },
   "options": {}
 }

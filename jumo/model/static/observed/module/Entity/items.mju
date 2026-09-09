@@ -59,19 +59,3 @@ struct SocketTableKind {
 struct DiscoverySourceKind {
   variant
 }
-
-struct ObservedLog {
-  unique log_id
-  timestamp
-  content
-  level
-  attributes
-}
-
-struct ObservedMetric {
-  name
-  value
-  timestamp
-  unit
-  attributes
-}

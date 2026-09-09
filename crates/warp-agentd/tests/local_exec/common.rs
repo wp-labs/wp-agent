@@ -8,11 +8,11 @@ use serde::Deserialize;
 use time::Duration as TimeDuration;
 use time::OffsetDateTime;
 use time::format_description::well_known::Rfc3339;
-use warp_insight_contracts::action_plan::{
+use wist_contracts::action_plan::{
     ActionPlanConstraints, ActionPlanContract, ActionPlanMeta, ActionPlanProgram, ActionPlanStep,
     ActionPlanTarget, ApprovalMode, RiskLevel,
 };
-use warp_insight_contracts::agent_config::{
+use wist_contracts::agent_config::{
     AgentConfigContract, AgentSection, ControlPlaneSection, ExecutionSection, LogFileInputSection,
     LogsFileOutputSection, LogsOutputSection, LogsSection, LogsTcpOutputSection, PathsSection,
     TelemetrySection,
@@ -44,11 +44,11 @@ pub(crate) fn test_exec_bin(root: &Path) -> PathBuf {
         .parent()
         .and_then(|p| p.parent())
         .expect("workspace root");
-    let wrapper = root.join("warp-insight-exec-wrapper.sh");
+    let wrapper = root.join("wist-exec-wrapper.sh");
     fs::write(
         &wrapper,
         format!(
-            "#!/bin/sh\ncd \"{}\"\nexec cargo run -q -p warp-insight-exec -- \"$@\"\n",
+            "#!/bin/sh\ncd \"{}\"\nexec cargo run -q -p wist-exec -- \"$@\"\n",
             workspace_root.display()
         ),
     )
@@ -63,7 +63,7 @@ pub(crate) fn test_exec_bin(root: &Path) -> PathBuf {
 
 #[cfg(unix)]
 pub(crate) fn write_exec_wrapper(root: &Path, body: &str) -> PathBuf {
-    let wrapper = root.join("warp-insight-exec-test-wrapper.sh");
+    let wrapper = root.join("wist-exec-test-wrapper.sh");
     fs::write(&wrapper, format!("#!/bin/sh\n{body}\n")).expect("write wrapper");
     let mut perms = fs::metadata(&wrapper)
         .expect("wrapper metadata")

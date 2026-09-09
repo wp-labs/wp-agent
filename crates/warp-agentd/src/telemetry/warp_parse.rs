@@ -6,9 +6,9 @@ use std::path::PathBuf;
 use tokio::fs::OpenOptions;
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
-use warp_insight_contracts::agent_config::LogsOutputSection;
-use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
-use warp_insight_shared::fs::ensure_parent;
+use wist_contracts::agent_config::LogsOutputSection;
+use wist_contracts::telemetry_record::TelemetryRecordContract;
+use wist_shared::fs::ensure_parent;
 
 pub(crate) trait RecordSink {
     async fn write_records(&mut self, records: &[TelemetryRecordContract]) -> io::Result<()>;
@@ -210,7 +210,7 @@ mod tests {
     use tokio::net::TcpListener;
 
     use super::{FileRecordSink, RecordSink, TcpFraming, TcpRecordSink, build_payload_bytes};
-    use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
+    use wist_contracts::telemetry_record::TelemetryRecordContract;
 
     fn record(body: &str) -> TelemetryRecordContract {
         TelemetryRecordContract::new_log(

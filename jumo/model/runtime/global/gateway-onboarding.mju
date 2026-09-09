@@ -5,7 +5,7 @@
 // 客户服务工程师（CustomerServiceEngineer）在客户现场下载/安装；WarpGateway 实例的动作由网关侧
 // 单入口 flow（GetGatewayInitialConfigFlow / RegisterGatewayFlow / ReportGatewayStatusFlow /
 // RenewGatewayCredentialFlow）承载，此处以 WarpGateway 泳道标注时间线。
-// 泳道：中心（WarpInsightCenter）与网关（WarpGateway）两侧。
+// 泳道：中心（WistCenter）与网关（WarpGateway）两侧。
 // 业务管理员创建实例；客户服务工程师下载安装；中心签发引导、置备派生、签发运行期凭据；
 // WarpGateway 实例安装完成后持一次性引导 Token 置备、注册、周期上报。
 domain Control
@@ -13,14 +13,14 @@ flow GatewayOnboardingFlow {
   meta {
     label zh "Gateway 接入整体流程"
     label en "Gateway Onboarding Flow"
-    summary zh "WarpGateway 从中心创建、客户现场下载/安装、init 置备、注册到运行期上报/续期的端到端编排；业务管理员（BusinessAdministrator）中心侧创建、客户服务工程师（CustomerServiceEngineer）现场部署；泳道：中心（WarpInsightCenter）/ 网关（WarpGateway）。"
+    summary zh "WarpGateway 从中心创建、客户现场下载/安装、init 置备、注册到运行期上报/续期的端到端编排；业务管理员（BusinessAdministrator）中心侧创建、客户服务工程师（CustomerServiceEngineer）现场部署；泳道：中心（WistCenter）/ 网关（WarpGateway）。"
     tags "gateway", "onboarding", "enrollment"
   }
 
   actor BusinessAdministrator
   actor CustomerServiceEngineer
 
-  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+  lane WistCenter for Control.InsightCenterApp.WistCenter
   lane WarpGateway for Control.GatewayApp.Application
 
   depends GatewayBootstrapToken, ControlCenterTrustBundle
@@ -31,20 +31,20 @@ flow GatewayOnboardingFlow {
 
   // ① 业务管理员经中心管理台创建实例——由 AdminCreateGatewayInstanceFlow.CreateInstance 承载；
   // 本步骤是时间线标记（创建动作不在本 flow 重复），不消费实例。
-  step CreateGatewayInstance in WarpInsightCenter by AdminCreateGatewayInstance {
+  step CreateGatewayInstance in WistCenter by AdminCreateGatewayInstance {
     next IssueBootstrapToken
   }
 
   // ② 中心签发一次性置备引导 Token（BOOTSTRAP_TOKEN，只存 sha256，短 TTL，绑定实例）——由
   // AdminCreateGatewayInstanceFlow.IssueBootstrapToken 承载；本步骤是时间线标记，不消费 token。
-  step IssueBootstrapToken in WarpInsightCenter {
+  step IssueBootstrapToken in WistCenter {
     next RevealBootstrapToken
   }
 
   // ③ 中心经 admin 页面一次性展示引导 Token 明文给工程师（只存 sha256；明文仅此一次展示、
   // 不入 create API 响应）。token 已在系统内（② 签发），展示即读取系统内记录，无需外部输入；
   // 工程师线下携带、安装时注入容器。分发通道保密即 B 方案安全基石。
-  step RevealBootstrapToken in WarpInsightCenter {
+  step RevealBootstrapToken in WistCenter {
     next DownloadGatewayImage
   }
 
@@ -79,7 +79,7 @@ flow GatewayOnboardingFlow {
   // ⑦ 中心校验并一次性消费引导 Token（Bearer bootstrap）：比对 token_hash、校验 gateway_id 与
   // instance_id 绑定、未超期（超期 status → Expired）；消费后 status → Consumed、used_count+1，防重放。
   // 仅 lifecycle_state = Provisioned 的实例可 init，校验通过后迁移 → Initializing，防止已初始化实例重复置备。
-  step ValidateBootstrapToken in WarpInsightCenter {
+  step ValidateBootstrapToken in WistCenter {
     next CallInitUrl
   }
 
@@ -89,7 +89,7 @@ flow GatewayOnboardingFlow {
   // 回传（网关已校验中心证书，见 ⑥）；config 携带控制中心端点、TLS 强制开关与信任包（运行期轮换用，
   // init 校验用信任包见 ⑤）；enrollment_token_id 即后续注册时提交的 REGIST_TOKEN 来源，注册流程校验并
   // 一次性消费。
-  step CallInitUrl in WarpInsightCenter {
+  step CallInitUrl in WistCenter {
     receive GatewayBootstrapToken from input
     create GatewayEnrollmentToken {
       token_id = "enroll-regist-001"

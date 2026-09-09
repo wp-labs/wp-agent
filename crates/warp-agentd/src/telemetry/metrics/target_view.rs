@@ -4,8 +4,8 @@ use std::io;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
-use warp_insight_contracts::discovery::{CandidateCollectionTarget, StringKeyValue};
-use warp_insight_shared::fs::write_json_atomic;
+use wist_contracts::discovery::{CandidateCollectionTarget, StringKeyValue};
+use wist_shared::fs::write_json_atomic;
 
 use crate::state_store::planner_candidates;
 
@@ -75,8 +75,8 @@ mod tests {
     use std::path::PathBuf;
     use std::time::{SystemTime, UNIX_EPOCH};
 
-    use warp_insight_contracts::discovery::{CandidateCollectionTarget, StringKeyValue};
-    use warp_insight_shared::fs::read_json;
+    use wist_contracts::discovery::{CandidateCollectionTarget, StringKeyValue};
+    use wist_shared::fs::read_json;
 
     use super::{build_metrics_target_view, path_for, store};
     use crate::state_store::planner_candidates;

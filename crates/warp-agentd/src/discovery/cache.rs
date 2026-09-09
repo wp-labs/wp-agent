@@ -3,8 +3,8 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
-use warp_insight_contracts::discovery::{DiscoveryCacheMeta, DiscoverySnapshotContract};
-use warp_insight_shared::fs::{read_json, write_json_atomic};
+use wist_contracts::discovery::{DiscoveryCacheMeta, DiscoverySnapshotContract};
+use wist_shared::fs::{read_json, write_json_atomic};
 
 pub const DISCOVERY_STATE_DIR: &str = "discovery";
 pub const DISCOVERY_RESOURCES_FILE: &str = "resources.json";
@@ -145,7 +145,7 @@ mod tests {
     use std::path::PathBuf;
     use std::time::{SystemTime, UNIX_EPOCH};
 
-    use warp_insight_contracts::discovery::{DiscoveryCacheMeta, DiscoverySnapshotContract};
+    use wist_contracts::discovery::{DiscoveryCacheMeta, DiscoverySnapshotContract};
 
     use super::{DiscoveryCachePaths, load_meta, load_snapshot, store_snapshot};
 

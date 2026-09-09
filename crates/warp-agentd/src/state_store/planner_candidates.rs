@@ -3,8 +3,8 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
-use warp_insight_contracts::discovery::CandidateCollectionTarget;
-use warp_insight_shared::fs::{read_json, write_json_atomic};
+use wist_contracts::discovery::CandidateCollectionTarget;
+use wist_shared::fs::{read_json, write_json_atomic};
 
 const PLANNER_DIR: &str = "planner";
 const HOST_METRICS_CANDIDATES_FILE: &str = "host_metrics_candidates.json";
@@ -46,7 +46,7 @@ mod tests {
     use std::path::PathBuf;
     use std::time::{SystemTime, UNIX_EPOCH};
 
-    use warp_insight_contracts::discovery::CandidateCollectionTarget;
+    use wist_contracts::discovery::CandidateCollectionTarget;
 
     use super::{host_metrics_path_for, load_or_default, process_metrics_path_for, store};
 

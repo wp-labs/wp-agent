@@ -1,6 +1,6 @@
 // warp-insight 生成与部署目标
-// WarpInsightCenter 全局控制中心前端 WEB。
+// WistCenter 全局控制中心前端 WEB。
 
-target<site,web> warp-insight-center-web {
+target<site,web> center-web {
   modules Control.InsightCenterApp.InsightCenterWeb
 }

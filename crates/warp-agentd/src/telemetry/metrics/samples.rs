@@ -161,7 +161,7 @@ fn map_runtime_fact_to_metric(
 
 #[cfg(test)]
 mod tests {
-    use warp_insight_contracts::discovery::StringKeyValue;
+    use wist_contracts::discovery::StringKeyValue;
 
     use super::build_samples_snapshot;
     use crate::telemetry::metrics::runtime::{

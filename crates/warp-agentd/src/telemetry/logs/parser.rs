@@ -1,6 +1,6 @@
 //! Conversion from folded lines into structured telemetry records.
 
-use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
+use wist_contracts::telemetry_record::TelemetryRecordContract;
 
 use super::multiline::FoldedLine;
 

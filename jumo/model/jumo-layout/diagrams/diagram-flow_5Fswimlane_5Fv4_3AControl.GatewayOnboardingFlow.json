@@ -4,113 +4,113 @@
     "y": -85.22708
   },
   "nodes": {
-    "step:ReceiveRuntimeCredential": {
-      "x": 902.3242,
-      "y": 1298.0
-    },
-    "input:1:Control.ControlCenterTrustBundle": {
-      "x": 560.0625,
-      "y": 652.7344
-    },
-    "input:4:Control.GatewayEnrollmentToken": {
-      "x": 578.65234,
-      "y": 1192.3867
-    },
-    "actor:Control.BusinessAdministrator": {
-      "x": 175.71875,
-      "y": 186.0
-    },
-    "lane:participant:Control.BusinessAdministrator": {
-      "x": 180.0,
-      "y": 0.0
-    },
-    "create:2:Control.GatewayStatusAccepted": {
-      "x": 1245.5391,
-      "y": 1400.5078
-    },
-    "input:5:Control.GatewayCredentialBundle": {
-      "x": 593.4922,
-      "y": 1297.4336
-    },
-    "step:DownloadGatewayImage": {
-      "x": 902.3242,
-      "y": 492.0
-    },
-    "step:RevealBootstrapToken": {
-      "x": 541.6367,
-      "y": 390.0
-    },
-    "create:1:Control.GatewayInitialConfig": {
-      "x": 902.3242,
-      "y": 997.8711
-    },
-    "input:0:Control.GatewayBootstrapToken": {
-      "x": 560.0625,
-      "y": 571.78906
-    },
-    "lane:participant:Control.CustomerServiceEngineer": {
-      "x": 1263.8242,
-      "y": 0.0
-    },
     "actor:Control.CustomerServiceEngineer": {
       "x": 1237.9062,
       "y": 492.0
-    },
-    "step:ApplyInitialConfig": {
-      "x": 902.3242,
-      "y": 1094.0
-    },
-    "lane:WarpGateway": {
-      "x": 902.3242,
-      "y": 0.0
-    },
-    "step:SubmitRegistration": {
-      "x": 902.3242,
-      "y": 1196.0
-    },
-    "step:ValidateBootstrapToken": {
-      "x": 541.6367,
-      "y": 844.0
-    },
-    "input:3:Control.GatewayInitialConfig": {
-      "x": 578.65234,
-      "y": 1093.9336
-    },
-    "step:CreateGatewayInstance": {
-      "x": 541.6367,
-      "y": 186.0
-    },
-    "step:ReportGatewayStatus": {
-      "x": 902.3242,
-      "y": 1400.0
-    },
-    "lane:WarpInsightCenter": {
-      "x": 541.6367,
-      "y": 0.0
-    },
-    "step:VerifyCenterTls": {
-      "x": 902.3242,
-      "y": 742.0
-    },
-    "input:2:Control.GatewayBootstrapToken": {
-      "x": 278.63672,
-      "y": 969.0
     },
     "step:InstallGatewayContainer": {
       "x": 902.3242,
       "y": 617.0
     },
+    "input:2:Control.GatewayBootstrapToken": {
+      "x": 278.63672,
+      "y": 969.0
+    },
+    "step:ValidateBootstrapToken": {
+      "x": 541.6367,
+      "y": 844.0
+    },
+    "step:VerifyCenterTls": {
+      "x": 902.3242,
+      "y": 742.0
+    },
     "step:IssueBootstrapToken": {
       "x": 541.6367,
       "y": 288.0
+    },
+    "actor:Control.BusinessAdministrator": {
+      "x": 175.71875,
+      "y": 186.0
+    },
+    "step:CallInitUrl": {
+      "x": 541.6367,
+      "y": 969.0
+    },
+    "step:ApplyInitialConfig": {
+      "x": 902.3242,
+      "y": 1094.0
+    },
+    "step:SubmitRegistration": {
+      "x": 902.3242,
+      "y": 1196.0
+    },
+    "step:ReportGatewayStatus": {
+      "x": 902.3242,
+      "y": 1400.0
+    },
+    "input:0:Control.GatewayBootstrapToken": {
+      "x": 560.0625,
+      "y": 571.78906
+    },
+    "input:4:Control.GatewayEnrollmentToken": {
+      "x": 578.65234,
+      "y": 1192.3867
+    },
+    "step:RevealBootstrapToken": {
+      "x": 541.6367,
+      "y": 390.0
+    },
+    "step:DownloadGatewayImage": {
+      "x": 902.3242,
+      "y": 492.0
+    },
+    "create:2:Control.GatewayStatusAccepted": {
+      "x": 1245.5391,
+      "y": 1400.5078
     },
     "create:0:Control.GatewayEnrollmentToken": {
       "x": 902.3242,
       "y": 934.0625
     },
-    "step:CallInitUrl": {
+    "lane:participant:Control.CustomerServiceEngineer": {
+      "x": 1263.8242,
+      "y": 0.0
+    },
+    "input:1:Control.ControlCenterTrustBundle": {
+      "x": 560.0625,
+      "y": 652.7344
+    },
+    "lane:participant:Control.BusinessAdministrator": {
+      "x": 180.0,
+      "y": 0.0
+    },
+    "create:1:Control.GatewayInitialConfig": {
+      "x": 902.3242,
+      "y": 997.8711
+    },
+    "lane:WarpGateway": {
+      "x": 902.3242,
+      "y": 0.0
+    },
+    "input:3:Control.GatewayInitialConfig": {
+      "x": 578.65234,
+      "y": 1093.9336
+    },
+    "lane:WarpInsightCenter": {
       "x": 541.6367,
-      "y": 969.0
+      "y": 0.0
+    },
+    "step:CreateGatewayInstance": {
+      "x": 541.6367,
+      "y": 186.0
+    },
+    "input:5:Control.GatewayCredentialBundle": {
+      "x": 593.4922,
+      "y": 1297.4336
+    },
+    "step:ReceiveRuntimeCredential": {
+      "x": 902.3242,
+      "y": 1298.0
     }
   },
   "sizes": {},

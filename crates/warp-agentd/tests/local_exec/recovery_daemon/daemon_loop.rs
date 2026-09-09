@@ -1,6 +1,6 @@
 use std::fs;
 
-use warp_insight_shared::fs::{read_json, write_json_atomic};
+use wist_shared::fs::{read_json, write_json_atomic};
 use warp_agentd::bootstrap;
 use warp_agentd::daemon;
 use warp_agentd::scheduler::{SchedulerRequest, submit_local_plan};

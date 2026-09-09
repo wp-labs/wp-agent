@@ -1,0 +1,13 @@
+[package]
+name = "wist-security"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+jumo-core = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-core" }
+jumo-derive = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-derive" }
+serde = { version = "1", features = ["derive"] }
+chrono = { version = "0.4", features = ["serde"] }
+wist-shared = { path = "../wist-shared" }

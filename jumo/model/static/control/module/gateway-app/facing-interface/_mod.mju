@@ -2,12 +2,12 @@ module<interface> GatewayApp.FacingInterface {
   meta {
     label zh "Gateway 侧服务接口"
     label en "Gateway Facing Service Interface"
-    summary zh "WarpInsightCenter 面向各 WarpGateway 实例暴露的 HTTP 接口，承载初始配置获取与状态上报。"
+    summary zh "WistCenter 面向各 WarpGateway 实例暴露的 HTTP 接口，承载初始配置获取与状态上报。"
     tags "gateway-facing", "gateway", "bootstrap", "status", "backend", "http", "interface"
   }
 
   layer Application
-  provides WarpInsightCenterGatewayInterface by protocol<http>
+  provides WistCenterGatewayInterface by protocol<http>
   depends Control.Gateway.Supervision
   depends Control.Agent.Status
 }

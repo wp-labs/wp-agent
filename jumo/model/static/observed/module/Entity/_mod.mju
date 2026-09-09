@@ -2,7 +2,7 @@ module Entity {
   meta {
     label zh "被观测实体"
     label en "Observed Entity"
-    summary zh "负责进程、网络接口、IP、服务端点、容器、文件身份、socket owner 和运行时根等原始实体，以及日志、指标等被观测信号。"
+    summary zh "负责进程、网络接口、IP、服务端点、容器、文件身份、socket owner 和运行时根等原始实体模型。"
     tags "observed", "entity"
   }
 

@@ -13,7 +13,7 @@ use ring::{
     signature::{self, Ed25519KeyPair, KeyPair},
 };
 use tower::ServiceExt;
-use warp_insight_contracts::enrollment::{
+use wist_contracts::enrollment::{
     AgentCredentialRenewed, AgentEnrollmentResultReturned, AgentEnrollmentResultStatus,
     AgentIdentityStatus, RenewAgentCredential, SubmitEnrollmentRequest,
 };
@@ -24,7 +24,7 @@ use crate::infra::{
 };
 use insight_control::types::DateTime;
 use insight_control::{AgentHello, PollControlCommands, ReportActionResult};
-use warp_insight_reporting::ResultAttestation;
+use wist_reporting::ResultAttestation;
 
 use super::{
     enrollment::{
@@ -216,7 +216,7 @@ fn install_script_signature_rejects_modified_script_body() {
 fn initial_config_is_valid_agent_config_contract_with_scoped_token() {
     let env = TestEnv::new();
     let text = agent_initial_config_toml(&env.config, "install-token-a");
-    let parsed: warp_insight_contracts::agent_config::AgentConfigContract =
+    let parsed: wist_contracts::agent_config::AgentConfigContract =
         toml::from_str(&text).expect("valid agent config toml");
 
     assert_eq!(parsed.schema_version, "v1");
@@ -274,7 +274,7 @@ fn initial_config_preserves_multiline_trust_bundle_as_valid_toml() {
         .expect("trust_bundle line");
     assert!(trust_bundle_line.contains("\\n"));
 
-    let parsed: warp_insight_contracts::agent_config::AgentConfigContract =
+    let parsed: wist_contracts::agent_config::AgentConfigContract =
         toml::from_str(&text).expect("valid agent config toml");
     assert_eq!(parsed.control_plane.trust_bundle, Some(trust_bundle));
 }
@@ -1293,7 +1293,7 @@ fn enrollment_request(token: &str) -> SubmitEnrollmentRequest {
         kind: "submit_enrollment_request".to_string(),
         token: token.to_string(),
         credential_request: "none".to_string(),
-        host_profile: warp_insight_contracts::enrollment::AgentHostProfile {
+        host_profile: wist_contracts::enrollment::AgentHostProfile {
             node_id: "node-a".to_string(),
             hostname: "host-a".to_string(),
             os: "linux".to_string(),

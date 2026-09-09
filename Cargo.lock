@@ -1544,10 +1544,10 @@ dependencies = [
  "jumo-core",
  "jumo-derive 0.1.3",
  "serde",
- "warp-insight-observed",
- "warp-insight-reporting",
- "warp-insight-security",
- "warp-insight-shared",
+ "wist-observed",
+ "wist-reporting",
+ "wist-security",
+ "wist-shared",
 ]
 
 [[package]]
@@ -1559,8 +1559,8 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
- "warp-insight-reporting",
- "warp-insight-shared",
+ "wist-reporting",
+ "wist-shared",
 ]
 
 [[package]]
@@ -1616,6 +1616,15 @@ dependencies = [
 [[package]]
 name = "jumo-derive"
 version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d13031db93a0130ba158ff7f58fce8e21e80f5e2f149546ac081efb8dd44354"
+dependencies = [
+ "jumo-derive-macros 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "jumo-derive"
+version = "0.1.3"
 source = "git+https://github.com/jumo-design/jumo-derive.git?branch=main#09a7a178be817aa7e3b23ee23a23251332c9e834"
 dependencies = [
  "jumo-derive-macros 0.1.0 (git+https://github.com/jumo-design/jumo-derive.git?branch=main)",
@@ -1624,6 +1633,17 @@ dependencies = [
 [[package]]
 name = "jumo-derive-macros"
 version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "jumo-derive-macros"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "faf1e38722eb62938f49051682ccce8d44fabfafe81ab329299eea936901e03e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3247,8 +3267,7 @@ dependencies = [
 name = "warp-agentd"
 version = "0.1.1"
 dependencies = [
- "jumo-core",
- "jumo-derive 0.1.3",
+ "jumo-derive 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc",
  "reqwest",
  "serde",
@@ -3256,9 +3275,9 @@ dependencies = [
  "time",
  "tokio",
  "toml",
- "warp-insight-contracts",
- "warp-insight-shared",
- "warp-insight-validate",
+ "wist-contracts",
+ "wist-shared",
+ "wist-validate",
 ]
 
 [[package]]
@@ -3271,8 +3290,7 @@ dependencies = [
  "hyper 1.11.0",
  "hyper-util",
  "insight-control",
- "jumo-core",
- "jumo-derive 0.1.3",
+ "jumo-derive 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "ring",
  "rustls 0.23.42",
  "rustls-pki-types",
@@ -3283,115 +3301,8 @@ dependencies = [
  "tokio-rustls 0.26.4",
  "toml",
  "tower",
- "warp-insight-contracts",
- "warp-insight-reporting",
-]
-
-[[package]]
-name = "warp-insight-center"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "aws-sdk-s3",
- "axum",
- "chrono",
- "http-body-util",
- "insight-control",
- "jumo-core",
- "jumo-derive 0.1.3",
- "reqwest",
- "ring",
- "serde",
- "serde_json",
- "sqlx",
- "tokio",
- "tower",
- "warp-insight-contracts",
- "warp-insight-observed",
- "warp-insight-reporting",
- "warp-insight-security",
-]
-
-[[package]]
-name = "warp-insight-contracts"
-version = "0.1.1"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "warp-insight-exec"
-version = "0.1.1"
-dependencies = [
- "serde",
- "warp-insight-contracts",
- "warp-insight-shared",
- "warp-insight-validate",
-]
-
-[[package]]
-name = "warp-insight-gateway"
-version = "0.1.1"
-dependencies = [
- "warp-insight-contracts",
-]
-
-[[package]]
-name = "warp-insight-observed"
-version = "0.1.1"
-dependencies = [
- "chrono",
- "jumo-core",
- "jumo-derive 0.1.3",
- "serde",
- "warp-insight-shared",
-]
-
-[[package]]
-name = "warp-insight-reporting"
-version = "0.1.1"
-dependencies = [
- "chrono",
- "jumo-core",
- "jumo-derive 0.1.3",
- "serde",
- "warp-insight-shared",
-]
-
-[[package]]
-name = "warp-insight-security"
-version = "0.1.1"
-dependencies = [
- "chrono",
- "jumo-core",
- "jumo-derive 0.1.3",
- "serde",
- "warp-insight-shared",
-]
-
-[[package]]
-name = "warp-insight-shared"
-version = "0.1.1"
-dependencies = [
- "chrono",
- "serde",
- "serde_json",
- "time",
-]
-
-[[package]]
-name = "warp-insight-upgrader"
-version = "0.1.1"
-
-[[package]]
-name = "warp-insight-validate"
-version = "0.1.1"
-dependencies = [
- "serde_json",
- "time",
- "toml",
- "warp-insight-contracts",
+ "wist-contracts",
+ "wist-reporting",
 ]
 
 [[package]]
@@ -3723,6 +3634,112 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23b97319f7b8343df12cc98938e5c3eb436064524c8d2b4e30a1d3a36eecdf81"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "wist-center"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "aws-sdk-s3",
+ "axum",
+ "chrono",
+ "http-body-util",
+ "insight-control",
+ "jumo-derive 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "reqwest",
+ "ring",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "tower",
+ "wist-contracts",
+ "wist-observed",
+ "wist-reporting",
+ "wist-security",
+]
+
+[[package]]
+name = "wist-contracts"
+version = "0.1.1"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "wist-exec"
+version = "0.1.1"
+dependencies = [
+ "serde",
+ "wist-contracts",
+ "wist-shared",
+ "wist-validate",
+]
+
+[[package]]
+name = "wist-gateway"
+version = "0.1.1"
+dependencies = [
+ "wist-contracts",
+]
+
+[[package]]
+name = "wist-observed"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "jumo-core",
+ "jumo-derive 0.1.3",
+ "serde",
+ "wist-shared",
+]
+
+[[package]]
+name = "wist-reporting"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "jumo-core",
+ "jumo-derive 0.1.3",
+ "serde",
+ "wist-shared",
+]
+
+[[package]]
+name = "wist-security"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "jumo-core",
+ "jumo-derive 0.1.3",
+ "serde",
+ "wist-shared",
+]
+
+[[package]]
+name = "wist-shared"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "time",
+]
+
+[[package]]
+name = "wist-upgrader"
+version = "0.1.1"
+
+[[package]]
+name = "wist-validate"
+version = "0.1.1"
+dependencies = [
+ "serde_json",
+ "time",
+ "toml",
+ "wist-contracts",
 ]
 
 [[package]]

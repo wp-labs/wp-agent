@@ -3,8 +3,8 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
-use warp_insight_shared::fs::{ensure_parent, read_json, write_json_atomic};
-use warp_insight_shared::time::now_rfc3339;
+use wist_shared::fs::{ensure_parent, read_json, write_json_atomic};
+use wist_shared::time::now_rfc3339;
 
 use crate::state_store::log_checkpoint_state::LogCheckpointState;
 

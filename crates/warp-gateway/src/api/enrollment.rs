@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
-use warp_insight_contracts::enrollment::{
+use wist_contracts::enrollment::{
     AgentCredentialBundle, AgentEnrollmentResult, AgentEnrollmentResultReturned,
     AgentEnrollmentResultStatus, AgentIdentity, AgentIdentityStatus, SubmitEnrollmentRequest,
 };

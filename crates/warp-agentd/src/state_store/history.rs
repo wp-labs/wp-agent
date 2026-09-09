@@ -4,9 +4,9 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
-use warp_insight_contracts::SCHEMA_VERSION_V1;
-use warp_insight_shared::fs::{read_json, write_json_atomic};
-use warp_insight_shared::time::now_rfc3339;
+use wist_contracts::SCHEMA_VERSION_V1;
+use wist_shared::fs::{read_json, write_json_atomic};
+use wist_shared::time::now_rfc3339;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ::jumo_derive::Jumo)]
 #[serde(deny_unknown_fields)]

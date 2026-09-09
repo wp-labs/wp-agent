@@ -1,5 +1,5 @@
 // Module: GatewayIdentity — WarpGateway 身份与凭据生命周期
-// 对应 AgentIdentity：WarpGateway 实例接入 WarpInsightCenter 后的稳定身份。
+// 对应 AgentIdentity：WarpGateway 实例接入 WistCenter 后的稳定身份。
 // 身份实体事实；续期、校验命令与流程由后续逻辑模块承载。
 
 struct GatewayIdentity {

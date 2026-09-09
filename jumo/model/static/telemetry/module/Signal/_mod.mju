@@ -1,0 +1,10 @@
+module<entity> Signal {
+  meta {
+    label zh "信号数据模型"
+    label en "Telemetry Signal"
+    summary zh "负责被观测对象产出的日志(LogRecord)、指标(MetricPoint)等信号记录数据模型；信号通过 resource_ref 关联 Observed 被观测对象。"
+    tags "telemetry", "signal", "data-plane"
+  }
+
+  layer Domain
+}

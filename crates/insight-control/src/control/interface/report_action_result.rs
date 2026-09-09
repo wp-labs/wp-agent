@@ -7,7 +7,7 @@ pub struct ReportActionResult {
     pub execution_id: String,
     pub kind: String,
     pub agent_id: String,
-    pub result_attestation: warp_insight_reporting::ResultAttestation,
+    pub result_attestation: wist_reporting::ResultAttestation,
     pub action_id: String,
     pub reported_at: crate::control::types::DateTime,
     pub final_status: String,

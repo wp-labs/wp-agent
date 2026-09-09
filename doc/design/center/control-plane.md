@@ -68,14 +68,14 @@
 - 上报能力与状态
 - 接收已签名的最终计划
 - 校验来源、签名、过期时间和 capability
-- 拉起 `warp-insight-exec` 或 `warp-insight-upgrader`
+- 拉起 `wist-exec` 或 `wist-upgrader`
 - 回传状态和结果
 
 ### 3.3 边界原则
 
 - 边缘不负责编排审批
 - 边缘不直接理解作者 DSL
-- 中心不直接控制 `warp-insight-exec`
+- 中心不直接控制 `wist-exec`
 - 高风险动作必须经过控制平面完整链路
 
 ---
@@ -592,7 +592,7 @@ running -> succeeded | failed | cancelled
 5. 校验本机 capability
 6. 校验本地当前状态是否允许执行
 7. 生成本地 `execution_id`
-8. 拉起 `warp-insight-exec`
+8. 拉起 `wist-exec`
 
 ### 10.2 接收升级计划时
 
@@ -602,7 +602,7 @@ running -> succeeded | failed | cancelled
 2. 校验签名和版本来源
 3. 校验本机状态、磁盘和 buffer 门槛
 4. 生成本地升级执行上下文
-5. 拉起 `warp-insight-upgrader`
+5. 拉起 `wist-upgrader`
 
 ### 10.3 本地拒绝条件
 
@@ -737,7 +737,7 @@ running -> succeeded | failed | cancelled
 - 一个围绕 `request -> approval -> compile -> dispatch -> execute -> report -> audit` 的治理闭环
 - 中心节点负责控制对象生成与状态机推进
 - `warp-insightd` 只消费最终计划，不消费作者 DSL
-- `warp-insight-exec` 与 `warp-insight-upgrader` 不直接挂接中心控制面
+- `wist-exec` 与 `wist-upgrader` 不直接挂接中心控制面
 - 所有关键对象都必须有稳定主键、状态和审计关联
 
 如果控制平面做不好，前面已经设计好的 `control/run` 分离、审批、风险分层、最小权限和边缘确定性都很难真正落地。

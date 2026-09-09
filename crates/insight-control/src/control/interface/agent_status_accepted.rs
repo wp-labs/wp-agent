@@ -4,5 +4,5 @@
 #[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
 #[jumo(kind = "message", role = "response", domain = "Reporting", module = "Reporting.Protocol")]
 pub struct AgentStatusAccepted {
-    pub snapshot: warp_insight_reporting::RuntimeHealthSnapshot,
+    pub snapshot: wist_reporting::RuntimeHealthSnapshot,
 }

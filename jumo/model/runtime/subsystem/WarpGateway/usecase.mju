@@ -31,11 +31,11 @@ usecase InitGatewayViaInitialConfig {
   flow Control.GetGatewayInitialConfigFlow
 }
 
-// 注册到 WarpInsightCenter（消费 RegistToken → 签发独立运行期凭据）
+// 注册到 WistCenter（消费 RegistToken → 签发独立运行期凭据）
 usecase RegisterToInsightCenter {
   meta {
-    label zh "注册到 WarpInsightCenter"
-    label en "Register to WarpInsightCenter"
+    label zh "注册到 WistCenter"
+    label en "Register to WistCenter"
     summary zh "WarpGateway 持 config.toml 中的 RegistToken 注册：center 消费注册凭据并签发独立运行期凭据（RUNTIME_TOKEN），网关进入中心监管视图。"
     tags "gateway", "register", "credential", "supervision"
   }

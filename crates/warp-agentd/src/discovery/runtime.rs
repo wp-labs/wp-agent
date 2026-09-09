@@ -3,8 +3,8 @@
 use std::io;
 use std::path::Path;
 
-use warp_insight_contracts::discovery::{DiscoveryCacheMeta, DiscoverySnapshotContract};
-use warp_insight_shared::time::now_rfc3339;
+use wist_contracts::discovery::{DiscoveryCacheMeta, DiscoverySnapshotContract};
+use wist_shared::time::now_rfc3339;
 
 use super::DiscoveryProbe;
 use super::cache::{
@@ -203,7 +203,7 @@ mod tests {
     use std::time::{Duration, SystemTime};
     use std::{fs, path::PathBuf};
 
-    use warp_insight_contracts::discovery::{
+    use wist_contracts::discovery::{
         DiscoveredResource, DiscoveryOrigin, DiscoverySnapshotContract,
     };
 

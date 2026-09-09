@@ -10,7 +10,7 @@
 # 可覆盖 env：CENTER_URL / GATEWAY_ID / IDENTITY_TOKEN / IMAGE
 #   IDENTITY_TOKEN：网关自生成身份（X-Gateway-Identity-Token），默认 sim-identity-<gateway_id>。
 #
-# 前置：warp-insight-center 已运行，且该 gateway 已创建（create 时签发 bootstrap token）。
+# 前置：wist-center 已运行，且该 gateway 已创建（create 时签发 bootstrap token）。
 
 set -euo pipefail
 
@@ -77,7 +77,7 @@ http_code="$(curl -s -o "${resp_tmp}" -w '%{http_code}' \
   -H "X-Gateway-Identity-Token: ${IDENTITY_TOKEN}")"
 if [[ "${http_code}" != "200" ]]; then
   if [[ "${http_code}" == "429" ]]; then
-    echo "  中心限流（429）：失败鉴权累积过多。请重启 warp-insight-center 清空限流，或用未 onboard 的新网关重试。" >&2
+    echo "  中心限流（429）：失败鉴权累积过多。请重启 wist-center 清空限流，或用未 onboard 的新网关重试。" >&2
   else
     echo "  初始化失败：HTTP ${http_code} body=$(cat "${resp_tmp}")" >&2
     echo "  提示：该网关可能已 onboard（bootstrap 已消费）；请用新网关或新 bootstrap 重试。" >&2

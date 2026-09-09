@@ -1,7 +1,7 @@
 //! Private file-input checkpoint state persisted by `warp-agentd`.
 
 use serde::{Deserialize, Serialize};
-use warp_insight_contracts::SCHEMA_VERSION_V1;
+use wist_contracts::SCHEMA_VERSION_V1;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ::jumo_derive::Jumo)]
 #[serde(deny_unknown_fields)]

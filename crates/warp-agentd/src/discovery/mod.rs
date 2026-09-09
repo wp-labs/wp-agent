@@ -11,7 +11,7 @@ pub mod runtime;
 
 use std::time::SystemTime;
 
-use warp_insight_contracts::discovery::{DiscoveredResource, DiscoveredTarget, DiscoveryOrigin};
+use wist_contracts::discovery::{DiscoveredResource, DiscoveredTarget, DiscoveryOrigin};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DiscoverySourceKind {

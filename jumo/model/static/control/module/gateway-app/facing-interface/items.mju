@@ -1,6 +1,6 @@
 // Module: GatewayFacingInterface — Gateway 侧服务接口
 //
-// WarpInsightCenter 面向各 WarpGateway 实例暴露的接入入口。
+// WistCenter 面向各 WarpGateway 实例暴露的接入入口。
 // 请求消息（GetGatewayInitialConfig / ReportGatewayStatus）与结果结构
 // （GatewayInitialConfig / GatewayStatusAccepted）由 GatewaySupervision 建模，
 // 本接口引用它们作为 wire 契约，并定义响应消息与接入流程。
@@ -36,11 +36,11 @@ struct GatewayInitializationStatus {
   initialized: Bool
 }
 
-interface WarpInsightCenterGatewayInterface {
+interface WistCenterGatewayInterface {
   meta {
-    label zh "WarpInsightCenter 网关接入接口"
-    label en "WarpInsightCenter Gateway Access Interface"
-    summary zh "WarpGateway 实例安装后主动访问的接入入口，获取初始配置并定期上报状态，供 WarpInsightCenter 全局聚合与控制。"
+    label zh "WistCenter 网关接入接口"
+    label en "WistCenter Gateway Access Interface"
+    summary zh "WarpGateway 实例安装后主动访问的接入入口，获取初始配置并定期上报状态，供 WistCenter 全局聚合与控制。"
     tags "gateway", "gateway-facing", "bootstrap", "status", "http", "interface"
   }
 
@@ -90,7 +90,7 @@ flow GetGatewayInitialConfigFlow {
 
   actor WarpGateway
 
-  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+  lane WistCenter for Control.InsightCenterApp.WistCenter
 
   depends GatewayIdentity, GatewayBootstrapToken
 
@@ -105,13 +105,13 @@ flow GetGatewayInitialConfigFlow {
   // ① 中心校验并一次性消费引导 Token（Bearer bootstrap）：比对 token_hash、校验 gateway_id 与
   // instance_id 绑定；消费后 status → Consumed、used_count+1；仅未初始化（Provisioned）实例可 init，
   // 防重放与重复置备。
-  step ValidateBootstrapToken in WarpInsightCenter {
+  step ValidateBootstrapToken in WistCenter {
     next DeriveRegistToken
   }
 
   // ② 中心基于引导 Token 校验结果签发注册凭据 RegistToken，落 enrollment token（hash）供 /register 消费。
   // instance_id 用 fixture 值，与 AdminCreateGatewayInstanceFlow 创建实例的 instance_id 按约定对齐。
-  step DeriveRegistToken in WarpInsightCenter {
+  step DeriveRegistToken in WistCenter {
     create GatewayEnrollmentToken {
       token_id = "enroll-regist-001"
       gateway_id = "gateway-issued"
@@ -127,7 +127,7 @@ flow GetGatewayInitialConfigFlow {
   }
 
   // ③ 中心构建初始配置：config 绑定网关身份与实例、注册 Token 引用，携带控制中心信任包（公钥）。
-  step<stop> BuildInitialConfig in WarpInsightCenter {
+  step<stop> BuildInitialConfig in WistCenter {
     create GatewayInitialConfig {
       gateway_id = "gateway-issued"
       instance_id = "gw-inst-001"
@@ -231,7 +231,7 @@ flow ReportGatewayStatusFlow {
 
   actor WarpGateway
 
-  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+  lane WistCenter for Control.InsightCenterApp.WistCenter
 
   creates GatewayStatusAccepted
 
@@ -241,7 +241,7 @@ flow ReportGatewayStatusFlow {
   }
 
   // 中心接收并落库状态，返回回执。
-  step<stop> AcceptStatusReport in WarpInsightCenter {
+  step<stop> AcceptStatusReport in WistCenter {
     create GatewayStatusAccepted {
       gateway_id = ReportGatewayStatus.gateway_id
       instance_id = ReportGatewayStatus.instance_id

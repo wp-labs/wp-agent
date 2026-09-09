@@ -74,7 +74,7 @@
 
 ### 3.4 不把远程 action 当采集主路径
 
-metrics 采集不能通过 `warp-insight-exec` 临时执行命令来补。
+metrics 采集不能通过 `wist-exec` 临时执行命令来补。
 
 metrics integration 必须属于 `warp-insightd` 常驻数据面能力。
 
@@ -348,7 +348,7 @@ AI 适合加速以下研发工作：
 
 也就是说：
 
-- metrics integration 不是 `warp-insight-exec` 工作
+- metrics integration 不是 `wist-exec` 工作
 - metrics integration 是 `warp-insightd` 数据面主线
 
 ---

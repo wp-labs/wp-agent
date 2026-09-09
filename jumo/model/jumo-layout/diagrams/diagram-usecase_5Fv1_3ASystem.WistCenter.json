@@ -1,0 +1,20 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "nodes": {
+    "actor:Control.PlatformMaintenanceEngineer": {
+      "x": 671.72266,
+      "y": 645.0768
+    },
+    "actor:Control.WarpGateway": {
+      "x": 942.48047,
+      "y": 673.2709
+    }
+  },
+  "sizes": {},
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

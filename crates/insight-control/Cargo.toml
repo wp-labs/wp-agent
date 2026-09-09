@@ -10,10 +10,10 @@ jumo-core = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-c
 jumo-derive = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-derive" }
 serde = { version = "1", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
-warp-insight-shared = { path = "../warp-insight-shared" }
-warp-insight-observed = { path = "../warp-insight-observed" }
-warp-insight-security = { path = "../warp-insight-security" }
-warp-insight-reporting = { path = "../warp-insight-reporting" }
+wist-shared = { path = "../wist-shared" }
+wist-observed = { path = "../wist-observed" }
+wist-security = { path = "../wist-security" }
+wist-reporting = { path = "../wist-reporting" }
 
 [lib]
 path = "src/lib.rs"

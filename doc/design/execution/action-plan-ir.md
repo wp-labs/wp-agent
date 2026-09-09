@@ -31,7 +31,7 @@
 
 - 作者输入可以有多种 frontend
 - 中心节点只把 frontend 编译到统一 IR
-- `warp-insightd` / `warp-insight-exec` 只接受 IR
+- `warp-insightd` / `wist-exec` 只接受 IR
 - 边缘不解析 DSL，不执行脚本，不解释字符串表达式
 
 一句话说：

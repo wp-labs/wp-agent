@@ -1,0 +1,396 @@
+{
+  "domain": "WarpInsightCenter",
+  "crate_name": "center-web",
+  "types": {
+    "states": [],
+    "variants": [],
+    "views": [
+      {
+        "name": "GatewayStatusView",
+        "fields": [
+          { "name": "gatewayId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "instanceId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "version", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "status", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "health", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "lastSeenAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "GatewayListView",
+        "fields": [
+          { "name": "gatewayCount", "ts_type": "number", "unique": false, "optional": false },
+          { "name": "onlineCount", "ts_type": "number", "unique": false, "optional": false },
+          { "name": "degradedCount", "ts_type": "number", "unique": false, "optional": false },
+          { "name": "offlineCount", "ts_type": "number", "unique": false, "optional": false },
+          { "name": "updatedAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "GatewayInstance",
+        "fields": [
+          { "name": "gatewayId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "instanceId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "status", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "createdAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "GatewayCustomerBinding",
+        "fields": [
+          { "name": "gatewayId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "customerId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "status", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "boundAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "GatewayInitialConfig",
+        "fields": [
+          { "name": "controlCenterEndpoint", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "policyVersion", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "telemetryOutput", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "WarpAgentdRelease",
+        "fields": [
+          { "name": "version", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "artifactUrl", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "status", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "publishedAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "WarpGateWayRelease",
+        "fields": [
+          { "name": "version", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "artifactUrl", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "status", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "publishedAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "UpgradePlan",
+        "fields": [
+          { "name": "planId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "component", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "targetVersion", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "targetCount", "ts_type": "number", "unique": false, "optional": false },
+          { "name": "status", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "createdAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "UpgradePlanApproval",
+        "fields": [
+          { "name": "planId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "status", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "approvedBy", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "approvedAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "GlobalPolicyDispatch",
+        "fields": [
+          { "name": "dispatchId", "ts_type": "string", "unique": true, "optional": false },
+          { "name": "policyVersion", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "targetCount", "ts_type": "number", "unique": false, "optional": false },
+          { "name": "status", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "dispatchedAt", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      }
+    ],
+    "events": [
+      {
+        "name": "CreateGatewayInstanceRequested",
+        "fields": [
+          { "name": "gatewayName", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "requestedBy", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "BindGatewayCustomerRequested",
+        "fields": [
+          { "name": "gatewayId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "customerId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "requestedBy", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "GetGatewayInitialConfigRequested",
+        "fields": [
+          { "name": "instanceId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "requestedBy", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "PublishWarpAgentdRequested",
+        "fields": [
+          { "name": "version", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "artifactUrl", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "requestedBy", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "PublishWarpGateWayRequested",
+        "fields": [
+          { "name": "version", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "artifactUrl", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "requestedBy", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "CreateUpgradePlanRequested",
+        "fields": [
+          { "name": "component", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "targetVersion", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "gatewayIds", "ts_type": "string[]", "unique": false, "optional": false },
+          { "name": "requestedBy", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      },
+      {
+        "name": "ApproveUpgradePlanRequested",
+        "fields": [
+          { "name": "planId", "ts_type": "string", "unique": false, "optional": false },
+          { "name": "approvedBy", "ts_type": "string", "unique": false, "optional": false }
+        ]
+      }
+    ],
+    "messages": []
+  },
+  "regions": [
+    {
+      "name": "GlobalTopNavigation",
+      "orientation": "horizontal",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayListPage",
+      "orientation": "vertical",
+      "contains": [
+        { "region": "GlobalTopNavigation", "prop_name": "globalTopNavigation", "slot_fills": [] },
+        { "region": "GatewayStatusList", "prop_name": "gatewayStatusList", "slot_fills": [] }
+      ],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayStatusList",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": {
+        "region": "GatewayStatusCard",
+        "item": "gateway",
+        "data_path": "gatewayStatusView",
+        "separator": null
+      }
+    },
+    {
+      "name": "GatewayStatusCard",
+      "orientation": "grid",
+      "contains": [
+        { "region": "GatewayInstanceText", "prop_name": "gatewayInstanceText", "slot_fills": [] },
+        { "region": "GatewayVersionText", "prop_name": "gatewayVersionText", "slot_fills": [] },
+        { "region": "GatewayOnlineStatusBadge", "prop_name": "gatewayOnlineStatusBadge", "slot_fills": [] },
+        { "region": "GatewayHealthBadge", "prop_name": "gatewayHealthBadge", "slot_fills": [] },
+        { "region": "GatewayLastSeenAtText", "prop_name": "gatewayLastSeenAtText", "slot_fills": [] }
+      ],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayInstanceText",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayVersionText",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayOnlineStatusBadge",
+      "orientation": "horizontal",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayHealthBadge",
+      "orientation": "horizontal",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayLastSeenAtText",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayInstancePage",
+      "orientation": "vertical",
+      "contains": [
+        { "region": "GlobalTopNavigation", "prop_name": "globalTopNavigation", "slot_fills": [] },
+        { "region": "GatewayInstanceCreatePanel", "prop_name": "gatewayInstanceCreatePanel", "slot_fills": [] },
+        { "region": "GatewayCustomerBindPanel", "prop_name": "gatewayCustomerBindPanel", "slot_fills": [] }
+      ],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayInstanceCreatePanel",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [
+        { "op": "onSubmit", "handler_name": "onSubmit", "emit_event": "CreateGatewayInstanceRequested" }
+      ],
+      "repeat": null
+    },
+    {
+      "name": "GatewayCustomerBindPanel",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [
+        { "op": "onSubmit", "handler_name": "onSubmit", "emit_event": "BindGatewayCustomerRequested" }
+      ],
+      "repeat": null
+    },
+    {
+      "name": "GatewayConfigPage",
+      "orientation": "vertical",
+      "contains": [
+        { "region": "GlobalTopNavigation", "prop_name": "globalTopNavigation", "slot_fills": [] },
+        { "region": "GatewayInitialConfigPanel", "prop_name": "gatewayInitialConfigPanel", "slot_fills": [] }
+      ],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "GatewayInitialConfigPanel",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [
+        { "op": "onSubmit", "handler_name": "onSubmit", "emit_event": "GetGatewayInitialConfigRequested" }
+      ],
+      "repeat": null
+    },
+    {
+      "name": "ReleasePage",
+      "orientation": "vertical",
+      "contains": [
+        { "region": "GlobalTopNavigation", "prop_name": "globalTopNavigation", "slot_fills": [] },
+        { "region": "WarpAgentdReleasePanel", "prop_name": "warpAgentdReleasePanel", "slot_fills": [] },
+        { "region": "WarpGateWayReleasePanel", "prop_name": "warpGateWayReleasePanel", "slot_fills": [] }
+      ],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "WarpAgentdReleasePanel",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [
+        { "op": "onSubmit", "handler_name": "onSubmit", "emit_event": "PublishWarpAgentdRequested" }
+      ],
+      "repeat": null
+    },
+    {
+      "name": "WarpGateWayReleasePanel",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [
+        { "op": "onSubmit", "handler_name": "onSubmit", "emit_event": "PublishWarpGateWayRequested" }
+      ],
+      "repeat": null
+    },
+    {
+      "name": "UpgradePlanPage",
+      "orientation": "vertical",
+      "contains": [
+        { "region": "GlobalTopNavigation", "prop_name": "globalTopNavigation", "slot_fills": [] },
+        { "region": "UpgradePlanCreatePanel", "prop_name": "upgradePlanCreatePanel", "slot_fills": [] },
+        { "region": "UpgradePlanApprovePanel", "prop_name": "upgradePlanApprovePanel", "slot_fills": [] }
+      ],
+      "when": null,
+      "layout_props": [],
+      "interactions": [],
+      "repeat": null
+    },
+    {
+      "name": "UpgradePlanCreatePanel",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [
+        { "op": "onSubmit", "handler_name": "onSubmit", "emit_event": "CreateUpgradePlanRequested" }
+      ],
+      "repeat": null
+    },
+    {
+      "name": "UpgradePlanApprovePanel",
+      "orientation": "vertical",
+      "contains": [],
+      "when": null,
+      "layout_props": [],
+      "interactions": [
+        { "op": "onSubmit", "handler_name": "onSubmit", "emit_event": "ApproveUpgradePlanRequested" }
+      ],
+      "repeat": null
+    }
+  ],
+  "flows": [],
+  "interfaces": [],
+  "modules": [],
+  "profile": {
+    "language": "typescript",
+    "framework": "react",
+    "deps": ["react", "vite", "chrono"],
+    "dev_deps": ["typescript", "@types/react", "@types/react-dom", "vite", "@vitejs/plugin-react", "prettier"]
+  }
+}

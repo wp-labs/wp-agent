@@ -1,6 +1,6 @@
 // Flows: AdminFacingInterface — 全局控制中心管理接口编排流程
 //
-// WarpInsightCenter 管理接口（forAdmin）的全部编排流程定义。
+// WistCenter 管理接口（forAdmin）的全部编排流程定义。
 // 与 admin-facing-interface.mju 拆分：接口契约（命令/响应/接口条目）保留在
 // admin-facing-interface.mju，本文件承载该接口的全部流程。流程仍归属
 // module<interface> InsightCenterApp.AdminFacingInterface。
@@ -13,7 +13,7 @@
 flow AdminCreateGatewayInstanceFlow {
   // 泳道：责任归属——实例创建与 token 签发均由中心 Application 层编排执行；
   // BusinessAdministrator 仅作为流程发起者（actor），不执行具体步骤。
-  lane Center for Control.InsightCenterApp.WarpInsightCenter
+  lane Center for Control.InsightCenterApp.WistCenter
 
   meta {
     label zh "创建网关实例"

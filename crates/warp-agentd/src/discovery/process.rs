@@ -8,8 +8,8 @@ use std::process::Command;
 
 use std::collections::BTreeMap;
 
-use warp_insight_contracts::discovery::{DiscoveredResource, DiscoveredTarget, DiscoveryOrigin};
-use warp_insight_shared::time::now_rfc3339;
+use wist_contracts::discovery::{DiscoveredResource, DiscoveredTarget, DiscoveryOrigin};
+use wist_shared::time::now_rfc3339;
 
 use crate::process_control::process_identity;
 

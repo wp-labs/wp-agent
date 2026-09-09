@@ -1,0 +1,18 @@
+// 日志信号 (OTel Log) — warp-parse 规范化后的一条日志记录。
+struct LogRecord {
+  unique record_id
+  timestamp
+  severity
+  body
+  resource_ref
+}
+
+// 指标信号 (OTel Metric) — warp-parse 规范化后的一个指标数据点。
+struct MetricPoint {
+  unique point_id
+  metric_name
+  value
+  timestamp
+  unit
+  resource_ref
+}

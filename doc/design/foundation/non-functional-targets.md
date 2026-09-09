@@ -15,8 +15,8 @@
 
 - [`target.md`](target.md)
 - [`architecture.md`](architecture.md)
-- [`self-observability.md`](../edge/self-observability.md)
-- [`agent-config-schema.md`](../edge/agent-config-schema.md)
+- [`self-observability.md`](../../crates/warp-agentd/docs/self-observability.md)
+- [`agent-config-schema.md`](../../crates/warp-agentd/docs/agent-config-schema.md)
 
 ---
 
@@ -44,7 +44,7 @@
 - `buffering`
 - `protection`
 
-对应定义见 [`agent-config-schema.md`](../edge/agent-config-schema.md)
+对应定义见 [`agent-config-schema.md`](../../crates/warp-agentd/docs/agent-config-schema.md)
 
 ---
 
@@ -259,7 +259,7 @@
 
 在 `normal` 或 `degraded` 模式下，建议满足：
 
-- 已接受计划到 `warp-insight-exec` 启动：
+- 已接受计划到 `wist-exec` 启动：
   - `p95 <= 2s`
 - cancel 请求到本地 kill / graceful stop 生效：
   - `p95 <= 3s`

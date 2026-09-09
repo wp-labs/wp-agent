@@ -6,7 +6,7 @@ struct ControlCenterTrustBundle {
   meta {
     label zh "控制中心信任包"
     label en "Control Center Trust Bundle"
-    summary zh "WarpGateway 校验 WarpInsightCenter HTTPS 服务端证书的 CA 信任材料（control-center.pem 公钥）与端点约束。"
+    summary zh "WarpGateway 校验 WistCenter HTTPS 服务端证书的 CA 信任材料（control-center.pem 公钥）与端点约束。"
     tags "gateway", "tls", "trust-bundle"
   }
 
@@ -90,7 +90,7 @@ struct GatewayBootstrapToken {
   meta {
     label zh "网关置备引导 Token"
     label en "Gateway Bootstrap Token"
-    summary zh "WarpInsightCenter 创建实例时签发的一次性置备引导凭据：网关调用 initial-config 时以 Bearer 鉴权置备；初始化完成后不可再生成。明文仅 admin 页面一次性展示，不进 create API 响应。"
+    summary zh "WistCenter 创建实例时签发的一次性置备引导凭据：网关调用 initial-config 时以 Bearer 鉴权置备；初始化完成后不可再生成。明文仅 admin 页面一次性展示，不进 create API 响应。"
     tags "gateway", "bootstrap", "token"
   }
 
@@ -123,7 +123,7 @@ struct GatewayCredentialBundle {
   meta {
     label zh "网关通讯凭据"
     label en "Gateway Credential Bundle"
-    summary zh "WarpGateway 注册成功后签发的 bearer 凭据，用于后续访问 WarpInsightCenter 网关接口的认证。"
+    summary zh "WarpGateway 注册成功后签发的 bearer 凭据，用于后续访问 WistCenter 网关接口的认证。"
     tags "gateway", "credential"
   }
 

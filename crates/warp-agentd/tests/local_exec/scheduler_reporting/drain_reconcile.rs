@@ -1,7 +1,7 @@
 use std::fs;
 
-use warp_insight_contracts::action_result::FinalStatus;
-use warp_insight_shared::fs::read_json;
+use wist_contracts::action_result::FinalStatus;
+use wist_shared::fs::read_json;
 use warp_agentd::bootstrap;
 use warp_agentd::local_exec::{LocalExecRequest, execute as execute_local};
 use warp_agentd::reporting_pipeline;
@@ -48,14 +48,14 @@ fn scheduler_drains_queue_and_prepares_report() {
         read_json(&reporting_path).expect("read reporting state");
     let report_envelope_path =
         reporting_pipeline::envelope_path_for(&state_dir, &submitted.execution_id);
-    let report_envelope: warp_insight_contracts::gateway::ReportActionResult =
+    let report_envelope: wist_contracts::gateway::ReportActionResult =
         read_json(&report_envelope_path).expect("read report envelope");
 
     assert!(queue_state.items.is_empty());
     assert!(!running_path.exists());
     assert_eq!(
         outcome.report.final_status,
-        warp_insight_contracts::action_result::FinalStatus::Succeeded
+        wist_contracts::action_result::FinalStatus::Succeeded
     );
     assert_eq!(outcome.report.result.final_status, FinalStatus::Succeeded);
     assert_eq!(reporting_state.final_state, "succeeded");
@@ -384,7 +384,7 @@ fn drain_rebuilds_corrupt_envelope_without_quarantining_execution() {
         execution_queue::load_or_default(&execution_queue::path_for(&state_dir)).expect("queue");
     let rebuilt_reporting_state: reporting::ReportingState =
         read_json(&reporting_path).expect("read reporting state");
-    let rebuilt_envelope: warp_insight_contracts::gateway::ReportActionResult =
+    let rebuilt_envelope: wist_contracts::gateway::ReportActionResult =
         read_json(&envelope_path).expect("read rebuilt envelope");
     let quarantine_path = history::path_for(&state_dir, &submitted.execution_id);
 

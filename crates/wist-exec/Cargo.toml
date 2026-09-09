@@ -1,0 +1,19 @@
+[package]
+name = "wist-exec"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde.workspace = true
+wist-contracts.workspace = true
+wist-shared.workspace = true
+wist-validate.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "wist-exec"
+path = "src/main.rs"

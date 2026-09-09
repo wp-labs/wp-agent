@@ -29,9 +29,9 @@
 - [`action-plan-ir.md`](../execution/action-plan-ir.md)
 - [`action-plan-schema.md`](../execution/action-plan-schema.md)
 - [`action-result-schema.md`](../execution/action-result-schema.md)
-- [`agentd-architecture.md`](../edge/agentd-architecture.md)
-- [`agentd-exec-protocol.md`](../edge/agentd-exec-protocol.md)
-- [`agent-config-schema.md`](../edge/agent-config-schema.md)
+- [`agentd-architecture.md`](../../crates/warp-agentd/docs/agentd-architecture.md)
+- [`agentd-exec-protocol.md`](../../crates/warp-agentd/docs/agentd-exec-protocol.md)
+- [`agent-config-schema.md`](../../crates/warp-agentd/docs/agent-config-schema.md)
 - [`control-plane.md`](../center/control-plane.md)
 - [`control-center-architecture.md`](../center/control-center-architecture.md)
 - [`agent-gateway-protocol.md`](../center/agent-gateway-protocol.md)
@@ -124,7 +124,7 @@
 | M0 | 设计冻结 | 固定关键词、边界、协议对象和第一版范围 |
 | M1 | 契约与 Schema | 冻结核心 schema、版本与校验器 |
 | M2 | Identity / Enrollment Baseline | 固定首次注册、证书、agent 身份与实例语义 |
-| M3 | Edge Runtime Skeleton | 建立支持 `standalone` 的 `warp-insightd` / `warp-insight-exec` / `warp-insight-upgrader` 基础骨架 |
+| M3 | Edge Runtime Skeleton | 建立支持 `standalone` 的 `warp-insightd` / `wist-exec` / `wist-upgrader` 基础骨架 |
 | M4 | Standalone Replacement Slice | 打通 `standalone` 文件日志输入、checkpoint、buffer/spool 与 `warp-parse/file` 输出，验证可替代部分 `Fluent Bit` 工作 |
 | M5 | Gateway Session MVP | 打通 `hello`、heartbeat、capability 和会话管理 |
 | M6 | Controlled Action MVP | 打通本地执行闭环和首批只读 opcode |
@@ -157,8 +157,8 @@
   - 中心节点
 - 固定三进程边界：
   - `warp-insightd`
-  - `warp-insight-exec`
-  - `warp-insight-upgrader`
+  - `wist-exec`
+  - `wist-upgrader`
 - 固定边缘唯一执行输入为 `ActionPlan`
 - 固定南向逻辑协议对象
 - 固定第一版 telemetry / discovery / remote action 的能力边界
@@ -243,8 +243,8 @@
 子任务：
 
 - 建立 `warp-insightd` 常驻进程骨架
-- 建立 `warp-insight-exec` 最小 runtime 骨架
-- 建立 `warp-insight-upgrader` 最小骨架
+- 建立 `wist-exec` 最小 runtime 骨架
+- 建立 `wist-upgrader` 最小骨架
 - 建立 `agentd <-> exec` 本地协议骨架
 - 建立工作目录、状态落盘和生命周期管理
 - 建立基础自观测、错误码和 panic/restart 框架
@@ -336,8 +336,8 @@
 
 - `warp-insightd` 接收 `DispatchActionPlan`
 - `warp-insightd` 做本地校验、排队与调度
-- `warp-insightd` 拉起 `warp-insight-exec`
-- `warp-insight-exec` 执行最小 step runtime
+- `warp-insightd` 拉起 `wist-exec`
+- `wist-exec` 执行最小 step runtime
 - `warp-insightd` 汇总结果并上报 `ActionPlanAck` / `ReportActionResult`
 - 实现首批只读 opcode：
   - `process.list`
@@ -540,7 +540,7 @@
 子任务：
 
 - 设计版本清单、签名校验与下载策略
-- 打通 `warp-insight-upgrader`
+- 打通 `wist-upgrader`
 - 打通升级前检查、切换、健康检查、回滚
 - 建立升级编排最小中心对象与协议
 - 建立升级与 action 的互斥规则
@@ -826,7 +826,7 @@
 
 负责：
 
-- `warp-insight-exec`
+- `wist-exec`
 - opcode runtime
 - `ActionResult`
 - 执行资源保护
@@ -842,7 +842,7 @@
 负责：
 
 - `warp-insightd`
-- `warp-insight-upgrader`
+- `wist-upgrader`
 - 本地状态机
 - 安装与升级
 
@@ -985,7 +985,7 @@
 当前最值得立刻启动的是：
 
 1. 完成 M1 中尚未代码化的 schema 与校验器
-2. 启动 M3 的 `standalone` `warp-insightd` / `warp-insight-exec` / `warp-insight-upgrader` skeleton
+2. 启动 M3 的 `standalone` `warp-insightd` / `wist-exec` / `wist-upgrader` skeleton
 3. 启动 M4 的 `file input -> checkpoint -> buffer/spool -> warp-parse/file output` 替代验证切片
 4. 用一类真实 `standalone` 日志链路验证“能力可替代、配置不兼容”的产品假设
 5. 在 M4 跑通后，再启动 M2 的 enrollment / identity 设计与实现

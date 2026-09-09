@@ -1,5 +1,5 @@
 // Module: GatewaySupervision — WarpGateway 上级聚合
-// 覆盖 WarpGateway 实例接入 WarpInsightCenter 的初始配置获取、状态上报与状态/实例/客户/列表视图实体。
+// 覆盖 WarpGateway 实例接入 WistCenter 的初始配置获取、状态上报与状态/实例/客户/列表视图实体。
 
 struct GatewayImage {
   meta {
@@ -118,7 +118,7 @@ struct GlobalPolicyDispatch {
   dispatched_at: DateTime
 }
 
-// ── 网关接入（forGateway：WarpGateway 实例 → WarpInsightCenter） ──
+// ── 网关接入（forGateway：WarpGateway 实例 → WistCenter） ──
 
 message<command> GetGatewayInitialConfig {
   instance_id: String
@@ -214,7 +214,7 @@ flow RegisterGatewayFlow {
 
   actor WarpGateway
 
-  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+  lane WistCenter for Control.InsightCenterApp.WistCenter
 
   creates GatewayEnrollmentTokenValidation
   creates GatewayIdentity
@@ -228,7 +228,7 @@ flow RegisterGatewayFlow {
 
   // 注册校验必须绑定 token 实例归属：按 token_id 命中 GatewayEnrollmentToken，校验其 gateway_id /
   // instance_id 与请求方一致，且未超期、未耗尽（used_count < max_uses），通过后才进入签发。
-  step ValidateEnrollmentToken in WarpInsightCenter {
+  step ValidateEnrollmentToken in WistCenter {
     create GatewayEnrollmentTokenValidation {
       token_id = RegisterGateway.enrollment_token
       gateway_id = "gateway-issued"
@@ -239,11 +239,11 @@ flow RegisterGatewayFlow {
   }
 
   // 防重复注册：同 gateway_id + instance_id 已注册则拒绝（GatewayIdentity 唯一 gateway_id）。
-  step CheckDuplicateRegistration in WarpInsightCenter {
+  step CheckDuplicateRegistration in WistCenter {
     next IssueGatewayIdentity
   }
 
-  step IssueGatewayIdentity in WarpInsightCenter {
+  step IssueGatewayIdentity in WistCenter {
     create GatewayIdentity {
       gateway_id = "gateway-issued"
       instance_id = RegisterGateway.instance_id
@@ -253,7 +253,7 @@ flow RegisterGatewayFlow {
     next IssueGatewayCredential
   }
 
-  step IssueGatewayCredential in WarpInsightCenter {
+  step IssueGatewayCredential in WistCenter {
     create GatewayCredentialBundle {
       credential_id = "credential-issued"
       gateway_id = "gateway-issued"
@@ -265,7 +265,7 @@ flow RegisterGatewayFlow {
     next AcceptRegistration
   }
 
-  step<stop> AcceptRegistration in WarpInsightCenter {
+  step<stop> AcceptRegistration in WistCenter {
     create GatewayEnrollmentResult {
       status = "accepted"
       gateway_id = "gateway-issued"
@@ -309,7 +309,7 @@ flow RenewGatewayCredentialFlow {
 
   actor WarpGateway
 
-  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+  lane WistCenter for Control.InsightCenterApp.WistCenter
 
   creates GatewayCredentialBundle
 
@@ -319,7 +319,7 @@ flow RenewGatewayCredentialFlow {
   }
 
   // 中心以当前凭据鉴权后签发新运行期凭据（短 TTL），旧凭据立即失效。
-  step<stop> IssueRenewedCredential in WarpInsightCenter {
+  step<stop> IssueRenewedCredential in WistCenter {
     create GatewayCredentialBundle {
       credential_id = "credential-renewed"
       gateway_id = RenewGatewayCredential.gateway_id

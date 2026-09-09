@@ -2,8 +2,8 @@
 
 actor<system> Agentd {
   meta {
-    label zh "WpAgent 守护进程"
-    label en "WpAgent Daemon"
+    label zh "WarpAgentd 守护进程"
+    label en "WarpAgentd Daemon"
     summary zh "运行在业务服务器上的 warp-agentd 守护进程，作为系统 actor 发起注册、凭据轮换、状态上报与控制指令轮询。"
     tags "edge", "agentd", "daemon"
   }
@@ -52,7 +52,7 @@ actor<system> WarpGateway {
   meta {
     label zh "WarpGateway 实例"
     label en "Warp Gateway Instance"
-    summary zh "接入 WarpInsightCenter 的一个 WarpGateway 实例，作为系统 actor 获取初始配置并定期上报状态。"
+    summary zh "接入 WistCenter 的一个 WarpGateway 实例，作为系统 actor 获取初始配置并定期上报状态。"
     tag "gateway"
   }
 

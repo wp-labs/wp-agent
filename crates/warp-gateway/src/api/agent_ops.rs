@@ -10,11 +10,11 @@ use insight_control::{
     PollControlCommands, ReportActionResult,
 };
 use insight_control::types::{DateTime};
-use warp_insight_reporting::{ActionResultReceipt, HealthState, MetricsHealthSnapshot, RuntimeHealthSnapshot};
+use wist_reporting::{ActionResultReceipt, HealthState, MetricsHealthSnapshot, RuntimeHealthSnapshot};
 use crate::infra::{
     new_secret_token, sha256_hex, AgentMetricSample, StoredAgentRegistration, StoredCredentialStatus,
 };
-use warp_insight_contracts::enrollment::{
+use wist_contracts::enrollment::{
     AgentCredentialBundle, AgentCredentialRenewed, RenewAgentCredential,
     RENEW_AGENT_CREDENTIAL_KIND,
 };

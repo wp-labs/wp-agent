@@ -1,6 +1,6 @@
 use std::fs;
 
-use warp_insight_shared::fs::read_json;
+use wist_shared::fs::read_json;
 use warp_agentd::bootstrap;
 use warp_agentd::reporting_pipeline;
 use warp_agentd::scheduler::{

@@ -102,7 +102,7 @@ ADMIN_TLS_EXT="${TMP_ROOT}/admin-tls.ext"
 ADMIN_LOG="${TMP_ROOT}/warp-gateway.log"
 ADMIN_PID=""
 ADMIN_WEB_BASE_URL="${ADMIN_WEB_BASE_URL:-http://${LAN_IP}:5173}"
-ADMIN_WEB_LOG="${TMP_ROOT}/warp-gateway-web.log"
+ADMIN_WEB_LOG="${TMP_ROOT}/gateway-web.log"
 ADMIN_WEB_PID=""
 SKIP_ADMIN_WEB="${SKIP_ADMIN_WEB:-0}"
 STOP_STARTED_SERVICES="${STOP_STARTED_SERVICES:-0}"
@@ -363,15 +363,15 @@ start_admin_web_service() {
   port="$(admin_web_listen_options | sed -n '2p')"
 
   require_cmd npm
-  if [[ ! -d "${REPO_ROOT}/crates/warp-gateway-web/node_modules" ]]; then
-    echo "admin-web dependencies are missing: crates/warp-gateway-web/node_modules" >&2
-    echo "run npm install in crates/warp-gateway-web before running this script." >&2
+  if [[ ! -d "${REPO_ROOT}/crates/gateway-web/node_modules" ]]; then
+    echo "admin-web dependencies are missing: crates/gateway-web/node_modules" >&2
+    echo "run npm install in crates/gateway-web before running this script." >&2
     exit 1
   fi
 
-  echo "admin-web is not running; starting warp-gateway-web..."
+  echo "admin-web is not running; starting gateway-web..."
   (
-    cd "${REPO_ROOT}/crates/warp-gateway-web"
+    cd "${REPO_ROOT}/crates/gateway-web"
     exec nohup npm run dev -- --host "${host}" --port "${port}" --strictPort \
       >"${ADMIN_WEB_LOG}" 2>&1
   ) &
@@ -379,19 +379,19 @@ start_admin_web_service() {
 
   for _ in {1..100}; do
     if ! kill -0 "${ADMIN_WEB_PID}" 2>/dev/null; then
-      echo "warp-gateway-web failed to start; log:" >&2
+      echo "gateway-web failed to start; log:" >&2
       cat "${ADMIN_WEB_LOG}" >&2
       exit 1
     fi
     if [[ "$(admin_web_status)" == "200" ]]; then
-      echo "started warp-gateway-web pid=${ADMIN_WEB_PID}"
+      echo "started gateway-web pid=${ADMIN_WEB_PID}"
       echo "admin web url: ${ADMIN_WEB_BASE_URL}"
       return
     fi
     sleep 0.1
   done
 
-  echo "warp-gateway-web did not become ready; log:" >&2
+  echo "gateway-web did not become ready; log:" >&2
   cat "${ADMIN_WEB_LOG}" >&2
   exit 1
 }
@@ -951,7 +951,7 @@ run_frontend_display_test() {
     echo "skipping frontend normalizer display test (npx not found)" >&2
     return 0
   fi
-  if [[ ! -d "${REPO_ROOT}/crates/warp-gateway-web/node_modules" ]]; then
+  if [[ ! -d "${REPO_ROOT}/crates/gateway-web/node_modules" ]]; then
     echo "skipping frontend normalizer display test (admin-web node_modules missing)" >&2
     return 0
   fi
@@ -960,7 +960,7 @@ run_frontend_display_test() {
     args+=("${host_flag}")
   fi
   (
-    cd "${REPO_ROOT}/crates/warp-gateway-web"
+    cd "${REPO_ROOT}/crates/gateway-web"
     npx tsx tests/overview-display.test.ts "${args[@]}"
   )
 }

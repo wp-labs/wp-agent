@@ -1,0 +1,16 @@
+// 信号域 (Telemetry Domain) — WHAT signals are produced about observed things
+//
+// 与被观测域 (Observed Domain) 不同轴：
+// - Observed  = 被观测对象/resource、资产与拓扑知识（process/container/host/主机资产…）
+// - Telemetry = 针对这些被观测对象产出的 log / metric 信号记录数据模型，字段命名对齐 OTel Signal。
+//
+// 采集机制见 discovery.Collect（管线/缓冲/WarpParse 摄入头），上报 envelope 见
+// reporting.Contract（TelemetryRecordContract）；本域只承载信号的规范化数据模型，
+// 信号记录通过 resource_ref 关联到 Observed 被观测对象（依赖方向 telemetry → observed）。
+//
+// Module 拆分：
+// - Signal     # 日志 LogRecord / 指标 MetricPoint（下文本体）
+
+// ══════════════════════════════════════════════════════════
+// Module: Signal — 信号数据模型
+// ══════════════════════════════════════════════════════════

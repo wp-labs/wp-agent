@@ -7,8 +7,8 @@ use std::path::Path;
 
 use tokio::fs::{File, OpenOptions};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
-use warp_insight_shared::fs::ensure_parent;
+use wist_contracts::telemetry_record::TelemetryRecordContract;
+use wist_shared::fs::ensure_parent;
 
 use crate::telemetry::warp_parse::RecordSink;
 
@@ -155,7 +155,7 @@ mod tests {
         replay_records, replay_records_async,
     };
     use crate::telemetry::warp_parse::RecordSink;
-    use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
+    use wist_contracts::telemetry_record::TelemetryRecordContract;
 
     fn temp_file(name: &str) -> PathBuf {
         let suffix = SystemTime::now()

@@ -8,21 +8,21 @@
       "x": 439.3086,
       "y": 497.73828
     },
-    "struct:Control.AgentOverviewMetrics": {
-      "x": 162.8789,
-      "y": 502.97656
+    "struct:Control.AgentOverview": {
+      "x": 162.30469,
+      "y": 187.20703
     },
     "struct:Control.AgentRuntimeStatus": {
       "x": 726.1953,
       "y": 187.71875
     },
-    "struct:Control.AgentOverview": {
-      "x": 162.30469,
-      "y": 187.20703
-    },
     "struct:Control.AgentInstance": {
       "x": 736.22656,
       "y": 497.73828
+    },
+    "struct:Control.AgentOverviewMetrics": {
+      "x": 162.8789,
+      "y": 502.97656
     }
   },
   "sizes": {},

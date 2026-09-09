@@ -1,0 +1,20 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": -0.0
+  },
+  "nodes": {
+    "struct:Observed.DiscoverySourceKind": {
+      "x": 537.71094,
+      "y": 291.6836
+    },
+    "struct:Observed.ContainerRuntimeRoot": {
+      "x": 537.71094,
+      "y": 165.19922
+    }
+  },
+  "sizes": {},
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

@@ -8,16 +8,16 @@
 - [`error-handling-system.md`](error-handling-system.md)：Rust 错误模型、协议错误投影、故障裁决和观测暴露
 - [`action-plan-schema.md`](../execution/action-plan-schema.md)：`ActionPlan` 的字段级协议定义
 - [`action-result-schema.md`](../execution/action-result-schema.md)：`ActionResult` 和 `StepActionRecord` 的字段级协议定义
-- [`agentd-architecture.md`](../edge/agentd-architecture.md)：`warp-insightd` 的模块边界、本地状态机和调度职责
-- [`agentd-failure-handling.md`](../edge/agentd-failure-handling.md)：`warp-insightd` 的故障分层、状态权威性、恢复和 health 口径
-- [`agentd-exec-protocol.md`](../edge/agentd-exec-protocol.md)：`warp-insightd` 与 `warp-insight-exec` 的本地交互协议
-- [`agentd-state-and-boundaries.md`](../edge/agentd-state-and-boundaries.md)：`warp-insightd` 的本地状态模型、唯一写入权和模块协作边界
-- [`agentd-state-schema.md`](../edge/agentd-state-schema.md)：`warp-insightd` 本地状态对象的字段级 schema
-- [`agentd-events.md`](../edge/agentd-events.md)：`warp-insightd` 进程内事件对象和模块事件流
-- [`capability-report-schema.md`](../edge/capability-report-schema.md)：agent 能力声明和匹配规则
-- [`agent-config-schema.md`](../edge/agent-config-schema.md)：`warp-insightd` 总配置骨架
+- [`agentd-architecture.md`](../../crates/warp-agentd/docs/agentd-architecture.md)：`warp-insightd` 的模块边界、本地状态机和调度职责
+- [`agentd-failure-handling.md`](../../crates/warp-agentd/docs/agentd-failure-handling.md)：`warp-insightd` 的故障分层、状态权威性、恢复和 health 口径
+- [`agentd-exec-protocol.md`](../../crates/warp-agentd/docs/agentd-exec-protocol.md)：`warp-insightd` 与 `wist-exec` 的本地交互协议
+- [`agentd-state-and-boundaries.md`](../../crates/warp-agentd/docs/agentd-state-and-boundaries.md)：`warp-insightd` 的本地状态模型、唯一写入权和模块协作边界
+- [`agentd-state-schema.md`](../../crates/warp-agentd/docs/agentd-state-schema.md)：`warp-insightd` 本地状态对象的字段级 schema
+- [`agentd-events.md`](../../crates/warp-agentd/docs/agentd-events.md)：`warp-insightd` 进程内事件对象和模块事件流
+- [`capability-report-schema.md`](../../crates/warp-agentd/docs/capability-report-schema.md)：agent 能力声明和匹配规则
+- [`agent-config-schema.md`](../../crates/warp-agentd/docs/agent-config-schema.md)：`warp-insightd` 总配置骨架
 - [`error-codes.md`](../edge/error-codes.md)：统一错误码和原因码词典
-- [`self-observability.md`](../edge/self-observability.md)：`warp-insight` 自身可观测性和验收指标面设计
+- [`self-observability.md`](../../crates/warp-agentd/docs/self-observability.md)：`warp-insight` 自身可观测性和验收指标面设计
 - [`non-functional-targets.md`](non-functional-targets.md)：资源预算、退化阈值、buffer/backpressure 和保底目标
 - [`metrics-integration-roadmap.md`](../telemetry/metrics-integration-roadmap.md)：metrics integration 的目标分层、优先级和批次规划
 - [`metrics-batch-a-plan.md`](../telemetry/metrics-batch-a-plan.md)：Batch A 的最小 target 覆盖、指标范围和统一配置骨架
@@ -324,17 +324,17 @@ AI 更适合用于：
 
 - `warp-insightd`：
   常驻主进程，负责采集、发现、标准化、统一事件封装、buffer、上送、心跳、策略接收和本地保护状态机
-- `warp-insight-exec`：
+- `wist-exec`：
   按需拉起的动作执行进程，负责执行远程诊断、只读命令、服务控制类动作和其他受控动作
-- `warp-insight-upgrader`：
+- `wist-upgrader`：
   按需拉起的升级辅助进程，负责升级包下载、校验、切换、健康探测和回滚
 
 这三个进程的职责边界应明确如下：
 
 - `warp-insightd` 不直接承载高风险远程动作执行逻辑
 - `warp-insightd` 不直接在自身进程内完成自我替换式升级
-- `warp-insight-exec` 不负责采集、发现、buffer 和上送
-- `warp-insight-upgrader` 不负责常驻采集任务和远程动作编排
+- `wist-exec` 不负责采集、发现、buffer 和上送
+- `wist-upgrader` 不负责常驻采集任务和远程动作编排
 
 之所以这样拆分，是因为 `target.md` 已经把以下要求定义成硬约束：
 
@@ -365,7 +365,7 @@ AI 更适合用于：
 
 - 接收中心节点策略、升级计划和远程动作计划
 - 校验本地状态是否允许执行
-- 拉起 `warp-insight-exec` 或 `warp-insight-upgrader`
+- 拉起 `wist-exec` 或 `wist-upgrader`
 - 传递最小必要参数和受限执行上下文
 - 回收执行结果、状态码和审计元数据
 - 对执行超时、异常退出和资源超限进行统一治理
@@ -377,8 +377,8 @@ Center Node
     |
     v
 warp-insightd
-  |---- spawn ----> warp-insight-exec
-  |---- spawn ----> warp-insight-upgrader
+  |---- spawn ----> wist-exec
+  |---- spawn ----> wist-upgrader
   |
   +---- collect / discover / buffer / export
 ```
@@ -808,7 +808,7 @@ AI 不应直接拥有：
 
 先打通 `standalone` 边缘运行基线：
 
-- `warp-insightd` / `warp-insight-exec` / `warp-insight-upgrader` 三进程骨架
+- `warp-insightd` / `wist-exec` / `wist-upgrader` 三进程骨架
 - 本地工作目录、状态目录和恢复骨架
 - `standalone` 运行模式
 - 最小自观测、错误码和 health 基线

@@ -2,7 +2,7 @@
 // 原始类型 re-export + Control 模块 re-export 桥
 #![allow(unused_imports)]
 
-pub use warp_insight_shared::{DateTime, Secret, Int, Bool, Float};
+pub use wist_shared::{DateTime, Secret, Int, Bool, Float};
 
 pub use crate::control::actors::*;
 pub use crate::control::caps::*;

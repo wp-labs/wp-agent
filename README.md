@@ -5,23 +5,23 @@ for the first implementation wave.
 
 Workspace layout:
 
-- `crates/warp-insight-contracts`
+- `crates/wist-contracts`
   Shared contract types and versioned schema objects.
-- `crates/warp-insight-validate`
+- `crates/wist-validate`
   Static validators for plans, results, config, and state.
-- `crates/warp-insight-shared`
+- `crates/wist-shared`
   Shared errors, IDs, paths, and common runtime helpers.
 - `crates/warp-gateway`
   Admin WEB backend skeleton for install links, Agent status, and remote upgrades.
-- `crates/warp-gateway-web`
+- `crates/gateway-web`
   Browser WEB frontend for the WarpGateWay console.
 - `crates/warp-agentd`
   Edge daemon skeleton.
-- `crates/warp-insight-exec`
+- `crates/wist-exec`
   ActionPlan runtime skeleton.
-- `crates/warp-insight-upgrader`
+- `crates/wist-upgrader`
   Upgrade helper skeleton.
-- `crates/warp-insight-gateway`
+- `crates/wist-gateway`
   Southbound gateway/server skeleton.
 - `crates/warp-insight-control`
   Control-center core skeleton.

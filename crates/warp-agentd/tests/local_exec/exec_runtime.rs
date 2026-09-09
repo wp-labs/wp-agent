@@ -1,8 +1,8 @@
 use std::fs;
 
-use warp_insight_contracts::action_result::FinalStatus;
-use warp_insight_shared::fs::read_json;
-use warp_insight_shared::paths::{ACTIONS_DIR, WORKDIR_RESULT_FILE};
+use wist_contracts::action_result::FinalStatus;
+use wist_shared::fs::read_json;
+use wist_shared::paths::{ACTIONS_DIR, WORKDIR_RESULT_FILE};
 use warp_agentd::bootstrap;
 use warp_agentd::local_exec::{LocalExecRequest, execute as execute_local};
 use warp_agentd::state_store::running;

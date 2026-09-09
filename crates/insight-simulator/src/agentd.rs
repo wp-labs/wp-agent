@@ -2,7 +2,7 @@
 
 use insight_control::{AgentHello, ReportActionResult};
 use insight_control::types::DateTime;
-use warp_insight_reporting::{ActionResultContract, ResultAttestation};
+use wist_reporting::{ActionResultContract, ResultAttestation};
 
 use crate::{client, config::SimConfig};
 
@@ -79,14 +79,14 @@ fn build_action_report(config: &SimConfig, sequence: u64, now: DateTime) -> Repo
         step_records: "[]".to_string(),
         execution_id: execution_id.clone(),
         exit_reason: String::new(),
-        started_at: warp_insight_shared::time::now_rfc3339(),
+        started_at: wist_shared::time::now_rfc3339(),
         outputs: "{}".to_string(),
         api_version: "v1".to_string(),
         resource_usage: "{}".to_string(),
         action_id: action_id.clone(),
         kind: "command".to_string(),
         request_id: String::new(),
-        finished_at: warp_insight_shared::time::now_rfc3339(),
+        finished_at: wist_shared::time::now_rfc3339(),
         final_status: "succeeded".to_string(),
     };
     ReportActionResult {

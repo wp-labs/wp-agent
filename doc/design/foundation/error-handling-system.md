@@ -15,9 +15,9 @@
 相关文档：
 
 - [`../edge/error-codes.md`](../edge/error-codes.md)：稳定错误码和原因码词典
-- [`../edge/agentd-failure-handling.md`](../edge/agentd-failure-handling.md)：`warp-insightd` 故障分层、恢复和 health 口径
-- [`../edge/agentd-events.md`](../edge/agentd-events.md)：daemon 进程内事件对象
-- [`../edge/agentd-state-schema.md`](../edge/agentd-state-schema.md)：本地状态里的错误字段
+- [`../../crates/warp-agentd/docs/agentd-failure-handling.md`](../../crates/warp-agentd/docs/agentd-failure-handling.md)：`warp-insightd` 故障分层、恢复和 health 口径
+- [`../../crates/warp-agentd/docs/agentd-events.md`](../../crates/warp-agentd/docs/agentd-events.md)：daemon 进程内事件对象
+- [`../../crates/warp-agentd/docs/agentd-state-schema.md`](../../crates/warp-agentd/docs/agentd-state-schema.md)：本地状态里的错误字段
 - [`../execution/action-result-schema.md`](../execution/action-result-schema.md)：`ActionResult.exit_reason` 与 `StepActionRecord.error_code`
 - [`../center/agent-gateway-protocol.md`](../center/agent-gateway-protocol.md)：中心与 agent 的南向协议
 - [`security-model.md`](security-model.md)：权限、审批、审计和敏感信息边界
@@ -77,13 +77,13 @@ Failure Decision
 
 | crate | 建议 reason | 职责范围 |
 |---|---|---|
-| `warp-insight-contracts` | `ContractReason` | schema 对象、serde 兼容、协议字段约束 |
-| `warp-insight-validate` | `ValidateReason` | ActionPlan、ActionResult、config、state 校验 |
-| `warp-insight-shared` | `SharedReason` | path、time、id、integrity、公共文件操作 |
+| `wist-contracts` | `ContractReason` | schema 对象、serde 兼容、协议字段约束 |
+| `wist-validate` | `ValidateReason` | ActionPlan、ActionResult、config、state 校验 |
+| `wist-shared` | `SharedReason` | path、time、id、integrity、公共文件操作 |
 | `warp-insightd` | `AgentdReason` | daemon bootstrap、config、state store、scheduler、reporting、telemetry runtime |
-| `warp-insight-exec` | `ExecReason` | workdir、runtime、opcode、result writer、子进程执行 |
-| `warp-insight-upgrader` | `UpgradeReason` | prepare、switch、rollback、health check |
-| `warp-insight-gateway` | `GatewayReason` | session、hello、heartbeat、dispatch、ack/result channel |
+| `wist-exec` | `ExecReason` | workdir、runtime、opcode、result writer、子进程执行 |
+| `wist-upgrader` | `UpgradeReason` | prepare、switch、rollback、health check |
+| `wist-gateway` | `GatewayReason` | session、hello、heartbeat、dispatch、ack/result channel |
 | `warp-insight-control` | `ControlReason` | request、approval、compile、sign、dispatch、tracking |
 
 每个 reason enum 必须包含一个透明 `General(UnifiedReason)` variant，用于复用配置、IO、权限、系统、数据和校验等通用类别。
@@ -224,7 +224,7 @@ ProtocolError {
 
 ### 6.3 错误码映射
 
-`../edge/error-codes.md` 继续维护协议稳定码。Rust reason identity 到协议码的映射由 `warp-insight-shared` 维护。
+`../edge/error-codes.md` 继续维护协议稳定码。Rust reason identity 到协议码的映射由 `wist-shared` 维护。
 
 示例映射：
 
@@ -343,8 +343,8 @@ fn call_gateway() -> Result<(), GatewayError> {
 ### P0：错误基线
 
 - 在 workspace 增加 `orion-error` 依赖，启用 `derive`，按需要启用 `serde_json` / `toml`。
-- 在 `warp-insight-shared` 增加错误投影和 code mapping 基础类型。
-- 为 `warp-insight-validate`、`warp-insightd`、`warp-insight-exec` 定义首批 reason enum。
+- 在 `wist-shared` 增加错误投影和 code mapping 基础类型。
+- 为 `wist-validate`、`warp-insightd`、`wist-exec` 定义首批 reason enum。
 - 将 `error_codes.rs` 从 placeholder 扩展为稳定协议码词典。
 - 增加热路径错误签名检查，禁止新增 `anyhow::Result`、裸 `io::Error`、`Box<dyn Error>` 和 `String` 错误返回。
 

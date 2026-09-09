@@ -1,6 +1,6 @@
 // Module: AdminFacingInterface — 全局控制中心管理接口（forAdmin）
 //
-// WarpInsightCenter 面向管理员的 HTTP 管理接口，与面向 WarpGateway 实例的
+// WistCenter 面向管理员的 HTTP 管理接口，与面向 WarpGateway 实例的
 // GatewayFacingInterface（forGateway）拆分。承载网关列表/策略编排与网关实例管理。
 // 请求/响应为 wire 契约（Admin 前缀），组合中心各 Domain/Application 模块事实。
 

@@ -1,6 +1,6 @@
 //! In-memory staging for telemetry records before sink or spool.
 
-use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
+use wist_contracts::telemetry_record::TelemetryRecordContract;
 
 #[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
 #[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
@@ -59,7 +59,7 @@ fn estimate_record_size(record: &TelemetryRecordContract) -> usize {
 #[cfg(test)]
 mod tests {
     use super::TelemetryBuffer;
-    use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
+    use wist_contracts::telemetry_record::TelemetryRecordContract;
 
     fn record(body: &str) -> TelemetryRecordContract {
         TelemetryRecordContract::new_log(

@@ -3,11 +3,11 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
-use warp_insight_contracts::state_exec::AgentRuntimeState;
-use warp_insight_contracts::state_exec::RuntimeMode;
-use warp_insight_shared::fs::{read_json, write_json_private_atomic};
-use warp_insight_shared::paths::AGENT_RUNTIME_FILE;
-use warp_insight_shared::time::now_rfc3339;
+use wist_contracts::state_exec::AgentRuntimeState;
+use wist_contracts::state_exec::RuntimeMode;
+use wist_shared::fs::{read_json, write_json_private_atomic};
+use wist_shared::paths::AGENT_RUNTIME_FILE;
+use wist_shared::time::now_rfc3339;
 
 pub fn load_default() -> AgentRuntimeState {
     AgentRuntimeState::new(
@@ -74,7 +74,7 @@ fn hostname_from_file() -> Option<String> {
 mod tests {
     use super::{default_instance_id_from_sources, path_for, store};
     use std::time::{SystemTime, UNIX_EPOCH};
-    use warp_insight_contracts::state_exec::{AgentRuntimeState, RuntimeMode};
+    use wist_contracts::state_exec::{AgentRuntimeState, RuntimeMode};
 
     #[test]
     fn default_instance_id_prefers_hostname_env() {

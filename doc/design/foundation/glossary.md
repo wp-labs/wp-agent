@@ -88,8 +88,8 @@
 包含但不限于：
 
 - `warp-insightd`
-- `warp-insight-exec`
-- `warp-insight-upgrader`
+- `wist-exec`
+- `wist-upgrader`
 
 ### 3.2 `warp-insightd`
 
@@ -107,7 +107,7 @@
 - step runner
 - action engine
 
-### 3.3 `warp-insight-exec`
+### 3.3 `wist-exec`
 
 边缘按需拉起的受控执行器。
 
@@ -122,7 +122,7 @@
 - controller
 - scheduler
 
-### 3.4 `warp-insight-upgrader`
+### 3.4 `wist-upgrader`
 
 边缘按需拉起的升级辅助进程。
 
@@ -221,7 +221,7 @@ IR 中 `kind = "output"` 的 step 类型。
 - `ActionPlan`
 - `ActionPlan IR`
 - `ActionResult`
-- `warp-insight-exec` runtime
+- `wist-exec` runtime
 
 不应把这张表直接套用到作者侧 DSL 文档。
 
@@ -300,7 +300,7 @@ IR 中 `kind = "output"` 的 step 类型。
 统一定义：
 
 - 已通过本地校验
-- 尚未拉起 `warp-insight-exec`
+- 尚未拉起 `wist-exec`
 - 等待 `execution_scheduler` 调度
 
 不是：
@@ -750,7 +750,7 @@ IR 中 `kind = "output"` 的 step 类型。
 如果你要写新文档，优先使用：
 
 - 边缘主进程：`warp-insightd`
-- 边缘执行器：`warp-insight-exec`
+- 边缘执行器：`wist-exec`
 - 最终执行对象：`ActionPlan`
 - 最终回传对象：`ActionResult`
 - 最小执行单位：`step`

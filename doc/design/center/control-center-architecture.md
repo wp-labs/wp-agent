@@ -121,7 +121,7 @@
 控制中心不负责：
 
 - 替代 `warp-insightd` 执行 opcode
-- 直接控制 `warp-insight-exec`
+- 直接控制 `wist-exec`
 - 在中心侧实时解析边缘原始 telemetry 流
 - 替代资源查询平台做全量分析引擎
 

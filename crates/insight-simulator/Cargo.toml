@@ -11,8 +11,8 @@ serde_json.workspace = true
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 tokio.workspace = true
 insight-control = { path = "../insight-control" }
-warp-insight-reporting = { path = "../warp-insight-reporting" }
-warp-insight-shared = { path = "../warp-insight-shared" }
+wist-reporting = { path = "../wist-reporting" }
+wist-shared = { path = "../wist-shared" }
 
 [lib]
 path = "src/lib.rs"

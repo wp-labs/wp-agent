@@ -6,14 +6,14 @@
 
 ### 变更
 - **crate 重命名**：`warp-insightd` → `warp-agentd`、`warp-insight-admin` → `warp-gateway`、
-  `warp-insight-admin-web` → `warp-gateway-web`；同步更新 workspace members、配置文件
+  `warp-insight-admin-web` → `gateway-web`；同步更新 workspace members、配置文件
   （`warp-gateway.toml`）、守护进程配置目录（`.warp-agentd` / `agentd.toml`）与 Jumo 模型服务名。
 
 ### 新增
 - **macOS 安装命令**：`/install` 页新增 `macos_install_code`（API 与前端卡片）。macOS 系统
   `openssl`（LibreSSL）不支持 Ed25519，安装命令改为用 curl `--pinnedpubkey` 固定网关证书
   SPKI（无需外部 OpenSSL 3），主机架构运行时自动选择（arm64→arm，其余→x86）
-- **demo 网关信任锚**：`scripts/demo-gateway.sh` 生成带 `IP:127.0.0.1,DNS:localhost` SAN 的
+- **demo 网关信任锚**：`sysrun/warp-gateway/ctrl-plane/demo-gateway.sh` 生成带 `IP:127.0.0.1,DNS:localhost` SAN 的
   自签证书并把证书本身写入 `trust_bundle`，使安装脚本内 `--cacert` 下载可真实校验网关
 
 ## [0.1.1] - 2026-08-03

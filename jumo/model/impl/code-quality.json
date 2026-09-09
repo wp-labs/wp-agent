@@ -4186,7 +4186,7 @@
       "module": "crates/warp-insight-center/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/action_plan.rs",
+      "path": "crates/wist-contracts/src/action_plan.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 126,
@@ -4199,10 +4199,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 18.01801801801802,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/action_result.rs",
+      "path": "crates/wist-contracts/src/action_result.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 126,
@@ -4215,10 +4215,10 @@
       "max_cyclomatic": 5,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 53.097345132743364,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/agent_config.rs",
+      "path": "crates/wist-contracts/src/agent_config.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 337,
@@ -4231,10 +4231,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 98.97610921501706,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/capability_report.rs",
+      "path": "crates/wist-contracts/src/capability_report.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 100,
@@ -4247,10 +4247,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 11.235955056179776,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/discovery.rs",
+      "path": "crates/wist-contracts/src/discovery.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 151,
@@ -4263,10 +4263,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 38.46153846153846,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/enrollment.rs",
+      "path": "crates/wist-contracts/src/enrollment.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 225,
@@ -4279,10 +4279,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 10.050251256281408,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/exporter.rs",
+      "path": "crates/wist-contracts/src/exporter.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 82,
@@ -4295,10 +4295,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 55.55555555555556,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/gateway.rs",
+      "path": "crates/wist-contracts/src/gateway.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 275,
@@ -4311,10 +4311,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 57.377049180327866,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/ingest.rs",
+      "path": "crates/wist-contracts/src/ingest.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 540,
@@ -4327,10 +4327,10 @@
       "max_cyclomatic": 22,
       "over_cyclomatic_function_count": 1,
       "file_complexity": 134.57556935817806,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/lib.rs",
+      "path": "crates/wist-contracts/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -4343,10 +4343,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/state_exec.rs",
+      "path": "crates/wist-contracts/src/state_exec.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 80,
@@ -4359,10 +4359,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 13.88888888888889,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-contracts/src/telemetry_record.rs",
+      "path": "crates/wist-contracts/src/telemetry_record.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 40,
@@ -4375,10 +4375,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 28.571428571428573,
-      "module": "crates/warp-insight-contracts/src"
+      "module": "crates/wist-contracts/src"
     },
     {
-      "path": "crates/warp-insight-exec/src/lib.rs",
+      "path": "crates/wist-exec/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 143,
@@ -4391,10 +4391,10 @@
       "max_cyclomatic": 5,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 78.74015748031496,
-      "module": "crates/warp-insight-exec/src"
+      "module": "crates/wist-exec/src"
     },
     {
-      "path": "crates/warp-insight-exec/src/main.rs",
+      "path": "crates/wist-exec/src/main.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 6,
@@ -4407,10 +4407,10 @@
       "max_cyclomatic": 2,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 333.3333333333333,
-      "module": "crates/warp-insight-exec/src"
+      "module": "crates/wist-exec/src"
     },
     {
-      "path": "crates/warp-insight-exec/src/result_writer.rs",
+      "path": "crates/wist-exec/src/result_writer.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 24,
@@ -4423,10 +4423,10 @@
       "max_cyclomatic": 3,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 157.89473684210526,
-      "module": "crates/warp-insight-exec/src"
+      "module": "crates/wist-exec/src"
     },
     {
-      "path": "crates/warp-insight-exec/src/runtime.rs",
+      "path": "crates/wist-exec/src/runtime.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 117,
@@ -4439,10 +4439,10 @@
       "max_cyclomatic": 7,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 66.0377358490566,
-      "module": "crates/warp-insight-exec/src"
+      "module": "crates/wist-exec/src"
     },
     {
-      "path": "crates/warp-insight-exec/src/workdir.rs",
+      "path": "crates/wist-exec/src/workdir.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 56,
@@ -4455,10 +4455,10 @@
       "max_cyclomatic": 2,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 130.43478260869566,
-      "module": "crates/warp-insight-exec/src"
+      "module": "crates/wist-exec/src"
     },
     {
-      "path": "crates/warp-insight-gateway/src/lease.rs",
+      "path": "crates/wist-gateway/src/lease.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 3,
@@ -4471,10 +4471,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 1000.0,
-      "module": "crates/warp-insight-gateway/src"
+      "module": "crates/wist-gateway/src"
     },
     {
-      "path": "crates/warp-insight-gateway/src/lib.rs",
+      "path": "crates/wist-gateway/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -4487,10 +4487,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 200.0,
-      "module": "crates/warp-insight-gateway/src"
+      "module": "crates/wist-gateway/src"
     },
     {
-      "path": "crates/warp-insight-gateway/src/main.rs",
+      "path": "crates/wist-gateway/src/main.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 3,
@@ -4503,10 +4503,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 333.3333333333333,
-      "module": "crates/warp-insight-gateway/src"
+      "module": "crates/wist-gateway/src"
     },
     {
-      "path": "crates/warp-insight-gateway/src/session.rs",
+      "path": "crates/wist-gateway/src/session.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 3,
@@ -4519,10 +4519,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 1000.0,
-      "module": "crates/warp-insight-gateway/src"
+      "module": "crates/wist-gateway/src"
     },
     {
-      "path": "crates/warp-insight-observed/src/lib.rs",
+      "path": "crates/wist-observed/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -4535,10 +4535,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src"
+      "module": "crates/wist-observed/src"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory/agent_health.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory/agent_health.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -4551,10 +4551,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory"
+      "module": "crates/wist-observed/src/observed/host_inventory"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory/host_disk_inventory_item.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory/host_disk_inventory_item.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -4567,10 +4567,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory"
+      "module": "crates/wist-observed/src/observed/host_inventory"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory/host_inventory.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory/host_inventory.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 27,
@@ -4583,10 +4583,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory"
+      "module": "crates/wist-observed/src/observed/host_inventory"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory/host_network_interface_inventory_item.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory/host_network_interface_inventory_item.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -4599,10 +4599,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory"
+      "module": "crates/wist-observed/src/observed/host_inventory"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory/host_runtime_state.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory/host_runtime_state.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 22,
@@ -4615,10 +4615,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory"
+      "module": "crates/wist-observed/src/observed/host_inventory"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory/mod.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 15,
@@ -4631,10 +4631,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory"
+      "module": "crates/wist-observed/src/observed/host_inventory"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory/protection_state.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory/protection_state.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -4647,10 +4647,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory"
+      "module": "crates/wist-observed/src/observed/host_inventory"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory_query/mod.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory_query/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -4663,10 +4663,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory_query"
+      "module": "crates/wist-observed/src/observed/host_inventory_query"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory_query/query_host_inventory.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory_query/query_host_inventory.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -4679,10 +4679,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory_query"
+      "module": "crates/wist-observed/src/observed/host_inventory_query"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_inventory_query/view_host_runtime_state.rs",
+      "path": "crates/wist-observed/src/observed/host_inventory_query/view_host_runtime_state.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -4695,10 +4695,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_inventory_query"
+      "module": "crates/wist-observed/src/observed/host_inventory_query"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/assignment_role.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/assignment_role.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -4711,10 +4711,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/assignment_source.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/assignment_source.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -4727,10 +4727,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/assignment_target_type.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/assignment_target_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -4743,10 +4743,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/external_identity_link.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/external_identity_link.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 18,
@@ -4759,10 +4759,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/external_link_internal_kind.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/external_link_internal_kind.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -4775,10 +4775,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/external_system_type.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/external_system_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -4791,10 +4791,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/host_group.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/host_group.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 15,
@@ -4807,10 +4807,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/host_group_membership.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/host_group_membership.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 13,
@@ -4823,10 +4823,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/host_group_type.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/host_group_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -4839,10 +4839,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/mod.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 27,
@@ -4855,10 +4855,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/responsibility_assignment.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/responsibility_assignment.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 20,
@@ -4871,10 +4871,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/subject.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/subject.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 14,
@@ -4887,10 +4887,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility/subject_type.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility/subject_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -4903,10 +4903,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility"
+      "module": "crates/wist-observed/src/observed/host_responsibility"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility_service/effective_host_responsibility.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility_service/effective_host_responsibility.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -4919,10 +4919,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility_service"
+      "module": "crates/wist-observed/src/observed/host_responsibility_service"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility_service/external_sync_cursor.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility_service/external_sync_cursor.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -4935,10 +4935,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility_service"
+      "module": "crates/wist-observed/src/observed/host_responsibility_service"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility_service/mod.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility_service/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 11,
@@ -4951,10 +4951,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility_service"
+      "module": "crates/wist-observed/src/observed/host_responsibility_service"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility_service/sync_external_responsibility.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility_service/sync_external_responsibility.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -4967,10 +4967,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility_service"
+      "module": "crates/wist-observed/src/observed/host_responsibility_service"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/host_responsibility_service/view_effective_host_responsibility.rs",
+      "path": "crates/wist-observed/src/observed/host_responsibility_service/view_effective_host_responsibility.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -4983,10 +4983,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility_service"
+      "module": "crates/wist-observed/src/observed/host_responsibility_service"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/mod.rs",
+      "path": "crates/wist-observed/src/observed/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 18,
@@ -4999,10 +4999,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed"
+      "module": "crates/wist-observed/src/observed"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/attachment_source.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/attachment_source.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5015,10 +5015,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/host_network_attachment.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/host_network_attachment.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -5031,10 +5031,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/mod.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 21,
@@ -5047,10 +5047,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/network_domain.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/network_domain.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -5063,10 +5063,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/network_domain_kind.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/network_domain_kind.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -5079,10 +5079,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/network_segment.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/network_segment.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -5095,10 +5095,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/network_segment_type.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/network_segment_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5111,10 +5111,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/pod_inventory.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/pod_inventory.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 18,
@@ -5127,10 +5127,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/pod_network_attachment.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/pod_network_attachment.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -5143,10 +5143,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/network_topology/pod_placement.rs",
+      "path": "crates/wist-observed/src/observed/network_topology/pod_placement.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -5159,10 +5159,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/network_topology"
+      "module": "crates/wist-observed/src/observed/network_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/business_domain.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/business_domain.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -5175,10 +5175,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/business_subsystem.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/business_subsystem.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -5191,10 +5191,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/dependency_scope.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/dependency_scope.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -5207,10 +5207,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/dependency_type.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/dependency_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5223,10 +5223,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/exposure_scope.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/exposure_scope.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5239,10 +5239,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/mod.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 33,
@@ -5255,10 +5255,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_dependency.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_dependency.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 15,
@@ -5271,10 +5271,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_endpoint.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_endpoint.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 15,
@@ -5287,10 +5287,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_endpoint_type.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_endpoint_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 11,
@@ -5303,10 +5303,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_entity.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_entity.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -5319,10 +5319,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_instance.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_instance.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -5335,10 +5335,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_instance_endpoint.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_instance_endpoint.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 14,
@@ -5351,10 +5351,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_instance_lifecycle_state.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_instance_lifecycle_state.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -5367,10 +5367,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_runtime_type.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_runtime_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -5383,10 +5383,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/service_type.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/service_type.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5399,10 +5399,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/service_topology/system_boundary.rs",
+      "path": "crates/wist-observed/src/observed/service_topology/system_boundary.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 13,
@@ -5415,10 +5415,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/service_topology"
+      "module": "crates/wist-observed/src/observed/service_topology"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/topology_query/mod.rs",
+      "path": "crates/wist-observed/src/observed/topology_query/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -5431,10 +5431,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/topology_query"
+      "module": "crates/wist-observed/src/observed/topology_query"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/topology_query/view_network_topology.rs",
+      "path": "crates/wist-observed/src/observed/topology_query/view_network_topology.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 6,
@@ -5447,10 +5447,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/topology_query"
+      "module": "crates/wist-observed/src/observed/topology_query"
     },
     {
-      "path": "crates/warp-insight-observed/src/observed/topology_query/view_service_topology.rs",
+      "path": "crates/wist-observed/src/observed/topology_query/view_service_topology.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5463,10 +5463,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-observed/src/observed/topology_query"
+      "module": "crates/wist-observed/src/observed/topology_query"
     },
     {
-      "path": "crates/warp-insight-reporting/src/lib.rs",
+      "path": "crates/wist-reporting/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -5479,10 +5479,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src"
+      "module": "crates/wist-reporting/src"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/ack_status.rs",
+      "path": "crates/wist-reporting/src/reporting/ack_status.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5495,10 +5495,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_output_item.rs",
+      "path": "crates/wist-reporting/src/reporting/action_output_item.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5511,10 +5511,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_outputs.rs",
+      "path": "crates/wist-reporting/src/reporting/action_outputs.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5527,10 +5527,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_plan_ack.rs",
+      "path": "crates/wist-reporting/src/reporting/action_plan_ack.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 21,
@@ -5543,10 +5543,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_plan_ack_builder.rs",
+      "path": "crates/wist-reporting/src/reporting/action_plan_ack_builder.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 19,
@@ -5559,10 +5559,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_plan_constraints.rs",
+      "path": "crates/wist-reporting/src/reporting/action_plan_constraints.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -5575,10 +5575,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_plan_contract.rs",
+      "path": "crates/wist-reporting/src/reporting/action_plan_contract.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 13,
@@ -5591,10 +5591,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_plan_meta.rs",
+      "path": "crates/wist-reporting/src/reporting/action_plan_meta.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -5607,10 +5607,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_plan_program.rs",
+      "path": "crates/wist-reporting/src/reporting/action_plan_program.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -5623,10 +5623,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_plan_step.rs",
+      "path": "crates/wist-reporting/src/reporting/action_plan_step.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 11,
@@ -5639,10 +5639,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_plan_target.rs",
+      "path": "crates/wist-reporting/src/reporting/action_plan_target.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 14,
@@ -5655,10 +5655,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_result_contract.rs",
+      "path": "crates/wist-reporting/src/reporting/action_result_contract.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 19,
@@ -5671,10 +5671,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/action_result_receipt.rs",
+      "path": "crates/wist-reporting/src/reporting/action_result_receipt.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5687,10 +5687,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/approval_mode.rs",
+      "path": "crates/wist-reporting/src/reporting/approval_mode.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5703,10 +5703,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/capability_limits.rs",
+      "path": "crates/wist-reporting/src/reporting/capability_limits.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5719,10 +5719,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/capability_report_contract.rs",
+      "path": "crates/wist-reporting/src/reporting/capability_report_contract.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 13,
@@ -5735,10 +5735,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/capability_report_sections.rs",
+      "path": "crates/wist-reporting/src/reporting/capability_report_sections.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -5751,10 +5751,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/daemon_loop.rs",
+      "path": "crates/wist-reporting/src/reporting/daemon_loop.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -5767,10 +5767,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/disc_row_context.rs",
+      "path": "crates/wist-reporting/src/reporting/disc_row_context.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5783,10 +5783,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/discovery_health.rs",
+      "path": "crates/wist-reporting/src/reporting/discovery_health.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5799,10 +5799,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/discovery_health_snapshot.rs",
+      "path": "crates/wist-reporting/src/reporting/discovery_health_snapshot.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -5815,10 +5815,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/discovery_ingest_ack.rs",
+      "path": "crates/wist-reporting/src/reporting/discovery_ingest_ack.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 13,
@@ -5831,10 +5831,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/discovery_ingest_ack_status.rs",
+      "path": "crates/wist-reporting/src/reporting/discovery_ingest_ack_status.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5847,10 +5847,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/discovery_probe_health.rs",
+      "path": "crates/wist-reporting/src/reporting/discovery_probe_health.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 14,
@@ -5863,10 +5863,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/discovery_readiness.rs",
+      "path": "crates/wist-reporting/src/reporting/discovery_readiness.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5879,10 +5879,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/discovery_report_mode.rs",
+      "path": "crates/wist-reporting/src/reporting/discovery_report_mode.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -5895,10 +5895,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/exec_capabilities.rs",
+      "path": "crates/wist-reporting/src/reporting/exec_capabilities.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5911,10 +5911,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/execution_history_record.rs",
+      "path": "crates/wist-reporting/src/reporting/execution_history_record.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -5927,10 +5927,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/execution_resource_usage.rs",
+      "path": "crates/wist-reporting/src/reporting/execution_resource_usage.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 11,
@@ -5943,10 +5943,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/export_result.rs",
+      "path": "crates/wist-reporting/src/reporting/export_result.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5959,10 +5959,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/exporter_output.rs",
+      "path": "crates/wist-reporting/src/reporting/exporter_output.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -5975,10 +5975,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/exporter_source.rs",
+      "path": "crates/wist-reporting/src/reporting/exporter_source.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -5991,10 +5991,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/final_status.rs",
+      "path": "crates/wist-reporting/src/reporting/final_status.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6007,10 +6007,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/health_state.rs",
+      "path": "crates/wist-reporting/src/reporting/health_state.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -6023,10 +6023,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/ingest_head_error.rs",
+      "path": "crates/wist-reporting/src/reporting/ingest_head_error.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6039,10 +6039,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/local_report_inspection.rs",
+      "path": "crates/wist-reporting/src/reporting/local_report_inspection.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 13,
@@ -6055,10 +6055,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/local_report_issue.rs",
+      "path": "crates/wist-reporting/src/reporting/local_report_issue.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6071,10 +6071,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/logs_capabilities.rs",
+      "path": "crates/wist-reporting/src/reporting/logs_capabilities.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -6087,10 +6087,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/metrics_capabilities.rs",
+      "path": "crates/wist-reporting/src/reporting/metrics_capabilities.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6103,10 +6103,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/metrics_failure.rs",
+      "path": "crates/wist-reporting/src/reporting/metrics_failure.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6119,10 +6119,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/metrics_failure_kind.rs",
+      "path": "crates/wist-reporting/src/reporting/metrics_failure_kind.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6135,10 +6135,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/metrics_health_snapshot.rs",
+      "path": "crates/wist-reporting/src/reporting/metrics_health_snapshot.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 11,
@@ -6151,10 +6151,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/metrics_tick.rs",
+      "path": "crates/wist-reporting/src/reporting/metrics_tick.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6167,10 +6167,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/mod.rs",
+      "path": "crates/wist-reporting/src/reporting/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 119,
@@ -6183,10 +6183,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/prepared_report.rs",
+      "path": "crates/wist-reporting/src/reporting/prepared_report.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6199,10 +6199,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/prepared_report_origin.rs",
+      "path": "crates/wist-reporting/src/reporting/prepared_report_origin.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6215,10 +6215,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/reporting_request.rs",
+      "path": "crates/wist-reporting/src/reporting/reporting_request.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 11,
@@ -6231,10 +6231,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/result_attestation.rs",
+      "path": "crates/wist-reporting/src/reporting/result_attestation.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 11,
@@ -6247,10 +6247,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/risk_level.rs",
+      "path": "crates/wist-reporting/src/reporting/risk_level.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6263,10 +6263,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/running_state_status.rs",
+      "path": "crates/wist-reporting/src/reporting/running_state_status.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6279,10 +6279,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/runtime_health_snapshot.rs",
+      "path": "crates/wist-reporting/src/reporting/runtime_health_snapshot.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 14,
@@ -6295,10 +6295,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/signal_request_kind.rs",
+      "path": "crates/wist-reporting/src/reporting/signal_request_kind.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6311,10 +6311,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/step_action_record.rs",
+      "path": "crates/wist-reporting/src/reporting/step_action_record.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 19,
@@ -6327,10 +6327,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/step_status.rs",
+      "path": "crates/wist-reporting/src/reporting/step_status.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6343,10 +6343,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/telemetry_failure.rs",
+      "path": "crates/wist-reporting/src/reporting/telemetry_failure.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6359,10 +6359,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/telemetry_failure_kind.rs",
+      "path": "crates/wist-reporting/src/reporting/telemetry_failure_kind.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6375,10 +6375,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/telemetry_record_contract.rs",
+      "path": "crates/wist-reporting/src/reporting/telemetry_record_contract.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 14,
@@ -6391,10 +6391,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/telemetry_tick.rs",
+      "path": "crates/wist-reporting/src/reporting/telemetry_tick.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6407,10 +6407,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-reporting/src/reporting/upgrade_capabilities.rs",
+      "path": "crates/wist-reporting/src/reporting/upgrade_capabilities.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6423,10 +6423,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-reporting/src/reporting"
+      "module": "crates/wist-reporting/src/reporting"
     },
     {
-      "path": "crates/warp-insight-security/src/lib.rs",
+      "path": "crates/wist-security/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6439,10 +6439,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src"
+      "module": "crates/wist-security/src"
     },
     {
-      "path": "crates/warp-insight-security/src/security/mod.rs",
+      "path": "crates/wist-security/src/security/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6455,10 +6455,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security"
+      "module": "crates/wist-security/src/security"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/advisory_source.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/advisory_source.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6471,10 +6471,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/evidence_raw_fact.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/evidence_raw_fact.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -6487,10 +6487,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/matching_route.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/matching_route.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -6503,10 +6503,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/mod.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 25,
@@ -6519,10 +6519,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/normalization_status.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/normalization_status.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -6535,10 +6535,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/severity.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/severity.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 10,
@@ -6551,10 +6551,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/software_entity.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/software_entity.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -6567,10 +6567,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/software_evidence.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/software_evidence.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 24,
@@ -6583,10 +6583,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/software_external_id.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/software_external_id.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 13,
@@ -6599,10 +6599,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/software_id_kind.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/software_id_kind.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6615,10 +6615,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/software_vulnerability_finding.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/software_vulnerability_finding.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 20,
@@ -6631,10 +6631,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability/vulnerability_advisory_raw.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability/vulnerability_advisory_raw.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 18,
@@ -6647,10 +6647,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability"
+      "module": "crates/wist-security/src/security/software_vulnerability"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability_service/ingest_vulnerability_advisory.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability_service/ingest_vulnerability_advisory.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -6663,10 +6663,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability_service"
+      "module": "crates/wist-security/src/security/software_vulnerability_service"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability_service/mod.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability_service/mod.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6679,10 +6679,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability_service"
+      "module": "crates/wist-security/src/security/software_vulnerability_service"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability_service/view_software_vulnerabilities.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability_service/view_software_vulnerabilities.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 8,
@@ -6695,10 +6695,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability_service"
+      "module": "crates/wist-security/src/security/software_vulnerability_service"
     },
     {
-      "path": "crates/warp-insight-security/src/security/software_vulnerability_service/vulnerability_feed_sync_state.rs",
+      "path": "crates/wist-security/src/security/software_vulnerability_service/vulnerability_feed_sync_state.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 12,
@@ -6711,10 +6711,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-security/src/security/software_vulnerability_service"
+      "module": "crates/wist-security/src/security/software_vulnerability_service"
     },
     {
-      "path": "crates/warp-insight-shared/src/error_codes.rs",
+      "path": "crates/wist-shared/src/error_codes.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 9,
@@ -6727,10 +6727,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-shared/src"
+      "module": "crates/wist-shared/src"
     },
     {
-      "path": "crates/warp-insight-shared/src/fs.rs",
+      "path": "crates/wist-shared/src/fs.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 108,
@@ -6743,10 +6743,10 @@
       "max_cyclomatic": 11,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 400.0,
-      "module": "crates/warp-insight-shared/src"
+      "module": "crates/wist-shared/src"
     },
     {
-      "path": "crates/warp-insight-shared/src/ids.rs",
+      "path": "crates/wist-shared/src/ids.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 7,
@@ -6759,10 +6759,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-shared/src"
+      "module": "crates/wist-shared/src"
     },
     {
-      "path": "crates/warp-insight-shared/src/integrity.rs",
+      "path": "crates/wist-shared/src/integrity.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 30,
@@ -6775,10 +6775,10 @@
       "max_cyclomatic": 2,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 260.8695652173913,
-      "module": "crates/warp-insight-shared/src"
+      "module": "crates/wist-shared/src"
     },
     {
-      "path": "crates/warp-insight-shared/src/lib.rs",
+      "path": "crates/wist-shared/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 11,
@@ -6791,10 +6791,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-shared/src"
+      "module": "crates/wist-shared/src"
     },
     {
-      "path": "crates/warp-insight-shared/src/paths.rs",
+      "path": "crates/wist-shared/src/paths.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -6807,10 +6807,10 @@
       "max_cyclomatic": 0,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 0.0,
-      "module": "crates/warp-insight-shared/src"
+      "module": "crates/wist-shared/src"
     },
     {
-      "path": "crates/warp-insight-shared/src/primitives.rs",
+      "path": "crates/wist-shared/src/primitives.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 37,
@@ -6823,10 +6823,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 206.89655172413794,
-      "module": "crates/warp-insight-shared/src"
+      "module": "crates/wist-shared/src"
     },
     {
-      "path": "crates/warp-insight-shared/src/time.rs",
+      "path": "crates/wist-shared/src/time.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 16,
@@ -6839,10 +6839,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 166.66666666666666,
-      "module": "crates/warp-insight-shared/src"
+      "module": "crates/wist-shared/src"
     },
     {
-      "path": "crates/warp-insight-upgrader/src/lib.rs",
+      "path": "crates/wist-upgrader/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 56,
@@ -6855,10 +6855,10 @@
       "max_cyclomatic": 5,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 212.7659574468085,
-      "module": "crates/warp-insight-upgrader/src"
+      "module": "crates/wist-upgrader/src"
     },
     {
-      "path": "crates/warp-insight-upgrader/src/main.rs",
+      "path": "crates/wist-upgrader/src/main.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 6,
@@ -6871,10 +6871,10 @@
       "max_cyclomatic": 2,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 333.3333333333333,
-      "module": "crates/warp-insight-upgrader/src"
+      "module": "crates/wist-upgrader/src"
     },
     {
-      "path": "crates/warp-insight-upgrader/src/prepare.rs",
+      "path": "crates/wist-upgrader/src/prepare.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 5,
@@ -6887,10 +6887,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 333.3333333333333,
-      "module": "crates/warp-insight-upgrader/src"
+      "module": "crates/wist-upgrader/src"
     },
     {
-      "path": "crates/warp-insight-upgrader/src/rollback.rs",
+      "path": "crates/wist-upgrader/src/rollback.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 5,
@@ -6903,10 +6903,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 333.3333333333333,
-      "module": "crates/warp-insight-upgrader/src"
+      "module": "crates/wist-upgrader/src"
     },
     {
-      "path": "crates/warp-insight-upgrader/src/switch.rs",
+      "path": "crates/wist-upgrader/src/switch.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 5,
@@ -6919,10 +6919,10 @@
       "max_cyclomatic": 1,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 333.3333333333333,
-      "module": "crates/warp-insight-upgrader/src"
+      "module": "crates/wist-upgrader/src"
     },
     {
-      "path": "crates/warp-insight-validate/src/action_plan.rs",
+      "path": "crates/wist-validate/src/action_plan.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 89,
@@ -6935,10 +6935,10 @@
       "max_cyclomatic": 31,
       "over_cyclomatic_function_count": 1,
       "file_complexity": 418.9189189189189,
-      "module": "crates/warp-insight-validate/src"
+      "module": "crates/wist-validate/src"
     },
     {
-      "path": "crates/warp-insight-validate/src/action_result.rs",
+      "path": "crates/wist-validate/src/action_result.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 128,
@@ -6951,10 +6951,10 @@
       "max_cyclomatic": 22,
       "over_cyclomatic_function_count": 1,
       "file_complexity": 286.95652173913044,
-      "module": "crates/warp-insight-validate/src"
+      "module": "crates/wist-validate/src"
     },
     {
-      "path": "crates/warp-insight-validate/src/config.rs",
+      "path": "crates/wist-validate/src/config.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 100,
@@ -6967,10 +6967,10 @@
       "max_cyclomatic": 33,
       "over_cyclomatic_function_count": 1,
       "file_complexity": 362.6373626373626,
-      "module": "crates/warp-insight-validate/src"
+      "module": "crates/wist-validate/src"
     },
     {
-      "path": "crates/warp-insight-validate/src/gateway.rs",
+      "path": "crates/wist-validate/src/gateway.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 129,
@@ -6983,10 +6983,10 @@
       "max_cyclomatic": 22,
       "over_cyclomatic_function_count": 2,
       "file_complexity": 429.82456140350877,
-      "module": "crates/warp-insight-validate/src"
+      "module": "crates/wist-validate/src"
     },
     {
-      "path": "crates/warp-insight-validate/src/lib.rs",
+      "path": "crates/wist-validate/src/lib.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 35,
@@ -6999,10 +6999,10 @@
       "max_cyclomatic": 2,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 142.85714285714286,
-      "module": "crates/warp-insight-validate/src"
+      "module": "crates/wist-validate/src"
     },
     {
-      "path": "crates/warp-insight-validate/src/state.rs",
+      "path": "crates/wist-validate/src/state.rs",
       "language": "rust",
       "source_kind": "business",
       "total_lines": 17,
@@ -7015,7 +7015,7 @@
       "max_cyclomatic": 6,
       "over_cyclomatic_function_count": 0,
       "file_complexity": 461.53846153846155,
-      "module": "crates/warp-insight-validate/src"
+      "module": "crates/wist-validate/src"
     }
   ],
   "modules": [
@@ -7997,21 +7997,21 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-contracts/src",
+      "module": "crates/wist-contracts/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-contracts/src/action_plan.rs",
-        "crates/warp-insight-contracts/src/action_result.rs",
-        "crates/warp-insight-contracts/src/agent_config.rs",
-        "crates/warp-insight-contracts/src/capability_report.rs",
-        "crates/warp-insight-contracts/src/discovery.rs",
-        "crates/warp-insight-contracts/src/enrollment.rs",
-        "crates/warp-insight-contracts/src/exporter.rs",
-        "crates/warp-insight-contracts/src/gateway.rs",
-        "crates/warp-insight-contracts/src/ingest.rs",
-        "crates/warp-insight-contracts/src/lib.rs",
-        "crates/warp-insight-contracts/src/state_exec.rs",
-        "crates/warp-insight-contracts/src/telemetry_record.rs"
+        "crates/wist-contracts/src/action_plan.rs",
+        "crates/wist-contracts/src/action_result.rs",
+        "crates/wist-contracts/src/agent_config.rs",
+        "crates/wist-contracts/src/capability_report.rs",
+        "crates/wist-contracts/src/discovery.rs",
+        "crates/wist-contracts/src/enrollment.rs",
+        "crates/wist-contracts/src/exporter.rs",
+        "crates/wist-contracts/src/gateway.rs",
+        "crates/wist-contracts/src/ingest.rs",
+        "crates/wist-contracts/src/lib.rs",
+        "crates/wist-contracts/src/state_exec.rs",
+        "crates/wist-contracts/src/telemetry_record.rs"
       ],
       "code_lines": 1836,
       "function_count": 73,
@@ -8027,14 +8027,14 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-exec/src",
+      "module": "crates/wist-exec/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-exec/src/lib.rs",
-        "crates/warp-insight-exec/src/main.rs",
-        "crates/warp-insight-exec/src/result_writer.rs",
-        "crates/warp-insight-exec/src/runtime.rs",
-        "crates/warp-insight-exec/src/workdir.rs"
+        "crates/wist-exec/src/lib.rs",
+        "crates/wist-exec/src/main.rs",
+        "crates/wist-exec/src/result_writer.rs",
+        "crates/wist-exec/src/runtime.rs",
+        "crates/wist-exec/src/workdir.rs"
       ],
       "code_lines": 304,
       "function_count": 10,
@@ -8050,13 +8050,13 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-gateway/src",
+      "module": "crates/wist-gateway/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-gateway/src/lease.rs",
-        "crates/warp-insight-gateway/src/lib.rs",
-        "crates/warp-insight-gateway/src/main.rs",
-        "crates/warp-insight-gateway/src/session.rs"
+        "crates/wist-gateway/src/lease.rs",
+        "crates/wist-gateway/src/lib.rs",
+        "crates/wist-gateway/src/main.rs",
+        "crates/wist-gateway/src/session.rs"
       ],
       "code_lines": 10,
       "function_count": 4,
@@ -8072,10 +8072,10 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src",
+      "module": "crates/wist-observed/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-observed/src/lib.rs"
+        "crates/wist-observed/src/lib.rs"
       ],
       "code_lines": 3,
       "function_count": 0,
@@ -8091,10 +8091,10 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src/observed",
-      "parent": "crates/warp-insight-observed/src",
+      "module": "crates/wist-observed/src/observed",
+      "parent": "crates/wist-observed/src",
       "files": [
-        "crates/warp-insight-observed/src/observed/mod.rs"
+        "crates/wist-observed/src/observed/mod.rs"
       ],
       "code_lines": 14,
       "function_count": 0,
@@ -8110,16 +8110,16 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src/observed/host_inventory",
-      "parent": "crates/warp-insight-observed/src/observed",
+      "module": "crates/wist-observed/src/observed/host_inventory",
+      "parent": "crates/wist-observed/src/observed",
       "files": [
-        "crates/warp-insight-observed/src/observed/host_inventory/agent_health.rs",
-        "crates/warp-insight-observed/src/observed/host_inventory/host_disk_inventory_item.rs",
-        "crates/warp-insight-observed/src/observed/host_inventory/host_inventory.rs",
-        "crates/warp-insight-observed/src/observed/host_inventory/host_network_interface_inventory_item.rs",
-        "crates/warp-insight-observed/src/observed/host_inventory/host_runtime_state.rs",
-        "crates/warp-insight-observed/src/observed/host_inventory/mod.rs",
-        "crates/warp-insight-observed/src/observed/host_inventory/protection_state.rs"
+        "crates/wist-observed/src/observed/host_inventory/agent_health.rs",
+        "crates/wist-observed/src/observed/host_inventory/host_disk_inventory_item.rs",
+        "crates/wist-observed/src/observed/host_inventory/host_inventory.rs",
+        "crates/wist-observed/src/observed/host_inventory/host_network_interface_inventory_item.rs",
+        "crates/wist-observed/src/observed/host_inventory/host_runtime_state.rs",
+        "crates/wist-observed/src/observed/host_inventory/mod.rs",
+        "crates/wist-observed/src/observed/host_inventory/protection_state.rs"
       ],
       "code_lines": 90,
       "function_count": 0,
@@ -8135,12 +8135,12 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src/observed/host_inventory_query",
-      "parent": "crates/warp-insight-observed/src/observed",
+      "module": "crates/wist-observed/src/observed/host_inventory_query",
+      "parent": "crates/wist-observed/src/observed",
       "files": [
-        "crates/warp-insight-observed/src/observed/host_inventory_query/mod.rs",
-        "crates/warp-insight-observed/src/observed/host_inventory_query/query_host_inventory.rs",
-        "crates/warp-insight-observed/src/observed/host_inventory_query/view_host_runtime_state.rs"
+        "crates/wist-observed/src/observed/host_inventory_query/mod.rs",
+        "crates/wist-observed/src/observed/host_inventory_query/query_host_inventory.rs",
+        "crates/wist-observed/src/observed/host_inventory_query/view_host_runtime_state.rs"
       ],
       "code_lines": 18,
       "function_count": 0,
@@ -8156,22 +8156,22 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility",
-      "parent": "crates/warp-insight-observed/src/observed",
+      "module": "crates/wist-observed/src/observed/host_responsibility",
+      "parent": "crates/wist-observed/src/observed",
       "files": [
-        "crates/warp-insight-observed/src/observed/host_responsibility/assignment_role.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/assignment_source.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/assignment_target_type.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/external_identity_link.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/external_link_internal_kind.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/external_system_type.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/host_group.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/host_group_membership.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/host_group_type.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/mod.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/responsibility_assignment.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/subject.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility/subject_type.rs"
+        "crates/wist-observed/src/observed/host_responsibility/assignment_role.rs",
+        "crates/wist-observed/src/observed/host_responsibility/assignment_source.rs",
+        "crates/wist-observed/src/observed/host_responsibility/assignment_target_type.rs",
+        "crates/wist-observed/src/observed/host_responsibility/external_identity_link.rs",
+        "crates/wist-observed/src/observed/host_responsibility/external_link_internal_kind.rs",
+        "crates/wist-observed/src/observed/host_responsibility/external_system_type.rs",
+        "crates/wist-observed/src/observed/host_responsibility/host_group.rs",
+        "crates/wist-observed/src/observed/host_responsibility/host_group_membership.rs",
+        "crates/wist-observed/src/observed/host_responsibility/host_group_type.rs",
+        "crates/wist-observed/src/observed/host_responsibility/mod.rs",
+        "crates/wist-observed/src/observed/host_responsibility/responsibility_assignment.rs",
+        "crates/wist-observed/src/observed/host_responsibility/subject.rs",
+        "crates/wist-observed/src/observed/host_responsibility/subject_type.rs"
       ],
       "code_lines": 156,
       "function_count": 0,
@@ -8187,14 +8187,14 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src/observed/host_responsibility_service",
-      "parent": "crates/warp-insight-observed/src/observed",
+      "module": "crates/wist-observed/src/observed/host_responsibility_service",
+      "parent": "crates/wist-observed/src/observed",
       "files": [
-        "crates/warp-insight-observed/src/observed/host_responsibility_service/effective_host_responsibility.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility_service/external_sync_cursor.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility_service/mod.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility_service/sync_external_responsibility.rs",
-        "crates/warp-insight-observed/src/observed/host_responsibility_service/view_effective_host_responsibility.rs"
+        "crates/wist-observed/src/observed/host_responsibility_service/effective_host_responsibility.rs",
+        "crates/wist-observed/src/observed/host_responsibility_service/external_sync_cursor.rs",
+        "crates/wist-observed/src/observed/host_responsibility_service/mod.rs",
+        "crates/wist-observed/src/observed/host_responsibility_service/sync_external_responsibility.rs",
+        "crates/wist-observed/src/observed/host_responsibility_service/view_effective_host_responsibility.rs"
       ],
       "code_lines": 51,
       "function_count": 0,
@@ -8210,19 +8210,19 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src/observed/network_topology",
-      "parent": "crates/warp-insight-observed/src/observed",
+      "module": "crates/wist-observed/src/observed/network_topology",
+      "parent": "crates/wist-observed/src/observed",
       "files": [
-        "crates/warp-insight-observed/src/observed/network_topology/attachment_source.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/host_network_attachment.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/mod.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/network_domain.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/network_domain_kind.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/network_segment.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/network_segment_type.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/pod_inventory.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/pod_network_attachment.rs",
-        "crates/warp-insight-observed/src/observed/network_topology/pod_placement.rs"
+        "crates/wist-observed/src/observed/network_topology/attachment_source.rs",
+        "crates/wist-observed/src/observed/network_topology/host_network_attachment.rs",
+        "crates/wist-observed/src/observed/network_topology/mod.rs",
+        "crates/wist-observed/src/observed/network_topology/network_domain.rs",
+        "crates/wist-observed/src/observed/network_topology/network_domain_kind.rs",
+        "crates/wist-observed/src/observed/network_topology/network_segment.rs",
+        "crates/wist-observed/src/observed/network_topology/network_segment_type.rs",
+        "crates/wist-observed/src/observed/network_topology/pod_inventory.rs",
+        "crates/wist-observed/src/observed/network_topology/pod_network_attachment.rs",
+        "crates/wist-observed/src/observed/network_topology/pod_placement.rs"
       ],
       "code_lines": 122,
       "function_count": 0,
@@ -8238,25 +8238,25 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src/observed/service_topology",
-      "parent": "crates/warp-insight-observed/src/observed",
+      "module": "crates/wist-observed/src/observed/service_topology",
+      "parent": "crates/wist-observed/src/observed",
       "files": [
-        "crates/warp-insight-observed/src/observed/service_topology/business_domain.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/business_subsystem.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/dependency_scope.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/dependency_type.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/exposure_scope.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/mod.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_dependency.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_endpoint.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_endpoint_type.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_entity.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_instance.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_instance_endpoint.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_instance_lifecycle_state.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_runtime_type.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/service_type.rs",
-        "crates/warp-insight-observed/src/observed/service_topology/system_boundary.rs"
+        "crates/wist-observed/src/observed/service_topology/business_domain.rs",
+        "crates/wist-observed/src/observed/service_topology/business_subsystem.rs",
+        "crates/wist-observed/src/observed/service_topology/dependency_scope.rs",
+        "crates/wist-observed/src/observed/service_topology/dependency_type.rs",
+        "crates/wist-observed/src/observed/service_topology/exposure_scope.rs",
+        "crates/wist-observed/src/observed/service_topology/mod.rs",
+        "crates/wist-observed/src/observed/service_topology/service_dependency.rs",
+        "crates/wist-observed/src/observed/service_topology/service_endpoint.rs",
+        "crates/wist-observed/src/observed/service_topology/service_endpoint_type.rs",
+        "crates/wist-observed/src/observed/service_topology/service_entity.rs",
+        "crates/wist-observed/src/observed/service_topology/service_instance.rs",
+        "crates/wist-observed/src/observed/service_topology/service_instance_endpoint.rs",
+        "crates/wist-observed/src/observed/service_topology/service_instance_lifecycle_state.rs",
+        "crates/wist-observed/src/observed/service_topology/service_runtime_type.rs",
+        "crates/wist-observed/src/observed/service_topology/service_type.rs",
+        "crates/wist-observed/src/observed/service_topology/system_boundary.rs"
       ],
       "code_lines": 192,
       "function_count": 0,
@@ -8272,12 +8272,12 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-observed/src/observed/topology_query",
-      "parent": "crates/warp-insight-observed/src/observed",
+      "module": "crates/wist-observed/src/observed/topology_query",
+      "parent": "crates/wist-observed/src/observed",
       "files": [
-        "crates/warp-insight-observed/src/observed/topology_query/mod.rs",
-        "crates/warp-insight-observed/src/observed/topology_query/view_network_topology.rs",
-        "crates/warp-insight-observed/src/observed/topology_query/view_service_topology.rs"
+        "crates/wist-observed/src/observed/topology_query/mod.rs",
+        "crates/wist-observed/src/observed/topology_query/view_network_topology.rs",
+        "crates/wist-observed/src/observed/topology_query/view_service_topology.rs"
       ],
       "code_lines": 16,
       "function_count": 0,
@@ -8293,10 +8293,10 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-reporting/src",
+      "module": "crates/wist-reporting/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-reporting/src/lib.rs"
+        "crates/wist-reporting/src/lib.rs"
       ],
       "code_lines": 3,
       "function_count": 0,
@@ -8312,68 +8312,68 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-reporting/src/reporting",
-      "parent": "crates/warp-insight-reporting/src",
+      "module": "crates/wist-reporting/src/reporting",
+      "parent": "crates/wist-reporting/src",
       "files": [
-        "crates/warp-insight-reporting/src/reporting/ack_status.rs",
-        "crates/warp-insight-reporting/src/reporting/action_output_item.rs",
-        "crates/warp-insight-reporting/src/reporting/action_outputs.rs",
-        "crates/warp-insight-reporting/src/reporting/action_plan_ack.rs",
-        "crates/warp-insight-reporting/src/reporting/action_plan_ack_builder.rs",
-        "crates/warp-insight-reporting/src/reporting/action_plan_constraints.rs",
-        "crates/warp-insight-reporting/src/reporting/action_plan_contract.rs",
-        "crates/warp-insight-reporting/src/reporting/action_plan_meta.rs",
-        "crates/warp-insight-reporting/src/reporting/action_plan_program.rs",
-        "crates/warp-insight-reporting/src/reporting/action_plan_step.rs",
-        "crates/warp-insight-reporting/src/reporting/action_plan_target.rs",
-        "crates/warp-insight-reporting/src/reporting/action_result_contract.rs",
-        "crates/warp-insight-reporting/src/reporting/action_result_receipt.rs",
-        "crates/warp-insight-reporting/src/reporting/approval_mode.rs",
-        "crates/warp-insight-reporting/src/reporting/capability_limits.rs",
-        "crates/warp-insight-reporting/src/reporting/capability_report_contract.rs",
-        "crates/warp-insight-reporting/src/reporting/capability_report_sections.rs",
-        "crates/warp-insight-reporting/src/reporting/daemon_loop.rs",
-        "crates/warp-insight-reporting/src/reporting/disc_row_context.rs",
-        "crates/warp-insight-reporting/src/reporting/discovery_health.rs",
-        "crates/warp-insight-reporting/src/reporting/discovery_health_snapshot.rs",
-        "crates/warp-insight-reporting/src/reporting/discovery_ingest_ack.rs",
-        "crates/warp-insight-reporting/src/reporting/discovery_ingest_ack_status.rs",
-        "crates/warp-insight-reporting/src/reporting/discovery_probe_health.rs",
-        "crates/warp-insight-reporting/src/reporting/discovery_readiness.rs",
-        "crates/warp-insight-reporting/src/reporting/discovery_report_mode.rs",
-        "crates/warp-insight-reporting/src/reporting/exec_capabilities.rs",
-        "crates/warp-insight-reporting/src/reporting/execution_history_record.rs",
-        "crates/warp-insight-reporting/src/reporting/execution_resource_usage.rs",
-        "crates/warp-insight-reporting/src/reporting/export_result.rs",
-        "crates/warp-insight-reporting/src/reporting/exporter_output.rs",
-        "crates/warp-insight-reporting/src/reporting/exporter_source.rs",
-        "crates/warp-insight-reporting/src/reporting/final_status.rs",
-        "crates/warp-insight-reporting/src/reporting/health_state.rs",
-        "crates/warp-insight-reporting/src/reporting/ingest_head_error.rs",
-        "crates/warp-insight-reporting/src/reporting/local_report_inspection.rs",
-        "crates/warp-insight-reporting/src/reporting/local_report_issue.rs",
-        "crates/warp-insight-reporting/src/reporting/logs_capabilities.rs",
-        "crates/warp-insight-reporting/src/reporting/metrics_capabilities.rs",
-        "crates/warp-insight-reporting/src/reporting/metrics_failure.rs",
-        "crates/warp-insight-reporting/src/reporting/metrics_failure_kind.rs",
-        "crates/warp-insight-reporting/src/reporting/metrics_health_snapshot.rs",
-        "crates/warp-insight-reporting/src/reporting/metrics_tick.rs",
-        "crates/warp-insight-reporting/src/reporting/mod.rs",
-        "crates/warp-insight-reporting/src/reporting/prepared_report.rs",
-        "crates/warp-insight-reporting/src/reporting/prepared_report_origin.rs",
-        "crates/warp-insight-reporting/src/reporting/reporting_request.rs",
-        "crates/warp-insight-reporting/src/reporting/result_attestation.rs",
-        "crates/warp-insight-reporting/src/reporting/risk_level.rs",
-        "crates/warp-insight-reporting/src/reporting/running_state_status.rs",
-        "crates/warp-insight-reporting/src/reporting/runtime_health_snapshot.rs",
-        "crates/warp-insight-reporting/src/reporting/signal_request_kind.rs",
-        "crates/warp-insight-reporting/src/reporting/step_action_record.rs",
-        "crates/warp-insight-reporting/src/reporting/step_status.rs",
-        "crates/warp-insight-reporting/src/reporting/telemetry_failure.rs",
-        "crates/warp-insight-reporting/src/reporting/telemetry_failure_kind.rs",
-        "crates/warp-insight-reporting/src/reporting/telemetry_record_contract.rs",
-        "crates/warp-insight-reporting/src/reporting/telemetry_tick.rs",
-        "crates/warp-insight-reporting/src/reporting/upgrade_capabilities.rs"
+        "crates/wist-reporting/src/reporting/ack_status.rs",
+        "crates/wist-reporting/src/reporting/action_output_item.rs",
+        "crates/wist-reporting/src/reporting/action_outputs.rs",
+        "crates/wist-reporting/src/reporting/action_plan_ack.rs",
+        "crates/wist-reporting/src/reporting/action_plan_ack_builder.rs",
+        "crates/wist-reporting/src/reporting/action_plan_constraints.rs",
+        "crates/wist-reporting/src/reporting/action_plan_contract.rs",
+        "crates/wist-reporting/src/reporting/action_plan_meta.rs",
+        "crates/wist-reporting/src/reporting/action_plan_program.rs",
+        "crates/wist-reporting/src/reporting/action_plan_step.rs",
+        "crates/wist-reporting/src/reporting/action_plan_target.rs",
+        "crates/wist-reporting/src/reporting/action_result_contract.rs",
+        "crates/wist-reporting/src/reporting/action_result_receipt.rs",
+        "crates/wist-reporting/src/reporting/approval_mode.rs",
+        "crates/wist-reporting/src/reporting/capability_limits.rs",
+        "crates/wist-reporting/src/reporting/capability_report_contract.rs",
+        "crates/wist-reporting/src/reporting/capability_report_sections.rs",
+        "crates/wist-reporting/src/reporting/daemon_loop.rs",
+        "crates/wist-reporting/src/reporting/disc_row_context.rs",
+        "crates/wist-reporting/src/reporting/discovery_health.rs",
+        "crates/wist-reporting/src/reporting/discovery_health_snapshot.rs",
+        "crates/wist-reporting/src/reporting/discovery_ingest_ack.rs",
+        "crates/wist-reporting/src/reporting/discovery_ingest_ack_status.rs",
+        "crates/wist-reporting/src/reporting/discovery_probe_health.rs",
+        "crates/wist-reporting/src/reporting/discovery_readiness.rs",
+        "crates/wist-reporting/src/reporting/discovery_report_mode.rs",
+        "crates/wist-reporting/src/reporting/exec_capabilities.rs",
+        "crates/wist-reporting/src/reporting/execution_history_record.rs",
+        "crates/wist-reporting/src/reporting/execution_resource_usage.rs",
+        "crates/wist-reporting/src/reporting/export_result.rs",
+        "crates/wist-reporting/src/reporting/exporter_output.rs",
+        "crates/wist-reporting/src/reporting/exporter_source.rs",
+        "crates/wist-reporting/src/reporting/final_status.rs",
+        "crates/wist-reporting/src/reporting/health_state.rs",
+        "crates/wist-reporting/src/reporting/ingest_head_error.rs",
+        "crates/wist-reporting/src/reporting/local_report_inspection.rs",
+        "crates/wist-reporting/src/reporting/local_report_issue.rs",
+        "crates/wist-reporting/src/reporting/logs_capabilities.rs",
+        "crates/wist-reporting/src/reporting/metrics_capabilities.rs",
+        "crates/wist-reporting/src/reporting/metrics_failure.rs",
+        "crates/wist-reporting/src/reporting/metrics_failure_kind.rs",
+        "crates/wist-reporting/src/reporting/metrics_health_snapshot.rs",
+        "crates/wist-reporting/src/reporting/metrics_tick.rs",
+        "crates/wist-reporting/src/reporting/mod.rs",
+        "crates/wist-reporting/src/reporting/prepared_report.rs",
+        "crates/wist-reporting/src/reporting/prepared_report_origin.rs",
+        "crates/wist-reporting/src/reporting/reporting_request.rs",
+        "crates/wist-reporting/src/reporting/result_attestation.rs",
+        "crates/wist-reporting/src/reporting/risk_level.rs",
+        "crates/wist-reporting/src/reporting/running_state_status.rs",
+        "crates/wist-reporting/src/reporting/runtime_health_snapshot.rs",
+        "crates/wist-reporting/src/reporting/signal_request_kind.rs",
+        "crates/wist-reporting/src/reporting/step_action_record.rs",
+        "crates/wist-reporting/src/reporting/step_status.rs",
+        "crates/wist-reporting/src/reporting/telemetry_failure.rs",
+        "crates/wist-reporting/src/reporting/telemetry_failure_kind.rs",
+        "crates/wist-reporting/src/reporting/telemetry_record_contract.rs",
+        "crates/wist-reporting/src/reporting/telemetry_tick.rs",
+        "crates/wist-reporting/src/reporting/upgrade_capabilities.rs"
       ],
       "code_lines": 575,
       "function_count": 0,
@@ -8389,10 +8389,10 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-security/src",
+      "module": "crates/wist-security/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-security/src/lib.rs"
+        "crates/wist-security/src/lib.rs"
       ],
       "code_lines": 3,
       "function_count": 0,
@@ -8408,10 +8408,10 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-security/src/security",
-      "parent": "crates/warp-insight-security/src",
+      "module": "crates/wist-security/src/security",
+      "parent": "crates/wist-security/src",
       "files": [
-        "crates/warp-insight-security/src/security/mod.rs"
+        "crates/wist-security/src/security/mod.rs"
       ],
       "code_lines": 4,
       "function_count": 0,
@@ -8427,21 +8427,21 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-security/src/security/software_vulnerability",
-      "parent": "crates/warp-insight-security/src/security",
+      "module": "crates/wist-security/src/security/software_vulnerability",
+      "parent": "crates/wist-security/src/security",
       "files": [
-        "crates/warp-insight-security/src/security/software_vulnerability/advisory_source.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/evidence_raw_fact.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/matching_route.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/mod.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/normalization_status.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/severity.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/software_entity.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/software_evidence.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/software_external_id.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/software_id_kind.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/software_vulnerability_finding.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability/vulnerability_advisory_raw.rs"
+        "crates/wist-security/src/security/software_vulnerability/advisory_source.rs",
+        "crates/wist-security/src/security/software_vulnerability/evidence_raw_fact.rs",
+        "crates/wist-security/src/security/software_vulnerability/matching_route.rs",
+        "crates/wist-security/src/security/software_vulnerability/mod.rs",
+        "crates/wist-security/src/security/software_vulnerability/normalization_status.rs",
+        "crates/wist-security/src/security/software_vulnerability/severity.rs",
+        "crates/wist-security/src/security/software_vulnerability/software_entity.rs",
+        "crates/wist-security/src/security/software_vulnerability/software_evidence.rs",
+        "crates/wist-security/src/security/software_vulnerability/software_external_id.rs",
+        "crates/wist-security/src/security/software_vulnerability/software_id_kind.rs",
+        "crates/wist-security/src/security/software_vulnerability/software_vulnerability_finding.rs",
+        "crates/wist-security/src/security/software_vulnerability/vulnerability_advisory_raw.rs"
       ],
       "code_lines": 151,
       "function_count": 0,
@@ -8457,13 +8457,13 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-security/src/security/software_vulnerability_service",
-      "parent": "crates/warp-insight-security/src/security",
+      "module": "crates/wist-security/src/security/software_vulnerability_service",
+      "parent": "crates/wist-security/src/security",
       "files": [
-        "crates/warp-insight-security/src/security/software_vulnerability_service/ingest_vulnerability_advisory.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability_service/mod.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability_service/view_software_vulnerabilities.rs",
-        "crates/warp-insight-security/src/security/software_vulnerability_service/vulnerability_feed_sync_state.rs"
+        "crates/wist-security/src/security/software_vulnerability_service/ingest_vulnerability_advisory.rs",
+        "crates/wist-security/src/security/software_vulnerability_service/mod.rs",
+        "crates/wist-security/src/security/software_vulnerability_service/view_software_vulnerabilities.rs",
+        "crates/wist-security/src/security/software_vulnerability_service/vulnerability_feed_sync_state.rs"
       ],
       "code_lines": 30,
       "function_count": 0,
@@ -8479,17 +8479,17 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-shared/src",
+      "module": "crates/wist-shared/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-shared/src/error_codes.rs",
-        "crates/warp-insight-shared/src/fs.rs",
-        "crates/warp-insight-shared/src/ids.rs",
-        "crates/warp-insight-shared/src/integrity.rs",
-        "crates/warp-insight-shared/src/lib.rs",
-        "crates/warp-insight-shared/src/paths.rs",
-        "crates/warp-insight-shared/src/primitives.rs",
-        "crates/warp-insight-shared/src/time.rs"
+        "crates/wist-shared/src/error_codes.rs",
+        "crates/wist-shared/src/fs.rs",
+        "crates/wist-shared/src/ids.rs",
+        "crates/wist-shared/src/integrity.rs",
+        "crates/wist-shared/src/lib.rs",
+        "crates/wist-shared/src/paths.rs",
+        "crates/wist-shared/src/primitives.rs",
+        "crates/wist-shared/src/time.rs"
       ],
       "code_lines": 187,
       "function_count": 22,
@@ -8505,14 +8505,14 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-upgrader/src",
+      "module": "crates/wist-upgrader/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-upgrader/src/lib.rs",
-        "crates/warp-insight-upgrader/src/main.rs",
-        "crates/warp-insight-upgrader/src/prepare.rs",
-        "crates/warp-insight-upgrader/src/rollback.rs",
-        "crates/warp-insight-upgrader/src/switch.rs"
+        "crates/wist-upgrader/src/lib.rs",
+        "crates/wist-upgrader/src/main.rs",
+        "crates/wist-upgrader/src/prepare.rs",
+        "crates/wist-upgrader/src/rollback.rs",
+        "crates/wist-upgrader/src/switch.rs"
       ],
       "code_lines": 62,
       "function_count": 7,
@@ -8528,15 +8528,15 @@
       "subtree_over_length_function_count": 0
     },
     {
-      "module": "crates/warp-insight-validate/src",
+      "module": "crates/wist-validate/src",
       "parent": null,
       "files": [
-        "crates/warp-insight-validate/src/action_plan.rs",
-        "crates/warp-insight-validate/src/action_result.rs",
-        "crates/warp-insight-validate/src/config.rs",
-        "crates/warp-insight-validate/src/gateway.rs",
-        "crates/warp-insight-validate/src/lib.rs",
-        "crates/warp-insight-validate/src/state.rs"
+        "crates/wist-validate/src/action_plan.rs",
+        "crates/wist-validate/src/action_result.rs",
+        "crates/wist-validate/src/config.rs",
+        "crates/wist-validate/src/gateway.rs",
+        "crates/wist-validate/src/lib.rs",
+        "crates/wist-validate/src/state.rs"
       ],
       "code_lines": 435,
       "function_count": 11,
@@ -9390,7 +9390,7 @@
     },
     {
       "name": "read_queued_plan",
-      "signature": "(workdir : & Path ,) -> io :: Result < warp_insight_contracts :: action_plan :: ActionPlanContract >",
+      "signature": "(workdir : & Path ,) -> io :: Result < wist_contracts :: action_plan :: ActionPlanContract >",
       "file": "crates/warp-agentd/src/daemon_recovery.rs",
       "start_line": 119,
       "end_line": 123,
@@ -11048,7 +11048,7 @@
     },
     {
       "name": "apply_credential_to_config",
-      "signature": "(config : & mut AgentConfigContract , credential : & warp_insight_contracts :: enrollment :: AgentCredentialBundle ,) -> Result < () , EnrollmentError >",
+      "signature": "(config : & mut AgentConfigContract , credential : & wist_contracts :: enrollment :: AgentCredentialBundle ,) -> Result < () , EnrollmentError >",
       "file": "crates/warp-agentd/src/enrollment.rs",
       "start_line": 471,
       "end_line": 502,
@@ -11060,7 +11060,7 @@
     },
     {
       "name": "apply_credential_to_runtime_state",
-      "signature": "(runtime_state : & mut AgentRuntimeState , credential : warp_insight_contracts :: enrollment :: AgentCredentialBundle ,)",
+      "signature": "(runtime_state : & mut AgentRuntimeState , credential : wist_contracts :: enrollment :: AgentCredentialBundle ,)",
       "file": "crates/warp-agentd/src/enrollment.rs",
       "start_line": 504,
       "end_line": 518,
@@ -12287,7 +12287,7 @@
     },
     {
       "name": "initialize_runtime_state",
-      "signature": "(state_dir : & Path , config : & warp_insight_contracts :: agent_config :: AgentConfigContract ,) -> io :: Result < () >",
+      "signature": "(state_dir : & Path , config : & wist_contracts :: agent_config :: AgentConfigContract ,) -> io :: Result < () >",
       "file": "crates/warp-agentd/src/runtime_entry.rs",
       "start_line": 265,
       "end_line": 278,
@@ -12335,7 +12335,7 @@
     },
     {
       "name": "sync_runtime_identity",
-      "signature": "(runtime_state : & mut warp_insight_contracts :: state_exec :: AgentRuntimeState , config : & warp_insight_contracts :: agent_config :: AgentConfigContract ,) -> io :: Result < () >",
+      "signature": "(runtime_state : & mut wist_contracts :: state_exec :: AgentRuntimeState , config : & wist_contracts :: agent_config :: AgentConfigContract ,) -> io :: Result < () >",
       "file": "crates/warp-agentd/src/runtime_entry.rs",
       "start_line": 343,
       "end_line": 378,
@@ -13718,7 +13718,7 @@
     {
       "name": "write_records",
       "type_name": "TestSink",
-      "signature": "(& mut self , records : & [warp_insight_contracts :: telemetry_record :: TelemetryRecordContract] ,) -> io :: Result < () >",
+      "signature": "(& mut self , records : & [wist_contracts :: telemetry_record :: TelemetryRecordContract] ,) -> io :: Result < () >",
       "file": "crates/warp-agentd/src/telemetry/logs/file_input_tests/mod.rs",
       "start_line": 40,
       "end_line": 49,
@@ -13742,7 +13742,7 @@
     },
     {
       "name": "read_output_records",
-      "signature": "(path : & Path ,) -> Vec < warp_insight_contracts :: telemetry_record :: TelemetryRecordContract >",
+      "signature": "(path : & Path ,) -> Vec < wist_contracts :: telemetry_record :: TelemetryRecordContract >",
       "file": "crates/warp-agentd/src/telemetry/logs/file_input_tests/mod.rs",
       "start_line": 64,
       "end_line": 73,
@@ -19123,7 +19123,7 @@
       "name": "new",
       "type_name": "ActionPlanContract",
       "signature": "(meta : ActionPlanMeta , target : ActionPlanTarget , constraints : ActionPlanConstraints , program : ActionPlanProgram ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/action_plan.rs",
+      "file": "crates/wist-contracts/src/action_plan.rs",
       "start_line": 28,
       "end_line": 42,
       "length": 15,
@@ -19135,7 +19135,7 @@
     {
       "name": "is_known_step_kind",
       "signature": "(kind : & str) -> bool",
-      "file": "crates/warp-insight-contracts/src/action_plan.rs",
+      "file": "crates/wist-contracts/src/action_plan.rs",
       "start_line": 121,
       "end_line": 126,
       "length": 6,
@@ -19148,7 +19148,7 @@
       "name": "new",
       "type_name": "ActionResultContract",
       "signature": "(action_id : String , execution_id : String , final_status : FinalStatus) -> Self",
-      "file": "crates/warp-insight-contracts/src/action_result.rs",
+      "file": "crates/wist-contracts/src/action_result.rs",
       "start_line": 28,
       "end_line": 43,
       "length": 16,
@@ -19161,7 +19161,7 @@
       "name": "as_state_name",
       "type_name": "FinalStatus",
       "signature": "(self) -> & 'static str",
-      "file": "crates/warp-insight-contracts/src/action_result.rs",
+      "file": "crates/wist-contracts/src/action_result.rs",
       "start_line": 61,
       "end_line": 69,
       "length": 9,
@@ -19174,7 +19174,7 @@
       "name": "new",
       "type_name": "AgentConfigContract",
       "signature": "(agent : AgentSection , control_plane : ControlPlaneSection , paths : PathsSection , execution : ExecutionSection ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 26,
       "end_line": 41,
       "length": 16,
@@ -19187,7 +19187,7 @@
       "name": "with_telemetry",
       "type_name": "AgentConfigContract",
       "signature": "(mut self , telemetry : TelemetrySection) -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 43,
       "end_line": 46,
       "length": 4,
@@ -19200,7 +19200,7 @@
       "name": "default",
       "type_name": "DiscoverySection",
       "signature": "() -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 65,
       "end_line": 73,
       "length": 9,
@@ -19213,7 +19213,7 @@
       "name": "default",
       "type_name": "PathsSection",
       "signature": "() -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 126,
       "end_line": 133,
       "length": 8,
@@ -19226,7 +19226,7 @@
       "name": "default",
       "type_name": "ExecutionSection",
       "signature": "() -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 150,
       "end_line": 157,
       "length": 8,
@@ -19239,7 +19239,7 @@
       "name": "default",
       "type_name": "LogsSection",
       "signature": "() -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 181,
       "end_line": 188,
       "length": 8,
@@ -19252,7 +19252,7 @@
       "name": "default",
       "type_name": "LogsOutputSection",
       "signature": "() -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 203,
       "end_line": 209,
       "length": 7,
@@ -19265,7 +19265,7 @@
       "name": "default",
       "type_name": "LogsFileOutputSection",
       "signature": "() -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 220,
       "end_line": 224,
       "length": 5,
@@ -19278,7 +19278,7 @@
       "name": "default",
       "type_name": "LogsTcpOutputSection",
       "signature": "() -> Self",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 239,
       "end_line": 245,
       "length": 7,
@@ -19290,7 +19290,7 @@
     {
       "name": "default_logs_buffer_bytes",
       "signature": "() -> u64",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 259,
       "end_line": 261,
       "length": 3,
@@ -19302,7 +19302,7 @@
     {
       "name": "default_root_dir",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 263,
       "end_line": 265,
       "length": 3,
@@ -19314,7 +19314,7 @@
     {
       "name": "default_run_dir",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 267,
       "end_line": 269,
       "length": 3,
@@ -19326,7 +19326,7 @@
     {
       "name": "default_state_dir",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 271,
       "end_line": 273,
       "length": 3,
@@ -19338,7 +19338,7 @@
     {
       "name": "default_log_dir",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 275,
       "end_line": 277,
       "length": 3,
@@ -19350,7 +19350,7 @@
     {
       "name": "default_max_running_actions",
       "signature": "() -> u32",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 279,
       "end_line": 281,
       "length": 3,
@@ -19362,7 +19362,7 @@
     {
       "name": "default_cancel_grace_ms",
       "signature": "() -> u64",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 283,
       "end_line": 285,
       "length": 3,
@@ -19374,7 +19374,7 @@
     {
       "name": "default_stdout_limit_bytes",
       "signature": "() -> u64",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 287,
       "end_line": 289,
       "length": 3,
@@ -19386,7 +19386,7 @@
     {
       "name": "default_stderr_limit_bytes",
       "signature": "() -> u64",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 291,
       "end_line": 293,
       "length": 3,
@@ -19398,7 +19398,7 @@
     {
       "name": "default_logs_spool_dir",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 295,
       "end_line": 297,
       "length": 3,
@@ -19410,7 +19410,7 @@
     {
       "name": "default_logs_output_file",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 299,
       "end_line": 301,
       "length": 3,
@@ -19422,7 +19422,7 @@
     {
       "name": "default_logs_output_kind",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 303,
       "end_line": 305,
       "length": 3,
@@ -19434,7 +19434,7 @@
     {
       "name": "default_logs_output_tcp_addr",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 307,
       "end_line": 309,
       "length": 3,
@@ -19446,7 +19446,7 @@
     {
       "name": "default_logs_output_tcp_port",
       "signature": "() -> u16",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 311,
       "end_line": 313,
       "length": 3,
@@ -19458,7 +19458,7 @@
     {
       "name": "default_logs_output_tcp_framing",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 315,
       "end_line": 317,
       "length": 3,
@@ -19470,7 +19470,7 @@
     {
       "name": "default_multiline_mode",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 319,
       "end_line": 321,
       "length": 3,
@@ -19482,7 +19482,7 @@
     {
       "name": "default_startup_position",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 323,
       "end_line": 325,
       "length": 3,
@@ -19494,7 +19494,7 @@
     {
       "name": "default_discovery_host_enabled",
       "signature": "() -> bool",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 327,
       "end_line": 329,
       "length": 3,
@@ -19506,7 +19506,7 @@
     {
       "name": "default_discovery_network_enabled",
       "signature": "() -> bool",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 331,
       "end_line": 333,
       "length": 3,
@@ -19518,7 +19518,7 @@
     {
       "name": "default_discovery_endpoint_enabled",
       "signature": "() -> bool",
-      "file": "crates/warp-insight-contracts/src/agent_config.rs",
+      "file": "crates/wist-contracts/src/agent_config.rs",
       "start_line": 335,
       "end_line": 337,
       "length": 3,
@@ -19531,7 +19531,7 @@
       "name": "new",
       "type_name": "CapabilityReportContract",
       "signature": "(sections : CapabilityReportSections) -> Self",
-      "file": "crates/warp-insight-contracts/src/capability_report.rs",
+      "file": "crates/wist-contracts/src/capability_report.rs",
       "start_line": 34,
       "end_line": 46,
       "length": 13,
@@ -19544,7 +19544,7 @@
       "name": "new",
       "type_name": "DiscoverySnapshotContract",
       "signature": "(snapshot_id : String , revision : u64 , generated_at : String) -> Self",
-      "file": "crates/warp-insight-contracts/src/discovery.rs",
+      "file": "crates/wist-contracts/src/discovery.rs",
       "start_line": 25,
       "end_line": 35,
       "length": 11,
@@ -19557,7 +19557,7 @@
       "name": "new",
       "type_name": "DiscoveryCacheMeta",
       "signature": "(snapshot_id : String , revision : u64 , generated_at : String , origins : Vec < DiscoveryOrigin > , last_success_at : Option < String > , last_error : Option < String > ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/discovery.rs",
+      "file": "crates/wist-contracts/src/discovery.rs",
       "start_line": 61,
       "end_line": 78,
       "length": 18,
@@ -19569,7 +19569,7 @@
     {
       "name": "default_health",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/discovery.rs",
+      "file": "crates/wist-contracts/src/discovery.rs",
       "start_line": 117,
       "end_line": 119,
       "length": 3,
@@ -19581,7 +19581,7 @@
     {
       "name": "default_target_state",
       "signature": "() -> String",
-      "file": "crates/warp-insight-contracts/src/discovery.rs",
+      "file": "crates/wist-contracts/src/discovery.rs",
       "start_line": 121,
       "end_line": 123,
       "length": 3,
@@ -19594,7 +19594,7 @@
       "name": "new",
       "type_name": "StringKeyValue",
       "signature": "(key : impl Into < String > , value : impl Into < String >) -> Self",
-      "file": "crates/warp-insight-contracts/src/discovery.rs",
+      "file": "crates/wist-contracts/src/discovery.rs",
       "start_line": 145,
       "end_line": 150,
       "length": 6,
@@ -19607,7 +19607,7 @@
       "name": "new",
       "type_name": "SubmitEnrollmentRequest",
       "signature": "(token : String , credential_request : String , host_profile : AgentHostProfile , capability_summary : String , requested_at : String ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/enrollment.rs",
+      "file": "crates/wist-contracts/src/enrollment.rs",
       "start_line": 23,
       "end_line": 39,
       "length": 17,
@@ -19620,7 +19620,7 @@
       "name": "new",
       "type_name": "RenewAgentCredential",
       "signature": "(agent_id : String , instance_id : String , credential_request : String , requested_at : String ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/enrollment.rs",
+      "file": "crates/wist-contracts/src/enrollment.rs",
       "start_line": 137,
       "end_line": 151,
       "length": 15,
@@ -19633,7 +19633,7 @@
       "name": "new",
       "type_name": "ExporterSource",
       "signature": "(agent_id : & str , instance_id : & str) -> Self",
-      "file": "crates/warp-insight-contracts/src/exporter.rs",
+      "file": "crates/wist-contracts/src/exporter.rs",
       "start_line": 47,
       "end_line": 53,
       "length": 7,
@@ -19646,7 +19646,7 @@
       "name": "with_probe",
       "type_name": "ExporterSource",
       "signature": "(mut self , probe : & str) -> Self",
-      "file": "crates/warp-insight-contracts/src/exporter.rs",
+      "file": "crates/wist-contracts/src/exporter.rs",
       "start_line": 55,
       "end_line": 58,
       "length": 4,
@@ -19659,7 +19659,7 @@
       "name": "new",
       "type_name": "ExporterOutput",
       "signature": "(kind : & str , output_id : String , seq : u64 , generated_at : String , source : ExporterSource , payload : T ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/exporter.rs",
+      "file": "crates/wist-contracts/src/exporter.rs",
       "start_line": 62,
       "end_line": 79,
       "length": 18,
@@ -19672,7 +19672,7 @@
       "name": "new",
       "type_name": "DispatchActionPlan",
       "signature": "(dispatch_id : String , plan : ActionPlanContract) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 40,
       "end_line": 47,
       "length": 8,
@@ -19685,7 +19685,7 @@
       "name": "builder",
       "type_name": "ActionPlanAck",
       "signature": "(dispatch_id : String , action_id : String , ack_status : AckStatus ,) -> ActionPlanAckBuilder",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 70,
       "end_line": 89,
       "length": 20,
@@ -19698,7 +19698,7 @@
       "name": "new",
       "type_name": "ActionPlanAck",
       "signature": "(dispatch_id : String , action_id : String , plan_digest : String , agent_id : String , instance_id : String , execution_id : Option < String > , ack_status : AckStatus , received_at : String , acknowledged_at : String ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 92,
       "end_line": 111,
       "length": 20,
@@ -19711,7 +19711,7 @@
       "name": "plan_digest",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , plan_digest : String) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 131,
       "end_line": 134,
       "length": 4,
@@ -19724,7 +19724,7 @@
       "name": "agent_id",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , agent_id : String) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 136,
       "end_line": 139,
       "length": 4,
@@ -19737,7 +19737,7 @@
       "name": "instance_id",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , instance_id : String) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 141,
       "end_line": 144,
       "length": 4,
@@ -19750,7 +19750,7 @@
       "name": "execution_id",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , execution_id : Option < String >) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 146,
       "end_line": 149,
       "length": 4,
@@ -19763,7 +19763,7 @@
       "name": "reason_code",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , reason_code : Option < String >) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 151,
       "end_line": 154,
       "length": 4,
@@ -19776,7 +19776,7 @@
       "name": "reason_message",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , reason_message : Option < String >) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 156,
       "end_line": 159,
       "length": 4,
@@ -19789,7 +19789,7 @@
       "name": "queue_position",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , queue_position : Option < u64 >) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 161,
       "end_line": 164,
       "length": 4,
@@ -19802,7 +19802,7 @@
       "name": "received_at",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , received_at : String) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 166,
       "end_line": 169,
       "length": 4,
@@ -19815,7 +19815,7 @@
       "name": "acknowledged_at",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(mut self , acknowledged_at : String) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 171,
       "end_line": 174,
       "length": 4,
@@ -19828,7 +19828,7 @@
       "name": "build",
       "type_name": "ActionPlanAckBuilder",
       "signature": "(self) -> ActionPlanAck",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 176,
       "end_line": 193,
       "length": 18,
@@ -19841,7 +19841,7 @@
       "name": "new",
       "type_name": "ReportActionResult",
       "signature": "(report_id : String , action_id : String , report_attempt : u32 , final_status : FinalStatus , execution_id : String , plan_digest : String , agent_id : String , instance_id : String , result_attestation : ResultAttestation , reported_at : String , result : ActionResultContract ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/gateway.rs",
+      "file": "crates/wist-contracts/src/gateway.rs",
       "start_line": 217,
       "end_line": 246,
       "length": 30,
@@ -19854,7 +19854,7 @@
       "name": "new",
       "type_name": "ReportDiscoverySnapshot",
       "signature": "(report_id : String , agent_id : String , instance_id : String , report_attempt : u32 , report_mode : DiscoveryReportMode , reported_at : String , snapshot : DiscoverySnapshotContract ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 37,
       "end_line": 60,
       "length": 24,
@@ -19867,7 +19867,7 @@
       "name": "new",
       "type_name": "DiscoveryIngestAck",
       "signature": "(report_id : String , agent_id : String , instance_id : String , snapshot_id : String , revision : u64 , ack_status : DiscoveryIngestAckStatus , accepted_at : String ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 89,
       "end_line": 111,
       "length": 23,
@@ -19880,7 +19880,7 @@
       "name": "discovery_snapshot",
       "type_name": "WarpParseIngestHead",
       "signature": "(body_len : u32) -> Self",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 137,
       "end_line": 146,
       "length": 10,
@@ -19893,7 +19893,7 @@
       "name": "encode",
       "type_name": "WarpParseIngestHead",
       "signature": "(self) -> Result < [u8 ; WARP_PARSE_INGEST_HEAD_LEN] , IngestHeadError >",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 148,
       "end_line": 178,
       "length": 31,
@@ -19906,7 +19906,7 @@
       "name": "decode",
       "type_name": "WarpParseIngestHead",
       "signature": "(input : & [u8]) -> Result < Self , IngestHeadError >",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 180,
       "end_line": 229,
       "length": 50,
@@ -19918,7 +19918,7 @@
     {
       "name": "parse_kv",
       "signature": "(field : & 'a str , key : & str) -> Result < & 'a str , IngestHeadError >",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 232,
       "end_line": 246,
       "length": 15,
@@ -19931,7 +19931,7 @@
       "name": "as_code",
       "type_name": "WarpParseIngestMessageKind",
       "signature": "(self) -> & 'static str",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 255,
       "end_line": 260,
       "length": 6,
@@ -19944,7 +19944,7 @@
       "name": "from_code",
       "type_name": "WarpParseIngestMessageKind",
       "signature": "(code : & str) -> Result < Self , IngestHeadError >",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 262,
       "end_line": 268,
       "length": 7,
@@ -19957,7 +19957,7 @@
       "name": "as_code",
       "type_name": "WarpParseIngestEncoding",
       "signature": "(self) -> & 'static str",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 277,
       "end_line": 281,
       "length": 5,
@@ -19970,7 +19970,7 @@
       "name": "from_code",
       "type_name": "WarpParseIngestEncoding",
       "signature": "(code : & str) -> Result < Self , IngestHeadError >",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 283,
       "end_line": 288,
       "length": 6,
@@ -19983,7 +19983,7 @@
       "name": "as_code",
       "type_name": "WarpParseIngestCompression",
       "signature": "(self) -> & 'static str",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 299,
       "end_line": 305,
       "length": 7,
@@ -19996,7 +19996,7 @@
       "name": "from_code",
       "type_name": "WarpParseIngestCompression",
       "signature": "(code : & str) -> Result < Self , IngestHeadError >",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 307,
       "end_line": 314,
       "length": 8,
@@ -20009,7 +20009,7 @@
       "name": "fmt",
       "type_name": "IngestHeadError",
       "signature": "(& self , f : & mut fmt :: Formatter < '_ >) -> fmt :: Result",
-      "file": "crates/warp-insight-contracts/src/ingest.rs",
+      "file": "crates/wist-contracts/src/ingest.rs",
       "start_line": 337,
       "end_line": 374,
       "length": 38,
@@ -20022,7 +20022,7 @@
       "name": "new",
       "type_name": "AgentRuntimeState",
       "signature": "(agent_id : String , instance_id : String , version : String , mode : RuntimeMode , updated_at : String ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/state_exec.rs",
+      "file": "crates/wist-contracts/src/state_exec.rs",
       "start_line": 25,
       "end_line": 43,
       "length": 19,
@@ -20035,7 +20035,7 @@
       "name": "new_log",
       "type_name": "TelemetryRecordContract",
       "signature": "(observed_at : String , input_id : String , source_path : String , body : String , file_offset : u64 , file_offset_end : u64 ,) -> Self",
-      "file": "crates/warp-insight-contracts/src/telemetry_record.rs",
+      "file": "crates/wist-contracts/src/telemetry_record.rs",
       "start_line": 21,
       "end_line": 39,
       "length": 19,
@@ -20047,7 +20047,7 @@
     {
       "name": "run",
       "signature": "() -> Result < () , String >",
-      "file": "crates/warp-insight-exec/src/lib.rs",
+      "file": "crates/wist-exec/src/lib.rs",
       "start_line": 7,
       "end_line": 16,
       "length": 10,
@@ -20059,7 +20059,7 @@
     {
       "name": "parse_cli_args",
       "signature": "(mut args : I) -> Result < std :: path :: PathBuf , String > where I : Iterator < Item = String > ,",
-      "file": "crates/warp-insight-exec/src/lib.rs",
+      "file": "crates/wist-exec/src/lib.rs",
       "start_line": 18,
       "end_line": 33,
       "length": 16,
@@ -20071,7 +20071,7 @@
     {
       "name": "main",
       "signature": "()",
-      "file": "crates/warp-insight-exec/src/main.rs",
+      "file": "crates/wist-exec/src/main.rs",
       "start_line": 1,
       "end_line": 6,
       "length": 6,
@@ -20083,7 +20083,7 @@
     {
       "name": "write",
       "signature": "(workdir : & ExecutionWorkdir , result : & ActionResultContract) -> io :: Result < () >",
-      "file": "crates/warp-insight-exec/src/result_writer.rs",
+      "file": "crates/wist-exec/src/result_writer.rs",
       "start_line": 11,
       "end_line": 24,
       "length": 14,
@@ -20095,7 +20095,7 @@
     {
       "name": "execute",
       "signature": "(workdir : & ExecutionWorkdir) -> io :: Result < ActionResultContract >",
-      "file": "crates/warp-insight-exec/src/runtime.rs",
+      "file": "crates/wist-exec/src/runtime.rs",
       "start_line": 13,
       "end_line": 117,
       "length": 105,
@@ -20108,7 +20108,7 @@
       "name": "open",
       "type_name": "ExecutionWorkdir",
       "signature": "(base : & Path) -> io :: Result < Self >",
-      "file": "crates/warp-insight-exec/src/workdir.rs",
+      "file": "crates/wist-exec/src/workdir.rs",
       "start_line": 24,
       "end_line": 39,
       "length": 16,
@@ -20121,7 +20121,7 @@
       "name": "read_plan",
       "type_name": "ExecutionWorkdir",
       "signature": "(& self) -> io :: Result < ActionPlanContract >",
-      "file": "crates/warp-insight-exec/src/workdir.rs",
+      "file": "crates/wist-exec/src/workdir.rs",
       "start_line": 41,
       "end_line": 43,
       "length": 3,
@@ -20134,7 +20134,7 @@
       "name": "read_runtime",
       "type_name": "ExecutionWorkdir",
       "signature": "(& self) -> io :: Result < ExecRuntimeContext >",
-      "file": "crates/warp-insight-exec/src/workdir.rs",
+      "file": "crates/wist-exec/src/workdir.rs",
       "start_line": 45,
       "end_line": 47,
       "length": 3,
@@ -20147,7 +20147,7 @@
       "name": "write_state",
       "type_name": "ExecutionWorkdir",
       "signature": "(& self , state : & ExecProgressState) -> io :: Result < () >",
-      "file": "crates/warp-insight-exec/src/workdir.rs",
+      "file": "crates/wist-exec/src/workdir.rs",
       "start_line": 49,
       "end_line": 51,
       "length": 3,
@@ -20160,7 +20160,7 @@
       "name": "write_result",
       "type_name": "ExecutionWorkdir",
       "signature": "(& self , result : & ActionResultContract) -> io :: Result < () >",
-      "file": "crates/warp-insight-exec/src/workdir.rs",
+      "file": "crates/wist-exec/src/workdir.rs",
       "start_line": 53,
       "end_line": 55,
       "length": 3,
@@ -20172,7 +20172,7 @@
     {
       "name": "reconcile",
       "signature": "()",
-      "file": "crates/warp-insight-gateway/src/lease.rs",
+      "file": "crates/wist-gateway/src/lease.rs",
       "start_line": 3,
       "end_line": 3,
       "length": 1,
@@ -20184,7 +20184,7 @@
     {
       "name": "run",
       "signature": "()",
-      "file": "crates/warp-insight-gateway/src/lib.rs",
+      "file": "crates/wist-gateway/src/lib.rs",
       "start_line": 6,
       "end_line": 8,
       "length": 3,
@@ -20196,7 +20196,7 @@
     {
       "name": "main",
       "signature": "()",
-      "file": "crates/warp-insight-gateway/src/main.rs",
+      "file": "crates/wist-gateway/src/main.rs",
       "start_line": 1,
       "end_line": 3,
       "length": 3,
@@ -20208,7 +20208,7 @@
     {
       "name": "serve",
       "signature": "()",
-      "file": "crates/warp-insight-gateway/src/session.rs",
+      "file": "crates/wist-gateway/src/session.rs",
       "start_line": 3,
       "end_line": 3,
       "length": 1,
@@ -20220,7 +20220,7 @@
     {
       "name": "ensure_parent",
       "signature": "(path : & Path) -> io :: Result < () >",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 10,
       "end_line": 15,
       "length": 6,
@@ -20232,7 +20232,7 @@
     {
       "name": "read_json",
       "signature": "(path : & Path) -> io :: Result < T > where T : DeserializeOwned ,",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 17,
       "end_line": 23,
       "length": 7,
@@ -20244,7 +20244,7 @@
     {
       "name": "write_json_atomic",
       "signature": "(path : & Path , value : & T) -> io :: Result < () > where T : Serialize ,",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 25,
       "end_line": 31,
       "length": 7,
@@ -20256,7 +20256,7 @@
     {
       "name": "write_json_private_atomic",
       "signature": "(path : & Path , value : & T) -> io :: Result < () > where T : Serialize ,",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 33,
       "end_line": 39,
       "length": 7,
@@ -20268,7 +20268,7 @@
     {
       "name": "write_json_compact_atomic",
       "signature": "(path : & Path , value : & T) -> io :: Result < () > where T : Serialize ,",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 41,
       "end_line": 47,
       "length": 7,
@@ -20280,7 +20280,7 @@
     {
       "name": "write_bytes_atomic",
       "signature": "(path : & Path , bytes : & [u8]) -> io :: Result < () >",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 49,
       "end_line": 62,
       "length": 14,
@@ -20292,7 +20292,7 @@
     {
       "name": "write_bytes_private_atomic",
       "signature": "(path : & Path , bytes : & [u8]) -> io :: Result < () >",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 65,
       "end_line": 90,
       "length": 26,
@@ -20304,7 +20304,7 @@
     {
       "name": "write_bytes_private_atomic",
       "signature": "(path : & Path , bytes : & [u8]) -> io :: Result < () >",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 93,
       "end_line": 95,
       "length": 3,
@@ -20316,7 +20316,7 @@
     {
       "name": "sync_parent_dir",
       "signature": "(path : & Path) -> io :: Result < () >",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 98,
       "end_line": 103,
       "length": 6,
@@ -20328,7 +20328,7 @@
     {
       "name": "sync_parent_dir",
       "signature": "(_path : & Path) -> io :: Result < () >",
-      "file": "crates/warp-insight-shared/src/fs.rs",
+      "file": "crates/wist-shared/src/fs.rs",
       "start_line": 106,
       "end_line": 108,
       "length": 3,
@@ -20340,7 +20340,7 @@
     {
       "name": "digest_json",
       "signature": "(value : & T) -> io :: Result < String > where T : Serialize ,",
-      "file": "crates/warp-insight-shared/src/integrity.rs",
+      "file": "crates/wist-shared/src/integrity.rs",
       "start_line": 7,
       "end_line": 13,
       "length": 7,
@@ -20352,7 +20352,7 @@
     {
       "name": "digest_bytes",
       "signature": "(bytes : & [u8]) -> String",
-      "file": "crates/warp-insight-shared/src/integrity.rs",
+      "file": "crates/wist-shared/src/integrity.rs",
       "start_line": 15,
       "end_line": 22,
       "length": 8,
@@ -20364,7 +20364,7 @@
     {
       "name": "sign_dev_placeholder",
       "signature": "(issued_by : & str , digest : & str) -> String",
-      "file": "crates/warp-insight-shared/src/integrity.rs",
+      "file": "crates/wist-shared/src/integrity.rs",
       "start_line": 24,
       "end_line": 26,
       "length": 3,
@@ -20376,7 +20376,7 @@
     {
       "name": "dev_placeholder_issuer",
       "signature": "(issued_by : & str) -> String",
-      "file": "crates/warp-insight-shared/src/integrity.rs",
+      "file": "crates/wist-shared/src/integrity.rs",
       "start_line": 28,
       "end_line": 30,
       "length": 3,
@@ -20389,7 +20389,7 @@
       "name": "now",
       "type_name": "DateTime",
       "signature": "() -> Self",
-      "file": "crates/warp-insight-shared/src/primitives.rs",
+      "file": "crates/wist-shared/src/primitives.rs",
       "start_line": 11,
       "end_line": 11,
       "length": 1,
@@ -20402,7 +20402,7 @@
       "name": "in_days",
       "type_name": "DateTime",
       "signature": "(days : i64) -> Self",
-      "file": "crates/warp-insight-shared/src/primitives.rs",
+      "file": "crates/wist-shared/src/primitives.rs",
       "start_line": 13,
       "end_line": 19,
       "length": 7,
@@ -20415,7 +20415,7 @@
       "name": "from_rfc3339",
       "type_name": "DateTime",
       "signature": "(value : & str) -> Option < Self >",
-      "file": "crates/warp-insight-shared/src/primitives.rs",
+      "file": "crates/wist-shared/src/primitives.rs",
       "start_line": 20,
       "end_line": 22,
       "length": 3,
@@ -20428,7 +20428,7 @@
       "name": "to_chrono",
       "type_name": "DateTime",
       "signature": "(& self) -> chrono :: DateTime < chrono :: Utc >",
-      "file": "crates/warp-insight-shared/src/primitives.rs",
+      "file": "crates/wist-shared/src/primitives.rs",
       "start_line": 24,
       "end_line": 26,
       "length": 3,
@@ -20441,7 +20441,7 @@
       "name": "seconds_until",
       "type_name": "DateTime",
       "signature": "(& self , later : & Self) -> i64",
-      "file": "crates/warp-insight-shared/src/primitives.rs",
+      "file": "crates/wist-shared/src/primitives.rs",
       "start_line": 27,
       "end_line": 29,
       "length": 3,
@@ -20454,7 +20454,7 @@
       "name": "fmt",
       "type_name": "Secret",
       "signature": "(& self , f : & mut std :: fmt :: Formatter < '_ >) -> std :: fmt :: Result",
-      "file": "crates/warp-insight-shared/src/primitives.rs",
+      "file": "crates/wist-shared/src/primitives.rs",
       "start_line": 36,
       "end_line": 36,
       "length": 1,
@@ -20466,7 +20466,7 @@
     {
       "name": "now_rfc3339",
       "signature": "() -> String",
-      "file": "crates/warp-insight-shared/src/time.rs",
+      "file": "crates/wist-shared/src/time.rs",
       "start_line": 6,
       "end_line": 10,
       "length": 5,
@@ -20478,7 +20478,7 @@
     {
       "name": "after_millis_rfc3339",
       "signature": "(millis : u64) -> String",
-      "file": "crates/warp-insight-shared/src/time.rs",
+      "file": "crates/wist-shared/src/time.rs",
       "start_line": 12,
       "end_line": 16,
       "length": 5,
@@ -20490,7 +20490,7 @@
     {
       "name": "run",
       "signature": "() -> Result < () , String >",
-      "file": "crates/warp-insight-upgrader/src/lib.rs",
+      "file": "crates/wist-upgrader/src/lib.rs",
       "start_line": 14,
       "end_line": 18,
       "length": 5,
@@ -20502,7 +20502,7 @@
     {
       "name": "parse_cli_args",
       "signature": "(mut args : I) -> Result < Stage , String > where I : Iterator < Item = String > ,",
-      "file": "crates/warp-insight-upgrader/src/lib.rs",
+      "file": "crates/wist-upgrader/src/lib.rs",
       "start_line": 20,
       "end_line": 31,
       "length": 12,
@@ -20514,7 +20514,7 @@
     {
       "name": "execute_stage",
       "signature": "(stage : Stage)",
-      "file": "crates/warp-insight-upgrader/src/lib.rs",
+      "file": "crates/wist-upgrader/src/lib.rs",
       "start_line": 33,
       "end_line": 39,
       "length": 7,
@@ -20526,7 +20526,7 @@
     {
       "name": "main",
       "signature": "()",
-      "file": "crates/warp-insight-upgrader/src/main.rs",
+      "file": "crates/wist-upgrader/src/main.rs",
       "start_line": 1,
       "end_line": 6,
       "length": 6,
@@ -20538,7 +20538,7 @@
     {
       "name": "execute",
       "signature": "()",
-      "file": "crates/warp-insight-upgrader/src/prepare.rs",
+      "file": "crates/wist-upgrader/src/prepare.rs",
       "start_line": 3,
       "end_line": 5,
       "length": 3,
@@ -20550,7 +20550,7 @@
     {
       "name": "execute",
       "signature": "()",
-      "file": "crates/warp-insight-upgrader/src/rollback.rs",
+      "file": "crates/wist-upgrader/src/rollback.rs",
       "start_line": 3,
       "end_line": 5,
       "length": 3,
@@ -20562,7 +20562,7 @@
     {
       "name": "execute",
       "signature": "()",
-      "file": "crates/warp-insight-upgrader/src/switch.rs",
+      "file": "crates/wist-upgrader/src/switch.rs",
       "start_line": 3,
       "end_line": 5,
       "length": 3,
@@ -20574,7 +20574,7 @@
     {
       "name": "validate_action_plan",
       "signature": "(contract : & ActionPlanContract) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/action_plan.rs",
+      "file": "crates/wist-validate/src/action_plan.rs",
       "start_line": 12,
       "end_line": 89,
       "length": 78,
@@ -20586,7 +20586,7 @@
     {
       "name": "validate_action_result",
       "signature": "(contract : & ActionResultContract) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/action_result.rs",
+      "file": "crates/wist-validate/src/action_result.rs",
       "start_line": 10,
       "end_line": 65,
       "length": 56,
@@ -20598,7 +20598,7 @@
     {
       "name": "validate_final_status_consistency",
       "signature": "(contract : & ActionResultContract ,) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/action_result.rs",
+      "file": "crates/wist-validate/src/action_result.rs",
       "start_line": 67,
       "end_line": 128,
       "length": 62,
@@ -20610,7 +20610,7 @@
     {
       "name": "validate_config",
       "signature": "(contract : & AgentConfigContract) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/config.rs",
+      "file": "crates/wist-validate/src/config.rs",
       "start_line": 10,
       "end_line": 100,
       "length": 91,
@@ -20622,7 +20622,7 @@
     {
       "name": "validate_dispatch_action_plan",
       "signature": "(contract : & DispatchActionPlan) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/gateway.rs",
+      "file": "crates/wist-validate/src/gateway.rs",
       "start_line": 13,
       "end_line": 23,
       "length": 11,
@@ -20634,7 +20634,7 @@
     {
       "name": "validate_action_plan_ack",
       "signature": "(contract : & ActionPlanAck) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/gateway.rs",
+      "file": "crates/wist-validate/src/gateway.rs",
       "start_line": 25,
       "end_line": 79,
       "length": 55,
@@ -20646,7 +20646,7 @@
     {
       "name": "validate_report_action_result",
       "signature": "(contract : & ReportActionResult) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/gateway.rs",
+      "file": "crates/wist-validate/src/gateway.rs",
       "start_line": 81,
       "end_line": 129,
       "length": 49,
@@ -20659,7 +20659,7 @@
       "name": "new",
       "type_name": "ValidationError",
       "signature": "(code : & 'static str) -> Self",
-      "file": "crates/warp-insight-validate/src/lib.rs",
+      "file": "crates/wist-validate/src/lib.rs",
       "start_line": 18,
       "end_line": 20,
       "length": 3,
@@ -20671,7 +20671,7 @@
     {
       "name": "require_non_empty",
       "signature": "(value : & str , code : & 'static str) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/lib.rs",
+      "file": "crates/wist-validate/src/lib.rs",
       "start_line": 23,
       "end_line": 28,
       "length": 6,
@@ -20683,7 +20683,7 @@
     {
       "name": "parse_rfc3339",
       "signature": "(value : & str , code : & 'static str ,) -> Result < OffsetDateTime , ValidationError >",
-      "file": "crates/warp-insight-validate/src/lib.rs",
+      "file": "crates/wist-validate/src/lib.rs",
       "start_line": 30,
       "end_line": 35,
       "length": 6,
@@ -20695,7 +20695,7 @@
     {
       "name": "validate_execution_state",
       "signature": "(contract : & AgentRuntimeState) -> Result < () , ValidationError >",
-      "file": "crates/warp-insight-validate/src/state.rs",
+      "file": "crates/wist-validate/src/state.rs",
       "start_line": 8,
       "end_line": 17,
       "length": 10,
@@ -20767,42 +20767,42 @@
       "value": 22,
       "threshold": 20,
       "level": "warn",
-      "location": "crates/warp-insight-contracts/src/ingest.rs:180"
+      "location": "crates/wist-contracts/src/ingest.rs:180"
     },
     {
       "metric": "cyclomatic",
       "value": 31,
       "threshold": 20,
       "level": "warn",
-      "location": "crates/warp-insight-validate/src/action_plan.rs:12"
+      "location": "crates/wist-validate/src/action_plan.rs:12"
     },
     {
       "metric": "cyclomatic",
       "value": 22,
       "threshold": 20,
       "level": "warn",
-      "location": "crates/warp-insight-validate/src/action_result.rs:10"
+      "location": "crates/wist-validate/src/action_result.rs:10"
     },
     {
       "metric": "cyclomatic",
       "value": 33,
       "threshold": 20,
       "level": "warn",
-      "location": "crates/warp-insight-validate/src/config.rs:10"
+      "location": "crates/wist-validate/src/config.rs:10"
     },
     {
       "metric": "cyclomatic",
       "value": 22,
       "threshold": 20,
       "level": "warn",
-      "location": "crates/warp-insight-validate/src/gateway.rs:25"
+      "location": "crates/wist-validate/src/gateway.rs:25"
     },
     {
       "metric": "cyclomatic",
       "value": 22,
       "threshold": 20,
       "level": "warn",
-      "location": "crates/warp-insight-validate/src/gateway.rs:81"
+      "location": "crates/wist-validate/src/gateway.rs:81"
     }
   ],
   "diagnostics": [],
