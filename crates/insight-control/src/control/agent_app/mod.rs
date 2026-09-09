@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.AgentApp
 
 pub mod agent_control_commands_returned;

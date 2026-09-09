@@ -152,6 +152,7 @@ mod tests {
                         multiline_mode: "indented".to_string(),
                     },
                 ],
+                file_inputs_file: None,
                 in_memory_buffer_bytes: 65_536,
                 spool_dir: "/tmp/root/state/spool/logs".to_string(),
                 output: LogsOutputSection {

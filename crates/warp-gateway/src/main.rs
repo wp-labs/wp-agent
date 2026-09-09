@@ -1,5 +1,5 @@
-// @moju generated
-// @moju hash=46ea6f5515c8cd4b
+// @jumo generated
+// @jumo hash=46ea6f5515c8cd4b
 
 use std::{
     error::Error,

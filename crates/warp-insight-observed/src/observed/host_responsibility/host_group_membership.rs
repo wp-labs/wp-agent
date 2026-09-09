@@ -1,6 +1,6 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.HostResponsibility")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.HostResponsibility")]
 pub struct HostGroupMembership {
     pub host_id: String,
     pub host_group_id: String,

@@ -1,5 +1,5 @@
-# @moju generated
-# @moju hash=d2b0d37b3a089d76
+# @jumo generated
+# @jumo hash=d2b0d37b3a089d76
 
 [package]
 name = "warp-gateway"
@@ -7,8 +7,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-moju-core = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-core" }
-moju-derive = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-derive" }
+jumo-core = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-core" }
+jumo-derive = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-derive" }
 axum = "0.7"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 serde = { version = "1", features = ["derive"] }
@@ -19,6 +19,7 @@ hyper = "1"
 hyper-util = { version = "0.1", features = ["server-auto", "tokio", "service", "http1", "http2"] }
 rustls = { version = "0.23", default-features = false, features = ["std", "ring"] }
 rustls-pki-types = "1"
+rustls-webpki = "0.103"
 tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
 warp-insight-contracts = { path = "../warp-insight-contracts" }
 insight-control = { path = "../insight-control" }

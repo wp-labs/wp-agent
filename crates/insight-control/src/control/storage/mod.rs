@@ -1,2 +1,2 @@
-// @moju generated
-// @moju hash=cbf29ce484222325
+// @jumo generated
+// @jumo hash=cbf29ce484222325

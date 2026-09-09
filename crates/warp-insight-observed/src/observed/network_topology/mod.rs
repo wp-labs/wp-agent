@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Observed.NetworkTopology
 
 pub mod pod_inventory;

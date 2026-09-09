@@ -2,7 +2,7 @@
 
 use std::fs;
 use std::io;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use warp_insight_shared::paths::ACTIONS_DIR;
 
@@ -12,14 +12,34 @@ pub fn initialize(
     state_dir: &Path,
     log_dir: &Path,
 ) -> io::Result<()> {
-    fs::create_dir_all(root_dir)?;
-    fs::create_dir_all(run_dir)?;
-    fs::create_dir_all(run_dir.join(ACTIONS_DIR))?;
-    fs::create_dir_all(state_dir)?;
-    fs::create_dir_all(log_dir)?;
-    fs::create_dir_all(state_dir.join("running"))?;
-    fs::create_dir_all(state_dir.join("reporting"))?;
-    fs::create_dir_all(state_dir.join("history"))?;
-    fs::create_dir_all(state_dir.join("logs").join("file_inputs"))?;
+    ensure_dirs([
+        root_dir.to_path_buf(),
+        run_dir.to_path_buf(),
+        run_dir.join(ACTIONS_DIR),
+        state_dir.to_path_buf(),
+        log_dir.to_path_buf(),
+    ])?;
+    ensure_dirs(state_layout_dirs(state_dir))
+}
+
+/// Directories kept under `state_dir` by the runtime (persisted execution state).
+fn state_layout_dirs(state_dir: &Path) -> [PathBuf; 4] {
+    [
+        state_dir.join("running"),
+        state_dir.join("reporting"),
+        state_dir.join("history"),
+        state_dir.join("logs").join("file_inputs"),
+    ]
+}
+
+/// Create every directory in `dirs`, stopping at the first failure.
+fn ensure_dirs(dirs: impl IntoIterator<Item = PathBuf>) -> io::Result<()> {
+    for dir in dirs {
+        fs::create_dir_all(dir)?;
+    }
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "bootstrap_tests.rs"]
+mod tests;

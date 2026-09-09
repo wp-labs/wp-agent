@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Control model module: status
 
 pub mod agent_instance;

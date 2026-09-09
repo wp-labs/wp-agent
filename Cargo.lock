@@ -1541,8 +1541,8 @@ name = "insight-control"
 version = "0.1.1"
 dependencies = [
  "chrono",
- "moju-core",
- "moju-derive 0.1.2",
+ "jumo-core",
+ "jumo-derive 0.1.3",
  "serde",
  "warp-insight-observed",
  "warp-insight-reporting",
@@ -1594,6 +1594,50 @@ dependencies = [
  "cfg-if",
  "futures-util",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "jumo-core"
+version = "0.2.2"
+dependencies = [
+ "jumo-derive 0.1.3 (git+https://github.com/jumo-design/jumo-derive.git?branch=main)",
+ "orion-error",
+ "winnow 1.0.4",
+ "wp-primitives",
+]
+
+[[package]]
+name = "jumo-derive"
+version = "0.1.3"
+dependencies = [
+ "jumo-derive-macros 0.1.0",
+]
+
+[[package]]
+name = "jumo-derive"
+version = "0.1.3"
+source = "git+https://github.com/jumo-design/jumo-derive.git?branch=main#09a7a178be817aa7e3b23ee23a23251332c9e834"
+dependencies = [
+ "jumo-derive-macros 0.1.0 (git+https://github.com/jumo-design/jumo-derive.git?branch=main)",
+]
+
+[[package]]
+name = "jumo-derive-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "jumo-derive-macros"
+version = "0.1.0"
+source = "git+https://github.com/jumo-design/jumo-derive.git?branch=main#09a7a178be817aa7e3b23ee23a23251332c9e834"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -1722,50 +1766,6 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "moju-core"
-version = "0.3.0"
-dependencies = [
- "moju-derive 0.1.1",
- "orion-error",
- "winnow 1.0.4",
- "wp-primitives",
-]
-
-[[package]]
-name = "moju-derive"
-version = "0.1.1"
-source = "git+https://github.com/dayu-sec/moju-derive.git?tag=v0.1.1#d44b32e1549d39fd6b6e9feee76098ec3f92e5aa"
-dependencies = [
- "moju-derive-macros 0.1.0 (git+https://github.com/dayu-sec/moju-derive.git?tag=v0.1.1)",
-]
-
-[[package]]
-name = "moju-derive"
-version = "0.1.2"
-dependencies = [
- "moju-derive-macros 0.1.0",
-]
-
-[[package]]
-name = "moju-derive-macros"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "moju-derive-macros"
-version = "0.1.0"
-source = "git+https://github.com/dayu-sec/moju-derive.git?tag=v0.1.1#d44b32e1549d39fd6b6e9feee76098ec3f92e5aa"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.117",
 ]
 
 [[package]]
@@ -3247,9 +3247,9 @@ dependencies = [
 name = "warp-agentd"
 version = "0.1.1"
 dependencies = [
+ "jumo-core",
+ "jumo-derive 0.1.3",
  "libc",
- "moju-core",
- "moju-derive 0.1.2",
  "reqwest",
  "serde",
  "serde_json",
@@ -3271,11 +3271,12 @@ dependencies = [
  "hyper 1.11.0",
  "hyper-util",
  "insight-control",
- "moju-core",
- "moju-derive 0.1.2",
+ "jumo-core",
+ "jumo-derive 0.1.3",
  "ring",
  "rustls 0.23.42",
  "rustls-pki-types",
+ "rustls-webpki 0.103.13",
  "serde",
  "serde_json",
  "tokio",
@@ -3296,8 +3297,8 @@ dependencies = [
  "chrono",
  "http-body-util",
  "insight-control",
- "moju-core",
- "moju-derive 0.1.2",
+ "jumo-core",
+ "jumo-derive 0.1.3",
  "reqwest",
  "ring",
  "serde",
@@ -3341,8 +3342,8 @@ name = "warp-insight-observed"
 version = "0.1.1"
 dependencies = [
  "chrono",
- "moju-core",
- "moju-derive 0.1.2",
+ "jumo-core",
+ "jumo-derive 0.1.3",
  "serde",
  "warp-insight-shared",
 ]
@@ -3352,8 +3353,8 @@ name = "warp-insight-reporting"
 version = "0.1.1"
 dependencies = [
  "chrono",
- "moju-core",
- "moju-derive 0.1.2",
+ "jumo-core",
+ "jumo-derive 0.1.3",
  "serde",
  "warp-insight-shared",
 ]
@@ -3363,8 +3364,8 @@ name = "warp-insight-security"
 version = "0.1.1"
 dependencies = [
  "chrono",
- "moju-core",
- "moju-derive 0.1.2",
+ "jumo-core",
+ "jumo-derive 0.1.3",
  "serde",
  "warp-insight-shared",
 ]

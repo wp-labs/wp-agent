@@ -1,10 +1,10 @@
-// @moju generated
-// @moju hash=91638372490551d3
+// @jumo generated
+// @jumo hash=91638372490551d3
 
 use insight_control::SubmitEnrollmentRequest;
 
-#[derive(::moju_derive::MoJu)]
-#[moju(kind = "interface", domain = "Control", module = "Control.AgentApp.FacingInterface")]
+#[derive(::jumo_derive::Jumo)]
+#[jumo(kind = "interface", domain = "Control", module = "Control.AgentApp.FacingInterface")]
 pub struct WpAgentOnlineRegistrationInterface;
 
 impl WpAgentOnlineRegistrationInterface {

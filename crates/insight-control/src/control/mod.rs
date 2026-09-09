@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Control 模型域（可复用）
 #![allow(unused_imports)]
 

@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=d1bd562097f2181c
+// @jumo generated
+// @jumo hash=d1bd562097f2181c
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "message", role = "command", domain = "Reporting", module = "Reporting.Protocol")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "message", role = "command", domain = "Reporting", module = "Reporting.Protocol")]
 pub struct ReportActionResult {
     pub execution_id: String,
     pub kind: String,

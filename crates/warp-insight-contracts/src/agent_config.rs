@@ -169,6 +169,10 @@ pub struct TelemetrySection {
 pub struct LogsSection {
     #[serde(default)]
     pub file_inputs: Vec<LogFileInputSection>,
+    /// 采集任务清单外置文件（可选）：路径相对本配置文件解析。
+    /// 设置后不能再同时写内联 `[[telemetry.logs.file_inputs]]`（二选一）。
+    #[serde(default)]
+    pub file_inputs_file: Option<String>,
     #[serde(default = "default_logs_buffer_bytes")]
     pub in_memory_buffer_bytes: u64,
     #[serde(default = "default_logs_spool_dir")]
@@ -181,6 +185,7 @@ impl Default for LogsSection {
     fn default() -> Self {
         Self {
             file_inputs: Vec::new(),
+            file_inputs_file: None,
             in_memory_buffer_bytes: default_logs_buffer_bytes(),
             spool_dir: default_logs_spool_dir(),
             output: LogsOutputSection::default(),
@@ -254,6 +259,14 @@ pub struct LogFileInputSection {
     pub startup_position: String,
     #[serde(default = "default_multiline_mode")]
     pub multiline_mode: String,
+}
+
+/// 外置采集任务清单文件的顶层结构（`[telemetry.logs] file_inputs_file` 指向的文件）。
+/// 内容为 `[[file_inputs]]` 数组；字段语义与内联 `[[telemetry.logs.file_inputs]]` 一致。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LogFileInputsFile {
+    pub file_inputs: Vec<LogFileInputSection>,
 }
 
 fn default_logs_buffer_bytes() -> u64 {

@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=ecc04201075c3e3c
+// @jumo generated
+// @jumo hash=ecc04201075c3e3c
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
 pub struct ActionPlanMeta {
     pub plan_version: String,
     pub request_id: String,
@@ -10,7 +10,7 @@ pub struct ActionPlanMeta {
     pub expires_at: String,
     pub tenant_id: String,
     pub compiled_at: String,
-    #[moju(unique)]
+    #[jumo(unique)]
     pub action_id: String,
     pub template_id: String,
 }

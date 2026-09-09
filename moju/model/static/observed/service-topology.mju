@@ -1,7 +1,0 @@
-// Module: ServiceTopology — business / system / service 拓扑实体
-// 来源：doc/design/center/models/business-system-service-topology-model.md
-//
-// 中心侧资源目录模型与关系图谱模型的业务拓扑扩展子模型的一部分：
-// business / system / service / service instance 分层；ServiceEndpoint（稳定入口）
-// 与 ServiceInstanceEndpoint（动态运行地址）分开；ServiceDependency（逻辑依赖）
-// 与 NetworkAttachment（拓扑连接）分开。

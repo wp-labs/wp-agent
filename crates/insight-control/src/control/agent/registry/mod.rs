@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Control model module: registry
 
 pub mod agent_initial_config;

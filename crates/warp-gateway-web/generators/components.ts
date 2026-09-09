@@ -56,6 +56,7 @@ function chineseLabel(name: string): string | null {
     NoAbnormalAgentPlaceholder: "当前没有异常 Agent",
     X86LinuxInstallCode: "X86 Linux 安装代码",
     ArmLinuxInstallCode: "Arm Linux 安装代码",
+    MacOSInstallCode: "macOS 安装命令",
     PauseAgent: "暂停 Agent",
     UpgradeAgent: "升级 Agent",
     UpgradeAgentRemotely: "远程升级 Agent",

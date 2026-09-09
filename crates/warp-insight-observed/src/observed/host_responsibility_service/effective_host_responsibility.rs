@@ -1,8 +1,8 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.HostResponsibilityService")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.HostResponsibilityService")]
 pub struct EffectiveHostResponsibility {
-    #[moju(unique)]
+    #[jumo(unique)]
     pub host_id: String,
     pub owner_subject_id: Option<String>,
     pub maintainer_subject_id: Option<String>,

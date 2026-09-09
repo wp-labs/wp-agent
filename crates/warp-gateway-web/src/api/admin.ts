@@ -44,6 +44,7 @@ export interface AgentOverview {
 export interface AgentInstallCode {
   x86LinuxInstallCode: string;
   armLinuxInstallCode: string;
+  macosInstallCode: string;
   bootstrapEnrollmentToken: string;
 }
 
@@ -66,6 +67,23 @@ export interface GatewayInitialConfig {
   server_tls_required: boolean;
   protocol_version: string;
   enrollment_token_id: string;
+}
+
+export type GatewayInstanceLifecycleState =
+  "Provisioned" | "Initializing" | "Running" | "Failed";
+
+/** Center 侧实例初始化状态；initialized 是 lifecycle_state 的服务端派生值。 */
+export interface GatewayInitializationStatus {
+  gateway_id: string;
+  instance_id: string | null;
+  lifecycle_state: GatewayInstanceLifecycleState;
+  initialized: boolean;
+}
+
+/** 页面完成状态守卫并取得 JSON 初始配置后的结果。 */
+export interface GatewayInitializationResult {
+  config: GatewayInitialConfig;
+  status: GatewayInitializationStatus;
 }
 
 export interface DispatchReceipt {
@@ -110,6 +128,25 @@ export class ApiError extends Error {
   }
 }
 
+/** 初始化 URL 不满足 Center 当前入口契约时抛出，错误由页面作为表单反馈展示。 */
+export class GatewayInitializationInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "GatewayInitializationInputError";
+  }
+}
+
+/** Center 已记录实例进入初始化态或运行态时抛出，阻止页面再次消费置备凭证。 */
+export class GatewayAlreadyInitializedError extends Error {
+  readonly status: GatewayInitializationStatus;
+
+  constructor(status: GatewayInitializationStatus) {
+    super("gateway is already initialized");
+    this.name = "GatewayAlreadyInitializedError";
+    this.status = status;
+  }
+}
+
 export function isRateLimitedError(error: unknown): error is ApiError {
   return error instanceof ApiError && error.status === 429;
 }
@@ -126,7 +163,10 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!response.ok) {
     if (response.status === 429) {
-      const retryAfter = Number.parseInt(response.headers.get("Retry-After") ?? "", 10);
+      const retryAfter = Number.parseInt(
+        response.headers.get("Retry-After") ?? "",
+        10,
+      );
       throw new ApiError(
         response.status,
         path,
@@ -201,7 +241,10 @@ function normalizeTrustBundle(value: unknown): ControlCenterTrustBundle | null {
       bundle.control_endpoint,
       "config.trust_bundle.control_endpoint",
     ),
-    ca_bundle: requiredString(bundle.ca_bundle, "config.trust_bundle.ca_bundle"),
+    ca_bundle: requiredString(
+      bundle.ca_bundle,
+      "config.trust_bundle.ca_bundle",
+    ),
     server_name: requiredString(
       bundle.server_name,
       "config.trust_bundle.server_name",
@@ -249,6 +292,33 @@ export function normalizeGatewayInitialConfig(
   };
 }
 
+function normalizeGatewayLifecycleState(
+  value: unknown,
+): GatewayInstanceLifecycleState {
+  if (
+    value === "Provisioned" ||
+    value === "Initializing" ||
+    value === "Running" ||
+    value === "Failed"
+  ) {
+    return value;
+  }
+  throw new Error("Invalid API response: invalid lifecycle_state");
+}
+
+/** 按 QueryGatewayInitializationStatus 响应契约校验 Center 返回值。 */
+export function normalizeGatewayInitializationStatus(
+  payload: unknown,
+): GatewayInitializationStatus {
+  const status = requiredRecord(payload, "response");
+  return {
+    gateway_id: requiredString(status.gateway_id, "gateway_id"),
+    instance_id: nullableString(status.instance_id, "instance_id"),
+    lifecycle_state: normalizeGatewayLifecycleState(status.lifecycle_state),
+    initialized: requiredBoolean(status.initialized, "initialized"),
+  };
+}
+
 function requiredArray(value: unknown, fieldName: string): any[] {
   if (Array.isArray(value)) return value;
   throw new Error(`Invalid API response: missing ${fieldName}`);
@@ -285,6 +355,10 @@ function normalizeInstallCode(payload: any): AgentInstallCode {
     armLinuxInstallCode: requiredString(
       installCode.arm_linux_install_code ?? installCode.armLinuxInstallCode,
       "installCode.armLinuxInstallCode",
+    ),
+    macosInstallCode: requiredString(
+      installCode.macos_install_code ?? installCode.macosInstallCode,
+      "installCode.macosInstallCode",
     ),
     bootstrapEnrollmentToken: requiredString(
       installCode.bootstrap_enrollment_token ??
@@ -427,24 +501,123 @@ export async function fetchAgentInstallCode(): Promise<AgentInstallCode> {
  * 从 Gateway 页面调用控制中心的网关面初始化接口。
  * initUrl 由 Center 创建实例时下发，**不携带凭证**（token 不进 URL）；
  * 网关凭证由操作者单独输入，只放入 Authorization Header。
- * 返回 `application/toml` 的 config.toml 文本（置备时由 Center 生成）。
+ * 返回 Center 当前实现的 `application/json` 响应中的 `config` 对象。
  */
 export async function fetchGatewayInitialConfig(
   initUrl: string,
   token?: string,
-): Promise<string> {
+): Promise<GatewayInitialConfig> {
   // 去掉可能残留的 fragment（如手工复制带 # 的链接）。
   const path = initUrl.split("#", 1)[0];
   const response = await fetch(path, {
     headers: {
-      accept: "application/toml",
+      accept: "application/json",
       ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
   });
   if (!response.ok) {
     throw new ApiError(response.status, path);
   }
-  return response.text();
+  return normalizeGatewayInitialConfig(await response.json());
+}
+
+/** 初始化 URL 校验后得到的请求目标，供页面 Service 串联状态查询与配置请求。 */
+export interface GatewayInitializationTarget {
+  initUrl: string;
+  instanceId: string;
+  statusUrl: string;
+}
+
+/**
+ * 校验 Center 交付的初始化 URL，并派生同一 Center 上的初始化状态查询地址。
+ * URL 只允许 instance_id 查询参数；Bearer 凭证必须由调用方另行放入 Header。
+ */
+export function parseGatewayInitializationUrl(
+  input: string,
+): GatewayInitializationTarget {
+  let url: URL;
+  try {
+    url = new URL(input.trim());
+  } catch {
+    throw new GatewayInitializationInputError(
+      "请输入完整、有效的控制中心初始化 URL。",
+    );
+  }
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new GatewayInitializationInputError(
+      "初始化 URL 只支持 HTTP 或 HTTPS 协议。",
+    );
+  }
+  if (url.username || url.password || url.hash) {
+    throw new GatewayInitializationInputError(
+      "初始化 URL 不能携带用户信息、凭证或 fragment。",
+    );
+  }
+  if (!url.pathname.endsWith("/api/v1/gateway/initial-config")) {
+    throw new GatewayInitializationInputError(
+      "初始化 URL 必须指向 /api/v1/gateway/initial-config。",
+    );
+  }
+  const queryNames = [...url.searchParams.keys()];
+  if (queryNames.length !== 1 || queryNames[0] !== "instance_id") {
+    throw new GatewayInitializationInputError(
+      "初始化 URL 只能包含 instance_id；Bearer 凭证请填写到独立凭证输入框。",
+    );
+  }
+  const instanceId = url.searchParams.get("instance_id")?.trim();
+  if (!instanceId) {
+    throw new GatewayInitializationInputError("初始化 URL 缺少 instance_id。");
+  }
+
+  const statusUrl = new URL(url);
+  statusUrl.pathname = statusUrl.pathname.replace(
+    /\/initial-config$/,
+    "/initialization-status",
+  );
+  statusUrl.search = "";
+  statusUrl.searchParams.set("instance_id", instanceId);
+  return {
+    initUrl: url.toString(),
+    instanceId,
+    statusUrl: statusUrl.toString(),
+  };
+}
+
+/** 查询 Center 侧实例状态；可选 Bearer 仍只通过 Authorization Header 发送。 */
+export async function fetchGatewayInitializationStatus(
+  statusUrl: string,
+  token?: string,
+): Promise<GatewayInitializationStatus> {
+  const response = await fetch(statusUrl, {
+    headers: {
+      accept: "application/json",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (!response.ok) {
+    throw new ApiError(response.status, statusUrl);
+  }
+  return normalizeGatewayInitializationStatus(await response.json());
+}
+
+/**
+ * 页面初始化业务 Service：解析 URL → 查询状态 → 拦截重复初始化 → 获取 JSON 配置。
+ * 状态检查不替代 Center 的服务端守卫，只用于在消费一次性凭证前提供明确反馈。
+ */
+export async function initializeGatewayViaUrl(
+  initUrl: string,
+  token?: string,
+): Promise<GatewayInitializationResult> {
+  const target = parseGatewayInitializationUrl(initUrl);
+  const status = await fetchGatewayInitializationStatus(
+    target.statusUrl,
+    token,
+  );
+  if (status.initialized) {
+    throw new GatewayAlreadyInitializedError(status);
+  }
+  const config = await fetchGatewayInitialConfig(target.initUrl, token);
+  return { config, status };
 }
 
 export async function pauseAgent(

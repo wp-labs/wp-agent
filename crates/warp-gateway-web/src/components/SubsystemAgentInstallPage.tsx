@@ -3,6 +3,7 @@ import { SubsystemAdminTopNavigation } from "./SubsystemAdminTopNavigation";
 import { SubsystemBootstrapTokenCard } from "./SubsystemBootstrapTokenCard";
 import { SubsystemX86LinuxInstallCode } from "./SubsystemX86LinuxInstallCode";
 import { SubsystemArmLinuxInstallCode } from "./SubsystemArmLinuxInstallCode";
+import { SubsystemMacOSInstallCode } from "./SubsystemMacOSInstallCode";
 import { ApiError, isRateLimitedError } from "../api";
 import { useAgentInstallCode } from "../hooks";
 import { RateLimitNotice } from "./RateLimitNotice";
@@ -19,7 +20,7 @@ export function SubsystemAgentInstallPage() {
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Agent 安装</h1>
         <p className={styles.pageSummary}>
-          获取 Bootstrap Token，然后在目标 Linux 主机上运行对应架构的安装命令，让 agent 加入集群。
+          获取 Bootstrap Token，然后在目标主机（Linux / macOS）上运行对应架构的安装命令，让 agent 加入集群。
         </p>
       </header>
       {isError ? (
@@ -50,6 +51,11 @@ export function SubsystemAgentInstallPage() {
             />
             <SubsystemArmLinuxInstallCode
               command={data?.armLinuxInstallCode}
+              token={token}
+              loading={isLoading}
+            />
+            <SubsystemMacOSInstallCode
+              command={data?.macosInstallCode}
               token={token}
               loading={isLoading}
             />

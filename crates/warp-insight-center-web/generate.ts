@@ -12,7 +12,7 @@ import { generateIndexFiles } from "./generators/index";
 
 const args = process.argv.slice(2);
 if (args.length < 2) {
-  console.error("Usage: npx tsx generate.ts <moju-ui-model.json> <output-dir>");
+  console.error("Usage: npx tsx generate.ts <jumo-ui-model.json> <output-dir>");
   process.exit(1);
 }
 

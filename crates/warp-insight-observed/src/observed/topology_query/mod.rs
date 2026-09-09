@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Observed.TopologyQuery
 
 pub mod view_network_topology;

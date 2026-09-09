@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Control model module: identity
 
 pub mod agent_control_auth_profile;

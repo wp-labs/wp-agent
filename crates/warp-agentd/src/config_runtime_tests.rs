@@ -72,6 +72,8 @@ fn default_config_template_contains_file_input_example() {
     assert!(template.contains("[discovery]"));
     assert!(template.contains("process_enabled = true"));
     assert!(template.contains("# [[telemetry.logs.file_inputs]]"));
+    assert!(template.contains("input_id = \"macos_install_log\""));
+    assert!(template.contains("input_id = \"macos_launchd\""));
     assert!(template.contains("path = \"log/warp-parse-records.ndjson\""));
     assert!(template.contains("# kind = \"tcp\""));
     assert!(!template.contains("max_running_actions = 1"));
@@ -391,4 +393,117 @@ fn resolve_config_path_prefers_new_name_over_legacy_name() {
     fs::write(&legacy, "schema_version = \"v1\"\n").expect("write legacy config");
 
     assert_eq!(resolve_config_path(&root), preferred);
+}
+
+#[test]
+fn load_from_path_loads_file_inputs_from_external_task_file() {
+    let root = temp_dir("ext-task-file");
+    let tasks_dir = root.join("tasks");
+    fs::create_dir_all(&tasks_dir).expect("create tasks dir");
+    fs::write(
+        tasks_dir.join("apps.toml"),
+        r#"
+[[file_inputs]]
+input_id = "app"
+path = "/var/log/app.log"
+startup_position = "head"
+multiline_mode = "none"
+
+[[file_inputs]]
+input_id = "web"
+path = "${HOME}/logs/web.log"
+"#,
+    )
+    .expect("write tasks file");
+
+    let config_path = root.join("agentd.toml");
+    fs::write(
+        &config_path,
+        r#"
+schema_version = "v1"
+
+[telemetry.logs]
+spool_dir = "state/spool/logs"
+file_inputs_file = "tasks/apps.toml"
+"#,
+    )
+    .expect("write config");
+
+    let config = load_from_path(&config_path).expect("load config");
+    let inputs = &config.telemetry.logs.file_inputs;
+
+    assert_eq!(inputs.len(), 2);
+    assert_eq!(inputs[0].input_id, "app");
+    assert_eq!(inputs[0].path, "/var/log/app.log");
+    assert_eq!(inputs[0].startup_position, "head");
+    assert_eq!(inputs[0].multiline_mode, "none");
+    let home = std::env::var("HOME").expect("HOME");
+    assert_eq!(inputs[1].input_id, "web");
+    assert_eq!(
+        inputs[1].path,
+        Path::new(&home)
+            .join("logs")
+            .join("web.log")
+            .display()
+            .to_string()
+    );
+    // 省略字段走契约默认值：startup_position 默认 head，multiline_mode 默认 none。
+    assert_eq!(inputs[1].startup_position, "head");
+    assert_eq!(inputs[1].multiline_mode, "none");
+}
+
+#[test]
+fn load_from_path_rejects_inline_and_external_file_inputs_together() {
+    let root = temp_dir("ext-task-conflict");
+    let tasks_dir = root.join("tasks");
+    fs::create_dir_all(&tasks_dir).expect("create tasks dir");
+    fs::write(
+        tasks_dir.join("apps.toml"),
+        "[[file_inputs]]\ninput_id = \"app\"\npath = \"/var/log/app.log\"\n",
+    )
+    .expect("write tasks file");
+
+    let config_path = root.join("agentd.toml");
+    fs::write(
+        &config_path,
+        r#"
+schema_version = "v1"
+
+[telemetry.logs]
+file_inputs_file = "tasks/apps.toml"
+
+[[telemetry.logs.file_inputs]]
+input_id = "inline"
+path = "/var/log/inline.log"
+"#,
+    )
+    .expect("write config");
+
+    let err = load_from_path(&config_path).expect_err("config should be rejected");
+    assert!(
+        err.to_string().contains("conflicts with inline"),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn load_from_path_reports_missing_external_task_file() {
+    let root = temp_dir("ext-task-missing");
+    let config_path = root.join("agentd.toml");
+    fs::write(
+        &config_path,
+        r#"
+schema_version = "v1"
+
+[telemetry.logs]
+file_inputs_file = "tasks/missing.toml"
+"#,
+    )
+    .expect("write config");
+
+    let err = load_from_path(&config_path).expect_err("config should be rejected");
+    assert!(
+        err.to_string().contains("read file_inputs_file"),
+        "unexpected error: {err}"
+    );
 }

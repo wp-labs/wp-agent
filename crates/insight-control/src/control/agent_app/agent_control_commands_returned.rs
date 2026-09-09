@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=14428160952fb811
+// @jumo generated
+// @jumo hash=14428160952fb811
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "message", role = "response", domain = "Control", module = "Control.AgentApp.FacingInterface")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "message", role = "response", domain = "Control", module = "Control.AgentApp.FacingInterface")]
 pub struct AgentControlCommandsReturned {
     pub messages: Vec<crate::control::types::AgentControlCommand>,
     pub next_sequence: i64,

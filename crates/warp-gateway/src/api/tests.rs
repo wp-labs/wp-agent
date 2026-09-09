@@ -18,13 +18,13 @@ use warp_insight_contracts::enrollment::{
     AgentIdentityStatus, RenewAgentCredential, SubmitEnrollmentRequest,
 };
 
-use insight_control::{AgentHello, PollControlCommands, ReportActionResult};
-use insight_control::types::{DateTime};
-use warp_insight_reporting::ResultAttestation;
 use crate::infra::{
     load_install_script_public_key_pem, sha256_hex, AdminConfig, AdminStore,
     StoredEnrollmentTokenStatus,
 };
+use insight_control::types::DateTime;
+use insight_control::{AgentHello, PollControlCommands, ReportActionResult};
+use warp_insight_reporting::ResultAttestation;
 
 use super::{
     enrollment::{
@@ -40,11 +40,18 @@ use super::{
 
 const TEST_ADMIN_API_TOKEN: &str = "test-admin-token";
 
+/// Self-signed TLS cert (CN=localhost, RSA) written into each TestEnv so the
+/// macOS install code can compute its `--pinnedpubkey` pin.
+const TEST_TLS_CERT_PEM: &str = "-----BEGIN CERTIFICATE-----\nMIIDCTCCAfGgAwIBAgIUVlBq6CYit7aQR8CpShgLhKef76gwDQYJKoZIhvcNAQEL\nBQAwFDESMBAGA1UEAwwJbG9jYWxob3N0MB4XDTI2MDkwODE0MzIzMFoXDTI3MDkw\nODE0MzIzMFowFDESMBAGA1UEAwwJbG9jYWxob3N0MIIBIjANBgkqhkiG9w0BAQEF\nAAOCAQ8AMIIBCgKCAQEAowBkJchsMBeZcyW2Hntz9fHbM2EYg4Phfn+S4RB2oCzc\n7hXmxB3FUMZ4VKWhF3ruhIFM7Tc6pfSUPx6AqgDJBtvkeA2v+oFR6P0Fsv2Xlczp\neBKpK0vygKjL7jGrHmbofKL5om/ytyQMVjgxhEWW5K54+bvldpa7JnBN3GAJU5KA\nxIAH/5lQSKzlvD6emuUJd62062sVkc9EX7bzM0fOWV2xMEn6JuW9Pa0sCDKZz71u\nIw4sT70inxl7djXxthq/fMekWCrjeNcoLODmMDJgiSUYki1ox1uT9YuXThgIIwHO\nERXzp3xrbO6gOeJgbX4C/aYxcMoaXQGmh89NRmK8MwIDAQABo1MwUTAdBgNVHQ4E\nFgQUDzbiNfr4kpFl2+bL6RmiPBCEgSYwHwYDVR0jBBgwFoAUDzbiNfr4kpFl2+bL\n6RmiPBCEgSYwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEARPZy\nXsWS0A8jnXSRbTxHCSciwic0pFDc9vo+8WyMkz1t754cbrStEhSU9Rl1hE1ZON6v\nVJpdG4Yezhdmx8zfqBbjDNhSjBlrdVRbOyC6oO5KDZHTIVI6mEqAQaRmohHY41y+\nUza+pZL6TIvol3F99ZOmPevIREmGDY9Xy6CxeaiTkSoCg/0XIO/55GeEQSix9YSM\nuvISELAaKycvD37ltjgr4DigLquxs03mCntBcKX7KvpPF6142KLvQxiHyI+VJdtK\nTapJeaMTcQ0i/jLOd47lwGDnQL2Q1RpF6Lp1uTkSDeBFjpJlRzZGnrssHX4vEA0L\nmSymA2FI5OPMsMzExQ==\n-----END CERTIFICATE-----\n";
+/// Expected `sha256//` pin (base64 of the sha256 of the SPKI) of the cert above.
+const TEST_TLS_CERT_PIN: &str = "uq4O4EN3e09Xmlo5euGldyHw+y27baJ+Jm/OBnFHrZc=";
+
 #[test]
 fn install_code_uses_header_bootstrap_token_without_url_token_leak() {
     let env = TestEnv::new();
     let expires_at = chrono::Utc::now() + chrono::Duration::seconds(900);
-    let install_code = agent_install_code(&env.config, "token-a", expires_at).expect("install code");
+    let install_code =
+        agent_install_code(&env.config, "token-a", expires_at).expect("install code");
 
     assert_eq!(
         install_code.bootstrap_bundle.agent_package_url,
@@ -66,12 +73,21 @@ fn install_code_uses_header_bootstrap_token_without_url_token_leak() {
     assert!(install_code
         .x86_linux_install_code
         .contains("openssl pkeyutl -verify -pubin"));
-    assert!(install_code
-        .x86_linux_install_code
-        .contains("sh \"$D/s\""));
+    assert!(install_code.x86_linux_install_code.contains("sh \"$D/s\""));
     assert!(install_code
         .x86_linux_install_code
         .contains("-----BEGIN PUBLIC KEY-----"));
+    let macos = &install_code.macos_install_code;
+    assert!(macos.contains("\"$(uname -s)\" != \"Darwin\""));
+    assert!(macos.contains("arm64) ARCH=arm ;; *) ARCH=x86"));
+    assert!(macos.contains(&format!(
+        "curl -fsSLk --pinnedpubkey \"sha256//{TEST_TLS_CERT_PIN}\" \"https://127.0.0.1:3000/api/v1/agent/install/$ARCH/install.sh\""
+    )));
+    assert!(macos.contains("sh \"$D/s\""));
+    assert!(!macos.contains("openssl pkeyutl"));
+    assert!(!macos.contains("install.sh.sig"));
+    assert!(!macos.contains("token-a"));
+    assert!(!macos.contains("?token="));
     assert_eq!(install_code.bootstrap_enrollment_token, "token-a");
     assert!(!install_code.x86_linux_install_code.contains("token-a"));
     assert!(!install_code.arm_linux_install_code.contains("token-a"));
@@ -144,8 +160,7 @@ fn install_script_fails_when_package_file_is_unreadable() {
     let package_path = env.config.agent_package_file.clone();
     std::fs::remove_file(&package_path).expect("remove package");
 
-    let err =
-        super::install::install_script(&env.config, "x86").expect_err("unreadable package");
+    let err = super::install::install_script(&env.config, "x86").expect_err("unreadable package");
 
     assert!(!err.is_empty());
 }
@@ -154,7 +169,8 @@ fn install_script_fails_when_package_file_is_unreadable() {
 fn install_command_verifies_script_signature_before_execution() {
     let env = TestEnv::new();
     let expires_at = chrono::Utc::now() + chrono::Duration::seconds(900);
-    let install_code = agent_install_code(&env.config, "token-a", expires_at).expect("install code");
+    let install_code =
+        agent_install_code(&env.config, "token-a", expires_at).expect("install code");
     let command = install_code.x86_linux_install_code;
 
     assert!(command.contains("mktemp -d"));
@@ -474,12 +490,7 @@ fn enrollment_response_uses_contract_wire_status() {
 async fn enrollment_handler_returns_created_contract_response() {
     let state = test_state();
     let token = issue_token_for_state(&state);
-    let response = enroll_agent(
-        State(state),
-        None,
-        Json(enrollment_request(&token)),
-    )
-    .await;
+    let response = enroll_agent(State(state), None, Json(enrollment_request(&token))).await;
     let status = response.status();
     assert_no_store(&response);
     let returned = decode_enrollment_response(response).await;
@@ -1306,11 +1317,12 @@ struct TestEnv {
 
 impl TestEnv {
     fn new() -> Self {
-        let root =
-            std::env::temp_dir().join(format!("warp-gateway-test-{}", unique_suffix()));
+        let root = std::env::temp_dir().join(format!("warp-gateway-test-{}", unique_suffix()));
         std::fs::create_dir_all(&root).expect("create root");
         let package_file = root.join("warp-agentd");
         std::fs::write(&package_file, "test-agent-package").expect("write package");
+        let tls_cert_file = root.join("admin-tls.crt.pem");
+        std::fs::write(&tls_cert_file, TEST_TLS_CERT_PEM).expect("write tls cert");
         let store_file = root.join("state").join("admin-store.json");
         let (install_signing_private_key_file, install_public_key_bytes) =
             write_install_signing_key(&root);
@@ -1320,7 +1332,7 @@ impl TestEnv {
         let config = AdminConfig {
             listen_addr: "127.0.0.1:3000".to_string(),
             public_base_url: "https://127.0.0.1:3000".to_string(),
-            tls_cert_file: root.join("admin-tls.crt.pem"),
+            tls_cert_file,
             tls_key_file: root.join("admin-tls.key.pem"),
             admin_api_token_hash: sha256_hex(TEST_ADMIN_API_TOKEN),
             agent_package_file: package_file,

@@ -11,8 +11,8 @@ use warp_insight_shared::time::now_rfc3339;
 use super::host::default_host_id;
 use super::{DiscoveryProbe, DiscoveryProbeError, DiscoverySourceKind, ProbeOutput};
 
-#[derive(::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
+#[derive(::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
 pub struct EndpointDiscoveryProbe;
 
 impl DiscoveryProbe for EndpointDiscoveryProbe {
@@ -84,8 +84,8 @@ impl DiscoveryProbe for EndpointDiscoveryProbe {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.Entity")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.Entity")]
 pub(super) struct ObservedServiceEndpoint {
     pub(super) protocol: String,
     pub(super) local_ip: String,

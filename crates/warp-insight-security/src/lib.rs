@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Security 模型域（可复用）：软件与漏洞情报
 
 pub mod security;

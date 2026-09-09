@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=c75502bb722a32ca
+// @jumo generated
+// @jumo hash=c75502bb722a32ca
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Enrollment")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Agent.Enrollment")]
 pub struct AgentEnrollmentResult {
     pub credential_bundle: crate::control::types::AgentCredentialBundle,
     pub initial_config: crate::control::types::AgentInitialConfig,

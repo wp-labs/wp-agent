@@ -169,6 +169,7 @@ pub(crate) fn standalone_config_with_file_input(
                 startup_position: "head".to_string(),
                 multiline_mode: "none".to_string(),
             }],
+            file_inputs_file: None,
             in_memory_buffer_bytes: 1_048_576,
             spool_dir: root
                 .join("state")
@@ -198,6 +199,7 @@ pub(crate) fn standalone_config_with_file_inputs(
     standalone_config(root).with_telemetry(TelemetrySection {
         logs: LogsSection {
             file_inputs,
+            file_inputs_file: None,
             in_memory_buffer_bytes: 1_048_576,
             spool_dir: root
                 .join("state")
@@ -235,6 +237,7 @@ pub(crate) fn standalone_config_with_tcp_file_input(
                 startup_position: "head".to_string(),
                 multiline_mode: "none".to_string(),
             }],
+            file_inputs_file: None,
             in_memory_buffer_bytes: 1_048_576,
             spool_dir: root
                 .join("state")

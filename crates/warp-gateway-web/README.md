@@ -1,11 +1,11 @@
-# Global UI — Generated MoJu Project
+# Global UI — Generated Jumo Project
 
-This directory contains a `moju-ui-model.json` describing the UI model.
+This directory contains a `jumo-ui-model.json` describing the UI model.
 
 ## Quick Start
 
 ```bash
 cd "../../warp-insight/crates/warp-gateway-web"
 npm install
-npx tsx generate.ts moju-ui-model.json .
+npx tsx generate.ts jumo-ui-model.json .
 ```

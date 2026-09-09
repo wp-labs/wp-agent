@@ -1,10 +1,10 @@
-// @moju generated
-// @moju hash=8c5f4e01d1ad3c4e
+// @jumo generated
+// @jumo hash=8c5f4e01d1ad3c4e
 
 use insight_control::AdminGetAgentInstallCode;
 
-#[derive(::moju_derive::MoJu)]
-#[moju(kind = "interface", domain = "Control", module = "Control.GatewayApp.UserFacingInterface")]
+#[derive(::jumo_derive::Jumo)]
+#[jumo(kind = "interface", domain = "Control", module = "Control.GatewayApp.UserFacingInterface")]
 pub struct WarpGateWayPublicInstallInterface;
 
 impl WarpGateWayPublicInstallInterface {

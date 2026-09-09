@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=776b3eddfe95851e
+// @jumo generated
+// @jumo hash=776b3eddfe95851e
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Enrollment")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Agent.Enrollment")]
 pub struct AgentEnrollmentToken {
     pub revoked_at: crate::control::types::DateTime,
     pub allowed_node_selector: String,
@@ -11,7 +11,7 @@ pub struct AgentEnrollmentToken {
     pub issued_at: crate::control::types::DateTime,
     pub used_count: i64,
     pub issued_by: String,
-    #[moju(unique)]
+    #[jumo(unique)]
     pub token_id: String,
     pub max_uses: i64,
     pub expires_at: crate::control::types::DateTime,

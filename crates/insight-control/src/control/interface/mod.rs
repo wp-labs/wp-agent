@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Control 跨域 wire 消息（Reporting.Protocol 等）
 
 pub mod action_result_accepted;

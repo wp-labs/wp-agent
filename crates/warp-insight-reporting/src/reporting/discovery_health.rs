@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=d40666075b48a03d
+// @jumo generated
+// @jumo hash=d40666075b48a03d
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Pipeline")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Pipeline")]
 pub struct DiscoveryHealth {
     pub snapshot: String,
 }

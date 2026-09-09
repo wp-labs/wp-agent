@@ -20,9 +20,10 @@ pub(super) fn process_identity_state(
         return Ok(ProcessIdentityState::MissingProcess);
     }
 
-    let actual = match expected {
-        Some(_) => process_identity(pid)?,
-        None => None,
+    let actual = if expected.is_some() {
+        process_identity(pid)?
+    } else {
+        None
     };
     Ok(classify_process_identity(expected, actual.as_deref()))
 }
@@ -101,12 +102,15 @@ pub(super) fn process_exists(pid: u32) -> io::Result<bool> {
 
     // SAFETY: `kill(pid, 0)` only asks the kernel to check process existence and
     // permission. It does not dereference pointers or access Rust-managed memory.
-    let rc = unsafe { libc::kill(pid as i32, 0) };
-    if rc == 0 {
+    if unsafe { libc::kill(pid as i32, 0) } == 0 {
         return Ok(true);
     }
+    classify_existence_error(io::Error::last_os_error())
+}
 
-    let err = io::Error::last_os_error();
+/// Translate a failed `kill(pid, 0)` existence probe into an answer.
+#[cfg(unix)]
+fn classify_existence_error(err: io::Error) -> io::Result<bool> {
     match err.raw_os_error() {
         Some(code) if code == libc::ESRCH => Ok(false),
         Some(code) if code == libc::EPERM => Ok(true),
@@ -138,49 +142,56 @@ fn send_signal(pid: u32, signal: i32) -> io::Result<()> {
 #[cfg(unix)]
 fn wait_for_exit(pid: u32, timeout: Duration) -> io::Result<bool> {
     let deadline = Instant::now() + timeout;
-    loop {
-        if !process_exists(pid)? {
-            return Ok(false);
-        }
-        if process_is_zombie(pid)? {
-            return Ok(false);
-        }
+    while process_is_running(pid)? {
         if Instant::now() >= deadline {
             return Ok(true);
         }
         thread::sleep(Duration::from_millis(10));
     }
+    Ok(false)
+}
+
+#[cfg(unix)]
+fn process_is_running(pid: u32) -> io::Result<bool> {
+    Ok(process_exists(pid)? && !process_is_zombie(pid)?)
 }
 
 #[cfg(target_os = "linux")]
-fn process_identity_token(pid: u32) -> io::Result<Option<String>> {
+fn read_proc_stat(pid: u32) -> io::Result<Option<String>> {
     let stat_path = format!("/proc/{pid}/stat");
-    let stat = match std::fs::read_to_string(stat_path) {
-        Ok(stat) => stat,
+    match std::fs::read_to_string(stat_path) {
+        Ok(stat) => Ok(Some(stat)),
         Err(err)
             if matches!(
                 err.kind(),
                 io::ErrorKind::NotFound | io::ErrorKind::PermissionDenied
             ) =>
         {
-            return Ok(None);
+            Ok(None)
         }
-        Err(err) => return Err(err),
+        Err(err) => Err(err),
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn process_identity_token(pid: u32) -> io::Result<Option<String>> {
+    let Some(stat) = read_proc_stat(pid)? else {
+        return Ok(None);
     };
     let Some((_, tail)) = stat.rsplit_once(") ") else {
         return Ok(None);
     };
-    let fields: Vec<&str> = tail.split_whitespace().collect();
-    if fields.len() <= 19 {
+    let Some(start_time) = tail.split_whitespace().nth(19) else {
         return Ok(None);
-    }
-    Ok(Some(format!("linux_proc_start:{}", fields[19])))
+    };
+    Ok(Some(format!("linux_proc_start:{start_time}")))
 }
 
 #[cfg(all(unix, not(target_os = "linux")))]
-fn process_identity_token(pid: u32) -> io::Result<Option<String>> {
-    let output = match Command::new("ps")
-        .args(["-o", "lstart=", "-p", &pid.to_string()])
+fn run_ps(program: &str, format_flag: &str, pid: u32) -> io::Result<Option<std::process::Output>> {
+    let pid_arg = pid.to_string();
+    let output = match Command::new(program)
+        .args(["-o", format_flag, "-p", pid_arg.as_str()])
         .output()
     {
         Ok(output) => output,
@@ -191,6 +202,14 @@ fn process_identity_token(pid: u32) -> io::Result<Option<String>> {
     if !output.status.success() {
         return Ok(None);
     }
+    Ok(Some(output))
+}
+
+#[cfg(all(unix, not(target_os = "linux")))]
+fn process_identity_token(pid: u32) -> io::Result<Option<String>> {
+    let Some(output) = run_ps("ps", "lstart=", pid)? else {
+        return Ok(None);
+    };
     let token = String::from_utf8_lossy(&output.stdout).trim().to_string();
     if token.is_empty() {
         return Ok(None);
@@ -205,18 +224,8 @@ fn process_identity_token(_pid: u32) -> io::Result<Option<String>> {
 
 #[cfg(target_os = "linux")]
 fn process_is_zombie(pid: u32) -> io::Result<bool> {
-    let stat_path = format!("/proc/{pid}/stat");
-    let stat = match std::fs::read_to_string(stat_path) {
-        Ok(stat) => stat,
-        Err(err)
-            if matches!(
-                err.kind(),
-                io::ErrorKind::NotFound | io::ErrorKind::PermissionDenied
-            ) =>
-        {
-            return Ok(false);
-        }
-        Err(err) => return Err(err),
+    let Some(stat) = read_proc_stat(pid)? else {
+        return Ok(false);
     };
     Ok(parse_linux_proc_state(&stat) == Some('Z'))
 }
@@ -234,18 +243,9 @@ fn process_is_zombie(pid: u32) -> io::Result<bool> {
 
 #[cfg(all(unix, not(target_os = "linux")))]
 pub(super) fn process_is_zombie_via_ps(pid: u32, program: &str) -> io::Result<bool> {
-    let output = match Command::new(program)
-        .args(["-o", "stat=", "-p", &pid.to_string()])
-        .output()
-    {
-        Ok(output) => output,
-        Err(err) if err.kind() == io::ErrorKind::PermissionDenied => return Ok(false),
-        Err(err) if err.kind() == io::ErrorKind::NotFound => return Ok(false),
-        Err(err) => return Err(err),
-    };
-    if !output.status.success() {
+    let Some(output) = run_ps(program, "stat=", pid)? else {
         return Ok(false);
-    }
+    };
     let stat = String::from_utf8_lossy(&output.stdout);
     Ok(stat.trim_start().starts_with('Z'))
 }

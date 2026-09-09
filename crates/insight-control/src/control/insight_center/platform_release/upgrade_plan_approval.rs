@@ -1,6 +1,6 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.InsightCenter.PlatformRelease")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.InsightCenter.PlatformRelease")]
 pub struct UpgradePlanApproval {
     pub plan_id: String,
     pub status: String,

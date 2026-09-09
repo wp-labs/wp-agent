@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // WarpInsightCenter 上级聚合控制中心服务：接收 WarpGateWay 状态上报。
 
 use std::{error::Error, sync::Arc};

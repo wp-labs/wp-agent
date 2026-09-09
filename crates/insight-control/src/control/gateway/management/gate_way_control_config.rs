@@ -1,8 +1,8 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Gateway.Management")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Gateway.Management")]
 pub struct GateWayControlConfig {
-    #[moju(unique)]
+    #[jumo(unique)]
     pub config_id: String,
     pub gateway_id: String,
     pub advertise_url: String,

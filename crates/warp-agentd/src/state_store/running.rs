@@ -56,8 +56,8 @@ impl RunningExecutionState {
     }
 }
 
-#[derive(Debug, Clone, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Execute")]
+#[derive(Debug, Clone, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Execute")]
 pub struct RunningExecutionStateBuilder {
     execution_id: String,
     action_id: String,

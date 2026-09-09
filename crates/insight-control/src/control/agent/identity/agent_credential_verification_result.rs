@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=cfb5641c937ad6f8
+// @jumo generated
+// @jumo hash=cfb5641c937ad6f8
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Identity")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Agent.Identity")]
 pub struct AgentCredentialVerificationResult {
     pub agent_id: String,
     pub instance_id: String,

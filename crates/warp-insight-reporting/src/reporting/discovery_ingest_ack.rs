@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=2dd655e756f626e2
+// @jumo generated
+// @jumo hash=2dd655e756f626e2
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "event", domain = "Reporting", module = "Reporting.Protocol")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "event", domain = "Reporting", module = "Reporting.Protocol")]
 pub struct DiscoveryIngestAck {
     pub report_id: String,
     pub status: String,

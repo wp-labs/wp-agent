@@ -1,5 +1,5 @@
-// @moju generated
-// @moju hash=b6b65f0bdf29caee
+// @jumo generated
+// @jumo hash=b6b65f0bdf29caee
 
 pub mod admin_operator;
 pub use admin_operator::*;

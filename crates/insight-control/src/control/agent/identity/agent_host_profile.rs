@@ -1,11 +1,11 @@
-// @moju generated
-// @moju hash=da7ecaf505afe2dd
+// @jumo generated
+// @jumo hash=da7ecaf505afe2dd
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Identity")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Agent.Identity")]
 pub struct AgentHostProfile {
     pub cloud_instance_id: String,
-    #[moju(unique)]
+    #[jumo(unique)]
     pub node_id: String,
     pub hostname: String,
     pub os: String,

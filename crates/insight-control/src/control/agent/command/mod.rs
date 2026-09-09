@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Control model module: command
 
 pub mod agent_control_command;

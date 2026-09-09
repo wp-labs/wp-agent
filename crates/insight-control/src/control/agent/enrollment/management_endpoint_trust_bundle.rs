@@ -1,12 +1,12 @@
-// @moju generated
-// @moju hash=dc6752475e7ec954
+// @jumo generated
+// @jumo hash=dc6752475e7ec954
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Enrollment")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Agent.Enrollment")]
 pub struct ManagementEndpointTrustBundle {
     pub control_endpoint: String,
     pub expires_at: crate::control::types::DateTime,
-    #[moju(unique)]
+    #[jumo(unique)]
     pub trust_bundle_id: String,
     pub ca_bundle: String,
     pub expected_san: String,

@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=002fd7b00bba6934
+// @jumo generated
+// @jumo hash=002fd7b00bba6934
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Registry")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Agent.Registry")]
 pub struct AgentPolicyBinding {
     pub bound_at: crate::control::types::DateTime,
     pub policy_id: String,

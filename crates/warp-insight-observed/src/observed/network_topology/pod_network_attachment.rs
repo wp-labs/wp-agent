@@ -1,8 +1,8 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.NetworkTopology")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.NetworkTopology")]
 pub struct PodNetworkAttachment {
-    #[moju(unique)]
+    #[jumo(unique)]
     pub attachment_id: String,
     pub pod_id: String,
     pub network_segment_id: String,

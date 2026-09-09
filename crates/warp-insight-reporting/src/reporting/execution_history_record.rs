@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=29287a669303a0ed
+// @jumo generated
+// @jumo hash=29287a669303a0ed
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Pipeline")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Pipeline")]
 pub struct ExecutionHistoryRecord {
     pub plan_digest: String,
     pub action_id: String,

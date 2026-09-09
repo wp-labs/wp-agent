@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=29d2bb84737948e5
+// @jumo generated
+// @jumo hash=29d2bb84737948e5
 
-#[derive(Debug, Clone, PartialEq, Eq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "state", domain = "Control", module = "Control.Agent.Enrollment")]
+#[derive(Debug, Clone, PartialEq, Eq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "state", domain = "Control", module = "Control.Agent.Enrollment")]
 pub enum AgentEnrollmentTokenStatus {
     Active,
     Expired,

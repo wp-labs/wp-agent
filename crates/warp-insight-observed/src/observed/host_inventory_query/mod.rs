@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Observed.HostInventoryQuery
 
 pub mod query_host_inventory;

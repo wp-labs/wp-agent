@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Observed.HostResponsibilityService
 
 pub mod effective_host_responsibility;

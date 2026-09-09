@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Control model module: protocol
 
 pub mod agent_downstream_message_type;

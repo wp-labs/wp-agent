@@ -1,5 +1,0 @@
-// warp-insight 生成与部署目标
-
-target<bin> warp-insight-upgrader {
-  modules Discovery.Execute, Reporting.Contract
-}

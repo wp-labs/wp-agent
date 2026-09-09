@@ -438,6 +438,7 @@ fn config_with_duplicate_log_input_ids_is_rejected() {
                     multiline_mode: "none".to_string(),
                 },
             ],
+            file_inputs_file: None,
             in_memory_buffer_bytes: 1024,
             spool_dir: "/tmp/root/state/spool/logs".to_string(),
             output: LogsOutputSection {
@@ -495,6 +496,7 @@ fn config_with_invalid_log_startup_position_is_rejected() {
                 startup_position: "middle".to_string(),
                 multiline_mode: "none".to_string(),
             }],
+            file_inputs_file: None,
             in_memory_buffer_bytes: 1024,
             spool_dir: "/tmp/root/state/spool/logs".to_string(),
             output: LogsOutputSection {
@@ -552,6 +554,7 @@ fn config_with_invalid_tcp_output_framing_is_rejected() {
                 startup_position: "head".to_string(),
                 multiline_mode: "none".to_string(),
             }],
+            file_inputs_file: None,
             in_memory_buffer_bytes: 1024,
             spool_dir: "/tmp/root/state/spool/logs".to_string(),
             output: LogsOutputSection {

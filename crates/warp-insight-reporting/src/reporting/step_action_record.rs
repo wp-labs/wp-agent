@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=0c1612003d84d7af
+// @jumo generated
+// @jumo hash=0c1612003d84d7af
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
 pub struct StepActionRecord {
     pub started_at: String,
     pub finished_at: String,
@@ -14,6 +14,6 @@ pub struct StepActionRecord {
     pub stderr_summary: String,
     pub resource_usage: String,
     pub duration_ms: String,
-    #[moju(unique)]
+    #[jumo(unique)]
     pub step_id: String,
 }

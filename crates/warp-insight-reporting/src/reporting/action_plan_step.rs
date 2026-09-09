@@ -1,11 +1,11 @@
-// @moju generated
-// @moju hash=c7fb3e88f7c747e0
+// @jumo generated
+// @jumo hash=c7fb3e88f7c747e0
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
 pub struct ActionPlanStep {
     pub op: String,
-    #[moju(unique)]
+    #[jumo(unique)]
     pub id: String,
     pub kind: String,
 }

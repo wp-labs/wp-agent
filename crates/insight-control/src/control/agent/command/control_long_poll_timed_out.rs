@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=19ba200dc55576ee
+// @jumo generated
+// @jumo hash=19ba200dc55576ee
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "event", domain = "Control", module = "Control.Agent.Command")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "event", domain = "Control", module = "Control.Agent.Command")]
 pub struct ControlLongPollTimedOut {
     pub agent_id: String,
     pub instance_id: String,

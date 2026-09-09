@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.Gateway.Security
 
 pub mod control_center_trust_bundle;

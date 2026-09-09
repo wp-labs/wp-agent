@@ -1,10 +1,10 @@
-// @moju generated
-// @moju hash=5cd0b68d5b14ca27
+// @jumo generated
+// @jumo hash=5cd0b68d5b14ca27
 
 use insight_control::AdminShowAgentRuntimeStatus;
 
-#[derive(::moju_derive::MoJu)]
-#[moju(kind = "interface", domain = "Control", module = "Control.GatewayApp.UserFacingInterface")]
+#[derive(::jumo_derive::Jumo)]
+#[jumo(kind = "interface", domain = "Control", module = "Control.GatewayApp.UserFacingInterface")]
 pub struct WarpGateWayManagementInterface;
 
 impl WarpGateWayManagementInterface {

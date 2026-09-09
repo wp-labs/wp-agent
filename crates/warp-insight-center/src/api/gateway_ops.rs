@@ -14,9 +14,9 @@ use axum::{
 use insight_control::types::DateTime;
 use insight_control::{
     GatewayCredentialBundle, GatewayCredentialVerificationResult, GatewayEnrollmentResult,
-    GatewayEnrollmentResultReturned, GatewayInitialConfig, GatewayStatusAccepted,
-    GatewayStatusAcceptedReturned, InitializeGatewayViaUrl, RegisterGateway, ReportGatewayStatus,
-    VerifyGatewayCredential,
+    GatewayEnrollmentResultReturned, GatewayInitialConfig, GatewayInitializationStatus,
+    GatewayInstanceLifecycleState, GatewayStatusAccepted, GatewayStatusAcceptedReturned,
+    QueryGatewayInitializationStatus, RegisterGateway, ReportGatewayStatus, VerifyGatewayCredential,
 };
 
 use crate::infra::{
@@ -285,7 +285,7 @@ pub struct InitialConfigQueryParams {
 /// - **未初始化**（有 bootstrap、无运行期凭据）：Bearer 为一次性 BootstrapToken，
 ///   携带 X-Gateway-Identity-Token → 派生 RegistToken 落 enrollment → 消费 bootstrap → 出 config.toml。
 /// - **已初始化**（有运行期凭据）：现有 authenticate_gateway（Bearer RUNTIME_TOKEN）→ 出同一 config.toml。
-/// 返回 `application/toml`（config.toml 即 GatewayInitialConfig 的序列化）。
+/// 返回 `application/json`：`config` 为 GatewayInitialConfig，置备态同时返回明文 RegistToken。
 pub async fn get_gateway_initial_config(
     State(state): State<ApiState>,
     headers: HeaderMap,
@@ -434,8 +434,8 @@ async fn provision_gateway_initial_config(
 }
 
 /// initial-config 响应（JSON 契约）：中心下发的控制面连接配置 + 派生 RegistToken。
-/// 网关/simulator 据此生成 config.toml（TOML 配置文件由网关侧落盘）。
-#[derive(serde::Serialize)]
+/// 网关/simulator 据此生成本地 config.toml（配置文件由网关侧落盘）。
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct InitialConfigReturned {
     pub config: GatewayInitialConfig,
     /// 置备路径：RegistToken 明文（注册用）；已初始化路径：None（已用运行期凭据）。
@@ -646,6 +646,7 @@ mod tests {
     use super::*;
     use axum::{body::Body, http::Request, routing::post, Router};
     use http_body_util::BodyExt;
+    use std::sync::atomic::{AtomicU64, Ordering};
     use std::time::{SystemTime, UNIX_EPOCH};
     use tower::ServiceExt;
 
@@ -755,11 +756,14 @@ mod tests {
 
     /// 构造"已创建未置备"网关（create_gateway 存 bootstrap hash、无运行期凭据）的完整路由。
     fn provision_state(bootstrap_token: &str) -> ApiState {
+        // 临时文件用「纳秒 + 原子计数器」命名，避免并发测试同纳秒撞同一路径导致 Conflict。
+        static COUNTER: AtomicU64 = AtomicU64::new(0);
         let nanos = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("time")
             .as_nanos();
-        let path = std::env::temp_dir().join(format!("wic-provision-{nanos}.json"));
+        let counter = COUNTER.fetch_add(1, Ordering::SeqCst);
+        let path = std::env::temp_dir().join(format!("wic-provision-{nanos}-{counter}.json"));
         let store = FileStore::new(&path);
         store
             .create_gateway("gw-p", bootstrap_token)
@@ -767,7 +771,7 @@ mod tests {
         ApiState {
             config: crate::config::CenterConfig {
                 listen_addr: "127.0.0.1:3100".to_string(),
-                store_path: std::env::temp_dir().join(format!("wic-provision-{nanos}.json")),
+                store_path: path.clone(),
                 gateway_credentials: Vec::new(),
                 admin_token_hash: None,
                 database_url: None,
@@ -994,20 +998,20 @@ mod tests {
             .get(header::CONTENT_TYPE)
             .and_then(|value| value.to_str().ok())
             .unwrap_or_default();
-        assert!(content_type.contains("application/toml"), "content-type: {content_type}");
+        assert!(content_type.contains("application/json"), "content-type: {content_type}");
         let body = response
             .into_body()
             .collect()
             .await
             .expect("body")
             .to_bytes();
-        let toml = String::from_utf8(body.to_vec()).expect("utf8");
-        // 派生 RegistToken 写入 [enrollment] token。
+        let returned: InitialConfigReturned = serde_json::from_slice(&body).expect("json");
+        // 派生 RegistToken 通过 JSON 响应的 regist_token 字段返回。
         let expected_regist =
             crate::infra::derive_regist_token("test-hmac-secret", "gw-p", "identity-p");
-        assert!(toml.contains(&format!("token = \"{expected_regist}\"")), "toml: {toml}");
-        assert!(toml.contains("server_tls_required = false"));
-        assert!(toml.contains("token_id = \"enroll-gw-p"));
+        assert_eq!(returned.regist_token.as_deref(), Some(expected_regist.as_str()));
+        assert!(!returned.config.server_tls_required);
+        assert!(returned.config.enrollment_token_id.starts_with("enroll-gw-p"));
 
         // bootstrap 一次性：置备成功后复用 → 401（已消费，且无运行期凭据）。
         let response = app
@@ -1224,6 +1228,57 @@ mod tests {
             .expect("response");
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
+
+    #[tokio::test]
+    async fn query_initialization_status_tracks_lifecycle() {
+        let state = provision_state("boot-tok");
+        let store = state.store.clone();
+        let app = super::super::router_for(state);
+        // 未初始化：Provisioned → initialized = false。
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/api/v1/gateway/initialization-status?instance_id=gw-p")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let status: GatewayInitializationStatus = serde_json::from_slice(&body).expect("json");
+        assert_eq!(status.gateway_id, "gw-p");
+        assert_eq!(
+            status.lifecycle_state,
+            GatewayInstanceLifecycleState::Provisioned
+        );
+        assert!(!status.initialized);
+        // initial-config 置备流程将 Center 侧生命周期推进到 Initializing。
+        store
+            .mark_gateway_initializing("gw-p")
+            .await
+            .expect("mark initializing");
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/api/v1/gateway/initialization-status?instance_id=gw-p")
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("response");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.expect("body").to_bytes();
+        let status: GatewayInitializationStatus = serde_json::from_slice(&body).expect("json");
+        assert_eq!(
+            status.lifecycle_state,
+            GatewayInstanceLifecycleState::Initializing
+        );
+        assert!(status.initialized);
+    }
 }
 
 /// 校验网关通讯凭据（VerifyGatewayCredentialFlow）：网关持 bearer 访问，中心比对
@@ -1247,26 +1302,41 @@ pub async fn verify_gateway_credential(
     }
 }
 
-/// 通过 URL 初始化（InitializeGatewayViaUrlFlow）：校验 URL 指向 initial-config 入口后，
-/// 构建初始配置（控制端点 = 提交的 URL）。
-pub async fn initialize_gateway_via_url(
-    State(_state): State<ApiState>,
-    Json(input): Json<InitializeGatewayViaUrl>,
+/// 查询网关初始化状态（QueryGatewayInitializationStatus）：GET /api/v1/gateway/initialization-status。
+/// 供网关/前端初始化页判断是否已初始化：initialized = lifecycle_state != Provisioned；
+/// lifecycle_state 未记录（None）时按未初始化（Provisioned）处理。
+pub async fn query_gateway_initialization_status(
+    State(state): State<ApiState>,
+    Query(params): Query<QueryGatewayInitializationStatus>,
 ) -> Response {
-    if !input.init_url.contains("initial-config") {
-        return (
-            StatusCode::BAD_REQUEST,
-            "init_url must reference the initial-config endpoint",
-        )
-            .into_response();
-    }
-    Json(GatewayInitialConfig {
-        gateway_id: "gateway-issued".to_string(),
-        control_center_endpoint: input.init_url,
-        trust_bundle: None,
-        server_tls_required: true,
-        protocol_version: "1.0".to_string(),
-        enrollment_token_id: "gw-enroll-001".to_string(),
+    let Some(gateway_id) = params.instance_id.as_deref() else {
+        return (StatusCode::BAD_REQUEST, "missing instance_id").into_response();
+    };
+    let gateway = match state.store.get_gateway(gateway_id).await {
+        Ok(Some(gateway)) => gateway,
+        Ok(None) => {
+            return (
+                StatusCode::NOT_FOUND,
+                format!("unknown gateway `{gateway_id}`"),
+            )
+                .into_response();
+        }
+        Err(err) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("failed to load gateway store: {err}"),
+            )
+                .into_response();
+        }
+    };
+    let lifecycle_state = gateway
+        .lifecycle_state
+        .unwrap_or(GatewayInstanceLifecycleState::Provisioned);
+    Json(GatewayInitializationStatus {
+        gateway_id: gateway.gateway_id.clone(),
+        instance_id: Some(gateway.instance_id.clone()),
+        lifecycle_state,
+        initialized: lifecycle_state != GatewayInstanceLifecycleState::Provisioned,
     })
     .into_response()
 }

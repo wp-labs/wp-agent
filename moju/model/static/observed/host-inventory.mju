@@ -1,6 +1,0 @@
-// Module: HostInventory — 主机资产目录与运行态
-// 来源：doc/design/center/models/host-inventory-and-runtime-state.md
-//
-// 主机静态事实（HostInventory，慢变目录对象）与主机动态运行态
-// （HostRuntimeState，快变时间点快照）必须分层建模，通过 host_id 关联，
-// 但分别存储、分别刷新、分别查询。

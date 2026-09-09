@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Reporting model domain
 
 pub mod ack_status;

@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=b505b229ad05d5d4
+// @jumo generated
+// @jumo hash=b505b229ad05d5d4
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Agent.Status")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Agent.Status")]
 pub struct AgentRuntimeStatus {
     pub version: String,
     pub health: String,

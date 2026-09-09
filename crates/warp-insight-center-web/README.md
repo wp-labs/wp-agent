@@ -1,6 +1,6 @@
 # warp-insight-center-web — WarpInsightCenter 全局控制中心前端
 
-WarpInsightCenter 子系统的浏览器端 WEB 前端（MoJu `module<ui> InsightCenterWeb`，`target<site,web> warp-insight-center-web`）。承载网关列表/实例、初始配置、版本发布与升级计划页面。
+WarpInsightCenter 子系统的浏览器端 WEB 前端（Jumo `module<ui> InsightCenterWeb`，`target<site,web> warp-insight-center-web`）。承载网关列表/实例、初始配置、版本发布与升级计划页面。
 
 ## 页面
 
@@ -30,8 +30,8 @@ npm run build    # tsc -b && vite build
 ## 生成管线（可复现）
 
 ```bash
-npx tsx generate.ts moju-ui-model.json .   # 从 moju-ui-model.json 生成骨架
+npx tsx generate.ts jumo-ui-model.json .   # 从 jumo-ui-model.json 生成骨架
 ```
 
-`moju-ui-model.json` 描述 UI 结构（对应 `WarpInsightCenter/layout.mju` 的区域与类型），
+`jumo-ui-model.json` 描述 UI 结构（对应 `WarpInsightCenter/layout.mju` 的区域与类型），
 生成器产出 `src/types`、`src/store` 与组件骨架；页面设计在生成骨架上手工精修。

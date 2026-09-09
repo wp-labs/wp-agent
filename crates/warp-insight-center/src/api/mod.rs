@@ -30,9 +30,9 @@ use admin_ops::{
     admin_dispatch_agent_fleet_command,
 };
 use gateway_ops::{
-    download_release_artifact, get_gateway_initial_config, initialize_gateway_via_url,
-    options_gateway_initial_config, register_gateway, renew_gateway_credential, submit_agent_status,
-    submit_gateway_status, verify_gateway_credential,
+    download_release_artifact, get_gateway_initial_config, options_gateway_initial_config,
+    query_gateway_initialization_status, register_gateway, renew_gateway_credential,
+    submit_agent_status, submit_gateway_status, verify_gateway_credential,
 };
 
 #[derive(Debug, Clone)]
@@ -75,7 +75,7 @@ pub(crate) fn build_control_center_trust_bundle(
     })
 }
 
-/// 为 Gateway 初始化端点统一补 CORS 响应头，确保浏览器能读取认证失败状态。
+/// 为 Gateway 初始化相关端点统一补 CORS 响应头，确保浏览器能读取状态与认证失败。
 async fn gateway_initial_config_cors(request: Request, next: Next) -> Response {
     let mut response = next.run(request).await;
     let headers = response.headers_mut();
@@ -113,7 +113,7 @@ pub fn router_for(state: ApiState) -> Router {
         .route("/api/v1/gateway/agents/status", post(submit_agent_status))
         // 网关面：WarpGateway 持注册 Token 注册（RegisterGatewayFlow）
         .route("/api/v1/gateway/register", post(register_gateway))
-        // 网关面：Gateway 拉取初始配置（初始化 URL 指向此端点；置备 + 出 config.toml）
+        // 网关面：Gateway 拉取初始配置（初始化 URL 指向此端点；返回 application/json）
         .route(
             "/api/v1/gateway/initial-config",
             get(get_gateway_initial_config)
@@ -131,10 +131,12 @@ pub fn router_for(state: ApiState) -> Router {
             "/api/v1/gateway/credentials/verify",
             post(verify_gateway_credential),
         )
-        // 网关面：通过 URL 初始化（InitializeGatewayViaUrlFlow）
+        // 网关面：查询网关初始化状态（QueryGatewayInitializationStatus）
         .route(
-            "/api/v1/gateway/initialize-via-url",
-            post(initialize_gateway_via_url),
+            "/api/v1/gateway/initialization-status",
+            get(query_gateway_initialization_status)
+                .options(options_gateway_initial_config)
+                .layer(from_fn(gateway_initial_config_cors)),
         )
         // 管理面：下发全局策略（DispatchGlobalPolicyFlow）
         .route(

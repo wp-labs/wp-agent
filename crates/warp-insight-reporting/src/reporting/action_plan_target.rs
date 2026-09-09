@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=8ef7b8ca57bc3ab0
+// @jumo generated
+// @jumo hash=8ef7b8ca57bc3ab0
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
 pub struct ActionPlanTarget {
     pub selectors: String,
     pub arch: String,

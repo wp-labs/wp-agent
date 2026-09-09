@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.Gateway.Identity
 
 pub mod gate_way_identity;

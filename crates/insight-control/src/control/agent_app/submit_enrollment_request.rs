@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=f89352363bbea22d
+// @jumo generated
+// @jumo hash=f89352363bbea22d
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "message", role = "command", domain = "Control", module = "Control.AgentApp.FacingInterface")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "message", role = "command", domain = "Control", module = "Control.AgentApp.FacingInterface")]
 pub struct SubmitEnrollmentRequest {
     pub capability_summary: String,
     pub token: String,

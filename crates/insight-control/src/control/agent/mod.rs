@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.Agent
 
 pub mod command;

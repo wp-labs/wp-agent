@@ -9,12 +9,16 @@ use axum::{
     Json,
 };
 
-use insight_control::AdminAgentInstallCodeReturned;
-use insight_control::types::{AgentBootstrapBundle, AgentInstallCode, DateTime};
 use crate::infra::{
     bytes_sha256_hex, new_secret_token, sha256_hex, sign_install_script, AdminConfig, AdminStore,
     StoredEnrollmentToken, StoredEnrollmentTokenStatus,
 };
+use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
+use insight_control::types::{AgentBootstrapBundle, AgentInstallCode, DateTime};
+use insight_control::AdminAgentInstallCodeReturned;
+use ring::digest::{digest, SHA256};
+use rustls_pki_types::{pem::PemObject, CertificateDer};
+use webpki::EndEntityCert;
 
 use super::ApiState;
 use super::{admin_auth::require_admin_bearer, rate_limit};
@@ -136,8 +140,7 @@ pub async fn get_agent_initial_config_with_token(
     client: Option<ConnectInfo<SocketAddr>>,
 ) -> Response {
     let client_key = rate_limit::client_key(client);
-    if let Some(response) =
-        rate_limit::check_rate_limit(&state, &client_key, BOOTSTRAP_AUTH_SCOPE)
+    if let Some(response) = rate_limit::check_rate_limit(&state, &client_key, BOOTSTRAP_AUTH_SCOPE)
     {
         return response;
     }
@@ -171,8 +174,7 @@ pub async fn download_agent_package(
     client: Option<ConnectInfo<SocketAddr>>,
 ) -> Response {
     let client_key = rate_limit::client_key(client);
-    if let Some(response) =
-        rate_limit::check_rate_limit(&state, &client_key, BOOTSTRAP_AUTH_SCOPE)
+    if let Some(response) = rate_limit::check_rate_limit(&state, &client_key, BOOTSTRAP_AUTH_SCOPE)
     {
         return response;
     }
@@ -250,10 +252,12 @@ pub fn agent_install_code(
     let package_sha256 = agent_package_sha256(config)?;
     let x86_install_script_url = config.install_script_url("x86");
     let arm_install_script_url = config.install_script_url("arm");
+    let macos_install_code = macos_install_command(config)?;
     Ok(AgentInstallCode {
         x86_linux_install_code: install_command(config, &x86_install_script_url),
         bootstrap_enrollment_token: token.to_string(),
         arm_linux_install_code: install_command(config, &arm_install_script_url),
+        macos_install_code,
         bootstrap_bundle: AgentBootstrapBundle {
             bundle_id: format!("agent-bootstrap-{}", short_token_id(token)),
             install_script_url: x86_install_script_url,
@@ -299,6 +303,45 @@ openssl pkeyutl -verify -pubin -inkey "$D/key.pem" -rawin -in "$D/s" -sigfile "$
         signature_url = signature_url,
         public_key_pem = config.install_script_signing_public_key_pem,
     )
+}
+
+/// sha256 of the TLS serving certificate's SubjectPublicKeyInfo (DER), base64.
+/// curl's `--pinnedpubkey sha256//<pin>` uses the same value, so the macOS
+/// install command can authenticate the gateway with the built-in curl even
+/// though macOS ships LibreSSL (which cannot verify the Ed25519 script
+/// signature the Linux command relies on).
+fn server_tls_spki_pin(config: &AdminConfig) -> Result<String, String> {
+    let cert = CertificateDer::from_pem_file(&config.tls_cert_file).map_err(|err| {
+        format!(
+            "failed to read tls certificate {}: {err}",
+            config.tls_cert_file.display()
+        )
+    })?;
+    let end_entity = EndEntityCert::try_from(&cert)
+        .map_err(|err| format!("failed to parse tls certificate: {err}"))?;
+    let spki = end_entity.subject_public_key_info();
+    Ok(BASE64_STANDARD.encode(digest(&SHA256, spki.as_ref()).as_ref()))
+}
+
+/// macOS install command: the built-in curl authenticates the TLS channel by
+/// pinning the gateway's serving certificate, so the target host needs no
+/// external OpenSSL 3 / Ed25519 CLI support. The host architecture is picked
+/// at runtime (arm64 -> arm, everything else -> x86).
+fn macos_install_command(config: &AdminConfig) -> Result<String, String> {
+    let pin = server_tls_spki_pin(config)?;
+    let install_base = format!(
+        "{}/api/v1/agent/install",
+        config.public_base_url.trim_end_matches('/')
+    );
+    Ok(format!(
+        r#"set -eu; D="$(mktemp -d)"; trap 'rm -rf "$D"' EXIT INT TERM; echo "working dir: $D"
+if [ "$(uname -s)" != "Darwin" ]; then echo "this install command is for macOS only" >&2; exit 2; fi
+case "$(uname -m)" in arm64) ARCH=arm ;; *) ARCH=x86 ;; esac
+curl -fsSLk --pinnedpubkey "sha256//{pin}" "{install_base}/$ARCH/install.sh" -o "$D/s"
+sh "$D/s""#,
+        pin = pin,
+        install_base = install_base,
+    ))
 }
 
 fn install_script_signature_url(script_url: &str) -> String {

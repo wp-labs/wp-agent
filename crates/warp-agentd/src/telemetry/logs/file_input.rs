@@ -34,8 +34,8 @@ use state_support::{CollectedReadBatch, DeliveryOutcome, PendingCheckpoint, Runt
 
 const SPOOL_REPLAY_BATCH_SIZE: usize = 128;
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
 pub struct FileInputConfig {
     pub input_id: String,
     pub source_path: PathBuf,
@@ -52,8 +52,8 @@ pub enum ProcessOutcomeKind {
     SpoolReplayOnly,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
 pub struct ProcessOutcome {
     pub kind: ProcessOutcomeKind,
     pub records_processed: usize,
@@ -99,8 +99,8 @@ impl ProcessOutcome {
     }
 }
 
-#[derive(::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
+#[derive(::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
 pub struct FileInputProcessor<S> {
     config: FileInputConfig,
     sink: S,

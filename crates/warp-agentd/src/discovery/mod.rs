@@ -32,8 +32,8 @@ impl DiscoverySourceKind {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
 pub struct ProbeOutput {
     pub probe: String,
     pub source: DiscoverySourceKind,
@@ -50,8 +50,8 @@ pub trait DiscoveryProbe {
     fn refresh(&self, now: SystemTime) -> Result<ProbeOutput, DiscoveryProbeError>;
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
 pub struct DiscoveryProbeError {
     pub probe: String,
     pub source: DiscoverySourceKind,

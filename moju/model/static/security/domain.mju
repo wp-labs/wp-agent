@@ -1,7 +1,0 @@
-// 安全域 (Security Domain) — center-side security intelligence
-//
-// Domain facts in this package are split by module boundary:
-// - software-vulnerability.mju     # 软件归一化、漏洞 enrichment 与公开漏洞源接入（实体）
-// - software-vulnerability-service.mju # 漏洞查询与公开漏洞源接入（逻辑）
-//   module/software-vulnerability.mju # Module: SoftwareVulnerability
-//   module/software-vulnerability-service.mju # Module: SoftwareVulnerabilityService

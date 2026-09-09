@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=d8862d2eaef92bea
+// @jumo generated
+// @jumo hash=d8862d2eaef92bea
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "event", domain = "Control", module = "Control.Agent.Enrollment")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "event", domain = "Control", module = "Control.Agent.Enrollment")]
 pub struct AgentEnrollmentTokenRejected {
     pub token_id: String,
     pub node_id: String,

@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.Gateway.Supervision
 
 pub mod gateway_enrollment_result;

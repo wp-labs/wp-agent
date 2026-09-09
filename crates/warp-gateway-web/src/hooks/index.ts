@@ -3,9 +3,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   ADMIN_AUTH_CHANGED_EVENT,
   fetchAgentInstallCode,
-  fetchGatewayInitialConfig,
   fetchAgentOverview,
   getAdminApiToken,
+  initializeGatewayViaUrl,
   pauseAgent,
   upgradeAgent,
   type PauseAgentCommand,
@@ -19,7 +19,8 @@ export function useAgentOverview() {
   useEffect(() => {
     const onAuthChanged = () => setAuthVersion((version) => version + 1);
     window.addEventListener(ADMIN_AUTH_CHANGED_EVENT, onAuthChanged);
-    return () => window.removeEventListener(ADMIN_AUTH_CHANGED_EVENT, onAuthChanged);
+    return () =>
+      window.removeEventListener(ADMIN_AUTH_CHANGED_EVENT, onAuthChanged);
   }, []);
   // Do not poll before a token is entered: every unauth'ed request would
   // otherwise hit the admin's per-IP rate limiter (5 failures -> 60s block).
@@ -39,11 +40,11 @@ export function useAgentInstallCode() {
   });
 }
 
-/** Gateway 初始化页面的显式提交动作；不自动轮询，避免重复消耗一次性凭证。 */
+/** Gateway 初始化页面的显式提交动作；先检查状态，不自动轮询或重复消费一次性凭证。 */
 export function useGatewayInitialConfig() {
   return useMutation({
     mutationFn: ({ initUrl, token }: { initUrl: string; token?: string }) =>
-      fetchGatewayInitialConfig(initUrl, token),
+      initializeGatewayViaUrl(initUrl, token),
   });
 }
 

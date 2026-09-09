@@ -1,5 +1,0 @@
-// warp-insight 生成与部署目标
-
-target<site,web> warp-gateway-web {
-  modules Control.GatewayApp.WebFrontend
-}

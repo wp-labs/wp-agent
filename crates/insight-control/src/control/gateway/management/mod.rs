@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.Gateway.Management
 
 pub mod warp_gate_way_instance;

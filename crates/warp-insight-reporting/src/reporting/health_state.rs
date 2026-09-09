@@ -1,10 +1,10 @@
-// @moju generated
-// @moju hash=e39a0b357a3492b2
+// @jumo generated
+// @jumo hash=e39a0b357a3492b2
 
 #[derive(
-    Debug, Clone, PartialEq, Eq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu,
+    Debug, Clone, PartialEq, Eq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo,
 )]
-#[moju(kind = "state", domain = "Reporting")]
+#[jumo(kind = "state", domain = "Reporting")]
 pub enum HealthState {
     Healthy,
     Degraded,

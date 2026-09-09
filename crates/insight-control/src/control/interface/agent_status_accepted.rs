@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=ed0b445234fa1dee
+// @jumo generated
+// @jumo hash=ed0b445234fa1dee
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "message", role = "response", domain = "Reporting", module = "Reporting.Protocol")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "message", role = "response", domain = "Reporting", module = "Reporting.Protocol")]
 pub struct AgentStatusAccepted {
     pub snapshot: warp_insight_reporting::RuntimeHealthSnapshot,
 }

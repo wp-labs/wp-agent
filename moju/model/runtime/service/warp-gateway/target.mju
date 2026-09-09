@@ -1,9 +1,0 @@
-// warp-insight 生成与部署目标
-
-target<bin,http> warp-gateway {
-  modules Control.GatewayApp.UserFacingInterface, Control.AgentApp.FacingInterface
-  modules Control.Agent.Enrollment, Control.Agent.Registration, Control.Agent.Identity, Control.Agent.Credential, Control.Agent.Status
-  modules Control.Agent.Command
-  modules Control.Protocol, Control.Agent.Registry, Control.Agent.Status
-  modules Reporting.Protocol
-}

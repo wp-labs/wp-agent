@@ -6,8 +6,8 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-moju-core = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-core" }
-moju-derive = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-derive" }
+jumo-core = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-core" }
+jumo-derive = { path = "/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-derive" }
 serde = { version = "1", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 warp-insight-shared = { path = "../warp-insight-shared" }

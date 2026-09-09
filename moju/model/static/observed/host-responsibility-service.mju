@@ -1,4 +1,0 @@
-// Module: HostResponsibilityService — 责任归属逻辑
-//
-// HostResponsibility 的逻辑（逻辑型 module<logic>）：有效责任查询、外部同步命令
-// 与派生视图/同步游标，实体事实由 HostResponsibility 承载。

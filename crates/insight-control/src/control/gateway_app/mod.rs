@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.GatewayApp
 
 pub mod admin_agent_install_code_returned;
@@ -27,3 +27,7 @@ pub mod dispatch_agent_fleet_command;
 pub use dispatch_agent_fleet_command::*;
 pub mod agent_fleet_dispatch_receipt;
 pub use agent_fleet_dispatch_receipt::*;
+pub mod gateway_initialization_status;
+pub use gateway_initialization_status::*;
+pub mod query_gateway_initialization_status;
+pub use query_gateway_initialization_status::*;

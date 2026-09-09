@@ -200,7 +200,8 @@ start_gateway_server() {
     require_cmd openssl
     openssl req -x509 -newkey rsa:2048 -nodes \
       -keyout "${state_dir}/admin-tls.key.pem" \
-      -out "${state_dir}/admin-tls.crt.pem" -days 365 -subj "/CN=localhost" >/dev/null 2>&1
+      -out "${state_dir}/admin-tls.crt.pem" -days 365 -subj "/CN=localhost" \
+      -addext "subjectAltName=IP:127.0.0.1,DNS:localhost" >/dev/null 2>&1
   fi
   # warp-gateway 启动校验 agent.package_file 存在；模板相对路径在 .run 下会解析错，
   # 改为仓库绝对路径，并确保 warp-agentd 已构建。
@@ -209,6 +210,23 @@ start_gateway_server() {
     cargo build --manifest-path "${REPO_ROOT}/Cargo.toml" -p warp-agentd >/dev/null
   fi
   sed -i '' "s|^package_file = .*|package_file = \"${REPO_ROOT}/target/debug/warp-agentd\"|" "${dir}/warp-gateway.toml"
+  # agent 安装期通过脚本内嵌 trust_bundle（--cacert）校验网关 TLS；
+  # demo 用自签证书，直接把该证书本身嵌为信任锚（install.sh 内嵌 CA PEM 不能是占位符）。
+  python3 - "${state_dir}/admin-tls.crt.pem" "${dir}/warp-gateway.toml" <<'PY'
+import re, sys
+nl = chr(10)
+cert = open(sys.argv[1]).read().strip()
+path = sys.argv[2]
+text = open(path).read()
+block = 'trust_bundle = """' + nl + cert + nl + '"""'
+text = re.sub(
+    r'(?ms)^trust_bundle = (""".*?"""|".*?")\s*\n',
+    block + '\n',
+    text,
+    count=1,
+)
+open(path, "w").write(text)
+PY
   WARP_GATEWAY_CONFIG="${dir}/warp-gateway.toml" \
     "${gw_bin}" >"/tmp/warp-gateway-demo-server.log" 2>&1 &
   GATEWAY_PID=$!

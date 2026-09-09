@@ -2,15 +2,15 @@
 
 use warp_insight_contracts::telemetry_record::TelemetryRecordContract;
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
 pub struct StageResult {
     pub staged: Vec<TelemetryRecordContract>,
     pub overflowed: Vec<TelemetryRecordContract>,
 }
 
-#[derive(Debug, Clone, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
+#[derive(Debug, Clone, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
 pub struct TelemetryBuffer {
     max_bytes: usize,
     used_bytes: usize,

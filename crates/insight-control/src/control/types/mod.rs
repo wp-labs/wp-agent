@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // 原始类型 re-export + Control 模块 re-export 桥
 #![allow(unused_imports)]
 

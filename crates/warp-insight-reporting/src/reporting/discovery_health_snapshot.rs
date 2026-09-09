@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=dbdabdd61754ddd4
+// @jumo generated
+// @jumo hash=dbdabdd61754ddd4
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Health")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Health")]
 pub struct DiscoveryHealthSnapshot {
     pub readiness: String,
     pub resource_count: String,

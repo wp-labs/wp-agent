@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Observed 模型域
 
 pub mod host_inventory;

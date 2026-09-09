@@ -12,8 +12,8 @@ use warp_insight_shared::time::now_rfc3339;
 
 use super::{DiscoveryProbe, DiscoveryProbeError, DiscoverySourceKind, ProbeOutput};
 
-#[derive(::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
+#[derive(::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
 pub struct ContainerDiscoveryProbe;
 
 impl DiscoveryProbe for ContainerDiscoveryProbe {
@@ -123,16 +123,16 @@ impl DiscoveryProbe for ContainerDiscoveryProbe {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.Entity")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.Entity")]
 struct ContainerRuntimeRoot {
     runtime: &'static str,
     runtime_namespace: Option<&'static str>,
     path: PathBuf,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.Entity")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.Entity")]
 struct ObservedContainer {
     container_id: String,
     name: String,
@@ -146,8 +146,8 @@ struct ObservedContainer {
     k8s_container_name: Option<String>,
 }
 
-#[derive(Debug, Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.Entity")]
+#[derive(Debug, Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.Entity")]
 struct OciRuntimeSpec {
     #[serde(default)]
     linux: Option<OciLinuxSpec>,
@@ -155,8 +155,8 @@ struct OciRuntimeSpec {
     annotations: BTreeMap<String, String>,
 }
 
-#[derive(Debug, Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.Entity")]
+#[derive(Debug, Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.Entity")]
 struct OciLinuxSpec {
     #[serde(default)]
     cgroups_path: Option<String>,

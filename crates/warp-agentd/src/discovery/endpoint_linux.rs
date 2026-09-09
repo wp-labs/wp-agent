@@ -85,8 +85,8 @@ enum SocketTableKind {
     UdpBound,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.Entity")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.Entity")]
 struct ProcessSocketOwner {
     pid: u32,
     process_identity: Option<String>,

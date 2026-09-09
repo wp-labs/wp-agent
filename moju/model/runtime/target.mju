@@ -1,9 +1,0 @@
-// warp-insight 生成与部署目标
-
-target<platform> warp-insight-managed {
-  subsystem WarpInsightCenter
-  subsystem WarpGateway
-  subsystem DataPlatform
-  subsystem WpAgent
-}
-

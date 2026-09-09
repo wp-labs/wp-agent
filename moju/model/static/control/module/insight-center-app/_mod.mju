@@ -1,9 +1,0 @@
-module<package> InsightCenterApp {
-  meta {
-    label zh "InsightCenterApp"
-    summary zh "WarpInsightCenter 的应用层边界：面向网关/管理接口、中心 WEB 与应用编排。"
-    tags "control", "application", "package"
-  }
-
-  layer Application
-}

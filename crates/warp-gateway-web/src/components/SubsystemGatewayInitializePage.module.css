@@ -211,6 +211,18 @@
   line-height: 1.55;
 }
 
+.statusBanner {
+  margin-top: 20px;
+  padding: 11px 13px;
+  border: 1px solid #b9dfca;
+  border-radius: 7px;
+  background: #f1fbf5;
+  color: #25623d;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
 .result {
   margin-top: 20px;
   padding: 24px 28px;
@@ -318,7 +330,7 @@
   overflow-wrap: anywhere;
 }
 
-.tomlBlock pre {
+.jsonBlock pre {
   max-height: 420px;
   margin: 16px 0;
   padding: 14px;

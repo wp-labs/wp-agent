@@ -1,8 +1,8 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Control", module = "Control.Gateway.Management")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Control", module = "Control.Gateway.Management")]
 pub struct WarpGateWayInstance {
-    #[moju(unique)]
+    #[jumo(unique)]
     pub gateway_id: String,
     pub instance_id: String,
     pub boot_id: String,

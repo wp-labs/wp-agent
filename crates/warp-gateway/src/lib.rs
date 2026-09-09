@@ -1,5 +1,5 @@
-// @moju generated
-// @moju hash=764a69fcf1d71142
+// @jumo generated
+// @jumo hash=764a69fcf1d71142
 
 pub mod api;
 pub mod app;

@@ -1,5 +1,5 @@
-// @moju generated
-// @moju hash=2ff63c2da808b5ca
+// @jumo generated
+// @jumo hash=2ff63c2da808b5ca
 
 use std::sync::{Arc, Mutex};
 

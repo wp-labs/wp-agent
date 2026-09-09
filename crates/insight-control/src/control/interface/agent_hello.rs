@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=7ec1773aaebcdc92
+// @jumo generated
+// @jumo hash=7ec1773aaebcdc92
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "message", role = "command", domain = "Reporting", module = "Reporting.Protocol")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "message", role = "command", domain = "Reporting", module = "Reporting.Protocol")]
 pub struct AgentHello {
     pub instance_id: String,
     pub version: String,

@@ -1,7 +1,0 @@
-// warp-insight 生成与部署目标
-// InsightSimulator 仿真器：CLI 工具（扮演 Gateway/Agentd 向上层发数据），非部署服务。
-
-target<bin> insight-simulator {
-  modules Control.GatewayApp.FacingInterface, Control.AgentApp.FacingInterface
-  modules Control.Protocol, Reporting.Protocol
-}

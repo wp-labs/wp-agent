@@ -2,26 +2,26 @@
 
 ## Context
 
-This crate was generated from a MoJu design and is intended as a compileable implementation skeleton.
+This crate was generated from a Jumo design and is intended as a compileable implementation skeleton.
 
 - Domain: `Global`
 - Target: `Global<bin,http>`
 - Profile: `HttpRust`
 - Crate: `warp-gateway`
 - Scaffold: `api, route, dto, handler`
-- Source MoJu model: `/Users/zuowenjian/devspace/rust/x-topology/warp-insight/moju`
-- MoJu skills: `/Users/zuowenjian/devspace/rust/x-topology/moju-sys/moju-skills`
-- MoJu model summary: `MOJU_MODEL.md`
+- Source Jumo model: `/Users/zuowenjian/devspace/rust/x-topology/warp-insight/jumo`
+- Jumo skills: `/Users/zuowenjian/devspace/rust/x-topology/moju-sys/jumo-skills`
+- Jumo model summary: `JUMO_MODEL.md`
 
 ## Read First
 
-1. Read the relevant long-lived MoJu skills from the `moju-skills` directory, especially `moju-model-understanding.md`.
-2. Read the source MoJu model directory listed above. It is the source of truth.
-3. Read `MOJU_MODEL.md` as a navigation summary only.
+1. Read the relevant long-lived Jumo skills from the `jumo-skills` directory, especially `jumo-model-understanding.md`.
+2. Read the source Jumo model directory listed above. It is the source of truth.
+3. Read `JUMO_MODEL.md` as a navigation summary only.
 
 ## Goal
 
-Complete the generated service implementation while preserving the generated module layout and MoJu metadata.
+Complete the generated service implementation while preserving the generated module layout and Jumo metadata.
 
 ## Interface Tasks
 
@@ -45,8 +45,8 @@ Complete the generated service implementation while preserving the generated mod
 
 ## Do Not
 
-- Do not edit MoJu source files unless explicitly requested.
-- Do not remove `.moju-gen.json` or MoJu metadata comments/attributes.
+- Do not edit Jumo source files unless explicitly requested.
+- Do not remove `.jumo-gen.json` or Jumo metadata comments/attributes.
 - Do not replace the generated module layout without updating this task file.
 
 ## Acceptance Criteria

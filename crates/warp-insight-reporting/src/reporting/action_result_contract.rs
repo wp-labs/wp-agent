@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=b3c4d43dade74294
+// @jumo generated
+// @jumo hash=b3c4d43dade74294
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
 pub struct ActionResultContract {
     pub step_records: String,
     pub execution_id: String,

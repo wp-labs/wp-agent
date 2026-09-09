@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Control model module: enrollment
 
 pub mod agent_bootstrap_bundle;

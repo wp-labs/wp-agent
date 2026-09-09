@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=fc2e0eec800f2d2f
+// @jumo generated
+// @jumo hash=fc2e0eec800f2d2f
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "event", domain = "Reporting", module = "Reporting.Protocol")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "event", domain = "Reporting", module = "Reporting.Protocol")]
 pub struct ActionPlanAck {
     pub api_version: String,
     pub kind: String,

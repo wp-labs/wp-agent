@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.InsightCenterApp
 
 pub mod admin_bind_gateway_customer;

@@ -1,6 +1,6 @@
-// @moju generated
-// @moju hash=c8d37edf2d51dc91
+// @jumo generated
+// @jumo hash=c8d37edf2d51dc91
 
-#[derive(Debug, Clone, ::moju_derive::MoJu)]
-#[moju(kind = "actor", domain = "Control")]
+#[derive(Debug, Clone, ::jumo_derive::Jumo)]
+#[jumo(kind = "actor", domain = "Control")]
 pub struct Agentd;

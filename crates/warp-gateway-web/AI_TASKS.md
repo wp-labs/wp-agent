@@ -2,7 +2,7 @@
 
 ## Context
 
-This project was generated from a MoJu design and is intended as a working UI implementation skeleton.
+This project was generated from a Jumo design and is intended as a working UI implementation skeleton.
 
 - Domain: `Global`
 - Target: `Global<bin,http>`
@@ -12,13 +12,13 @@ This project was generated from a MoJu design and is intended as a working UI im
 
 ## Read First
 
-1. Read `moju-ui-model.json` — it describes the complete UI model (types, regions, flows, interfaces).
+1. Read `jumo-ui-model.json` — it describes the complete UI model (types, regions, flows, interfaces).
 2. Read the generated source under `src/` — all components, hooks, and API layers are wired from the model.
-3. The source MoJu model is the source of truth; generated code reflects one projection of it.
+3. The source Jumo model is the source of truth; generated code reflects one projection of it.
 
 ## Goal
 
-Complete the generated UI implementation while preserving the generated module layout and MoJu metadata.
+Complete the generated UI implementation while preserving the generated module layout and Jumo metadata.
 
 ## Component Tasks
 
@@ -90,8 +90,8 @@ Complete the generated UI implementation while preserving the generated module l
 
 ## Do Not
 
-- Do not edit MoJu source files unless explicitly requested.
-- Do not remove `// @moju generated` headers from generated files.
+- Do not edit Jumo source files unless explicitly requested.
+- Do not remove `// @jumo generated` headers from generated files.
 - Do not replace the generated module layout without updating this task file.
 
 ## Acceptance Criteria

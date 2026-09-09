@@ -27,15 +27,30 @@ vite.config.js
 .run.gxl
 .report
 
-# MoJu draft files (AI-generated, awaiting review)
-moju/draft/
+# Jumo draft files (AI-generated, awaiting review)
+jumo/draft/
 
-# MoJu tooling artifacts (diff baselines, generation manifests)
-.moju-baseline/
-.moju-gen.json
+# Jumo tooling artifacts (diff baselines, generation manifests)
+.jumo-baseline/
+.jumo-gen.json
 
 # Local agent runtime data directory (may contain credentials)
 /warp-agentd/
 
 # Local run/test artifacts
 .run/
+
+# Case-scoped agent runtime data (checkpoints/state must stay out of git)
+case/*/run/
+case/*/state/
+case/*/log/
+
+# Generated monitor env (created from .env.example by start.sh)
+crates/warp-gateway/monitor/.env
+crates/warp-gateway/bin/wpadm
+crates/warp-gateway/bin/wparse
+crates/warp-gateway/bin/wpgen
+crates/warp-gateway/bin/wpl-check
+crates/warp-gateway/bin/wprescue
+crates/warp-gateway/data-plane/data/
+case/agentd-p0-macos/

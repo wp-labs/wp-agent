@@ -1,5 +1,5 @@
-// @moju generated
-// @moju hash=1dab1fe78bc3d451
+// @jumo generated
+// @jumo hash=1dab1fe78bc3d451
 
 pub struct GlobalService;
 

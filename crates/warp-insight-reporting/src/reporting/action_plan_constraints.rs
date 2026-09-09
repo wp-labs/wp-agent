@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=73408617c9281b26
+// @jumo generated
+// @jumo hash=73408617c9281b26
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Reporting", module = "Reporting.Contract")]
 pub struct ActionPlanConstraints {
     pub approval_mode: String,
     pub step_timeout_default_ms: String,

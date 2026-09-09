@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Reporting 模型域（可复用）：上报/契约
 
 pub mod reporting;

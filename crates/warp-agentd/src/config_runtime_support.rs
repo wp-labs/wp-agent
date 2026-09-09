@@ -50,6 +50,16 @@ container_enabled = false
 # # state_dir = "state"
 # # log_dir = "log"
 #
+# 采集任务与运行设定的稳定度不同：可以把 [[telemetry.logs.file_inputs]] 清单移到独立文件，
+# 在 [telemetry.logs] 内用 file_inputs_file 引用（路径相对本配置文件，与内联二选一）：
+# file_inputs_file = "tasks/apps.toml"
+#   tasks/apps.toml 内容示例：
+#   [[file_inputs]]
+#   input_id = "monitoring-app"
+#   path = "/var/log/monitoring/app.log"
+#   startup_position = "tail"
+#   multiline_mode = "none"
+#
 # 示例：把某个监控系统日志文件送到本地 warp-parse record 输出文件。
 # 取消注释后，把 path 改成你的真实日志路径。
 #
@@ -57,6 +67,41 @@ container_enabled = false
 # input_id = "monitoring-app"
 # path = "/var/log/monitoring/app.log"
 # startup_position = "head"
+# multiline_mode = "none"
+#
+# macOS P0 采集清单（示例，按需取消注释）：只支持“可追加的单个文本文件”。
+# 需要 root/Full Disk Access 才能读的路径，agent 用户态读取失败会被跳过/进本地缓冲重试，
+# 生产请用 root helper 采集；新增文件（.ips）与统一日志/audit 需 Phase 2 source。
+# 注：install.log / launchd.log 体量大，默认 tail（只收新增行）；需要首次回放历史时改 head。
+#
+# [[telemetry.logs.file_inputs]]
+# input_id = "macos_install_log"
+# path = "/var/log/install.log"
+# startup_position = "tail"
+# multiline_mode = "none"
+#
+# [[telemetry.logs.file_inputs]]
+# input_id = "macos_launchd"
+# path = "/var/log/com.apple.xpc.launchd/launchd.log"
+# startup_position = "tail"
+# multiline_mode = "none"
+#
+# [[telemetry.logs.file_inputs]]
+# input_id = "macos_shutdown_monitor"
+# path = "/var/log/shutdown_monitor.log"
+# startup_position = "tail"
+# multiline_mode = "none"
+#
+# [[telemetry.logs.file_inputs]]
+# input_id = "macos_fsck"
+# path = "/var/log/fsck_apfs.log"
+# startup_position = "head"
+# multiline_mode = "none"
+#
+# [[telemetry.logs.file_inputs]]
+# input_id = "macos_wifi"
+# path = "/var/log/wifi.log"
+# startup_position = "tail"
 # multiline_mode = "none"
 #
 # 示例：把日志通过 TCP 发到本机 WarpParse 的 tcp_src。
@@ -144,7 +189,7 @@ pub(super) fn resolve_paths(
     config
 }
 
-fn absolutize(base: &Path, raw: &str) -> PathBuf {
+pub(super) fn absolutize(base: &Path, raw: &str) -> PathBuf {
     let path = Path::new(raw);
     let joined = if path.is_absolute() {
         path.to_path_buf()
@@ -172,7 +217,7 @@ fn expand_optional(value: Option<String>) -> Result<Option<String>, ConfigError>
     value.map(expand_string).transpose()
 }
 
-fn expand_string(value: String) -> Result<String, ConfigError> {
+pub(super) fn expand_string(value: String) -> Result<String, ConfigError> {
     let mut out = String::with_capacity(value.len());
     let mut cursor = 0usize;
     while let Some(start) = value[cursor..].find("${") {

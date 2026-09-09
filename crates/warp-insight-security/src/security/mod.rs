@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Security 模型域
 
 pub mod software_vulnerability;

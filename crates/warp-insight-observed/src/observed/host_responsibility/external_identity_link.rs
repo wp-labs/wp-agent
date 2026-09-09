@@ -1,8 +1,8 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.HostResponsibility")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.HostResponsibility")]
 pub struct ExternalIdentityLink {
-    #[moju(unique)]
+    #[jumo(unique)]
     pub link_id: String,
     pub tenant_id: String,
     pub system_type: crate::ExternalSystemType,

@@ -57,8 +57,8 @@ impl TelemetryRecordSink {
     }
 }
 
-#[derive(Debug, Clone, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
+#[derive(Debug, Clone, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
 pub(crate) struct FileRecordSink {
     path: PathBuf,
 }
@@ -110,8 +110,8 @@ impl TcpFraming {
     }
 }
 
-#[derive(Debug, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
+#[derive(Debug, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Collect")]
 pub(crate) struct TcpRecordSink {
     target_addr: String,
     framing: TcpFraming,
@@ -143,7 +143,8 @@ impl RecordSink for TcpRecordSink {
 
         let mut payload = Vec::new();
         for record in records {
-            payload.extend_from_slice(&build_payload_bytes(record.body.as_bytes(), self.framing));
+            let frame = build_record_frame(record)?;
+            payload.extend_from_slice(&build_payload_bytes(&frame, self.framing));
         }
 
         match self.stream().await?.write_all(&payload).await {
@@ -154,6 +155,27 @@ impl RecordSink for TcpRecordSink {
             }
         }
     }
+}
+
+/// TCP 上送帧：结构化信封（不含原文）与 `RAW:` 原始行分离，避免把 raw 塞进 JSON。
+///
+/// `{envelope} RAW: <body>`，其中 envelope 只承载可结构化字段（input_id/source_path/时间/偏移），
+/// body 保持原文、不转义，供数据面审计核对与回放。
+fn build_record_frame(record: &TelemetryRecordContract) -> io::Result<Vec<u8>> {
+    let envelope = serde_json::json!({
+        "signal_kind": record.signal_kind,
+        "observed_at": record.observed_at,
+        "input_id": record.input_id,
+        "source_path": record.source_path,
+        "file_offset": record.file_offset,
+        "file_offset_end": record.file_offset_end,
+    });
+    let mut frame = serde_json::to_vec(&envelope)
+        .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))?;
+    // RAW: 后跟一个空格分隔帧标记与原文，保证原文从正文首字符开始、不带标记前缀。
+    frame.extend_from_slice(b" RAW: ");
+    frame.extend_from_slice(record.body.as_bytes());
+    Ok(frame)
 }
 
 fn build_payload_bytes(data: &[u8], framing: TcpFraming) -> Vec<u8> {
@@ -225,7 +247,7 @@ mod tests {
     }
 
     #[tokio::test(flavor = "current_thread")]
-    async fn tcp_record_sink_sends_line_framed_bodies() {
+    async fn tcp_record_sink_sends_envelope_and_raw_frame() {
         let listener = match TcpListener::bind("127.0.0.1:0").await {
             Ok(listener) => listener,
             Err(err) if err.kind() == io::ErrorKind::PermissionDenied => return,
@@ -234,7 +256,7 @@ mod tests {
         let port = listener.local_addr().expect("listener addr").port();
         let server = tokio::spawn(async move {
             let (mut socket, _) = listener.accept().await.expect("accept");
-            let mut buf = vec![0u8; 64];
+            let mut buf = vec![0u8; 1024];
             let n = socket.read(&mut buf).await.expect("read");
             String::from_utf8_lossy(&buf[..n]).into_owned()
         });
@@ -245,7 +267,30 @@ mod tests {
             .expect("write records");
 
         let body = server.await.expect("join");
-        assert_eq!(body, "line-a\nline-b\n");
+        let lines: Vec<&str> = body.lines().collect();
+        assert_eq!(lines.len(), 2);
+        for line in &lines {
+            let (envelope, raw) = line.split_once(" RAW: ").expect("RAW marker");
+            assert!(envelope.starts_with('{'), "envelope json: {envelope}");
+            assert!(envelope.contains("\"input_id\":\"input-a\""));
+            assert!(
+                !envelope.contains("\"body\""),
+                "raw must not be in envelope"
+            );
+            assert!(raw.starts_with("line-"), "raw body: {raw}");
+        }
+    }
+
+    #[test]
+    fn record_frame_keeps_raw_outside_json_envelope() {
+        let frame = super::build_record_frame(&record("raw 行内容")).expect("build frame");
+        let text = String::from_utf8_lossy(&frame);
+        let (envelope, raw) = text.split_once(" RAW: ").expect("RAW marker");
+        let parsed: serde_json::Value = serde_json::from_str(envelope).expect("valid envelope");
+        assert_eq!(parsed["signal_kind"], "log");
+        assert_eq!(parsed["input_id"], "input-a");
+        assert!(parsed.get("body").is_none(), "raw must not be in envelope");
+        assert_eq!(raw, "raw 行内容");
     }
 
     #[test]

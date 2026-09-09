@@ -17,8 +17,8 @@ use warp_insight_shared::time::now_rfc3339;
 use super::host::{default_host_id, default_host_name};
 use super::{DiscoveryProbe, DiscoveryProbeError, DiscoverySourceKind, ProbeOutput};
 
-#[derive(::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
+#[derive(::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Discovery", module = "Discovery.Probe")]
 pub struct NetworkDiscoveryProbe;
 
 impl DiscoveryProbe for NetworkDiscoveryProbe {
@@ -147,8 +147,8 @@ impl DiscoveryProbe for NetworkDiscoveryProbe {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.Entity")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.Entity")]
 struct ObservedNetworkInterface {
     name: String,
     mac: Option<String>,
@@ -156,8 +156,8 @@ struct ObservedNetworkInterface {
     addresses: Vec<ObservedIpAddress>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.Entity")]
+#[derive(Debug, Clone, PartialEq, Eq, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.Entity")]
 struct ObservedIpAddress {
     ip: String,
     prefix: u8,

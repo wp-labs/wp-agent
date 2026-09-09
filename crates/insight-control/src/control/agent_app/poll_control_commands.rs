@@ -1,8 +1,8 @@
-// @moju generated
-// @moju hash=d829890b1e8302c4
+// @jumo generated
+// @jumo hash=d829890b1e8302c4
 
-#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "message", role = "command", domain = "Control", module = "Control.AgentApp.FacingInterface")]
+#[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "message", role = "command", domain = "Control", module = "Control.AgentApp.FacingInterface")]
 pub struct PollControlCommands {
     pub requested_at: crate::control::types::DateTime,
     pub last_seen_sequence: i64,

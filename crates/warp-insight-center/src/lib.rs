@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // WarpInsightCenter 上级聚合控制中心（子系统实现）
 
 pub use insight_control::*;

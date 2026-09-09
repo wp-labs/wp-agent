@@ -1,8 +1,8 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.ServiceTopology")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.ServiceTopology")]
 pub struct ServiceEndpoint {
-    #[moju(unique)]
+    #[jumo(unique)]
     pub endpoint_id: String,
     pub service_id: String,
     pub endpoint_type: crate::ServiceEndpointType,

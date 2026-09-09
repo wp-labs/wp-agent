@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Observed.ServiceTopology
 
 pub mod business_domain;

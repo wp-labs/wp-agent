@@ -1,8 +1,8 @@
-// @moju generated
-#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::moju_derive::MoJu)]
-#[moju(kind = "struct", domain = "Observed", module = "Observed.ServiceTopology")]
+// @jumo generated
+#[derive(Debug, Clone, PartialEq, ::serde::Serialize, ::serde::Deserialize, ::jumo_derive::Jumo)]
+#[jumo(kind = "struct", domain = "Observed", module = "Observed.ServiceTopology")]
 pub struct BusinessSubsystem {
-    #[moju(unique)]
+    #[jumo(unique)]
     pub subsystem_id: String,
     pub system_id: String,
     pub tenant_id: String,

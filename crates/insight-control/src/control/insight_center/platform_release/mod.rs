@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Model module: Control.InsightCenter.PlatformRelease
 
 pub mod publish_warp_agentd;

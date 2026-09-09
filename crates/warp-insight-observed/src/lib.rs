@@ -1,4 +1,4 @@
-// @moju generated
+// @jumo generated
 // Observed 模型域（可复用）：主机资产/责任/拓扑
 
 pub mod observed;
