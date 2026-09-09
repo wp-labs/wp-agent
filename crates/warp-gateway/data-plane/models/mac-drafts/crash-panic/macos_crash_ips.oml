@@ -1,0 +1,11 @@
+name : macos_crash_ips
+rule : macos/macos_crash_ips
+---
+log_desc = read(log_desc);
+log_type = read(log_type);
+raw_msg = pipe take(raw_msg) | json_escape;
+
+bug_type = read(bug_type);
+os_version = read(os_version);
+roots_installed = read(roots_installed);
+incident_id = read(incident_id);

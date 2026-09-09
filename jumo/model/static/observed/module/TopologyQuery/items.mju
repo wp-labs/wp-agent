@@ -1,0 +1,19 @@
+command ViewNetworkTopology = Control.OperatorRequest {
+  meta {
+    label zh "查看网络拓扑"
+    label en "View Network Topology"
+    tags "center", "topology", "network"
+  }
+
+}
+
+command ViewServiceTopology = Control.OperatorRequest {
+  meta {
+    label zh "查看业务/服务拓扑"
+    label en "View Service Topology"
+    tags "center", "topology", "service"
+  }
+
+  business_id: String?
+  service_id: String?
+}

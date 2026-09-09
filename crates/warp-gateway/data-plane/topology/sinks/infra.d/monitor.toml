@@ -1,0 +1,23 @@
+
+[sink_group]
+name = "monitor"
+batch_size = 1
+batch_timeout_ms = 300
+
+[[sink_group.sinks]]
+connect = "file_proto_text_sink"
+
+[sink_group.sinks.params]
+file = "monitor.dat"
+
+[sink_group.sinks.expect]
+max = 1.0
+
+# 观测栈（crates/warp-gateway/monitor docker-compose）：统计指标镜像到 VictoriaMetrics
+[[sink_group.sinks]]
+name = "metrics_vmetrics_sink"
+connect = "victoriametrics_sink"
+tags = ["sink:vmetrics"]
+
+[sink_group.sinks.params]
+endpoint = "http://127.0.0.1:18429"

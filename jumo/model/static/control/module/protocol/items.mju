@@ -1,0 +1,62 @@
+// Module: Protocol — 控制消息传输契约
+
+command AgentUpstreamMessage {
+  unique message_id: String
+  agent_id: String
+  instance_id: String
+  sequence: Int
+  kind: AgentUpstreamMessageType
+  payload: String
+  sent_at: DateTime
+}
+
+command AgentDownstreamMessage {
+  unique message_id: String
+  agent_id: String
+  instance_id: String
+  sequence: Int
+  kind: AgentDownstreamMessageType
+  payload: String
+  sent_at: DateTime
+}
+
+variant AgentUpstreamMessageType {
+  meta {
+    label zh "Agent 上行消息类型"
+    label en "Agent Upstream Message Type"
+    tags "control", "protocol"
+  }
+
+  EnrollmentRequest
+  StatusReport
+  CommandPoll
+  ActionResult
+}
+
+variant AgentDownstreamMessageType {
+  meta {
+    label zh "Agent 下行消息类型"
+    label en "Agent Downstream Message Type"
+    tags "control", "protocol"
+  }
+
+  EnrollmentResult
+  ControlCommands
+  PolicyRefreshHint
+  IdentityRotationHint
+}
+
+event ControlMessageAccepted {
+  message_id: String
+  agent_id: String
+  instance_id: String
+  accepted_at: DateTime
+}
+
+event ControlMessageRejected {
+  message_id: String
+  agent_id: String
+  instance_id: String
+  reason_code: String
+  rejected_at: DateTime
+}

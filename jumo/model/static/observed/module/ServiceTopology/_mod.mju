@@ -1,0 +1,9 @@
+module<entity> ServiceTopology {
+  meta {
+    label zh "业务/服务拓扑实体"
+    label en "Service Topology"
+    tags "control", "center", "topology", "service"
+  }
+
+  layer Domain
+}

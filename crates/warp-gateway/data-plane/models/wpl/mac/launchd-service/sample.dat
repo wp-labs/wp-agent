@@ -1,0 +1,10 @@
+2026-09-09 08:56:22.956762 (user/501) <Notice>: removing service: com.apple.mdworker.shared.14000000-0000-0000-0000-000000000000
+2026-09-09 08:56:22.956769 (user/501/com.apple.mdworker.shared.14000000-0000-0000-0000-000000000000 [10795]) <Notice>: internal event: PETRIFIED, code = 0
+2026-09-09 08:56:22.956771 (user/501/com.apple.mdworker.shared.14000000-0000-0000-0000-000000000000 [10795]) <Notice>: service state: not running
+2026-09-09 08:56:22.956778 (pid/10795 [mdworker_shared]) <Notice>: shutting down
+2026-09-09 08:56:22.956780 (pid/10795 [mdworker_shared]) <Notice>: cleaning up
+2026-09-09 08:56:22.956826 (system) <Notice>: removing child: pid/10795
+2026-09-09 08:56:24.392429 (system) <Warning>: failed lookup: name = com.apple.AppleLOM.Watchdog, flags = 0x1, requestor = watchdogd[551], error = 3: No such process
+2026-09-09 08:56:24.933530 (gui/501 [100015]) <Warning>: failed lookup: name = com.apple.DFRSystemExtra.InputMenu.disableinput, flags = 0x1, requestor = TextInputMenuAg[8131], error = 3: No such process
+2026-09-09 08:56:27.535874 <Notice>: Remove subscription with token 6523
+2026-09-09 08:56:32.810942 (gui/501 [100015]) <Warning>: failed lookup: name = com.apple.DFRSystemExtra.InputMenu.disableinput, flags = 0x1, requestor = TextInputMenuAg[8131], error = 3: No such process

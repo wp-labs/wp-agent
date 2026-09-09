@@ -1,0 +1,6 @@
+// Module: NetworkTopology — host/pod/network 拓扑实体
+// 来源：doc/design/center/models/host-pod-network-topology-model.md
+//
+// 中心侧资源目录模型与关系图谱模型的拓扑扩展子模型的一部分：
+// host / pod / network 独立对象，不互相内嵌；调度归属（PodPlacement）与
+// 网络归属（Pod/HostNetworkAttachment）必须分开建模。

@@ -1,0 +1,18 @@
+module<interface> GatewayApp.UserFacingInterface {
+  meta {
+    label zh "用户侧服务接口"
+    label en "User Facing Service Interface"
+    summary zh "WarpGateway 面向运维用户和管理员的 HTTP 接口，统一承载已认证安装代码获取、Agent 状态查询、暂停和远程升级能力。"
+    tags "user-facing", "admin", "web", "backend", "http", "interface"
+  }
+
+  layer Application
+  provides WarpGatewayPublicInstallInterface by protocol<http>
+  provides WarpGatewayManagementInterface by protocol<http>
+  depends Control.Agent.Enrollment, Control.Agent.Registration
+  depends Control.Agent.Identity, Control.Agent.Credential
+  depends Control.Agent.Status
+  depends Control.Agent.Command
+  depends Control.Gateway.Management, Control.Gateway.Management
+  depends Control.Agent.Status
+}

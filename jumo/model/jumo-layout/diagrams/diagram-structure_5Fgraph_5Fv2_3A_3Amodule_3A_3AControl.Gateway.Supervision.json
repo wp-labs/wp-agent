@@ -1,0 +1,32 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": -0.0
+  },
+  "nodes": {
+    "struct:Control.GatewayRuntimeStatus": {
+      "x": 911.2422,
+      "y": 414.51172
+    },
+    "struct:Control.GatewayInitialConfig": {
+      "x": 200.0,
+      "y": 439.25
+    },
+    "struct:Control.GatewayEnrollmentResult": {
+      "x": 548.58984,
+      "y": 136.0
+    },
+    "struct:Control.GatewayImage": {
+      "x": 885.6914,
+      "y": 136.0
+    },
+    "struct:Control.GatewayInstance": {
+      "x": 548.58984,
+      "y": 414.51172
+    }
+  },
+  "sizes": {},
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

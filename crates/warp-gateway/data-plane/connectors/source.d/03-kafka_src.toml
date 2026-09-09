@@ -1,0 +1,14 @@
+[[connectors]]
+allow_override = ["brokers", "topic", "group_id", "config", "data_format", "batch_size", "batch_timeout_ms", "batch_max_bytes"]
+id = "kafka_src"
+type = "kafka"
+
+[connectors.params]
+batch_max_bytes = 262144
+batch_size = 0
+batch_timeout_ms = 1
+brokers = "localhost:9092"
+config = ["auto.offset.reset=latest", "enable.auto.commit=true"]
+data_format = "ndjson"
+group_id = "wp_events_group"
+topic = "wp_events"

@@ -1,0 +1,37 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "nodes": {
+    "usecase:System.WpAgent.CollectLogs": {
+      "x": 330.42188,
+      "y": 334.03516
+    },
+    "usecase:System.WpAgent.PeriodicallyReportSelfStatus": {
+      "x": 554.21875,
+      "y": 240.96875
+    },
+    "usecase:System.WpAgent.CollectMetrics": {
+      "x": 445.08594,
+      "y": 111.65625
+    },
+    "actor:Control.Agentd": {
+      "x": 1029.8008,
+      "y": 270.14062
+    },
+    "usecase:System.WpAgent.RegisterWithManagementCenter": {
+      "x": 699.46875,
+      "y": 375.55078
+    }
+  },
+  "sizes": {
+    "system_boundary:System.WpAgent": {
+      "x": 733.6289,
+      "y": 429.85547
+    }
+  },
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

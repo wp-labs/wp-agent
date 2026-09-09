@@ -1,0 +1,15 @@
+#[copy_raw(name: "raw_msg")]
+package macos {
+  #[tag(log_desc: "macOS 崩溃/panic DiagnosticReports .ips 元数据", log_type: "macos_crash_ips")]
+  rule macos_crash_ips {
+    (
+      json(
+        digit@bug_type,
+        time@timestamp,
+        chars@os_version,
+        digit@roots_installed,
+        chars@incident_id,
+      )
+    )
+  }
+}

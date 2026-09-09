@@ -1,0 +1,40 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": -0.0
+  },
+  "nodes": {
+    "actor:Control.GatewayOperator": {
+      "x": 603.96094,
+      "y": 215.97656
+    },
+    "actor:Control.PublicInstallClient": {
+      "x": 610.76953,
+      "y": 529.9375
+    },
+    "actor:Control.OperationsEngineer": {
+      "x": 611.5508,
+      "y": 367.9375
+    },
+    "actor:Control.CustomerServiceEngineer": {
+      "x": 219.85547,
+      "y": 367.9375
+    },
+    "actor:Control.PlatformMaintenanceEngineer": {
+      "x": 216.17578,
+      "y": 529.9375
+    },
+    "actor:Control.Agentd": {
+      "x": 605.1719,
+      "y": 71.0
+    },
+    "actor:Control.BusinessAdministrator": {
+      "x": 221.0625,
+      "y": 215.97656
+    }
+  },
+  "sizes": {},
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

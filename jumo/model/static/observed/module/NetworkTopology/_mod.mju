@@ -1,0 +1,9 @@
+module<entity> NetworkTopology {
+  meta {
+    label zh "网络拓扑实体"
+    label en "Network Topology"
+    tags "control", "center", "topology", "network"
+  }
+
+  layer Domain
+}

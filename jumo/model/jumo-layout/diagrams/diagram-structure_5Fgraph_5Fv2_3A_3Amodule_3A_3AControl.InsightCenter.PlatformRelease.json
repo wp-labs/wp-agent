@@ -1,0 +1,20 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": -0.0
+  },
+  "nodes": {
+    "struct:Control.UpgradeTarget": {
+      "x": 639.5508,
+      "y": 530.03906
+    },
+    "struct:Control.UpgradeStep": {
+      "x": 639.5508,
+      "y": 329.0
+    }
+  },
+  "sizes": {},
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

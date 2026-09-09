@@ -1,0 +1,20 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": -58.621845
+  },
+  "nodes": {
+    "struct:Control.AgentBootstrapBundle": {
+      "x": 829.23047,
+      "y": 1039.7539
+    },
+    "struct:Control.AgentInstallCode": {
+      "x": 515.28906,
+      "y": 1013.2656
+    }
+  },
+  "sizes": {},
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

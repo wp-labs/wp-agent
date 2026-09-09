@@ -1,0 +1,72 @@
+// 发现采集域 (Discovery & Collection Domain) — HOW we observe
+
+// ══════════════════════════════════════════════════════════
+// Module: Config — Agent 配置
+// ══════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════
+// Module: Probe — 发现探针与运行时
+// ══════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════
+// Module: Collect — 采集管线
+// ══════════════════════════════════════════════════════════
+
+// ── 文件输入 ──
+
+// ── 缓冲与输出 ──
+
+// ── Metrics ──
+
+// ── WarpParse ──
+
+// ── 位点管理 ──
+
+// ══════════════════════════════════════════════════════════
+// Module: Execute — 调度执行与状态
+// ══════════════════════════════════════════════════════════
+
+// ── 调度队列 ──
+
+// ── 本地执行 ──
+
+// ── 运行时状态 ──
+
+// ═══════════════════════════════════════════
+// Flow & Verify
+// ═══════════════════════════════════════════
+
+actor Collector {
+  can RefreshDiscovery
+  can CollectLogs
+  can CollectMetrics
+}
+
+command RefreshDiscovery {
+  state_dir
+}
+
+flow RefreshDiscoveryFlow {
+  actor Collector
+  trigger RefreshDiscovery
+
+  creates DiscoveryRefreshResult
+
+  step<stop> Refresh {
+    create DiscoveryRefreshResult {
+      last_success_at = RefreshDiscovery.state_dir
+    }
+  }
+}
+
+verify RefreshDiscoveryVerified for flow RefreshDiscoveryFlow {
+  given {
+    RefreshDiscovery.state_dir = "/var/lib/warp-insight/state"
+  }
+
+  when RefreshDiscovery
+
+  expect {
+    DiscoveryRefreshResult.last_success_at == "/var/lib/warp-insight/state"
+  }
+}

@@ -1,0 +1,55 @@
+// 被观测域 (Observed Domain) — WHAT is observed
+//
+// Module 拆分：
+// - host-inventory.mju           # 主机资产目录与运行态（实体）
+// - host-inventory-query.mju     # 主机查询（逻辑）
+// - host-responsibility.mju      # 主机责任归属与外部同步（实体）
+// - host-responsibility-service.mju # 责任查询/同步（逻辑）
+// - network-topology.mju         # host/pod/network 拓扑（实体）
+// - service-topology.mju         # business/service 拓扑（实体）
+// - topology-query.mju           # 拓扑查询（逻辑）
+// - domain.mju                   # Snapshot / Entity 模块事实（下文本体）
+
+// ══════════════════════════════════════════════════════════
+// Module: Snapshot — 发现快照契约
+// ══════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════
+// Module: Entity — 被观测实体
+// ══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════
+// Flow & Verify
+// ═══════════════════════════════════════════
+
+actor Observer {
+  can CreateSnapshot
+}
+
+command CreateSnapshot {
+  snapshot_id
+}
+
+flow CreateSnapshotFlow {
+  actor Observer
+  trigger CreateSnapshot
+  creates DiscoveredResource
+  step<stop> RecordResource {
+    create DiscoveredResource {
+      resource_id = CreateSnapshot.snapshot_id
+      kind = "host"
+    }
+  }
+}
+
+verify CreateSnapshotVerified for flow CreateSnapshotFlow {
+  given {
+    CreateSnapshot.snapshot_id = "snap-001"
+  }
+
+  when CreateSnapshot
+
+  expect {
+    DiscoveredResource.resource_id == "snap-001"
+  }
+}

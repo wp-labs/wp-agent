@@ -1,0 +1,10 @@
+module<logic> Agent.Status {
+  meta {
+    label zh "Agentd 状态管理"
+    label en "Agentd Status Management"
+    summary zh "负责 Agentd 实例、运行状态查询、在线状态视图和管理端状态展示所需的状态聚合。"
+    tags "control", "agentd", "status"
+  }
+
+  layer Domain
+}

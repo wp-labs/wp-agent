@@ -1,0 +1,4 @@
+/dev/rdisk6s1:    The volume Thunderbolt-DATA was formatted by storagekitd (2811.120.14.0.1) and last modified by apfs_kext (2811.120.14.0.1).
+/dev/rdisk6s1: ** QUICKCHECK ONLY; FILESYSTEM CLEAN
+/dev/rdisk6s1: fsck_apfs completed at Tue Sep  8 15:41:15 2026
+

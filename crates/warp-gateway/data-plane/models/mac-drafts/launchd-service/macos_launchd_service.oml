@@ -1,0 +1,13 @@
+name : macos_launchd_service
+rule : macos_launchd/*
+---
+log_desc = read(log_desc);
+log_type = read(log_type);
+raw_msg = pipe take(raw_msg) | json_escape;
+
+event_time = read(ts);
+event_ts = pipe read(ts) | Time::to_ts_zone(8, ms);
+level = read(lvl);
+message = read(msg);
+sender = read(option:[sen]);
+sender_tail = read(option:[sen2]);

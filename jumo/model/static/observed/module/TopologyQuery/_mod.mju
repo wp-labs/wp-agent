@@ -1,0 +1,11 @@
+module<logic> TopologyQuery {
+  meta {
+    label zh "资源拓扑查询"
+    label en "Resource Topology Query"
+    summary zh "负责 host/pod/network 与业务/服务拓扑的查询逻辑。"
+    tags "control", "center", "topology"
+  }
+
+  layer Domain
+  depends NetworkTopology, ServiceTopology
+}

@@ -1,0 +1,159 @@
+// Module: PlatformRelease — 平台版本发布
+// 覆盖 WarpAgentd / WarpGateway 新版本的发布。
+
+command PublishWarpAgentd = OperatorRequest {
+  meta {
+    label zh "发布 WarpAgentd"
+    label en "Publish WarpAgentd"
+    tags "release", "warp-agentd"
+  }
+
+  version: String
+  artifact_url: String
+  requested_at: DateTime
+}
+
+struct WarpAgentdRelease {
+  meta {
+    label zh "WarpAgentd 发布记录"
+    label en "WarpAgentd Release"
+    tags "release", "warp-agentd"
+  }
+
+  version: String
+  artifact_url: String
+  status: String
+  published_at: DateTime
+}
+
+command PublishWarpGateway = OperatorRequest {
+  meta {
+    label zh "发布 WarpGateway"
+    label en "Publish WarpGateway"
+    tags "release", "warp-gateway"
+  }
+
+  version: String
+  artifact_url: String
+  requested_at: DateTime
+}
+
+struct WarpGatewayRelease {
+  meta {
+    label zh "WarpGateway 发布记录"
+    label en "WarpGateway Release"
+    tags "release", "warp-gateway"
+  }
+
+  version: String
+  artifact_url: String
+  status: String
+  published_at: DateTime
+}
+
+// 制品存储后端：本地文件或云对象存储（S3 兼容 / MinIO）。
+variant ArtifactStorageKind {
+  meta {
+    label zh "制品存储类型"
+    label en "Artifact Storage Kind"
+    tags "release", "artifact", "storage"
+  }
+
+  LocalFile
+  ObjectStorage
+}
+
+// 制品镜像记录：发布时把外部制品（GitHub / 制品库，访问慢）下载后镜像到本地文件或
+// 云对象存储，`stored_url` 为快的下载地址（供升级拉取），避免直接依赖慢源分发。
+struct ArtifactMirror {
+  meta {
+    label zh "制品镜像记录"
+    label en "Artifact Mirror"
+    tags "release", "artifact", "mirror"
+  }
+
+  component: String
+  version: String
+  source_url: String
+  stored_url: String
+  storage_kind: ArtifactStorageKind
+  mirrored_at: DateTime
+}
+
+// 一个升级目标：组件 + 目标版本（升级计划可含多个目标，如 WarpAgentd v2.5.0 + WarpGateway v3.1.0）。
+struct UpgradeTarget {
+  meta {
+    label zh "升级目标"
+    label en "Upgrade Target"
+    tags "release", "upgrade"
+  }
+
+  component: String
+  target_version: String
+}
+
+// 升级执行步骤：手动分批（每步升级范围内的部分网关），实现滚动升级。
+struct UpgradeStep {
+  meta {
+    label zh "升级执行步骤"
+    label en "Upgrade Step"
+    tags "release", "upgrade", "rollout"
+  }
+
+  step_index: Int
+  gateway_ids: List<String>
+  status: String
+}
+
+command CreateUpgradePlan = OperatorRequest {
+  meta {
+    label zh "创建升级计划"
+    label en "Create Upgrade Plan"
+    tags "release", "upgrade"
+  }
+
+  targets: List<UpgradeTarget>
+  gateway_ids: List<String>
+  steps: List<UpgradeStep>
+  requested_at: DateTime
+}
+
+struct UpgradePlan {
+  meta {
+    label zh "升级计划"
+    label en "Upgrade Plan"
+    tags "release", "upgrade"
+  }
+
+  plan_id: String
+  targets: List<UpgradeTarget>
+  target_count: Int
+  status: String
+  created_at: DateTime
+  steps: List<UpgradeStep>
+}
+
+command ApproveUpgradePlan {
+  meta {
+    label zh "批准升级计划"
+    label en "Approve Upgrade Plan"
+    tags "release", "upgrade"
+  }
+
+  plan_id: String
+  approved_by: String
+  approved_at: DateTime
+}
+
+struct UpgradePlanApproval {
+  meta {
+    label zh "升级计划批准"
+    label en "Upgrade Plan Approval"
+    tags "release", "upgrade"
+  }
+
+  plan_id: String
+  status: String
+  approved_by: String
+  approved_at: DateTime
+}

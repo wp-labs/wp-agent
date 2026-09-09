@@ -1,0 +1,17 @@
+# WarpGateway 初始配置示例（静态预置）
+# 基于安全注册机制的网关初始化配置（对应 GatewayInitialConfig 设计）
+# 运行期产物（instance_id / gateway_id / credential_id）见 gateway_run.json
+# 策略、遥测等未定项：想清楚后再加上
+
+version = 1  # 配置文件格式版本（解析器先读它决定如何解析后续内容）
+
+[control_center]
+endpoint = "https://warp-insight.example.com"
+trust_bundle = "/etc/warp-gateway/ca/control-center.pem"  # 中心签发、经 GatewayEnrollmentToken.control_center_trust_bundle 随注册下发
+server_tls_required = true
+
+[enrollment]
+token_id = "gw-enroll-001"
+
+[protocol]
+version = "1.0"  # 网关↔中心 wire 协议版本

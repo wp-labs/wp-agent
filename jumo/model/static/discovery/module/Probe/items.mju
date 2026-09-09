@@ -1,0 +1,77 @@
+struct DiscoveryProbe {
+}
+
+struct HostDiscoveryProbe {
+  kind
+}
+
+struct NetworkDiscoveryProbe {
+  kind
+}
+
+struct EndpointDiscoveryProbe {
+  kind
+}
+
+struct ProcessDiscoveryProbe {
+  kind
+}
+
+struct ContainerDiscoveryProbe {
+  kind
+}
+
+struct K8sDiscoveryProbe {
+  kind
+}
+
+struct ProbeOutput {
+  source
+  probe
+  resources
+  targets
+}
+
+struct DiscoveryProbeError {
+  source
+  probe
+  detail
+}
+
+struct DiscoveryRuntime {
+  probes
+}
+
+struct DiscoveryRefreshResult {
+  refreshed_snapshot
+  persisted_snapshot
+  used_cached_snapshot
+  had_successful_refresh
+  errors
+  last_success_at
+  last_error
+  store_failure
+  successful_probes
+}
+
+struct SuccessfulProbeRefresh {
+  source
+  probe
+  resource_count
+  target_count
+}
+
+struct DiscoveryStoreFailure {
+  phase
+  detail
+}
+
+struct DiscoveryCachePaths {
+  snapshot_path
+  meta_path
+}
+
+struct DiscoveryCacheLoadFailure {
+  phase
+  detail
+}

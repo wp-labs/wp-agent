@@ -1,0 +1,10 @@
+[[connectors]]
+allow_override = ["base", "file", "encode", "data_format"]
+id = "file_src"
+type = "file"
+
+[connectors.params]
+base = "./data/in_dat"
+data_format = "ndjson"
+encode = "text"
+file = "gen.dat"

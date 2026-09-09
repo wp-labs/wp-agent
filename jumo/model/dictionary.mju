@@ -1,0 +1,10 @@
+// 规范命名词典：canonical term -> aliases（历史/变体拼法）
+// 校验扫描标识符与 meta 文案，命中 alias 时发 warning 建议规范形。
+//
+// 注意：Gateway 与 WarpGateway 是不同概念（如 GatewayInstance 与
+// WarpGatewayInstance 并存），不塌缩；只归一大写拼法。
+
+lexicon {
+  term Gateway { aliases "GateWay" }
+  term WarpGateway { aliases "WarpGateWay" }
+}

@@ -1,0 +1,137 @@
+struct SchedulerRequest {
+  run_dir
+  state_dir
+  plan
+}
+
+struct SchedulerOutcome {
+  execution_id
+  plan_digest
+}
+
+struct DrainRequest {
+  run_dir
+  state_dir
+  exec_bin
+  instance_id
+  cancel_grace_ms
+  stdout_limit_bytes
+  stderr_limit_bytes
+}
+
+struct DrainOutcome {
+  execution_id
+  plan_digest
+  report
+}
+
+struct QueueHeadContext {
+  request
+  item
+}
+
+struct QueueHeadDisposition {
+  variant
+}
+
+struct ExecutionQueueState {
+  items
+}
+
+struct ExecutionQueueItem {
+  unique execution_id
+  action_id
+  plan_digest
+  request_id
+  enqueued_at
+  deadline_at
+  risk_level
+}
+
+struct ExecutionQueueItemBuilder {
+  execution_id
+  action_id
+  plan_digest
+  request_id
+  enqueued_at
+}
+
+struct LocalExecRequest {
+  workdir
+  exec_bin
+  cancel_grace_ms
+  stdout_limit_bytes
+  stderr_limit_bytes
+}
+
+struct LocalExecOutcome {
+  execution_id
+  exit_code
+  stdout_bytes
+  stderr_bytes
+  duration_ms
+}
+
+struct ExitClassification {
+  exit_code
+  timed_out
+  cancelled
+}
+
+struct QuarantineRequest {
+  execution_id
+  reason
+}
+
+state RunningExecutionState {
+  execution_id
+  action_id
+  plan_digest
+  spawned_at
+  pid
+  status
+}
+
+struct RunningExecutionStateBuilder {
+  execution_id
+  action_id
+  plan_digest
+}
+
+struct ProcessIdentityState {
+  pid
+  start_time
+}
+
+state AgentRuntimeState {
+  schema_version
+  agent_id
+  instance_id
+  version
+  mode
+  updated_at
+}
+
+struct RuntimeMode {
+  variant
+}
+
+struct ExecRuntimeContext {
+  unique execution_id
+  spawned_at
+  deadline_at
+  agent_id
+  node_id
+  workdir
+}
+
+state ExecProgressState {
+  execution_id
+  action_id
+  state
+  updated_at
+  step_id
+  attempt
+  reason_code
+  detail
+}

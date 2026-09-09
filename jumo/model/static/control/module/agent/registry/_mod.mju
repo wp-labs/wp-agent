@@ -1,0 +1,10 @@
+module<entity> Agent.Registry {
+  meta {
+    label zh "Agent 登记簿"
+    label en "Agent AgentRegistry"
+    summary zh "负责 Agent 登记索引、能力索引、策略绑定和初始配置等控制域核心事实。"
+    tags "control", "registry"
+  }
+
+  layer Domain
+}

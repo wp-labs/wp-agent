@@ -1,0 +1,3 @@
+// Module: HostInventoryQuery — 主机资产目录查询
+//
+// HostInventory 的查询逻辑（逻辑型 module<service>），实体事实由 HostInventory 承载。

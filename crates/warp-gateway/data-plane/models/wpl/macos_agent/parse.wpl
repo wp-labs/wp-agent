@@ -1,0 +1,88 @@
+// warp-agentd 上送帧：{envelope} RAW: <原文>（envelope 结构化字段 + RAW 原文分离）
+// 按 input_id 拆规则，用 tag log_type 表达语义 category（macos.*）
+package macos_agent {
+
+  #[tag(log_desc: "macOS agent 日志-软件安装/更新", log_type: "macos.install")]
+  rule mac_agent_install {
+    ( json(
+        chars@signal_kind,
+        chars@observed_at,
+        chars@input_id,
+        chars@source_path,
+        digit@file_offset,
+        digit@file_offset_end,
+      ),
+      chars:marker,
+      chars:raw\0 | f_chars_has(input_id, macos_install_log) )
+  }
+
+  #[tag(log_desc: "macOS agent 日志-launchd 服务", log_type: "macos.launchd")]
+  rule mac_agent_launchd {
+    ( json(
+        chars@signal_kind,
+        chars@observed_at,
+        chars@input_id,
+        chars@source_path,
+        digit@file_offset,
+        digit@file_offset_end,
+      ),
+      chars:marker,
+      chars:raw\0 | f_chars_has(input_id, macos_launchd) )
+  }
+
+  #[tag(log_desc: "macOS agent 日志-关机/重启", log_type: "macos.reboot")]
+  rule mac_agent_reboot {
+    ( json(
+        chars@signal_kind,
+        chars@observed_at,
+        chars@input_id,
+        chars@source_path,
+        digit@file_offset,
+        digit@file_offset_end,
+      ),
+      chars:marker,
+      chars:raw\0 | f_chars_has(input_id, macos_shutdown_monitor) )
+  }
+
+  #[tag(log_desc: "macOS agent 日志-磁盘检查", log_type: "macos.fsck")]
+  rule mac_agent_fsck {
+    ( json(
+        chars@signal_kind,
+        chars@observed_at,
+        chars@input_id,
+        chars@source_path,
+        digit@file_offset,
+        digit@file_offset_end,
+      ),
+      chars:marker,
+      chars:raw\0 | f_chars_has(input_id, macos_fsck) )
+  }
+
+  #[tag(log_desc: "macOS agent 日志-WiFi", log_type: "macos.wifi")]
+  rule mac_agent_wifi {
+    ( json(
+        chars@signal_kind,
+        chars@observed_at,
+        chars@input_id,
+        chars@source_path,
+        digit@file_offset,
+        digit@file_offset_end,
+      ),
+      chars:marker,
+      chars:raw\0 | f_chars_has(input_id, macos_wifi) )
+  }
+
+  #[tag(log_desc: "macOS agent 日志-其它 file input", log_type: "macos.file")]
+  rule mac_agent_other {
+    ( json(
+        chars@signal_kind,
+        chars@observed_at,
+        chars@input_id,
+        chars@source_path,
+        digit@file_offset,
+        digit@file_offset_end,
+      ),
+      chars:marker,
+      chars:raw\0 )
+  }
+}

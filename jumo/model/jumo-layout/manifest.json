@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "diagrams": {
+    "actor_over": "diagrams/diagram-actor_5Fover.json",
+    "deployment_v2": "diagrams/diagram-deployment_5Fv2.json",
+    "flow_swimlane_v4:Control.AdminCreateGatewayInstanceFlow": "diagrams/diagram-flow_5Fswimlane_5Fv4_3AControl.AdminCreateGatewayInstanceFlow.json",
+    "flow_swimlane_v4:Control.AdminGetAgentOverviewFlow": "diagrams/diagram-flow_5Fswimlane_5Fv4_3AControl.AdminGetAgentOverviewFlow.json",
+    "flow_swimlane_v4:Control.GatewayOnboardingFlow": "diagrams/diagram-flow_5Fswimlane_5Fv4_3AControl.GatewayOnboardingFlow.json",
+    "flow_swimlane_v4:Control.GetGatewayInitialConfigFlow": "diagrams/diagram-flow_5Fswimlane_5Fv4_3AControl.GetGatewayInitialConfigFlow.json",
+    "runtime:Global::layer_diagram_v2": "diagrams/diagram-runtime_3AGlobal_3A_3Alayer_5Fdiagram_5Fv2.json",
+    "runtime:System.WarpGateway::layer_diagram_v2": "diagrams/diagram-runtime_3ASystem.WarpGateway_3A_3Alayer_5Fdiagram_5Fv2.json",
+    "static:Control::layer_diagram_v2": "diagrams/diagram-static_3AControl_3A_3Alayer_5Fdiagram_5Fv2.json",
+    "static:Control::package_diagram_v1:Control.Agent": "diagrams/diagram-static_3AControl_3A_3Apackage_5Fdiagram_5Fv1_3AControl.Agent.json",
+    "structure_graph_v2::module::Control.Agent.Command": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Agent.Command.json",
+    "structure_graph_v2::module::Control.Agent.Enrollment": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Agent.Enrollment.json",
+    "structure_graph_v2::module::Control.Agent.Registry": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Agent.Registry.json",
+    "structure_graph_v2::module::Control.Agent.Status": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Agent.Status.json",
+    "structure_graph_v2::module::Control.Gateway.Supervision": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.Gateway.Supervision.json",
+    "structure_graph_v2::module::Control.InsightCenter.PlatformRelease": "diagrams/diagram-structure_5Fgraph_5Fv2_3A_3Amodule_3A_3AControl.InsightCenter.PlatformRelease.json",
+    "usecase_v1:System.InsightSimulator": "diagrams/diagram-usecase_5Fv1_3ASystem.InsightSimulator.json",
+    "usecase_v1:System.WarpGateway": "diagrams/diagram-usecase_5Fv1_3ASystem.WarpGateway.json",
+    "usecase_v1:System.WarpInsightCenter": "diagrams/diagram-usecase_5Fv1_3ASystem.WarpInsightCenter.json",
+    "usecase_v1:System.WpAgent": "diagrams/diagram-usecase_5Fv1_3ASystem.WpAgent.json"
+  }
+}

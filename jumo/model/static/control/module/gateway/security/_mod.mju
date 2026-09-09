@@ -1,0 +1,10 @@
+module<entity> Gateway.Security {
+  meta {
+    label zh "网关安全凭据与信任材料"
+    label en "Gateway Security"
+    summary zh "承载 WarpGateway 接入安全机制的凭据与信任材料实体：置备引导 Token（BootstrapToken）、注册 Token（EnrollmentToken）、运行期凭据（CredentialBundle）、控制中心信任包（TrustBundle）与校验记录。安全相关 flows 由 Gateway.Supervision 等逻辑模块承载。"
+    tags "control", "gateway", "security", "credential", "token", "tls"
+  }
+
+  layer Domain
+}

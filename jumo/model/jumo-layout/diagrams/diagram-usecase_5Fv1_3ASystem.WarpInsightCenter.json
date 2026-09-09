@@ -1,0 +1,73 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "nodes": {
+    "usecase:System.WarpInsightCenter.ApproveUpgradePlan": {
+      "x": 372.1953,
+      "y": 98.94141
+    },
+    "actor:Control.WarpGateway": {
+      "x": 71.41797,
+      "y": 434.95447
+    },
+    "usecase:System.WarpInsightCenter.ReceiveGatewayStatusReport": {
+      "x": 350.67578,
+      "y": 283.46094
+    },
+    "usecase:System.WarpInsightCenter.RenewGatewayCredential": {
+      "x": 350.67578,
+      "y": 517.6914
+    },
+    "usecase:System.WarpInsightCenter.ViewGatewayStatus": {
+      "x": 487.39062,
+      "y": 194.63281
+    },
+    "usecase:System.WarpInsightCenter.BindGatewayCustomer": {
+      "x": 875.03906,
+      "y": 98.94141
+    },
+    "usecase:System.WarpInsightCenter.GetInitialConfig": {
+      "x": 339.0,
+      "y": 400.39844
+    },
+    "usecase:System.WarpInsightCenter.PublishWarpGateway": {
+      "x": 855.4961,
+      "y": 536.64844
+    },
+    "actor:Control.BusinessAdministrator": {
+      "x": 1132.3086,
+      "y": 159.61328
+    },
+    "usecase:System.WarpInsightCenter.CreateUpgradePlan": {
+      "x": 855.4961,
+      "y": 328.76172
+    },
+    "actor:Control.CustomerServiceEngineer": {
+      "x": 82.796875,
+      "y": 171.98047
+    },
+    "actor:Control.PlatformMaintenanceEngineer": {
+      "x": 1132.3086,
+      "y": 447.49084
+    },
+    "usecase:System.WarpInsightCenter.PublishWarpAgentd": {
+      "x": 670.2617,
+      "y": 447.49084
+    },
+    "usecase:System.WarpInsightCenter.CreateGatewayInstance": {
+      "x": 754.4961,
+      "y": 227.84766
+    }
+  },
+  "sizes": {
+    "system_boundary:System.WarpInsightCenter": {
+      "x": 881.5156,
+      "y": 563.9531
+    }
+  },
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

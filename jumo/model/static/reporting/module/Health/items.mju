@@ -1,0 +1,75 @@
+struct DiscoveryReadiness {
+  variant
+}
+
+struct DiscoveryProbeHealth {
+  source
+  probe
+  phase
+  status
+  resource_count
+  target_count
+  error
+}
+
+struct DiscoveryHealthSnapshot {
+  readiness
+  cached_snapshot_loaded
+  used_cached_snapshot
+  resource_count
+  target_count
+  failure_count
+  last_success_at
+  updated_at
+  probes
+}
+
+struct MetricsHealthSnapshot {
+  active: Bool
+  target_count: Int
+  sample_count: Int
+  failure_count: Int
+}
+
+variant HealthState {
+  Healthy
+  Degraded
+  Unhealthy
+}
+
+struct RuntimeHealthSnapshot {
+  state: HealthState
+  queue_depth: Int
+  running_count: Int
+  reporting_count: Int
+  discovery: String
+  metrics: MetricsHealthSnapshot
+  updated_at: DateTime
+}
+
+struct MetricsTick {
+  health_snapshot
+  failures
+}
+
+struct MetricsFailureKind {
+  variant
+}
+
+struct MetricsFailure {
+  kind
+  detail
+}
+
+struct TelemetryTick {
+  failures
+}
+
+struct TelemetryFailureKind {
+  variant
+}
+
+struct TelemetryFailure {
+  kind
+  detail
+}

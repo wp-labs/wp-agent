@@ -1,0 +1,8 @@
+// Module: HostResponsibility — 主机责任归属与外部同步
+// 来源：doc/design/center/models/host-responsibility-and-maintainer-model.md
+//       doc/design/center/models/host-responsibility-sync-from-external-systems.md
+//
+// 责任归属是治理关系对象，不并入 HostInventory 主对象。主体优先绑定 team，
+// 责任分配支持 host 与 host_group 两级目标，通过继承规则计算"有效责任视图"。
+// 外部系统（CMDB/LDAP/IAM/HR/Oncall）通过 ExternalIdentityLink /
+// ExternalSyncCursor 归一到内部模型，查询只读内部归一后的责任视图。

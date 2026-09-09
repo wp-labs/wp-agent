@@ -1,0 +1,81 @@
+// 上报域 (Reporting Domain) — HOW we report
+
+// ══════════════════════════════════════════════════════════
+// Module: Protocol — 通信协议
+// ══════════════════════════════════════════════════════════
+
+// ── Gateway ──
+
+// ── Ingest ──
+
+// ══════════════════════════════════════════════════════════
+// Module: Contract — 业务数据契约
+// ══════════════════════════════════════════════════════════
+
+// ── Action Plan ──
+
+// ── Action Result ──
+
+// ── Capability ──
+
+// ── Telemetry ──
+
+// ══════════════════════════════════════════════════════════
+// Module: Health — 健康上报
+// ══════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════
+// Module: Pipeline — 上报管线与编排
+// ══════════════════════════════════════════════════════════
+
+// ── 上报管线 ──
+
+// ── 导出 ──
+
+// ── 记录与编排 ──
+
+// ═══════════════════════════════════════════
+// Flow & Verify
+// ═══════════════════════════════════════════
+
+flow AgentHelloFlow {
+  actor Control.Agentd
+  trigger AgentHello
+
+  creates RuntimeHealthSnapshot
+
+  step<stop> ReportHealth {
+    create RuntimeHealthSnapshot {
+      state = AgentHello.agent_id
+      updated_at = AgentHello.version
+    }
+  }
+}
+
+flow ReportActionResultFlow {
+  actor Control.Agentd
+  trigger ReportActionResult
+
+  creates ActionResultReceipt
+
+  step<stop> AcceptActionResult {
+    create ActionResultReceipt {
+      report_id = ReportActionResult.report_id
+      agent_id = ReportActionResult.agent_id
+      accepted_at = ReportActionResult.reported_at
+    }
+  }
+}
+
+verify AgentHelloVerified for flow AgentHelloFlow {
+  given {
+    AgentHello.agent_id = "agent-001"
+    AgentHello.version = "v1"
+  }
+
+  when AgentHello
+
+  expect {
+    RuntimeHealthSnapshot.state == "agent-001"
+  }
+}

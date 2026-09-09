@@ -1,0 +1,10 @@
+module<entity> Agent.Identity {
+  meta {
+    label zh "Agent 身份"
+    label en "Agent AgentIdentity"
+    summary zh "负责 Agent 身份、宿主机画像、证书凭据与身份生命周期实体。"
+    tags "control", "identity"
+  }
+
+  layer Domain
+}

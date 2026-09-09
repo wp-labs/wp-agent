@@ -1,0 +1,23 @@
+profile HttpRust for warp-gateway.target<bin,http> {
+  language rust
+  runtime async
+  deps axum, tokio, serde
+  scaffold api, route, dto, handler
+  path "crates/warp-gateway"
+}
+
+profile WebTs for warp-gateway-web.target<site,web> {
+  language typescript
+  runtime browser
+  deps react, vite
+  scaffold dto, client, route
+  path "crates/warp-gateway-web"
+}
+
+profile HttpRust for warp-insight-center.target<bin,http> {
+  language rust
+  runtime async
+  deps axum, tokio, serde
+  scaffold api, route, dto, handler
+  path "crates/warp-insight-center"
+}

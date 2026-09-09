@@ -1,0 +1,129 @@
+// WarpGateway gateway-initialize page layout regions
+
+region GatewayInitializeUsecaseCard {
+  meta {
+    label zh "网关初始化卡片"
+    label en "Gateway Initialize Card"
+    summary zh "承载 InitializeGatewayViaUrl 用例：输入控制中心初始化 URL 与可选 Bearer，先检查实例状态，未初始化时获取网关初始配置完成初始化。"
+    tags "admin", "gateway", "initialize", "usecase-card"
+  }
+
+  orientation vertical
+  contains GatewayInitializeUsecaseMeta { slot_trigger: InitializeGatewayViaUrl, slot_outcome: GatewayInitialConfig }
+  contains GatewayInitUrlForm
+  contains GatewayInitialConfigResult
+}
+
+region GatewayInitializeUsecaseMeta {
+  meta {
+    label zh "网关初始化用例说明"
+    label en "Gateway Initialize Usecase Meta"
+    tags "admin", "gateway", "initialize", "usecase-meta"
+  }
+
+  orientation vertical
+}
+
+region GatewayInitUrlForm {
+  meta {
+    label zh "初始化 URL 表单"
+    label en "Init URL Form"
+    summary zh "输入控制中心初始化 URL（init_url，含 instance_id）与可选 Bearer；Bearer 仅进入 Authorization Header，不拼入 URL。"
+    tags "admin", "gateway", "initialize", "form"
+  }
+
+  orientation vertical
+  contains GatewayInitUrlInput { slot_field: init_url }
+  contains GatewayBearerCredentialInput
+  contains SubmitInitializeAction { slot_command: InitializeGatewayViaUrl }
+  on activate emit InitializeViaUrlRequested
+}
+
+region GatewayInitUrlInput {
+  meta {
+    label zh "初始化 URL 输入"
+    label en "Init URL Input"
+    tags "admin", "gateway", "initialize", "input"
+  }
+
+  orientation vertical
+}
+
+region GatewayBearerCredentialInput {
+  meta {
+    label zh "Bearer 凭证输入"
+    label en "Bearer Credential Input"
+    summary zh "可选置备凭证，仅作为 Authorization: Bearer 请求头发送，不写入 init_url。"
+    tags "admin", "gateway", "initialize", "credential", "input"
+  }
+
+  orientation vertical
+}
+
+region SubmitInitializeAction {
+  meta {
+    label zh "提交初始化"
+    label en "Submit Initialize"
+    tags "admin", "gateway", "initialize", "submit"
+  }
+
+  orientation vertical
+}
+
+region GatewayInitialConfigResult {
+  meta {
+    label zh "初始配置结果"
+    label en "Gateway Initial Config Result"
+    summary zh "展示从初始化 URL 获取的网关初始配置：控制中心端点、TLS 要求、协议版本与注册 Token 引用。"
+    tags "admin", "gateway", "initialize", "result"
+  }
+
+  orientation vertical
+  contains ControlCenterEndpointText { slot_field: control_center_endpoint }
+  contains ServerTlsRequiredText { slot_field: server_tls_required }
+  contains ProtocolVersionText { slot_field: protocol_version }
+  contains EnrollmentTokenIdText { slot_field: enrollment_token_id }
+}
+
+region ControlCenterEndpointText {
+  meta {
+    label zh "控制中心端点"
+    label en "Control Center Endpoint Text"
+    tags "admin", "gateway", "initialize", "endpoint"
+  }
+
+  orientation vertical
+}
+
+region ServerTlsRequiredText {
+  meta {
+    label zh "TLS 要求"
+    label en "Server TLS Required Text"
+    tags "admin", "gateway", "initialize", "tls"
+  }
+
+  orientation vertical
+}
+
+region ProtocolVersionText {
+  meta {
+    label zh "协议版本"
+    label en "Protocol Version Text"
+    tags "admin", "gateway", "initialize", "protocol"
+  }
+
+  orientation vertical
+}
+
+region EnrollmentTokenIdText {
+  meta {
+    label zh "注册 Token 引用"
+    label en "Enrollment Token Id Text"
+    tags "admin", "gateway", "initialize", "enrollment"
+  }
+
+  orientation vertical
+}
+
+event InitializeViaUrlRequested {
+}

@@ -1,0 +1,12 @@
+name : macos_agent_record
+rule : macos_agent/*
+---
+signal_kind = read(signal_kind) ;
+observed_at = read(observed_at) ;
+input_id = read(input_id) ;
+category = read(log_type) ;
+log_desc = read(log_desc) ;
+source_path = read(source_path) ;
+file_offset = read(file_offset) ;
+file_offset_end = read(file_offset_end) ;
+raw = read(raw) ;

@@ -1,0 +1,3 @@
+// Module: TopologyQuery — 资源拓扑查询
+//
+// Topology 的查询逻辑（逻辑型 module<service>），实体事实由 Topology 承载。

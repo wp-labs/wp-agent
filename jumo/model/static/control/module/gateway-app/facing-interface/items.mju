@@ -1,0 +1,258 @@
+// Module: GatewayFacingInterface — Gateway 侧服务接口
+//
+// WarpInsightCenter 面向各 WarpGateway 实例暴露的接入入口。
+// 请求消息（GetGatewayInitialConfig / ReportGatewayStatus）与结果结构
+// （GatewayInitialConfig / GatewayStatusAccepted）由 GatewaySupervision 建模，
+// 本接口引用它们作为 wire 契约，并定义响应消息与接入流程。
+
+message<command> ReportAgentStatus {
+  gateway_id: String
+  agents: List<AgentRuntimeStatus>
+}
+
+message<response> AgentStatusAcceptedReturned {
+  gateway_id: String
+  agents_accepted: Int
+}
+
+message<query> QueryGatewayInitializationStatus {
+  instance_id: String?
+}
+
+// 网关初始化状态查询结果：lifecycle_state 为网关实例当前生命周期
+// （Provisioned / Initializing / Running / Failed），initialized 为其派生布尔
+// （lifecycle_state != Provisioned），供网关初始化页判断是否已初始化、禁用重新初始化入口。
+struct GatewayInitializationStatus {
+  meta {
+    label zh "网关初始化状态"
+    label en "Gateway Initialization Status"
+    summary zh "WarpGateway 实例当前初始化状态查询结果：lifecycle_state 为中心侧实例生命周期，initialized 为派生布尔（非 Provisioned 即视为已初始化）。"
+    tags "gateway", "bootstrap", "initialization", "status"
+  }
+
+  gateway_id: String
+  instance_id: String?
+  lifecycle_state: GatewayInstanceLifecycleState
+  initialized: Bool
+}
+
+interface WarpInsightCenterGatewayInterface {
+  meta {
+    label zh "WarpInsightCenter 网关接入接口"
+    label en "WarpInsightCenter Gateway Access Interface"
+    summary zh "WarpGateway 实例安装后主动访问的接入入口，获取初始配置并定期上报状态，供 WarpInsightCenter 全局聚合与控制。"
+    tags "gateway", "gateway-facing", "bootstrap", "status", "http", "interface"
+  }
+
+  entry RegisterGateway {
+    actor WarpGateway
+    output GatewayEnrollmentResult
+  }
+
+  entry GetGatewayInitialConfig {
+    actor WarpGateway
+    output GatewayInitialConfig
+  }
+
+  entry ReportGatewayStatus {
+    actor WarpGateway
+    output GatewayStatusAccepted
+  }
+
+  entry RenewGatewayCredential {
+    actor WarpGateway
+    output GatewayCredentialBundle
+  }
+
+  entry ReportAgentStatus {
+    actor WarpGateway
+    output AgentStatusAcceptedReturned
+  }
+
+  entry VerifyGatewayCredential {
+    actor WarpGateway
+    output GatewayCredentialVerificationResult
+  }
+
+  entry QueryGatewayInitializationStatus {
+    actor WarpGateway
+    output GatewayInitializationStatus
+  }
+}
+
+flow GetGatewayInitialConfigFlow {
+  meta {
+    label zh "置备 Gateway"
+    label en "Provision Gateway Flow"
+    summary zh "未初始化网关持一次性 BootstrapToken 调 initial-config：校验并消费引导 Token → 中心签发注册凭据（RegistToken）并落 enrollment → 构建 config.toml（携带信任包、引用注册 Token）。初始化后以运行期凭据重取同一配置。"
+    tags "gateway", "bootstrap", "config", "provisioning"
+  }
+
+  actor WarpGateway
+
+  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+
+  depends GatewayIdentity, GatewayBootstrapToken
+
+  creates GatewayInitialConfig
+  creates GatewayEnrollmentToken
+
+  // 入口：WarpGateway 持一次性 bootstrap 调 init-url（by 声明 trigger）。
+  step CallInitUrl in WarpGateway by GetGatewayInitialConfig {
+    next ValidateBootstrapToken
+  }
+
+  // ① 中心校验并一次性消费引导 Token（Bearer bootstrap）：比对 token_hash、校验 gateway_id 与
+  // instance_id 绑定；消费后 status → Consumed、used_count+1；仅未初始化（Provisioned）实例可 init，
+  // 防重放与重复置备。
+  step ValidateBootstrapToken in WarpInsightCenter {
+    next DeriveRegistToken
+  }
+
+  // ② 中心基于引导 Token 校验结果签发注册凭据 RegistToken，落 enrollment token（hash）供 /register 消费。
+  // instance_id 用 fixture 值，与 AdminCreateGatewayInstanceFlow 创建实例的 instance_id 按约定对齐。
+  step DeriveRegistToken in WarpInsightCenter {
+    create GatewayEnrollmentToken {
+      token_id = "enroll-regist-001"
+      gateway_id = "gateway-issued"
+      instance_id = "gw-inst-001"
+      token_hash = "sha256:regist-token-hash"
+      max_uses = 1
+      used_count = 0
+      status = "Active"
+      issued_at = GetGatewayInitialConfig.requested_at
+      expires_at = "2026-08-16T00:00:00Z"
+    }
+    next BuildInitialConfig
+  }
+
+  // ③ 中心构建初始配置：config 绑定网关身份与实例、注册 Token 引用，携带控制中心信任包（公钥）。
+  step<stop> BuildInitialConfig in WarpInsightCenter {
+    create GatewayInitialConfig {
+      gateway_id = "gateway-issued"
+      instance_id = "gw-inst-001"
+      control_center_endpoint = "https://center.warpinsight.example"
+      trust_bundle = ControlCenterTrustBundle
+      server_tls_required = true
+      protocol_version = "1.0"
+      enrollment_token_id = "enroll-regist-001"
+    }
+  }
+}
+
+verify ProvisionIssuedVerified for flow GetGatewayInitialConfigFlow {
+  given {
+    GetGatewayInitialConfig.requested_at = "2026-07-04T00:00:00Z"
+  }
+
+  when GetGatewayInitialConfig
+
+  expect {
+    GatewayEnrollmentToken.token_id == "enroll-regist-001"
+    GatewayEnrollmentToken.status == "Active"
+    GatewayInitialConfig.enrollment_token_id == "enroll-regist-001"
+  }
+}
+
+flow InitializeGatewayViaUrlFlow {
+  meta {
+    label zh "通过 URL 初始化"
+    label en "Initialize Gateway Via Url Flow"
+    summary zh "客户服务工程师在 Gateway 管理页提交控制中心初始化 URL 与可选 Bearer：Gateway 先判断本地是否已初始化，已初始化则拒绝；未初始化才校验 URL、调用 initial-config 获取并校验 GatewayInitialConfig → Gateway 应用配置并持久化本地初始化状态。Bearer 仅通过 Authorization Header 传输。"
+    tags "gateway", "bootstrap", "initialize", "config"
+  }
+
+  actor CustomerServiceEngineer
+  trigger InitializeGatewayViaUrl
+
+  lane WarpGateway for Control.GatewayApp.Application
+
+  depends GatewayControlConfig
+
+  creates GatewayControlConfig
+
+  // ① Gateway 本地先做初始化状态守卫：读取本地持久化配置（GatewayControlConfig），
+  //    已应用配置即视为已初始化，直接拒绝，不向 Center 请求配置。
+  step CheckAlreadyInitialized in WarpGateway by InitializeGatewayViaUrl {
+    match {
+      not_empty(GatewayControlConfig.config_id) -> RejectAlreadyInitialized
+      _ -> ValidateUrlAndParseInstanceId
+    }
+  }
+
+  // ③ 本地守卫判定已初始化，拒绝重复初始化，不再次消费一次性凭证，也不覆盖现有配置。
+  step<exit> RejectAlreadyInitialized in WarpGateway {
+  }
+
+  // ④ 校验绝对 HTTP(S) URL 必须指向 initial-config；非法 URL 拒绝。
+  //    URL 与可选 Bearer 已由 CustomerServiceEngineer 通过 InitializeGatewayViaUrl 提交，
+  //    Bearer 属于协议层 Authorization Header，不写入消息字段，也不得拼入 init_url。
+  step ValidateUrlAndParseInstanceId in WarpGateway {
+    match {
+      contains(InitializeGatewayViaUrl.init_url, "initial-config") -> RequestInitialConfig
+      _ -> RejectInvalidUrl
+    }
+  }
+
+  // ④b 非法初始化 URL：提前退出 flow（拒绝初始化）。
+  step<exit> RejectInvalidUrl in WarpGateway {
+  }
+
+  // ⑤ 未初始化时从既有 GetGatewayInitialConfigFlow 接收初始配置：可选 Bearer 只作为
+  //    Authorization Header 请求 init_url；Center 返回 application/json，
+  //    本步骤按 GatewayInitialConfig 契约校验配置响应，不在 Gateway 侧伪造配置。
+  step RequestInitialConfig in WarpGateway {
+    receive GatewayInitialConfig from GetGatewayInitialConfigFlow
+    next ApplyConfigPersistStateAndReturnSuccess
+  }
+
+  // ⑥ Gateway 应用已接收的 GatewayInitialConfig，并持久化本地控制面配置
+  //    （GatewayControlConfig = 本地已初始化标记，与 ① 守卫闭环）；
+  //    Center 侧 GatewayInstance 生命周期由 Center 的置备/状态上报流程维护。
+  step<stop> ApplyConfigPersistStateAndReturnSuccess in WarpGateway {
+    create GatewayControlConfig {
+      config_id = GatewayInitialConfig.gateway_id
+      gateway_id = GatewayInitialConfig.gateway_id
+      advertise_url = GatewayInitialConfig.control_center_endpoint
+      enrollment_url = GatewayInitialConfig.control_center_endpoint
+      gateway_url = GatewayInitialConfig.control_center_endpoint
+      telemetry_url = GatewayInitialConfig.control_center_endpoint
+      updated_at = "now"
+    }
+  }
+}
+
+flow ReportGatewayStatusFlow {
+  meta {
+    label zh "上报 Gateway 状态"
+    label en "Report Gateway Status Flow"
+    tags "gateway", "status"
+  }
+
+  actor WarpGateway
+
+  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+
+  creates GatewayStatusAccepted
+
+  // 入口：WarpGateway 周期上报运行状态（by 声明 trigger）。
+  step ReportStatus in WarpGateway by ReportGatewayStatus {
+    next AcceptStatusReport
+  }
+
+  // 中心接收并落库状态，返回回执。
+  step<stop> AcceptStatusReport in WarpInsightCenter {
+    create GatewayStatusAccepted {
+      gateway_id = ReportGatewayStatus.gateway_id
+      instance_id = ReportGatewayStatus.instance_id
+      accepted_at = ReportGatewayStatus.reported_at
+    }
+  }
+}
+
+flow ReportAgentStatusFlow {
+  actor WarpGateway
+  trigger ReportAgentStatus
+
+  
+}

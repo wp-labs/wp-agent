@@ -1,0 +1,40 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "nodes": {
+    "module:Control.Agent.Registry": {
+      "x": 121.24219,
+      "y": 593.1914
+    },
+    "module:Control.Agent.Enrollment": {
+      "x": 289.29688,
+      "y": 453.7461
+    },
+    "module:Control.Agent.Registration": {
+      "x": 229.57422,
+      "y": 177.28516
+    },
+    "module:Control.Agent.Command": {
+      "x": 1002.95703,
+      "y": 300.53125
+    },
+    "module:Control.Agent.Credential": {
+      "x": 756.33594,
+      "y": 162.80078
+    },
+    "module:Control.Agent.Identity": {
+      "x": 756.33594,
+      "y": 587.4258
+    },
+    "module:Control.Agent.Status": {
+      "x": 1002.95703,
+      "y": 412.13672
+    }
+  },
+  "sizes": {},
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

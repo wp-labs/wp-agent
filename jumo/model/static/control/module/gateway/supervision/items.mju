@@ -1,0 +1,353 @@
+// Module: GatewaySupervision — WarpGateway 上级聚合
+// 覆盖 WarpGateway 实例接入 WarpInsightCenter 的初始配置获取、状态上报与状态/实例/客户/列表视图实体。
+
+struct GatewayImage {
+  meta {
+    label zh "网关镜像"
+    label en "Gateway Image"
+    summary zh "WarpGateway 部署用的容器镜像（docker pull / docker run 对象），下载后启动容器实例；携带摘要、签名与独立信任锚（发行方签名者 signer_id + 中心签发的 release manifest），安装前按信任锚校验完整性，防投毒镜像与循环信任。"
+    tags "gateway", "deployment", "image"
+  }
+
+  image_ref: String
+  version: String
+  image_digest: String
+  image_signature: String
+  signer_id: String
+  release_manifest_ref: String
+}
+
+struct GatewayInitialConfig {
+  meta {
+    label zh "Gateway 初始配置"
+    label en "Gateway Initial Config"
+    summary zh "WarpGateway 初始化所需的安全连接配置：网关身份、控制中心端点、TLS 信任包、协议版本与注册 Token 引用（策略/遥测待定）。config.toml 即其序列化。"
+    tags "gateway", "config"
+  }
+
+  gateway_id: String
+  instance_id: String?
+  control_center_endpoint: String
+  trust_bundle: ControlCenterTrustBundle?
+  server_tls_required: Bool
+  protocol_version: String
+  enrollment_token_id: String
+}
+
+struct GatewayStatusAccepted {
+  meta {
+    label zh "Gateway 状态已接收"
+    label en "Gateway Status Accepted"
+    tags "gateway", "status"
+  }
+
+  gateway_id: String
+  instance_id: String
+  accepted_at: DateTime
+}
+
+// Gateway 运行态领域事实（注册后的版本/状态/健康/最近上报），非 View DTO。
+struct GatewayRuntimeStatus {
+  meta {
+    label zh "Gateway 运行状态"
+    label en "Gateway Runtime Status"
+    tags "gateway", "status", "runtime"
+  }
+
+  unique gateway_id: String
+  instance_id: String
+  version: String?
+  status: String?
+  health: String?
+  memory_bytes: Int?
+  cpu_percent: Float?
+  last_seen_at: DateTime
+}
+
+variant GatewayInstanceLifecycleState {
+  meta {
+    label zh "Gateway 实例生命周期状态"
+    label en "Gateway Instance Lifecycle State"
+    tags "gateway", "lifecycle", "provisioning"
+  }
+
+  Provisioned
+  Initializing
+  Running
+  Failed
+}
+
+struct GatewayInstance {
+  meta {
+    label zh "Gateway 管理实例"
+    label en "Gateway Instance"
+    tags "gateway", "provisioning"
+  }
+
+  gateway_id: String
+  instance_id: String
+  lifecycle_state: GatewayInstanceLifecycleState
+  created_at: DateTime
+  initialized_at: DateTime?
+}
+
+struct GatewayCustomerBinding {
+  meta {
+    label zh "Gateway 客户绑定"
+    label en "Gateway Customer Binding"
+    tags "gateway", "provisioning", "customer"
+  }
+
+  gateway_id: String
+  customer_id: String
+  status: String
+  bound_at: DateTime
+}
+
+struct GlobalPolicyDispatch {
+  meta {
+    label zh "全局策略下发回执"
+    label en "Global Policy Dispatch"
+    tags "center", "policy"
+  }
+
+  unique dispatch_id: String
+  policy_version: String
+  target_count: Int
+  status: String
+  dispatched_at: DateTime
+}
+
+// ── 网关接入（forGateway：WarpGateway 实例 → WarpInsightCenter） ──
+
+message<command> GetGatewayInitialConfig {
+  instance_id: String
+  requested_at: DateTime
+}
+
+message<command> InitializeGatewayViaUrl {
+  init_url: String
+  requested_at: DateTime
+}
+
+message<command> ReportGatewayStatus {
+  gateway_id: String
+  instance_id: String
+  version: String
+  status: String
+  health: String
+  memory_bytes: Int?
+  cpu_percent: Float?
+  reported_at: DateTime
+}
+
+// ── 安全注册（forGateway：预共享 Token → 身份/凭据签发，参考 Agentd） ──
+
+struct GatewayEnrollmentResult {
+  meta {
+    label zh "网关注册结果"
+    label en "Gateway Enrollment Result"
+    summary zh "WarpGateway 安全注册的回执：签发身份、凭据与初始配置引用。"
+    tags "gateway", "enrollment", "result"
+  }
+
+  status: String
+  gateway_id: String
+  instance_id: String
+  credential_id: String
+  initial_config: String
+}
+
+// 网关容器安装发起命令：客户服务工程师在客户现场启动网关容器时发出，驱动
+// GatewayOnboardingFlow 的 InstallGatewayContainer step。
+message<command> GatewayContainerInstallRequested {
+  gateway_id: String
+  instance_id: String
+  requested_at: DateTime
+}
+
+message<response> GatewayInstallReceipt {
+  gateway_id: String
+  status: String
+  received_at: DateTime
+}
+
+// 网关镜像下载发起命令：客户服务工程师在客户现场拉取网关镜像（docker pull）时发出，驱动
+// GatewayOnboardingFlow 的 DownloadGatewayImage step。
+message<command> GatewayImageDownloadRequested {
+  gateway_id: String
+  instance_id: String
+  requested_at: DateTime
+}
+
+message<response> GatewayImageDownloadReceipt {
+  gateway_id: String
+  status: String
+  received_at: DateTime
+}
+
+message<command> RegisterGateway {
+  enrollment_token: String
+  instance_id: String
+  requested_at: DateTime
+}
+
+message<command> VerifyGatewayCredential {
+  gateway_id: String
+  instance_id: String
+  credential_id: String
+}
+
+message<command> RenewGatewayCredential {
+  gateway_id: String
+  instance_id: String
+  current_credential_id: String
+}
+
+flow RegisterGatewayFlow {
+  meta {
+    label zh "网关注册管理中心"
+    label en "Gateway Registration Flow"
+    summary zh "WarpGateway 持 REGIST_TOKEN 注册：消费注册凭据、防重复、签发独立运行期凭据（RUNTIME_TOKEN），返回注册回执。"
+    tags "gateway", "registration", "enrollment", "secure"
+  }
+
+  actor WarpGateway
+
+  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+
+  creates GatewayEnrollmentTokenValidation
+  creates GatewayIdentity
+  creates GatewayCredentialBundle
+  creates GatewayEnrollmentResult
+
+  // 入口：WarpGateway 持 REGIST_TOKEN 提交注册（by 声明 trigger，省略 flow-level trigger）。
+  step SubmitRegistration in WarpGateway by RegisterGateway {
+    next ValidateEnrollmentToken
+  }
+
+  // 注册校验必须绑定 token 实例归属：按 token_id 命中 GatewayEnrollmentToken，校验其 gateway_id /
+  // instance_id 与请求方一致，且未超期、未耗尽（used_count < max_uses），通过后才进入签发。
+  step ValidateEnrollmentToken in WarpInsightCenter {
+    create GatewayEnrollmentTokenValidation {
+      token_id = RegisterGateway.enrollment_token
+      gateway_id = "gateway-issued"
+      status = "valid"
+      validated_at = RegisterGateway.requested_at
+    }
+    next CheckDuplicateRegistration
+  }
+
+  // 防重复注册：同 gateway_id + instance_id 已注册则拒绝（GatewayIdentity 唯一 gateway_id）。
+  step CheckDuplicateRegistration in WarpInsightCenter {
+    next IssueGatewayIdentity
+  }
+
+  step IssueGatewayIdentity in WarpInsightCenter {
+    create GatewayIdentity {
+      gateway_id = "gateway-issued"
+      instance_id = RegisterGateway.instance_id
+      status = "Active"
+      issued_at = RegisterGateway.requested_at
+    }
+    next IssueGatewayCredential
+  }
+
+  step IssueGatewayCredential in WarpInsightCenter {
+    create GatewayCredentialBundle {
+      credential_id = "credential-issued"
+      gateway_id = "gateway-issued"
+      instance_id = RegisterGateway.instance_id
+      auth_scheme = "bearer"
+      bearer_token = "gateway-credential-secret"
+      issued_at = RegisterGateway.requested_at
+    }
+    next AcceptRegistration
+  }
+
+  step<stop> AcceptRegistration in WarpInsightCenter {
+    create GatewayEnrollmentResult {
+      status = "accepted"
+      gateway_id = "gateway-issued"
+      instance_id = RegisterGateway.instance_id
+      credential_id = "credential-issued"
+      initial_config = "v1"
+    }
+  }
+}
+
+flow VerifyGatewayCredentialFlow {
+  meta {
+    label zh "校验网关通讯凭据"
+    label en "Verify Gateway Credential Flow"
+    summary zh "WarpGateway 访问网关接口前校验 bearer 凭据的有效性。"
+    tags "gateway", "credential", "verify"
+  }
+
+  actor WarpGateway
+  trigger VerifyGatewayCredential
+
+  creates GatewayCredentialVerificationResult
+
+  step<stop> VerifyCredential {
+    create GatewayCredentialVerificationResult {
+      gateway_id = VerifyGatewayCredential.gateway_id
+      credential_id = VerifyGatewayCredential.credential_id
+      status = "valid"
+      verified_at = "now"
+    }
+  }
+}
+
+flow RenewGatewayCredentialFlow {
+  meta {
+    label zh "续期网关通讯凭据"
+    label en "Renew Gateway Credential Flow"
+    summary zh "WarpGateway 用当前凭据申请新的 bearer 凭据，实现凭据定期轮换；旧凭据立即失效。"
+    tags "gateway", "credential", "renewal"
+  }
+
+  actor WarpGateway
+
+  lane WarpInsightCenter for Control.InsightCenterApp.WarpInsightCenter
+
+  creates GatewayCredentialBundle
+
+  // 入口：WarpGateway 持当前 RUNTIME_TOKEN 申请续期（by 声明 trigger）。
+  step RequestRenewal in WarpGateway by RenewGatewayCredential {
+    next IssueRenewedCredential
+  }
+
+  // 中心以当前凭据鉴权后签发新运行期凭据（短 TTL），旧凭据立即失效。
+  step<stop> IssueRenewedCredential in WarpInsightCenter {
+    create GatewayCredentialBundle {
+      credential_id = "credential-renewed"
+      gateway_id = RenewGatewayCredential.gateway_id
+      instance_id = RenewGatewayCredential.instance_id
+      auth_scheme = "bearer"
+      bearer_token = "gateway-credential-renewed"
+      issued_at = "now"
+      expires_at = "2026-08-16T00:00:00Z"
+    }
+  }
+}
+
+verify GatewayRegistrationVerified for flow RegisterGatewayFlow {
+  given {
+    // 与 GatewayOnboardingFlow.CallInitUrl 签发的 enrollment token_id 对齐，贯通「签发→注册消费」。
+    RegisterGateway.enrollment_token = "enroll-regist-001"
+    RegisterGateway.instance_id = "gateway-issued"
+    RegisterGateway.requested_at = "2026-07-04T00:00:00Z"
+  }
+
+  when RegisterGateway
+
+  expect {
+    GatewayEnrollmentTokenValidation.status == "valid"
+    GatewayCredentialBundle.credential_id == "credential-issued"
+    GatewayEnrollmentResult.status == "accepted"
+    // R1：注册身份绑定到请求方实例，防重复/冒名注册。
+    GatewayIdentity.instance_id == "gateway-issued"
+    GatewayIdentity.status == "Active"
+  }
+}

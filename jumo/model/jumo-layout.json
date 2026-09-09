@@ -1,0 +1,1871 @@
+{
+  "diagrams": {
+    "region_nested_v2": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {},
+      "sizes": {
+        "region:System.WarpGateWay.AdminHomePage/System.WarpGateWay.AgentStatusFleetView/System.WarpGateWay.AgentStatusDetailPanel/System.WarpGateWay.AgentRuntimeStatusResult/System.WarpGateWay.AgentInstanceText": {
+          "x": 827.2479,
+          "y": 105.921875
+        },
+        "region:System.WarpGateWay.AdminHomePage/System.WarpGateWay.AgentStatusFleetView/System.WarpGateWay.AgentStatusFilterBar": {
+          "x": 1045.5938,
+          "y": 246.30078
+        },
+        "region:System.WarpGateWay.AdminHomePage/System.WarpGateWay.AgentStatusFleetView/System.WarpGateWay.AgentStatusDetailPanel": {
+          "x": 1014.8375,
+          "y": 652.3086
+        }
+      },
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Agent.Command": {
+      "pan": {
+        "x": 0.0,
+        "y": -110.81847
+      },
+      "nodes": {},
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "events_v2": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "event:Control.ControlCommandsReturned": {
+          "x": 190.98828,
+          "y": 208.17969
+        },
+        "event:Control.ControlLongPollTimedOut": {
+          "x": 181.7461,
+          "y": 569.02344
+        },
+        "event:Control.AgentEnrollmentAccepted": {
+          "x": 1074.5742,
+          "y": 1045.0
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Agent.Identity": {
+      "pan": {
+        "x": 0.0,
+        "y": -1568.5015
+      },
+      "nodes": {},
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "interface_contract_scope_v3:Control.AgentFacingInterface": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "interface:Control.WpAgentOnlineRegistrationInterface": {
+          "x": 413.64062,
+          "y": 356.09766
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "interface_contract_scope_v3:Control.UserFacingInterface": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "interface:Control.WarpGateWayPublicInstallInterface": {
+          "x": 891.3047,
+          "y": 98.72266
+        },
+        "interface:Control.WarpGateWayManagementInterface": {
+          "x": 295.64062,
+          "y": 244.1289
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "static:Control::package_diagram_v1:Control.InsightCenterApp": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "module:Control.InsightCenterApp.AdminFacingInterface": {
+          "x": 182.15234,
+          "y": 473.48828
+        },
+        "module:Control.InsightCenterApp.InsightCenterWeb": {
+          "x": 182.15234,
+          "y": 162.45312
+        },
+        "module:Control.InsightCenterApp.WarpInsightCenter": {
+          "x": 517.28125,
+          "y": 473.48828
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Gateway.Security": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "struct:Control.GatewayCredentialVerificationResult": {
+          "x": 200.0,
+          "y": 409.13672
+        },
+        "struct:Control.GatewayCredentialBundle": {
+          "x": 520.5469,
+          "y": 155.59375
+        },
+        "struct:Control.GatewayEnrollmentAuthProfile": {
+          "x": 200.0,
+          "y": 606.09375
+        },
+        "struct:Control.ControlCenterTrustBundle": {
+          "x": 524.9531,
+          "y": 400.41406
+        },
+        "struct:Control.GatewayEnrollmentToken": {
+          "x": 524.9531,
+          "y": 695.875
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Observed.Snapshot": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "struct:Observed.DiscoveryOrigin": {
+          "x": 235.11328,
+          "y": -32.875
+        },
+        "struct:Observed.DiscoveredResource": {
+          "x": 235.11328,
+          "y": -283.59375
+        },
+        "struct:Observed.DiscoveryCacheMeta": {
+          "x": 889.21484,
+          "y": -283.59375
+        },
+        "struct:Observed.CandidateCollectionTarget": {
+          "x": 235.11328,
+          "y": -514.9375
+        },
+        "struct:Observed.StringKeyValue": {
+          "x": 921.01953,
+          "y": -24.570312
+        },
+        "struct:Observed.DiscoverySnapshotContract": {
+          "x": 539.6133,
+          "y": -32.875
+        },
+        "struct:Observed.DiscoveredTarget": {
+          "x": 539.6133,
+          "y": -292.40234
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.AgentCommandControl": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "struct:Control.AgentControlCommand": {
+          "x": 299.58203,
+          "y": 212.76562
+        },
+        "struct:Control.DispatchReceipt": {
+          "x": 567.8008,
+          "y": 246.21484
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "actor_hierarchy_v2": {
+      "pan": {
+        "x": -7.6376476,
+        "y": -366.46417
+      },
+      "nodes": {
+        "actor:Control.Agentd": {
+          "x": 190.35938,
+          "y": 702.46875
+        },
+        "actor:Control.AdminOperator": {
+          "x": 190.35938,
+          "y": 149.41406
+        },
+        "actor:Control.CustomerServiceEngineer": {
+          "x": 190.35938,
+          "y": 347.19922
+        },
+        "flow:Control.PollControlCommandsFlow": {
+          "x": 972.2617,
+          "y": 521.5469
+        },
+        "flow:Control.VerifyAgentCredentialFlow": {
+          "x": 972.2617,
+          "y": 621.1094
+        },
+        "flow:Control.AdminShowAgentRuntimeStatusFlow": {
+          "x": 905.0,
+          "y": 337.83594
+        },
+        "command:Control.AdminGetAgentOverview": {
+          "x": 571.46875,
+          "y": 149.41406
+        },
+        "flow:Control.AdminGetAgentOverviewFlow": {
+          "x": 905.0,
+          "y": 149.41406
+        },
+        "command:Control.SubmitEnrollmentRequest": {
+          "x": 542.5547,
+          "y": 435.40234
+        },
+        "command:Control.PollControlCommands": {
+          "x": 542.5547,
+          "y": 521.5469
+        },
+        "actor:Control.ExternalIdentitySource": {
+          "x": 542.5547,
+          "y": 967.0781
+        },
+        "command:Control.AdminPauseAgent": {
+          "x": 571.46875,
+          "y": 249.04688
+        },
+        "actor:Control.PlatformMaintenanceEngineer": {
+          "x": 190.35938,
+          "y": 958.08594
+        },
+        "actor:Control.WarpGateway": {
+          "x": 199.82812,
+          "y": 1366.4336
+        },
+        "command:Control.RenewAgentCredential": {
+          "x": 542.5547,
+          "y": 737.9453
+        },
+        "command:Control.AdminUpgradeAgent": {
+          "x": 571.46875,
+          "y": 49.87497
+        },
+        "flow:Control.AgentdRegistrationFlow": {
+          "x": 972.2617,
+          "y": 435.40234
+        },
+        "command:Control.VerifyAgentCredential": {
+          "x": 542.5547,
+          "y": 621.1094
+        },
+        "flow:Control.RenewAgentCredentialFlow": {
+          "x": 972.2617,
+          "y": 727.59375
+        },
+        "flow:Control.AdminUpgradeAgentFlow": {
+          "x": 905.0,
+          "y": 49.87497
+        },
+        "command:Control.AdminShowAgentRuntimeStatus": {
+          "x": 571.46875,
+          "y": 337.83594
+        },
+        "flow:Control.AdminPauseAgentFlow": {
+          "x": 905.0,
+          "y": 249.04688
+        },
+        "actor:Control.PublicVulnerabilityFeed": {
+          "x": 887.85156,
+          "y": 967.0781
+        },
+        "actor:Control.SecurityAnalyst": {
+          "x": 190.35938,
+          "y": 1112.9922
+        },
+        "actor:Control.GatewayOperator": {
+          "x": 190.35938,
+          "y": 521.5469
+        },
+        "actor:Control.OperationsEngineer": {
+          "x": 190.35938,
+          "y": 820.2422
+        },
+        "command:Control.AdminGetAgentInstallCode": {
+          "x": 558.9883,
+          "y": 820.2422
+        },
+        "flow:Control.AdminGetAgentInstallCodeFlow": {
+          "x": 972.2617,
+          "y": 820.2422
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "interface_contract_scope_v3:Control.GatewayApp.FacingInterface": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "interface:Control.WarpInsightCenterGatewayInterface": {
+          "x": 371.28516,
+          "y": 251.54297
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "usecase_v1:System.WarpInsightCenter": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "actor:Control.PlatformMaintenanceEngineer": {
+          "x": 67.58984,
+          "y": 176.11197
+        },
+        "usecase:System.WarpInsightCenter.ViewGatewayStatus": {
+          "x": 572.9922,
+          "y": 562.85156
+        },
+        "usecase:System.WarpInsightCenter.CreateGatewayInstance": {
+          "x": 342.77344,
+          "y": 309.70703
+        },
+        "usecase:System.WarpInsightCenter.PublishWarpGateWay": {
+          "x": 475.09766,
+          "y": 71.44141
+        },
+        "usecase:System.WarpInsightCenter.ApproveUpgradePlan": {
+          "x": 429.82812,
+          "y": 660.6953
+        },
+        "usecase:System.WarpInsightCenter.PublishWarpAgentd": {
+          "x": 758.70703,
+          "y": 103.16016
+        },
+        "usecase:System.WarpInsightCenter.PublishWarpGateway": {
+          "x": 397.65625,
+          "y": 79.08853
+        },
+        "usecase:System.WarpInsightCenter.BindGatewayCustomer": {
+          "x": 582.76953,
+          "y": 365.1328
+        },
+        "actor:Control.WarpGateway": {
+          "x": 1163.0977,
+          "y": 562.85156
+        },
+        "actor:Control.CustomerServiceEngineer": {
+          "x": 103.93359,
+          "y": 602.39923
+        },
+        "usecase:System.WarpInsightCenter.CreateUpgradePlan": {
+          "x": 637.52344,
+          "y": 211.98697
+        },
+        "usecase:System.WarpInsightCenter.GetInitialConfig": {
+          "x": 781.0039,
+          "y": 425.2461
+        },
+        "usecase:System.WarpInsightCenter.ReceiveGatewayStatusReport": {
+          "x": 878.58594,
+          "y": 562.85156
+        }
+      },
+      "sizes": {
+        "system_boundary:System.WarpInsightCenter": {
+          "x": 935.02734,
+          "y": 702.70703
+        }
+      },
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "flow_swimlane_v2:Control.InitializeGatewayViaUrlFlow": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "step:Restart": {
+          "x": 560.7461,
+          "y": 476.73828
+        },
+        "step:Finish": {
+          "x": 560.7461,
+          "y": 605.0625
+        },
+        "create:0:Control.GatewayInitialConfig": {
+          "x": 907.9414,
+          "y": 370.42578
+        },
+        "step:BuildInitialConfig": {
+          "x": 560.7461,
+          "y": 370.6875
+        },
+        "step:ValidateInitUrl": {
+          "x": 560.7461,
+          "y": 242.98828
+        },
+        "step:RejectInitialization": {
+          "x": 942.3867,
+          "y": 274.0
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Enrollment": {
+      "pan": {
+        "x": 0.0,
+        "y": -61.274178
+      },
+      "nodes": {
+        "struct:Control.AgentInstallCode": {
+          "x": 219.46875,
+          "y": 209.92969
+        },
+        "struct:Control.AgentEnrollmentTokenStatus": {
+          "x": 545.21875,
+          "y": 608.0781
+        },
+        "struct:Control.AgentEnrollmentAuthProfile": {
+          "x": 914.52734,
+          "y": 315.28906
+        },
+        "struct:Control.AgentBootstrapBundle": {
+          "x": 503.97656,
+          "y": 209.92969
+        },
+        "struct:Control.AgentEnrollmentToken": {
+          "x": 232.03516,
+          "y": 401.4453
+        },
+        "struct:Control.AgentEnrollmentResultStatus": {
+          "x": 855.59766,
+          "y": 505.66797
+        },
+        "struct:Control.AgentEnrollmentResult": {
+          "x": 516.53516,
+          "y": 436.08203
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.AgentIdentity": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "struct:Control.AgentCredentialBundle": {
+          "x": 531.52734,
+          "y": 153.5
+        },
+        "struct:Control.AgentControlAuthProfile": {
+          "x": 225.70312,
+          "y": 119.87109
+        },
+        "struct:Control.AgentCredentialVerificationResult": {
+          "x": 531.52734,
+          "y": 387.04688
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "flow_swimlane_v4:Control.GatewayOnboardingFlow": {
+      "pan": {
+        "x": -376.94785,
+        "y": -179.63417
+      },
+      "nodes": {
+        "create:2:Control.GatewayStatusAccepted": {
+          "x": 541.8906,
+          "y": 1376.7383
+        },
+        "input:4:Control.GatewayEnrollmentToken": {
+          "x": 917.28516,
+          "y": 1195.457
+        },
+        "step:IssueBootstrapToken": {
+          "x": 542.8828,
+          "y": 288.0
+        },
+        "step:ValidateBootstrapToken": {
+          "x": 541.8906,
+          "y": 752.22656
+        },
+        "input:7:Control.GatewayBootstrapToken": {
+          "x": 279.8828,
+          "y": 969.0
+        },
+        "input:0:Control.GatewayInstance": {
+          "x": 279.8828,
+          "y": 186.0
+        },
+        "input:1:Control.ControlCenterTrustBundle": {
+          "x": 926.21875,
+          "y": 662.85547
+        },
+        "input:5:Control.GatewayCredentialBundle": {
+          "x": 926.21875,
+          "y": 1289.125
+        },
+        "actor:Control.CustomerServiceEngineer": {
+          "x": 1585.7344,
+          "y": 174.46484
+        },
+        "step:InstallGatewayContainer": {
+          "x": 1262.5586,
+          "y": 617.9297
+        },
+        "step:CallInitUrl": {
+          "x": 542.8828,
+          "y": 969.0
+        },
+        "lane:WarpInsightCenter": {
+          "x": 542.8828,
+          "y": 0.0
+        },
+        "input:0:Control.GatewayBootstrapToken": {
+          "x": 926.21875,
+          "y": 583.4297
+        },
+        "input:3:Control.GatewayInitialConfig": {
+          "x": 638.58984,
+          "y": 1148.8242
+        },
+        "create:1:Control.GatewayInitialConfig": {
+          "x": 638.9961,
+          "y": 1082.207
+        },
+        "step:VerifyCenterTls": {
+          "x": 1263.3047,
+          "y": 743.9922
+        },
+        "input:2:Control.GatewayBootstrapToken": {
+          "x": 278.80078,
+          "y": 969.0
+        },
+        "input:1:Control.GatewayBootstrapToken": {
+          "x": 279.8828,
+          "y": 288.0
+        },
+        "step:DownloadGatewayImage": {
+          "x": 1262.3633,
+          "y": 390.0
+        },
+        "create:0:Control.GatewayEnrollmentToken": {
+          "x": 455.5625,
+          "y": 1082.207
+        },
+        "lane:participant:Control.CustomerServiceEngineer": {
+          "x": 1619.3477,
+          "y": 0.0
+        },
+        "step:RevealBootstrapToken": {
+          "x": 542.8828,
+          "y": 390.0
+        },
+        "step:CreateGatewayInstance": {
+          "x": 542.8828,
+          "y": 186.0
+        }
+      },
+      "sizes": {},
+      "scales": {
+        "canvas": 0.5999999
+      },
+      "fills": {},
+      "options": {}
+    },
+    "layer_diagram_v2": {
+      "pan": {
+        "x": -1.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "layer:Domain": {
+          "x": 713.33203,
+          "y": 334.28125
+        },
+        "module:Control.AgentFacingInterface": {
+          "x": 729.2851,
+          "y": 176.09375
+        },
+        "layer:Infra": {
+          "x": 713.33203,
+          "y": 524.1211
+        },
+        "module:Control.UserFacingInterface": {
+          "x": 1110.4062,
+          "y": 173.48047
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {
+        "layer_width": "1186.664"
+      }
+    },
+    "flow_swimlane_v4:Control.AdminCreateGatewayInstanceFlow": {
+      "pan": {
+        "x": -0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "actor:Control.BusinessAdministrator": {
+          "x": 165.3711,
+          "y": 186.0
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "actor_over": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "actor:Control.GatewayOperator": {
+          "x": 585.85547,
+          "y": 250.76562
+        },
+        "actor:Control.Agentd": {
+          "x": 585.85547,
+          "y": 79.74609
+        },
+        "actor:Control.CustomerServiceEngineer": {
+          "x": 220.0,
+          "y": 250.76562
+        },
+        "actor:Control.OperationsEngineer": {
+          "x": 585.85547,
+          "y": 411.83203
+        },
+        "actor:Control.PlatformMaintenanceEngineer": {
+          "x": 220.0,
+          "y": 411.83203
+        },
+        "actor:Control.WarpGateway": {
+          "x": 585.85547,
+          "y": 556.8047
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "interface_contract_scope_v3:Control.InsightCenterApp.AdminFacingInterface": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "interface:Control.GatewayOpsInterface": {
+          "x": 324.89062,
+          "y": 674.71875
+        },
+        "interface:Control.PlatformReleaseInterface": {
+          "x": 913.16797,
+          "y": 784.7422
+        },
+        "interface:Control.GatewayProvisioningInterface": {
+          "x": 913.16797,
+          "y": 169.0664
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "usecase_v1:System.DataPlatform": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "usecase:System.InsightSimulator.SimulateAgentStatusReport": {
+          "x": 451.6953,
+          "y": 106.97656
+        },
+        "usecase:System.InsightSimulator.SimulateActionResultReport": {
+          "x": 492.5039,
+          "y": 335.38672
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "flow_v2:Control.AgentdRegistrationFlow": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {},
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "usecase_v1:System.WpAgent": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "usecase:System.WpAgent.PeriodicallyReportSelfStatus": {
+          "x": 355.95703,
+          "y": 385.2578
+        },
+        "usecase:System.WpAgent.CollectLogs": {
+          "x": 326.54688,
+          "y": 229.52344
+        },
+        "usecase:System.WpAgent.RegisterWithManagementCenter": {
+          "x": 595.9531,
+          "y": 283.76953
+        },
+        "usecase:System.WpAgent.CollectMetrics": {
+          "x": 507.6836,
+          "y": 106.08984
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "flow_v2:Observed.CreateSnapshotFlow": {
+      "pan": {
+        "x": 0.0,
+        "y": -7.1421986
+      },
+      "nodes": {},
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Identity": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "struct:Control.AgentCredentialBundle": {
+          "x": 218.60938,
+          "y": 202.58984
+        },
+        "struct:Control.AgentCredentialVerificationResult": {
+          "x": 201.16016,
+          "y": 458.5586
+        },
+        "struct:Control.AgentIdentityStatus": {
+          "x": 495.0547,
+          "y": 75.65234
+        },
+        "struct:Control.AgentHostProfile": {
+          "x": 787.0156,
+          "y": 403.96484
+        },
+        "struct:Control.AgentControlAuthProfile": {
+          "x": 495.0547,
+          "y": 361.65234
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Agent.Enrollment": {
+      "pan": {
+        "x": 0.0,
+        "y": -212.99998
+      },
+      "nodes": {
+        "struct:Control.AgentBootstrapBundle": {
+          "x": 549.9219,
+          "y": 486.21094
+        },
+        "struct:Control.AgentEnrollmentResult": {
+          "x": 510.54297,
+          "y": 190.44531
+        },
+        "struct:Control.AgentEnrollmentToken": {
+          "x": 206.33984,
+          "y": 431.51562
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "usecase_v1:System.InsightSimulator": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "usecase:System.InsightSimulator.SimulateGetGatewayInitialConfig": {
+          "x": 691.03906,
+          "y": 372.29688
+        },
+        "actor:Control.WarpGateway": {
+          "x": 1061.582,
+          "y": 221.44922
+        },
+        "usecase:System.InsightSimulator.SimulateAgentStatusReport": {
+          "x": 346.47266,
+          "y": 336.75
+        },
+        "usecase:System.InsightSimulator.SimulateGatewayStatusReport": {
+          "x": 706.1836,
+          "y": 122.0
+        },
+        "actor:Control.Agentd": {
+          "x": 62.570312,
+          "y": 192.82422
+        }
+      },
+      "sizes": {
+        "system_boundary:System.InsightSimulator": {
+          "x": 778.33203,
+          "y": 413.3164
+        }
+      },
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Discovery.Config": {
+      "pan": {
+        "x": 0.0,
+        "y": 518.6249
+      },
+      "nodes": {
+        "struct:Discovery.LogsTcpOutputSection": {
+          "x": 532.2461,
+          "y": 1932.2874
+        },
+        "struct:Discovery.ConfigError": {
+          "x": 540.625,
+          "y": 245.68945
+        },
+        "struct:Discovery.LogFileInputSection": {
+          "x": 823.58887,
+          "y": 1069.1953
+        },
+        "struct:Discovery.LogsSection": {
+          "x": 199.34082,
+          "y": 1813.1965
+        },
+        "struct:Discovery.LogsOutputSection": {
+          "x": 505.21973,
+          "y": 1648.8184
+        },
+        "struct:Discovery.PathsSection": {
+          "x": 875.32227,
+          "y": 1772.6038
+        },
+        "struct:Discovery.DiscoverySection": {
+          "x": 517.4121,
+          "y": 404.5254
+        },
+        "struct:Discovery.LogsFileOutputSection": {
+          "x": 199.34082,
+          "y": 1648.8184
+        },
+        "struct:Discovery.AgentSection": {
+          "x": 540.625,
+          "y": 101.13962
+        },
+        "struct:Discovery.ControlPlaneSection": {
+          "x": 220.09766,
+          "y": 327.7002
+        },
+        "struct:Discovery.EnsuredConfigFile": {
+          "x": 228.99414,
+          "y": 1020.125
+        },
+        "struct:Discovery.ExecutionSection": {
+          "x": 532.2461,
+          "y": 1043.2979
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "deployment_v2": {
+      "pan": {
+        "x": -41.999996,
+        "y": -0.0
+      },
+      "nodes": {
+        "node:ManagedServiceHost": {
+          "x": 322.26562,
+          "y": 131.70703
+        },
+        "node:AgentHost2": {
+          "x": 649.73047,
+          "y": 622.7969
+        },
+        "node:WarpGateWayHost": {
+          "x": 322.26562,
+          "y": 555.96875
+        },
+        "node:WarpGatewayHost": {
+          "x": 322.26562,
+          "y": 496.2461
+        },
+        "node:AgentHost1": {
+          "x": 632.3164,
+          "y": 414.53906
+        },
+        "network:ManagedServiceZone": {
+          "x": 493.05273,
+          "y": 104.49609
+        },
+        "node:AgentHost": {
+          "x": 812.0547,
+          "y": 304.875
+        },
+        "network:OnlineBusinessZone": {
+          "x": 494.32227,
+          "y": 481.125
+        }
+      },
+      "sizes": {
+        "network:OnlineBusinessZone": {
+          "x": 744.8242,
+          "y": 464.23438
+        },
+        "network:ManagedServiceZone": {
+          "x": 736.41797,
+          "y": 201.83594
+        }
+      },
+      "scales": {},
+      "fills": {
+        "node:AgentHost1": 5
+      },
+      "options": {}
+    },
+    "usecase_v1:System.WarpGateWay": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "actor:Control.AdminOperator": {
+          "x": 99.34766,
+          "y": 265.48828
+        },
+        "usecase:System.WarpGateWay.ShowAgentRuntimeStatus": {
+          "x": 620.6719,
+          "y": 230.75
+        },
+        "usecase:System.WarpGateWay.UpgradeAgentRemotely": {
+          "x": 339.0,
+          "y": 339.5
+        },
+        "usecase:System.WarpGateWay.GetAgentInstallCode": {
+          "x": 377.29297,
+          "y": 110.91797
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "actor_detail:Control.AdminOperator": {
+      "pan": {
+        "x": 0.0,
+        "y": -123.70648
+      },
+      "nodes": {
+        "flow:Control.AdminLookupAgentRegistryEntryFlow": {
+          "x": 928.1172,
+          "y": 148.0
+        },
+        "flow:Control.AdminQueryAgentCapabilityIndexFlow": {
+          "x": 928.1172,
+          "y": 328.0
+        },
+        "flow:Control.AdminUpgradeAgentFlow": {
+          "x": 938.28516,
+          "y": 507.99997
+        },
+        "flow:Control.AdminShowAgentRuntimeStatusFlow": {
+          "x": 938.28516,
+          "y": 418.0
+        },
+        "actor:Control.AdminOperator": {
+          "x": 168.3125,
+          "y": 372.48438
+        },
+        "flow:Control.AdminPauseAgentFlow": {
+          "x": 928.1172,
+          "y": 238.0
+        },
+        "flow:Control.AdminGetAgentOverviewFlow": {
+          "x": 938.28516,
+          "y": 58.0
+        },
+        "command:Control.AdminUpgradeAgent": {
+          "x": 555.0,
+          "y": 508.0
+        },
+        "flow:Control.DispatchAgentFleetCommandFlow": {
+          "x": 928.1172,
+          "y": 688.0
+        },
+        "flow:Control.ViewGateWayOverviewFlow": {
+          "x": 928.1172,
+          "y": 1138.0
+        },
+        "flow:Control.AdminViewGateWayManagementStateFlow": {
+          "x": 938.28516,
+          "y": 598.0
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "flow_swimlane_v3:Control.GatewayOnboardingFlow": {
+      "pan": {
+        "x": 0.0,
+        "y": -179.77336
+      },
+      "nodes": {
+        "step:ReportGatewayStatus": {
+          "x": 1341.877,
+          "y": 1304.7422
+        },
+        "create:3:Control.GatewayInitialConfig": {
+          "x": 485.98438,
+          "y": 1039.3438
+        },
+        "step:IssueBootstrapToken": {
+          "x": 570.3926,
+          "y": 345.89062
+        },
+        "actor:Control.CustomerServiceEngineer": {
+          "x": 1001.41406,
+          "y": 307.98047
+        },
+        "create:0:Control.GatewayInstance": {
+          "x": 673.3613,
+          "y": 259.9414
+        },
+        "step:GenerateGatewayIdentity": {
+          "x": 1260.0,
+          "y": 625.28516
+        },
+        "input:2:Control.GatewayBootstrapToken": {
+          "x": 1627.1582,
+          "y": 659.84766
+        },
+        "input:0:Control.GatewayBootstrapToken": {
+          "x": 982.28125,
+          "y": 454.78125
+        },
+        "create:4:Control.GatewayStatusAccepted": {
+          "x": 1604.877,
+          "y": 1252.0
+        },
+        "input:3:Control.GatewayBootstrapToken": {
+          "x": 972.1543,
+          "y": 807.34375
+        },
+        "step:ReceiveRuntimeCredential": {
+          "x": 1341.877,
+          "y": 1211.6992
+        },
+        "step:DeriveRegistToken": {
+          "x": 545.125,
+          "y": 971.1133
+        },
+        "create:3:Control.GatewayEnrollmentToken": {
+          "x": 708.78125,
+          "y": 1122.6992
+        },
+        "step:CreateGatewayInstance": {
+          "x": 570.3457,
+          "y": 186.63672
+        },
+        "input:4:Control.GatewayInitialConfig": {
+          "x": 1600.0059,
+          "y": 971.1133
+        },
+        "step:DownloadGatewayImage": {
+          "x": 1341.877,
+          "y": 569.4531
+        },
+        "input:1:Control.GatewayBootstrapToken": {
+          "x": 923.0781,
+          "y": 667.64453
+        },
+        "lane:WarpInsightCenter": {
+          "x": 569.49023,
+          "y": 0.0
+        },
+        "step:ValidateBootstrapToken": {
+          "x": 574.9512,
+          "y": 660.16406
+        },
+        "create:1:Control.GatewayBootstrapToken": {
+          "x": 673.3613,
+          "y": 423.27734
+        },
+        "step:ApplyInitialConfig": {
+          "x": 1341.877,
+          "y": 896.8906
+        },
+        "step:CallInitUrl": {
+          "x": 574.9512,
+          "y": 896.8906
+        },
+        "create:4:Control.GatewayInitialConfig": {
+          "x": 466.91406,
+          "y": 1122.6992
+        },
+        "step:RevealBootstrapToken": {
+          "x": 569.8965,
+          "y": 532.625
+        },
+        "lane:WarpGateway": {
+          "x": 1341.877,
+          "y": 0.0
+        },
+        "step:IssueRuntimeCredential": {
+          "x": 553.15625,
+          "y": 1279.4922
+        },
+        "create:2:Control.GatewayEnrollmentToken": {
+          "x": 659.7793,
+          "y": 1039.3438
+        },
+        "input:1:Control.GatewayImage": {
+          "x": 1627.1582,
+          "y": 569.4531
+        },
+        "step:SubmitRegistration": {
+          "x": 1341.877,
+          "y": 1039.3438
+        },
+        "lane:participant:Control.CustomerServiceEngineer": {
+          "x": 982.28125,
+          "y": 0.0
+        },
+        "actor:Control.BusinessAdministrator": {
+          "x": 164.21094,
+          "y": 186.63672
+        },
+        "step:InstallGatewayContainer": {
+          "x": 1355.9434,
+          "y": 660.16406
+        },
+        "input:3:Control.GatewayEnrollmentToken": {
+          "x": 540.0,
+          "y": 1152.3633
+        },
+        "input:5:Control.GatewayEnrollmentToken": {
+          "x": 1600.1816,
+          "y": 1211.6992
+        },
+        "input:2:Control.GatewayIdentityToken": {
+          "x": 923.0781,
+          "y": 751.8828
+        },
+        "create:5:Control.GatewayCredentialBundle": {
+          "x": 871.83203,
+          "y": 1252.1016
+        },
+        "input:6:Control.GatewayCredentialBundle": {
+          "x": 1604.877,
+          "y": 1150.0
+        }
+      },
+      "sizes": {
+        "lane:WarpInsightCenter": {
+          "x": 408.29297,
+          "y": 0.0
+        },
+        "lane:WarpGateway": {
+          "x": 317.26953,
+          "y": 0.0
+        }
+      },
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "flow_swimlane_v2:Control.AdminCreateGatewayInstanceFlow": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "trigger": {
+          "x": 180.0,
+          "y": 179.0
+        },
+        "step:CreateInstance": {
+          "x": 540.0,
+          "y": 274.0
+        },
+        "create:1:Control.ControlCenterTrustBundle": {
+          "x": 862.5586,
+          "y": 360.42578
+        },
+        "create:0:Control.GatewayInstance": {
+          "x": 846.21094,
+          "y": 273.6875
+        },
+        "create:2:Control.GatewayEnrollmentToken": {
+          "x": 865.16406,
+          "y": 503.5039
+        },
+        "actor": {
+          "x": 180.0,
+          "y": 75.0
+        },
+        "step:IssueEnrollmentToken": {
+          "x": 540.0,
+          "y": 376.0
+        },
+        "step:PrepareConfigFile": {
+          "x": 540.0,
+          "y": 495.625
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Discovery.Probe": {
+      "pan": {
+        "x": 0.0,
+        "y": 1960.303
+      },
+      "nodes": {
+        "struct:Discovery.DiscoveryCacheLoadFailure": {
+          "x": 516.8115,
+          "y": 133.52142
+        },
+        "struct:Discovery.DiscoveryProbeError": {
+          "x": 566.35254,
+          "y": 662.62305
+        },
+        "struct:Discovery.DiscoveryRefreshResult": {
+          "x": 898.0908,
+          "y": 662.623
+        },
+        "struct:Discovery.DiscoveryProbe": {
+          "x": 218.05664,
+          "y": 624.4101
+        },
+        "struct:Discovery.DiscoveryCachePaths": {
+          "x": 800.7422,
+          "y": 133.52142
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "static:Control::package_diagram_v1:Control.Gateway": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "module:Control.GatewayApp.UserFacingInterface": {
+          "x": 612.125,
+          "y": 308.21875
+        },
+        "module:Control.GatewayApp.Application": {
+          "x": 180.32031,
+          "y": 308.21875
+        },
+        "module:Control.Gateway.Identity": {
+          "x": 254.8711,
+          "y": 398.5625
+        },
+        "module:Control.Gateway.Management": {
+          "x": 529.6367,
+          "y": 398.5625
+        },
+        "module:Control.GatewayApp.WebFrontend": {
+          "x": 300.48047,
+          "y": 128.48438
+        },
+        "module:Control.Gateway.InstanceManagement": {
+          "x": 247.39062,
+          "y": 270.33203
+        },
+        "module:Control.Gateway.Supervision": {
+          "x": 521.7617,
+          "y": 270.33203
+        },
+        "module:Control.Gateway.Security": {
+          "x": 832.9492,
+          "y": 398.5625
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "profile_targets_v2": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "target:Global:insight-simulator": {
+          "x": 205.41797,
+          "y": 181.29688
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Discovery.Execute": {
+      "pan": {
+        "x": 0.0,
+        "y": -5094.04
+      },
+      "nodes": {
+        "struct:Discovery.SchedulerRequest": {
+          "x": 537.3242,
+          "y": 3046.374
+        },
+        "struct:Discovery.RuntimeMode": {
+          "x": 537.3242,
+          "y": 2842.4844
+        },
+        "struct:Discovery.SchedulerOutcome": {
+          "x": 208.50586,
+          "y": 3059.0654
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "flow_swimlane_v4:Control.InitializeGatewayViaUrlFlow": {
+      "pan": {
+        "x": -204.52066,
+        "y": -2.0
+      },
+      "nodes": {
+        "create:0:Control.GatewayInitialConfig": {
+          "x": 1025.9414,
+          "y": 395.91797
+        },
+        "step:BuildInitialConfig": {
+          "x": 540.0,
+          "y": 390.0
+        },
+        "step:Finish": {
+          "x": 540.0,
+          "y": 695.3789
+        },
+        "step:RejectAlreadyInitialized": {
+          "x": 1065.3242,
+          "y": 186.0
+        },
+        "step:Restart": {
+          "x": 540.0,
+          "y": 540.375
+        },
+        "actor:Control.CustomerServiceEngineer": {
+          "x": 171.73615,
+          "y": 98.50261
+        },
+        "step:RejectInitialization": {
+          "x": 1065.3242,
+          "y": 288.0
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "static:Control::package_diagram_v1:Control.InsightCenter": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "module:Control.InsightCenter.PlatformRelease": {
+          "x": 395.25,
+          "y": 340.3789
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Gateway.Supervision": {
+      "pan": {
+        "x": 0.0,
+        "y": -1456.7019
+      },
+      "nodes": {
+        "struct:Control.GatewayListView": {
+          "x": 202.07812,
+          "y": 2628.9883
+        },
+        "struct:Control.GatewayEnrollmentTokenValidation": {
+          "x": 521.3633,
+          "y": 1867.2188
+        },
+        "struct:Control.GatewayInstance": {
+          "x": 200.0,
+          "y": 1875.6914
+        },
+        "struct:Control.ControlCenterTrustBundle": {
+          "x": 858.2383,
+          "y": 1569.0859
+        },
+        "struct:Control.GatewayInitialConfig": {
+          "x": 856.625,
+          "y": 1852.1094
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Agent.Registry": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "struct:Control.AgentInitialConfig": {
+          "x": 512.39844,
+          "y": 119.5
+        },
+        "struct:Control.AgentPolicyBinding": {
+          "x": 198.51172,
+          "y": 319.3086
+        },
+        "struct:Control.AgentRegistryEntry": {
+          "x": 520.51953,
+          "y": 319.3086
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Observed.Entity": {
+      "pan": {
+        "x": 0.0,
+        "y": -0.0
+      },
+      "nodes": {
+        "struct:Observed.ObservedIpAddress": {
+          "x": 527.001,
+          "y": 37.80957
+        },
+        "struct:Observed.ProcessSocketOwner": {
+          "x": 534.0117,
+          "y": 1509.0157
+        },
+        "struct:Observed.ObservedNetworkInterface": {
+          "x": 518.65625,
+          "y": 196.83783
+        },
+        "struct:Observed.ContainerRuntimeRoot": {
+          "x": 191.6123,
+          "y": -437.32715
+        },
+        "struct:Observed.OciRuntimeSpec": {
+          "x": 534.0117,
+          "y": 1379.0626
+        },
+        "struct:Observed.OciLinuxSpec": {
+          "x": 534.0117,
+          "y": 1268.4845
+        },
+        "struct:Observed.ObservedProcess": {
+          "x": 518.65625,
+          "y": 355.4052
+        },
+        "struct:Observed.ObservedFileIdentity": {
+          "x": 534.0117,
+          "y": -122.29883
+        },
+        "struct:Observed.DiscoverySourceKind": {
+          "x": 534.0117,
+          "y": -437.32715
+        },
+        "struct:Observed.ObservedContainer": {
+          "x": 534.0117,
+          "y": -310.92578
+        },
+        "struct:Observed.AddressFamily": {
+          "x": 202.27539,
+          "y": -310.92578
+        },
+        "struct:Observed.ObservedServiceEndpoint": {
+          "x": 534.0117,
+          "y": 1137.4803
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "static:Control::package_diagram_v1:Control.Agent": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "module:Control.Agent.Enrollment": {
+          "x": 442.13672,
+          "y": 476.76562
+        },
+        "module:Control.Agent.Credential": {
+          "x": 558.64453,
+          "y": 687.6289
+        },
+        "module:Control.Agent.Status": {
+          "x": 821.40234,
+          "y": 363.16797
+        },
+        "module:Control.AgentApp.FacingInterface": {
+          "x": 158.66406,
+          "y": 114.08594
+        },
+        "module:Control.Agent.Command": {
+          "x": 204.77344,
+          "y": 160.44531
+        },
+        "module:Control.Agent.Registry": {
+          "x": 795.85547,
+          "y": 610.41406
+        },
+        "module:Control.Agent.Registration": {
+          "x": 584.9531,
+          "y": 232.03516
+        },
+        "module:Control.Agent.Identity": {
+          "x": 193.03906,
+          "y": 687.6289
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.AgentdStatusManagement": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "struct:Control.AgentRuntimeStatusView": {
+          "x": 550.0,
+          "y": 416.26172
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "usecase_v1:System.WarpGateway": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "usecase:System.WarpGateway.PauseAgent": {
+          "x": 666.5586,
+          "y": 353.90625
+        },
+        "usecase:System.WarpGateway.InitializeGatewayViaUrl": {
+          "x": 512.7617,
+          "y": 230.67578
+        },
+        "usecase:System.WarpGateway.UpgradeAgentRemotely": {
+          "x": 621.66797,
+          "y": 598.5742
+        },
+        "usecase:System.WarpGateway.ShowAgentRuntimeStatus": {
+          "x": 527.9961,
+          "y": 483.86328
+        },
+        "actor:Control.AdminOperator": {
+          "x": 1122.4023,
+          "y": 353.5664
+        }
+      },
+      "sizes": {
+        "system_boundary:System.WarpGateway": {
+          "x": 716.3125,
+          "y": 657.3867
+        }
+      },
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "actor_detail:Control.CustomerServiceEngineer": {
+      "pan": {
+        "x": 0.0,
+        "y": -51.21497
+      },
+      "nodes": {
+        "flow:Control.GetGatewayInitialConfigFlow": {
+          "x": 921.3008,
+          "y": 688.0
+        },
+        "actor:Control.CustomerServiceEngineer": {
+          "x": 177.54688,
+          "y": 411.9961
+        },
+        "flow:Control.AdminShowGatewayStatusFlow": {
+          "x": 931.6211,
+          "y": 328.0
+        },
+        "flow:Control.AdminBindGatewayCustomerFlow": {
+          "x": 931.6211,
+          "y": 58.0
+        },
+        "flow:Control.AdminCreateGatewayInstanceFlow": {
+          "x": 931.6211,
+          "y": 148.0
+        },
+        "flow:Control.AdminListGatewayStatusFlow": {
+          "x": 931.6211,
+          "y": 238.0
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "actor_detail:Control.Agentd": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "flow:Control.PollControlCommandsFlow": {
+          "x": 905.0,
+          "y": 168.75
+        },
+        "flow:Control.AgentdRegistrationFlow": {
+          "x": 896.96484,
+          "y": 348.75
+        },
+        "flow:Control.RenewAgentCredentialFlow": {
+          "x": 905.0,
+          "y": 258.75
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Control.Protocol": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "struct:Control.AgentUpstreamMessageType": {
+          "x": 160.0,
+          "y": 173.44531
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "structure_graph_v2::module::Discovery.Collect": {
+      "pan": {
+        "x": 0.0,
+        "y": 3650.7566
+      },
+      "nodes": {
+        "struct:Discovery.IfEmptyThen": {
+          "x": 692.82715,
+          "y": 571.01636
+        },
+        "struct:Discovery.FileInputConfig": {
+          "x": 1043.6182,
+          "y": 59.058594
+        },
+        "struct:Discovery.FoldResult": {
+          "x": 1051.748,
+          "y": 335.1748
+        },
+        "struct:Discovery.FileInputProcessor": {
+          "x": 299.6582,
+          "y": 335.1748
+        },
+        "struct:Discovery.MetricsSampleGroup": {
+          "x": 259.1504,
+          "y": 844.2405
+        },
+        "struct:Discovery.MetricsCollectionOutcome": {
+          "x": 1035.669,
+          "y": 974.32837
+        },
+        "struct:Discovery.CollectedReadBatch": {
+          "x": 332.417,
+          "y": 59.058594
+        },
+        "struct:Discovery.MetricsSampleRecord": {
+          "x": 661.83594,
+          "y": 1092.7874
+        },
+        "struct:Discovery.FileRecordSink": {
+          "x": 692.82715,
+          "y": 335.1748
+        },
+        "struct:Discovery.FoldedLine": {
+          "x": 280.53223,
+          "y": 579.3386
+        },
+        "struct:Discovery.MetricsSamplesSnapshot": {
+          "x": 1035.669,
+          "y": 1133.5588
+        },
+        "struct:Discovery.LogCheckpointState": {
+          "x": 1068.4326,
+          "y": 579.3386
+        },
+        "struct:Discovery.MetricsRuntimeSnapshot": {
+          "x": 1035.669,
+          "y": 826.37036
+        },
+        "struct:Discovery.DeliveryOutcome": {
+          "x": 671.43066,
+          "y": 45.117188
+        },
+        "struct:Discovery.MetricsCollectionTargetSample": {
+          "x": 653.6865,
+          "y": 876.2405
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    },
+    "interface_contract_scope_v3:Control.GatewayApp.UserFacingInterface": {
+      "pan": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "nodes": {
+        "interface:Control.WarpGateWayManagementInterface": {
+          "x": 359.57812,
+          "y": 468.28125
+        }
+      },
+      "sizes": {},
+      "scales": {},
+      "fills": {},
+      "options": {}
+    }
+  }
+}

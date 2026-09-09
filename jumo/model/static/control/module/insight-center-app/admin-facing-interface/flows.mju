@@ -1,0 +1,71 @@
+// Flows: AdminFacingInterface — 全局控制中心管理接口编排流程
+//
+// WarpInsightCenter 管理接口（forAdmin）的全部编排流程定义。
+// 与 admin-facing-interface.mju 拆分：接口契约（命令/响应/接口条目）保留在
+// admin-facing-interface.mju，本文件承载该接口的全部流程。流程仍归属
+// module<interface> InsightCenterApp.AdminFacingInterface。
+//
+// interface entry 默认 `{Entry}Flow` 允许不存在（无编排端点合法），因此
+// 本文件只保留有真实 step 的编排 flow；空壳 flow 不保留。
+
+// ── 编排流程 ──
+
+flow AdminCreateGatewayInstanceFlow {
+  // 泳道：责任归属——实例创建与 token 签发均由中心 Application 层编排执行；
+  // BusinessAdministrator 仅作为流程发起者（actor），不执行具体步骤。
+  lane Center for Control.InsightCenterApp.WarpInsightCenter
+
+  meta {
+    label zh "创建网关实例"
+    label en "Create Gateway Instance and Issue Bootstrap Token"
+    summary zh "创建 Gateway 管理实例并签发一次性置备引导 Token（含控制中心信任根）。初始配置内容由 GetGatewayInitialConfigFlow 在网关初始化时即时提供：网关以 BootstrapToken 鉴权，center 签发 RegistToken 生成 config.toml。"
+    tags "gateway", "provisioning", "config"
+  }
+
+  actor BusinessAdministrator
+
+  creates GatewayInstance
+  creates GatewayBootstrapToken
+  creates ControlCenterTrustBundle
+
+  // 入口：业务管理员经中心管理台创建实例（by 声明 trigger，省略 flow-level trigger）。
+  step CreateInstance in Center by AdminCreateGatewayInstance {
+    create GatewayInstance {
+      gateway_id = AdminCreateGatewayInstance.gateway_name
+      instance_id = AdminCreateGatewayInstance.instance_id
+      lifecycle_state = "Provisioned"
+      created_at = "now"
+    }
+    next PrepareTrustBundle
+  }
+
+  // 准备控制中心信任包（control-center.pem 公钥），随注册 Token 交给网关
+  // 校验中心 HTTPS 证书。
+  step PrepareTrustBundle in Center {
+    create ControlCenterTrustBundle {
+      trust_bundle_id = "trust-gw-enroll-001"
+      control_endpoint = "https://center.warpinsight.example"
+      ca_bundle = "control-center.pem"
+      server_name = "center.warpinsight.example"
+      expected_san = "center.warpinsight.example"
+      issued_at = "now"
+      expires_at = "2027-08-12T00:00:00Z"
+    }
+    next IssueBootstrapToken
+  }
+
+  // 签发一次性置备引导 Token（短 TTL）：仅 create 时签发一次，初始化完成后不可再生成。
+  step<stop> IssueBootstrapToken in Center {
+    create GatewayBootstrapToken {
+      token_id = "gw-boot-001"
+      gateway_id = AdminCreateGatewayInstance.gateway_name
+      instance_id = AdminCreateGatewayInstance.instance_id
+      token_hash = "sha256:bootstrap-token-hash"
+      max_uses = 1
+      used_count = 0
+      status = "Active"
+      issued_at = "now"
+      expires_at = "2026-08-16T00:00:00Z"
+    }
+  }
+}

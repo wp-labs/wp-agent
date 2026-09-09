@@ -1,0 +1,25 @@
+{
+  "pan": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "nodes": {
+    "usecase:System.InsightSimulator.SimulateGatewayStatusReport": {
+      "x": 607.9531,
+      "y": 369.91016
+    },
+    "actor:Control.WarpGateway": {
+      "x": 78.859375,
+      "y": 358.26953
+    }
+  },
+  "sizes": {
+    "system_boundary:System.InsightSimulator": {
+      "x": 732.7656,
+      "y": 446.3086
+    }
+  },
+  "scales": {},
+  "fills": {},
+  "options": {}
+}

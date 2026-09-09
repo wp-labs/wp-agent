@@ -1,0 +1,35 @@
+#[copy_raw(name:"raw_msg")]
+package macos_launchd {
+  #[tag(log_desc: "macOS launchd 服务生命周期日志", log_type: "macos_launchd_service")]
+  rule macos_launchd_service {
+    (
+      time:ts,
+      chars:lvl<<,>>,
+      _,
+      chars:msg\0
+    )
+  }
+
+  #[tag(log_desc: "macOS launchd 服务生命周期日志", log_type: "macos_launchd_service")]
+  rule macos_launchd_service_sender {
+    (
+      time:ts,
+      chars:sen,
+      chars:lvl<<,>>,
+      _,
+      chars:msg\0
+    )
+  }
+
+  #[tag(log_desc: "macOS launchd 服务生命周期日志", log_type: "macos_launchd_service")]
+  rule macos_launchd_service_sender2 {
+    (
+      time:ts,
+      chars:sen,
+      chars:sen2,
+      chars:lvl<<,>>,
+      _,
+      chars:msg\0
+    )
+  }
+}

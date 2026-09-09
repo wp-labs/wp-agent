@@ -1,0 +1,6 @@
+2026-09-09 07:53:36+08 MacBook-Pro-2 softwareupdated[686]: SUOSULoginCredentialPolicyManager: No update downloaded and prepared.
+2026-09-09 07:53:36+08 MacBook-Pro-2 loginwindow[601]: +[SUOSULoginCredentialPolicy currentLoginCredentialPolicy] = 0
+2026-09-09 07:53:42+08 MacBook-Pro-2 softwareupdated[686]: SUOSULoginCredentialPolicyManager: No update downloaded and prepared.
+2026-09-09 07:53:42+08 MacBook-Pro-2 loginwindow[601]: +[SUOSULoginCredentialPolicy currentLoginCredentialPolicy] = 0
+2026-09-09 07:56:23+08 MacBook-Pro-2 softwareupdated[686]: SUOSUServiceDaemon: Last lock action fired for Updates Available notification.
+2026-09-09 07:56:23+08 MacBook-Pro-2 softwareupdated[686]: -[SUOSUServiceDaemon _postUpdatesAvailableBSDNotification]: Posting com.apple.SoftwareUpdate.updatesAvailable notification
